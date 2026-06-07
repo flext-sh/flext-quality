@@ -16,7 +16,7 @@ from collections.abc import (
     Mapping,
     MutableSequence,
 )
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Annotated, ClassVar, override
 
@@ -151,7 +151,7 @@ class FlextQualityDocumentationReporter:
     ) -> str:
         """Generate comprehensive quality report."""
         report_data = FlextQualityDocumentationReporter.ReportData(
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=u.now().isoformat(),
             title="FLEXT Quality Documentation Report",
             audit=self.audit_data,
             validation=self.validation_data,
@@ -533,15 +533,15 @@ class FlextQualityDocumentationReporter:
         recent_reports: MutableSequence[
             t.MappingKV[str, t.Quality.DocumentationReportValue | datetime]
         ] = []
-        cutoff_date = datetime.now(UTC) - timedelta(days=days)
+        cutoff_date = u.now() - timedelta(days=days)
         for report_file in report_files:
             if "latest_" in report_file.name:
                 continue
             try:
                 date_str = report_file.name.split("_")[1]
                 report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-                    tzinfo=UTC,
-                )
+                                    tzinfo=u.configured_timezone(),
+                                )
                 if report_date >= cutoff_date:
                     read = u.Cli.files_read_text(report_file)
                     if read.failure:
@@ -582,11 +582,8 @@ class FlextQualityDocumentationReporter:
         for report in reports:
             date_val_raw = report.get("date")
             if date_val_raw is None:
-                date_val_raw = report.get("timestamp", datetime.now(UTC))
-            if isinstance(date_val_raw, datetime):
-                date_val = date_val_raw
-            else:
-                date_val = datetime.now(UTC)
+                date_val_raw = report.get("timestamp", u.now())
+            date_val = date_val_raw if isinstance(date_val_raw, datetime) else u.now()
             if "metrics" in report:
                 metrics = report.get("metrics")
                 if isinstance(metrics, dict):
@@ -639,7 +636,7 @@ class FlextQualityDocumentationReporter:
         md = [
             f"# Documentation Quality Trends - Last {days} Days",
             "",
-            f"Generated: {datetime.now(UTC).isoformat()}",
+            f"Generated: {u.now().isoformat()}",
             "",
         ]
         if isinstance(trend_data, dict) and "error" in trend_data:
@@ -750,7 +747,7 @@ class FlextQualityDocumentationReporter:
                 trend_report = reporter.generate_trend_report(days=30)
                 filename = (
                     self.filename
-                    or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+                    or f"monthly_trends_{u.now().strftime('%Y%m%d')}"
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
@@ -759,7 +756,7 @@ class FlextQualityDocumentationReporter:
                 trend_report = reporter.generate_trend_report(days=7)
                 filename = (
                     self.filename
-                    or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+                    or f"weekly_trends_{u.now().strftime('%Y%m%d')}"
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
@@ -771,7 +768,7 @@ class FlextQualityDocumentationReporter:
                 )
                 filename = (
                     self.filename
-                    or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
+                    or f"quality_report_{u.now().strftime('%Y%m%d_%H%M%S')}"
                 )
                 save_result = reporter.save_report(
                     report_content, filename, self.output_format
