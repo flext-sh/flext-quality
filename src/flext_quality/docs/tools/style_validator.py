@@ -12,7 +12,6 @@ import sys
 from collections.abc import (
     MutableSequence,
 )
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
@@ -715,18 +714,6 @@ Top Issues:
                 report += f"- {suggestion}\n"
 
         return report
-
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
-        """Save style validation report."""
-        Path(output_path).mkdir(exist_ok=True, parents=True)
-
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-        filename = f"style_validation_{timestamp}.json"
-        filepath = Path(output_path) / filename
-
-        filepath.write_bytes(self.RESULTS_ADAPTER.dump_json(self.results, indent=2))
-
-        return filepath
 
 
 def validate_file_style(
