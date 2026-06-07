@@ -47,24 +47,32 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues."""
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                original_content = content
-                content = self._fix_trailing_spaces(content)
-                content = self._normalize_list_indentation(content)
-                content = self._fix_heading_spacing(content)
-                content = self._normalize_emphasis_style(content)
-                if content != original_content:
-                    self._save_with_backup(file_path, content)
-                    self.results.changes_made += 1
-                    self.results.optimizations.append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "formatting_fixes",
-                        "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
-                    })
-                self.results.files_processed += 1
-            except c.EXC_FS_DECODING as e:
-                self.logger.warning("Failed to optimize formatting in file: %s", e)
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
+                self.logger.warning(
+                    "Failed to optimize formatting in file: %s", read.error
+                )
+                continue
+            content = read.value
+            original_content = content
+            content = self._fix_trailing_spaces(content)
+            content = self._normalize_list_indentation(content)
+            content = self._fix_heading_spacing(content)
+            content = self._normalize_emphasis_style(content)
+            if content != original_content:
+                save = self._save_with_backup(file_path, content)
+                if save.failure:
+                    self.logger.warning(
+                        "Failed to optimize formatting in file: %s", save.error
+                    )
+                    continue
+                self.results.changes_made += 1
+                self.results.optimizations.append({
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "formatting_fixes",
+                    "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
+                })
+            self.results.files_processed += 1
         return self.results
 
     def _fix_trailing_spaces(self, content: str) -> str:
@@ -101,26 +109,32 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                original_content = content
-                headings = u.Quality.compile_pattern(
-                    r"^(#{1,6})\\s+(.+)$",
-                    multiline=True,
-                ).findall(content)
-                if len(headings) > c.Quality.THRESHOLD_MIN_HEADINGS_FOR_TOC:
-                    content = self._add_or_update_toc(content)
-                if content != original_content:
-                    self._save_with_backup(file_path, content)
-                    self.results.changes_made += 1
-                    self.results.optimizations.append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "toc_update",
-                        "description": "Added or updated table of contents",
-                    })
-                self.results.files_processed += 1
-            except c.EXC_FS_DECODING as e:
-                self.logger.warning("Failed to update TOC in file: %s", e)
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
+                self.logger.warning("Failed to update TOC in file: %s", read.error)
+                continue
+            content = read.value
+            original_content = content
+            headings = u.Quality.compile_pattern(
+                r"^(#{1,6})\\s+(.+)$",
+                multiline=True,
+            ).findall(content)
+            if len(headings) > c.Quality.THRESHOLD_MIN_HEADINGS_FOR_TOC:
+                content = self._add_or_update_toc(content)
+            if content != original_content:
+                save = self._save_with_backup(file_path, content)
+                if save.failure:
+                    self.logger.warning(
+                        "Failed to update TOC in file: %s", save.error
+                    )
+                    continue
+                self.results.changes_made += 1
+                self.results.optimizations.append({
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "toc_update",
+                    "description": "Added or updated table of contents",
+                })
+            self.results.files_processed += 1
         return self.results
 
     def _find_existing_toc(self, lines: t.StrSequence) -> tuple[int, int]:
@@ -198,26 +212,34 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                original_content = content
-                content = self._add_missing_alt_text(content)
-                content = self._improve_link_text(content)
-                if content != original_content:
-                    self._save_with_backup(file_path, content)
-                    self.results.changes_made += 1
-                    self.results.optimizations.append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "accessibility_enhancement",
-                        "description": "Added alt text and improved link descriptions",
-                    })
-                self.results.files_processed += 1
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s",
                     file_path,
-                    e,
+                    read.error,
                 )
+                continue
+            content = read.value
+            original_content = content
+            content = self._add_missing_alt_text(content)
+            content = self._improve_link_text(content)
+            if content != original_content:
+                save = self._save_with_backup(file_path, content)
+                if save.failure:
+                    self.logger.warning(
+                        "Failed to enhance accessibility in %s: %s",
+                        file_path,
+                        save.error,
+                    )
+                    continue
+                self.results.changes_made += 1
+                self.results.optimizations.append({
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "accessibility_enhancement",
+                    "description": "Added alt text and improved link descriptions",
+                })
+            self.results.files_processed += 1
         return self.results
 
     def _add_missing_alt_text(self, content: str) -> str:
@@ -253,27 +275,35 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability."""
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                original_content = content
-                content = self._break_long_paragraphs(content)
-                content = self._ensure_heading_hierarchy(content)
-                content = self._add_section_breaks(content)
-                if content != original_content:
-                    self._save_with_backup(file_path, content)
-                    self.results.changes_made += 1
-                    self.results.optimizations.append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "structure_optimization",
-                        "description": "Improved paragraph breaks and section organization",
-                    })
-                self.results.files_processed += 1
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s",
+                    "Failed to optimize structure in %s: %s",
                     file_path,
-                    e,
+                    read.error,
                 )
+                continue
+            content = read.value
+            original_content = content
+            content = self._break_long_paragraphs(content)
+            content = self._ensure_heading_hierarchy(content)
+            content = self._add_section_breaks(content)
+            if content != original_content:
+                save = self._save_with_backup(file_path, content)
+                if save.failure:
+                    self.logger.warning(
+                        "Failed to optimize structure in %s: %s",
+                        file_path,
+                        save.error,
+                    )
+                    continue
+                self.results.changes_made += 1
+                self.results.optimizations.append({
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "structure_optimization",
+                    "description": "Improved paragraph breaks and section organization",
+                })
+            self.results.files_processed += 1
         return self.results
 
     def _break_long_paragraphs(self, content: str) -> str:
@@ -305,37 +335,45 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                original_content = content
-                if content.startswith("---"):
-                    content = self._update_frontmatter(content)
-                if not u.Quality.compile_pattern(
-                    r"<!--.*updated.*-->",
-                    ignorecase=True,
-                ).search(content):
-                    lines = content.split("\n")
-                    if lines and lines[0].strip():
-                        lines.insert(
-                            1,
-                            f"<!-- Updated: {datetime.now(UTC).strftime('%Y-%m-%d')} -->",
-                        )
-                        content = "\n".join(lines)
-                if content != original_content:
-                    self._save_with_backup(file_path, content)
-                    self.results.changes_made += 1
-                    self.results.optimizations.append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "metadata_update",
-                        "description": "Updated frontmatter and added modification timestamp",
-                    })
-                self.results.files_processed += 1
-            except c.EXC_FS_FULL_DECODE as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s",
+                    "Failed to update metadata in %s: %s",
                     file_path,
-                    e,
+                    read.error,
                 )
+                continue
+            content = read.value
+            original_content = content
+            if content.startswith("---"):
+                content = self._update_frontmatter(content)
+            if not u.Quality.compile_pattern(
+                r"<!--.*updated.*-->",
+                ignorecase=True,
+            ).search(content):
+                lines = content.split("\n")
+                if lines and lines[0].strip():
+                    lines.insert(
+                        1,
+                        f"<!-- Updated: {datetime.now(UTC).strftime('%Y-%m-%d')} -->",
+                    )
+                    content = "\n".join(lines)
+            if content != original_content:
+                save = self._save_with_backup(file_path, content)
+                if save.failure:
+                    self.logger.warning(
+                        "Failed to update metadata in %s: %s",
+                        file_path,
+                        save.error,
+                    )
+                    continue
+                self.results.changes_made += 1
+                self.results.optimizations.append({
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "metadata_update",
+                    "description": "Updated frontmatter and added modification timestamp",
+                })
+            self.results.files_processed += 1
         return self.results
 
     def _update_frontmatter(self, content: str) -> str:
@@ -372,7 +410,7 @@ class FlextQualityDocumentationOptimizer:
                     pass
         return "\n".join(lines)
 
-    def _save_with_backup(self, file_path: Path, content: str) -> None:
+    def _save_with_backup(self, file_path: Path, content: str) -> p.Result[None]:
         """Save file with optional backup."""
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
@@ -380,7 +418,10 @@ class FlextQualityDocumentationOptimizer:
             self.results.backups_created.append(
                 str(backup_path.relative_to(self.project_root)),
             )
-        _ = file_path.write_text(content, encoding="utf-8")
+        write = u.Cli.atomic_write_text_file(file_path, content)
+        if write.failure:
+            return r[None].fail(write.error or f"cannot write {file_path}")
+        return r[None].ok(None)
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
@@ -391,18 +432,25 @@ class FlextQualityDocumentationOptimizer:
         )
         return report_text
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
-        output_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"optimization_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
-        _ = filepath.write_text(report_content, encoding="utf-8")
+        report_write = u.Cli.atomic_write_text_file(filepath, report_content)
+        if report_write.failure:
+            return r[str].fail(report_write.error or f"cannot write {filepath}")
         latest_file = output_dir / "latest_optimization.json"
-        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
-        return str(filepath)
+        latest_write = u.Cli.json_write(
+            latest_file,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        )
+        if latest_write.failure:
+            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+        return r[str].ok(str(filepath))
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""
@@ -483,7 +531,11 @@ class FlextQualityDocumentationOptimizer:
                 run_any = True
             if not run_any:
                 return r[bool].fail("No optimization selected")
-            optimizer.save_report(self.output)
+            save_result = optimizer.save_report(self.output)
+            if save_result.failure:
+                return r[bool].fail(
+                    save_result.error or "optimization report write failed"
+                )
             return r[bool].ok(value=True)
 
 
