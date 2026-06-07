@@ -147,51 +147,49 @@ class FlextQualityLinkChecker:
         all_links: MutableSequence[FlextQualityLinkChecker.LinkInfo] = []
 
         for file_path in file_paths:
-            try:
-                content = file_path.read_text(encoding="utf-8")
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
+                logger.warning(
+                    "failed_to_extract_links",
+                    file_path=str(file_path),
+                    error=read.error,
+                )
+                continue
+            content = read.value
+            md_links = u.Quality.compile_pattern(
+                r"\[([^\]]+)\]\(([^)]+)\)"
+            ).findall(content)
+            for text, url in md_links:
+                link_type = self._classify_link(url)
+                link_info = FlextQualityLinkChecker.LinkInfo(
+                    url=url,
+                    text=text,
+                    type=link_type,
+                    file=str(file_path),
+                    line=content.count("\n", 0, content.find(f"[{text}]({url})")) + 1,
+                )
+                all_links.append(link_info)
 
-                md_links = u.Quality.compile_pattern(
-                    r"\[([^\]]+)\]\(([^)]+)\)"
-                ).findall(content)
-                for text, url in md_links:
+            ref_links = u.Quality.compile_pattern(
+                r"\[([^\]]+)\]\[([^\]]+)\]"
+            ).findall(content)
+            ref_defs = u.Quality.compile_pattern(
+                r"\[([^\]]+)\]:\s*([^\s]+)"
+            ).findall(content)
+
+            ref_dict: t.StrMapping = dict(ref_defs)
+            for text, ref in ref_links:
+                if ref in ref_dict:
+                    url = ref_dict[ref]
                     link_type = self._classify_link(url)
                     link_info = FlextQualityLinkChecker.LinkInfo(
                         url=url,
                         text=text,
                         type=link_type,
                         file=str(file_path),
-                        line=content.count("\n", 0, content.find(f"[{text}]({url})"))
-                        + 1,
+                        reference=ref,
                     )
                     all_links.append(link_info)
-
-                ref_links = u.Quality.compile_pattern(
-                    r"\[([^\]]+)\]\[([^\]]+)\]"
-                ).findall(content)
-                ref_defs = u.Quality.compile_pattern(
-                    r"\[([^\]]+)\]:\s*([^\s]+)"
-                ).findall(content)
-
-                ref_dict: t.StrMapping = dict(ref_defs)
-                for text, ref in ref_links:
-                    if ref in ref_dict:
-                        url = ref_dict[ref]
-                        link_type = self._classify_link(url)
-                        link_info = FlextQualityLinkChecker.LinkInfo(
-                            url=url,
-                            text=text,
-                            type=link_type,
-                            file=str(file_path),
-                            reference=ref,
-                        )
-                        all_links.append(link_info)
-
-            except c.EXC_FS_DECODING as e:
-                logger.warning(
-                    "failed_to_extract_links",
-                    file_path=str(file_path),
-                    error=str(e),
-                )
 
         return all_links
 
