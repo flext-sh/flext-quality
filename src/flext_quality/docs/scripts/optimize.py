@@ -16,7 +16,6 @@ import shutil
 from collections.abc import (
     MutableSequence,
 )
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import override
 
@@ -38,7 +37,7 @@ class FlextQualityDocumentationOptimizer:
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=u.now().isoformat(),
         )
 
     def optimize_formatting(
@@ -355,7 +354,7 @@ class FlextQualityDocumentationOptimizer:
                 if lines and lines[0].strip():
                     lines.insert(
                         1,
-                        f"<!-- Updated: {datetime.now(UTC).strftime('%Y-%m-%d')} -->",
+                        f"<!-- Updated: {u.now().strftime('%Y-%m-%d')} -->",
                     )
                     content = "\n".join(lines)
             if content != original_content:
@@ -398,7 +397,7 @@ class FlextQualityDocumentationOptimizer:
                         for k, v in (parsed_fm or {}).items()
                         if isinstance(v, t.PRIMITIVES_TYPES)
                     }
-                    metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
+                    metadata["updated"] = u.now().strftime("%Y-%m-%d")
                     new_frontmatter = u.Cli.yaml_dump_str(
                         metadata,
                     ).strip()
@@ -435,7 +434,7 @@ class FlextQualityDocumentationOptimizer:
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"optimization_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
