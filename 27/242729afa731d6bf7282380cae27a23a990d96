@@ -1,0 +1,26 @@
+src/flext_quality/docs/scripts/optimize.py
+  s_9942ef7a89ba9a::t_d0427fdc512c3c 50-75
+  s_9942ef7a89ba9a::t_93bf3a19ebbb28 435,442-444,446-453
+  s_9942ef7a89ba9a::t_9fcaaff3fa5cbd 338-339,341,343,345-376
+  s_9942ef7a89ba9a::t_bffde6e5b584fd 278-279,281,283,285-306
+  s_9942ef7a89ba9a::t_1f57edf4a7f88f 413,421-424
+  s_9942ef7a89ba9a::t_3993136fa27830 112-137
+  s_9942ef7a89ba9a::t_1cb38f819c2f73 534-538
+  s_9942ef7a89ba9a::t_e4434ca35501de 215-216,220,222-242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "27242729afa731d6bf7282380cae27a23a990d96",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
