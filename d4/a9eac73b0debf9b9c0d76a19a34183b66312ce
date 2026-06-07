@@ -1,0 +1,20 @@
+src/flext_quality/rules/engine.py
+  s_9942ef7a89ba9a::t_35844a3d965cd8 133-134,139,144
+  s_9942ef7a89ba9a::t_105b9ee67fd7cf 115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "d4a9eac73b0debf9b9c0d76a19a34183b66312ce",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
