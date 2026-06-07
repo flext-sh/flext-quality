@@ -1,0 +1,20 @@
+src/flext_quality/docs/tools/style_validator.py
+  s_9942ef7a89ba9a::t_265520e7bec4df 19
+  s_9942ef7a89ba9a::t_fbd5b64712680a 231-232,236-244,247-281
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "f6e68e2c016bb55ed4891eccde28c6a9040e5f59",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
