@@ -697,11 +697,13 @@ class FlextQualityDocumentationReporter:
         content: str,
         filename: str,
         report_format: str = "html",
-    ) -> Path:
+    ) -> p.Result[Path]:
         """Save report to file."""
         filepath = self.reports_dir / f"{filename}.{report_format}"
-        _ = filepath.write_text(content, encoding="utf-8")
-        return filepath
+        write = u.Cli.atomic_write_text_file(filepath, content)
+        if write.failure:
+            return r[Path].fail(write.error or f"cannot write {filepath}")
+        return r[Path].ok(filepath)
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation reporting."""
@@ -751,14 +753,18 @@ class FlextQualityDocumentationReporter:
                     self.filename
                     or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
                 )
-                reporter.save_report(trend_report, filename, "md")
+                save_result = reporter.save_report(trend_report, filename, "md")
+                if save_result.failure:
+                    return r[bool].fail(save_result.error or "report write failed")
             elif self.weekly_trends:
                 trend_report = reporter.generate_trend_report(days=7)
                 filename = (
                     self.filename
                     or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
                 )
-                reporter.save_report(trend_report, filename, "md")
+                save_result = reporter.save_report(trend_report, filename, "md")
+                if save_result.failure:
+                    return r[bool].fail(save_result.error or "report write failed")
             else:
                 report_content = reporter.generate_quality_report(
                     self.output_format,
@@ -768,7 +774,11 @@ class FlextQualityDocumentationReporter:
                     self.filename
                     or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
                 )
-                reporter.save_report(report_content, filename, self.output_format)
+                save_result = reporter.save_report(
+                    report_content, filename, self.output_format
+                )
+                if save_result.failure:
+                    return r[bool].fail(save_result.error or "report write failed")
             return r[bool].ok(value=True)
 
 
