@@ -13,7 +13,6 @@ from collections.abc import (
     Mapping,
     MutableSequence,
 )
-from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -94,7 +93,7 @@ class FlextQualityDocumentationNotifier:
         )
         self.load_config(config_path)
         self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=u.now().isoformat(),
         )
 
     def load_config(self, config_path: str) -> None:
@@ -429,7 +428,7 @@ FLEXT Quality Documentation Alert
 
 ---
 This is an automated notification from the FLEXT Quality Documentation Maintenance System.
-Timestamp: {datetime.now(UTC).isoformat()}
+Timestamp: {u.now().isoformat()}
         """.strip()
 
         msg.attach(MIMEText(body, "plain"))
@@ -473,7 +472,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
                     "title": title,
                     "text": message,
                     "footer": "FLEXT Quality Documentation System",
-                    "ts": datetime.now(UTC).timestamp(),
+                    "ts": u.now().timestamp(),
                 },
             ],
         }
@@ -498,7 +497,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
             "title": title,
             "message": message,
             "priority": priority,
-            "timestamp": datetime.now(UTC).isoformat(),
+            "timestamp": u.now().isoformat(),
             "source": "FLEXT Quality Documentation System",
         }
 
