@@ -350,30 +350,3 @@ class FlextQualityConfigManager:
                 },
             },
         )
-
-    def save_config(self, name: str, data: FlextQualityConfigTypes.ConfigData) -> bool:
-        """Save a configuration to file."""
-        try:
-            config_path = self.config_dir / f"{name}.yaml"
-            self.config_dir.mkdir(parents=True, exist_ok=True)
-
-            normalized_data = t.json_dict_adapter().validate_python(data)
-            result = u.Cli.yaml_dump(config_path, normalized_data)
-            if result.failure:
-                return False
-
-            # Clear cache for this settings
-            if name in self._cache:
-                del self._cache[name]
-
-            # Reset specific settings objects
-            if name == "audit_rules":
-                self._audit_rules = None
-            elif name == "style_guide":
-                self._style_guide = None
-            elif name == "validation_config":
-                self._validation_config = None
-
-            return True
-        except (FileNotFoundError, PermissionError, ValueError, OSError):
-            return False
