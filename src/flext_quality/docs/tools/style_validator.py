@@ -16,7 +16,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from flext_quality import c, m, t, u
+from flext_quality import m, t, u
 
 
 class FlextQualityStyleValidator:
@@ -228,50 +228,57 @@ class FlextQualityStyleValidator:
         file_path: Path,
     ) -> FlextQualityStyleValidator.FileResults:
         """Validate a single documentation file."""
-        try:
-            content = file_path.read_text(encoding="utf-8")
-            filename = (file_path.relative_to(file_path.parents[2]),)
-
-            violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
-            issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
-            suggestions_list: MutableSequence[str] = []
-            file_results: FlextQualityStyleValidator.FileResults = (
-                FlextQualityStyleValidator.FileResults.model_validate({
-                    "file": filename,
-                    "violations": violations_list,
-                    "issues": issues_list,
-                    "suggestions": suggestions_list,
-                })
-            )
-
-            file_results.violations.extend(self._check_markdown_formatting(content))
-            file_results.violations.extend(self._check_heading_consistency(content))
-            file_results.violations.extend(self._check_list_consistency(content))
-            file_results.violations.extend(self._check_code_formatting(content))
-            file_results.issues.extend(self._check_accessibility(content))
-            file_results.violations.extend(self._check_line_length(content))
-            file_results.violations.extend(self._check_whitespace(content))
-
-            file_results.suggestions = list(
-                self._generate_suggestions(
-                    file_results.violations,
-                ),
-            )
-
-            self.results.files_checked += 1
-            self.results.style_violations.extend(file_results.violations)
-            self.results.accessibility_issues.extend(file_results.issues)
-            self.results.suggestions.extend(file_results.suggestions)
-
-            return file_results
-
-        except c.EXC_FS_FULL_DECODE:
+        read = u.Cli.files_read_text(file_path)
+        if read.failure:
             return FlextQualityStyleValidator.FileResults(
                 file=str(file_path),
                 violations=[],
-                issues=[],
+                issues=[
+                    FlextQualityStyleValidator.StyleIssue(
+                        type="file-read-error",
+                        line=0,
+                        content="",
+                        message=f"Failed to read file: {read.error}",
+                        severity="error",
+                    ),
+                ],
                 suggestions=[],
             )
+        content = read.value
+        filename = (file_path.relative_to(file_path.parents[2]),)
+
+        violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
+        issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
+        suggestions_list: MutableSequence[str] = []
+        file_results: FlextQualityStyleValidator.FileResults = (
+            FlextQualityStyleValidator.FileResults.model_validate({
+                "file": filename,
+                "violations": violations_list,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
+            })
+        )
+
+        file_results.violations.extend(self._check_markdown_formatting(content))
+        file_results.violations.extend(self._check_heading_consistency(content))
+        file_results.violations.extend(self._check_list_consistency(content))
+        file_results.violations.extend(self._check_code_formatting(content))
+        file_results.issues.extend(self._check_accessibility(content))
+        file_results.violations.extend(self._check_line_length(content))
+        file_results.violations.extend(self._check_whitespace(content))
+
+        file_results.suggestions = list(
+            self._generate_suggestions(
+                file_results.violations,
+            ),
+        )
+
+        self.results.files_checked += 1
+        self.results.style_violations.extend(file_results.violations)
+        self.results.accessibility_issues.extend(file_results.issues)
+        self.results.suggestions.extend(file_results.suggestions)
+
+        return file_results
 
     def _check_markdown_formatting(
         self,
