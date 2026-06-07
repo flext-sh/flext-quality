@@ -126,12 +126,11 @@ class FlextQualityModels(m, web_m):
                 lines = 0
                 words = 0
                 if path.exists():
-                    try:
-                        content = path.read_text(encoding=c.DEFAULT_ENCODING)
+                    read = u.Cli.files_read_text(path)
+                    if read.success:
+                        content = read.value
                         lines = content.count("\n") + 1
                         words = len(content.split())
-                    except c.EXC_OS_DECODING:
-                        pass
                 return cls(
                     path=str(path),
                     size=size,
