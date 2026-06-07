@@ -682,8 +682,13 @@ Found {len(broken_links)} broken links that need attention:
                 )
                 return r[bool].ok(value=True)
             if self.audit_data:
+                audit_read = u.Cli.files_read_text(Path(self.audit_data))
+                if audit_read.failure:
+                    return r[bool].fail(
+                        audit_read.error or f"cannot read {self.audit_data}"
+                    )
                 audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    Path(self.audit_data).read_bytes(),
+                    audit_read.value,
                 )
                 _ = notifier.notify_critical_issues(audit_data)
                 issues_raw = audit_data.get("issues")
@@ -698,14 +703,24 @@ Found {len(broken_links)} broken links that need attention:
                     _ = notifier.notify_broken_links(broken_links)
                 return r[bool].ok(value=True)
             if self.weekly_report:
+                weekly_read = u.Cli.files_read_text(Path(self.weekly_report))
+                if weekly_read.failure:
+                    return r[bool].fail(
+                        weekly_read.error or f"cannot read {self.weekly_report}"
+                    )
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    Path(self.weekly_report).read_bytes(),
+                    weekly_read.value,
                 )
                 _ = notifier.notify_weekly_report(report_data)
                 return r[bool].ok(value=True)
             if self.monthly_report:
+                monthly_read = u.Cli.files_read_text(Path(self.monthly_report))
+                if monthly_read.failure:
+                    return r[bool].fail(
+                        monthly_read.error or f"cannot read {self.monthly_report}"
+                    )
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    Path(self.monthly_report).read_bytes(),
+                    monthly_read.value,
                 )
                 _ = notifier.notify_monthly_report(report_data)
                 return r[bool].ok(value=True)
