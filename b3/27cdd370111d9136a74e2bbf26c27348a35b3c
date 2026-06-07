@@ -1,0 +1,21 @@
+docs/guides/troubleshooting.md
+  s_73cbfc60e45e37::t_53c9e67c9ca696 118,315,397
+docs/getting-started.md
+  s_73cbfc60e45e37::t_53c9e67c9ca696 272,286
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b327cdd370111d9136a74e2bbf26c27348a35b3c",
+  "prompts": {},
+  "sessions": {
+    "s_73cbfc60e45e37": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "80f2c44c-f1f2-49a0-8035-ccac60ac602b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
