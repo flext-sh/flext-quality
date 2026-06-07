@@ -55,69 +55,70 @@ class FlextQualityLinkValidator:
         all_links: MutableSequence[m.Quality.LinkRecord] = []
         for file_path in doc_files:
             file_rel_path = str(file_path)
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                link_pattern = "\\[([^\\]]+)\\]\\(([^)]+)\\)"
-                matches = u.Quality.compile_pattern(link_pattern).findall(content)
-                for text, url in matches:
-                    link_type = self._classify_link(url)
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=text,
-                            url=url,
-                            type=link_type,
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content,
-                                f"[{text}]({url})",
-                            ),
-                        ),
-                    )
-                html_link_pattern = (
-                    "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
-                )
-                html_matches = u.Quality.compile_pattern(
-                    html_link_pattern,
-                    ignorecase=True,
-                ).findall(content)
-                for url, text in html_matches:
-                    link_type = self._classify_link(url)
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=text.strip(),
-                            url=url,
-                            type=link_type,
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content,
-                                f'href="{url}"',
-                            ),
-                        ),
-                    )
-                image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-                image_matches = u.Quality.compile_pattern(image_pattern).findall(
-                    content
-                )
-                for alt_text, src in image_matches:
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=alt_text,
-                            url=src,
-                            type="image",
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content,
-                                f"![{alt_text}]({src})",
-                            ),
-                        ),
-                    )
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.errors.append(
                     m.Quality.LinkCheckResult(
                         type="file_read_error",
                         file=file_rel_path,
-                        error=str(e),
+                        error=read.error,
+                    ),
+                )
+                continue
+            content = read.value
+            file_rel_path = str(file_path.relative_to(file_path.parents[2]))
+            link_pattern = "\\[([^\\]]+)\\]\\(([^)]+)\\)"
+            matches = u.Quality.compile_pattern(link_pattern).findall(content)
+            for text, url in matches:
+                link_type = self._classify_link(url)
+                all_links.append(
+                    m.Quality.LinkRecord(
+                        text=text,
+                        url=url,
+                        type=link_type,
+                        file=file_rel_path,
+                        line_number=self._find_line_number(
+                            content,
+                            f"[{text}]({url})",
+                        ),
+                    ),
+                )
+            html_link_pattern = (
+                "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
+            )
+            html_matches = u.Quality.compile_pattern(
+                html_link_pattern,
+                ignorecase=True,
+            ).findall(content)
+            for url, text in html_matches:
+                link_type = self._classify_link(url)
+                all_links.append(
+                    m.Quality.LinkRecord(
+                        text=text.strip(),
+                        url=url,
+                        type=link_type,
+                        file=file_rel_path,
+                        line_number=self._find_line_number(
+                            content,
+                            f'href="{url}"',
+                        ),
+                    ),
+                )
+            image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
+            image_matches = u.Quality.compile_pattern(image_pattern).findall(
+                content
+            )
+            for alt_text, src in image_matches:
+                all_links.append(
+                    m.Quality.LinkRecord(
+                        text=alt_text,
+                        url=src,
+                        type="image",
+                        file=file_rel_path,
+                        line_number=self._find_line_number(
+                            content,
+                            f"![{alt_text}]({src})",
+                        ),
                     ),
                 )
         return all_links
@@ -380,27 +381,28 @@ class FlextQualityLinkValidator:
         file_anchors: MutableMapping[str, set[str]] = {}
         for file_path in doc_files:
             file_rel_path = str(file_path)
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                headings = u.Quality.compile_pattern(
-                    r"^#{1,6}\\s+(.+)$",
-                    multiline=True,
-                ).findall(content)
-                anchors = [self._heading_to_anchor(heading) for heading in headings]
-                explicit_anchors = u.Quality.compile_pattern(
-                    r"<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>",
-                ).findall(content)
-                anchors.extend(explicit_anchors)
-                file_anchors[file_rel_path] = set(anchors)
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.warnings_list.append(
                     m.Quality.LinkCheckResult(
                         type="anchor_index_error",
                         file=file_rel_path,
-                        warning=f"Could not build anchor index: {e!s}",
+                        warning=f"Could not build anchor index: {read.error}",
                     ),
                 )
+                continue
+            content = read.value
+            file_rel_path = str(file_path.relative_to(file_path.parents[2]))
+            headings = u.Quality.compile_pattern(
+                r"^#{1,6}\\s+(.+)$",
+                multiline=True,
+            ).findall(content)
+            anchors = [self._heading_to_anchor(heading) for heading in headings]
+            explicit_anchors = u.Quality.compile_pattern(
+                r"<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>",
+            ).findall(content)
+            anchors.extend(explicit_anchors)
+            file_anchors[file_rel_path] = set(anchors)
         for link in anchor_links:
             anchor = link.url[1:]
             link_file = link.file
@@ -471,18 +473,27 @@ class FlextQualityLinkValidator:
         )
         return report_text
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
+    def save_report(
+        self, output_path: str = "docs/maintenance/reports/"
+    ) -> p.Result[Path]:
         """Save validation report."""
         output_dir = Path(output_path)
-        output_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"validation_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
-        _ = filepath.write_text(report_content, encoding="utf-8")
+        report_write = u.Cli.atomic_write_text_file(filepath, report_content)
+        if report_write.failure:
+            return r[Path].fail(report_write.error or f"cannot write {filepath}")
         latest_file = output_dir / "latest_validation.json"
-        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
-        return filepath
+        latest_write = u.Cli.json_write(
+            latest_file,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        )
+        if latest_write.failure:
+            return r[Path].fail(latest_write.error or f"cannot write {latest_file}")
+        return r[Path].ok(filepath)
 
 
 class FlextQualityContentValidator:
@@ -504,24 +515,25 @@ class FlextQualityContentValidator:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                issues = self._check_markdown_issues(content)
-                if issues:
-                    self.results.content_issues.extend([
-                        issue.model_copy(update={"file": file_rel_path})
-                        for issue in issues
-                    ])
-                self.results.files_checked += 1
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.content_issues.append(
                     m.Quality.ContentIssue(
                         type="syntax_validation_error",
                         file=file_rel_path,
-                        error=str(e),
+                        error=read.error,
                     ),
                 )
+                continue
+            content = read.value
+            file_rel_path = str(file_path.relative_to(file_path.parents[2]))
+            issues = self._check_markdown_issues(content)
+            if issues:
+                self.results.content_issues.extend([
+                    issue.model_copy(update={"file": file_rel_path})
+                    for issue in issues
+                ])
+            self.results.files_checked += 1
         return self.results
 
     def _check_markdown_issues(
@@ -568,37 +580,38 @@ class FlextQualityContentValidator:
         """Check content quality metrics."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                metrics = self._calculate_content_metrics(content)
-                if metrics.word_count < 50:
-                    self.results.content_issues.append(
-                        m.Quality.ContentIssue(
-                            type="insufficient_content",
-                            file=file_rel_path,
-                            word_count=metrics.word_count,
-                            warning="Document appears to be too short",
-                        ),
-                    )
-                if metrics.readability_score < 60:
-                    self.results.content_issues.append(
-                        m.Quality.ContentIssue(
-                            type="readability_issue",
-                            file=file_rel_path,
-                            readability_score=metrics.readability_score,
-                            warning="Content may be difficult to read",
-                        ),
-                    )
-                self.results.files_checked += 1
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.content_issues.append(
                     m.Quality.ContentIssue(
                         type="quality_analysis_error",
                         file=file_rel_path,
-                        error=str(e),
+                        error=read.error,
                     ),
                 )
+                continue
+            content = read.value
+            file_rel_path = str(file_path.relative_to(file_path.parents[2]))
+            metrics = self._calculate_content_metrics(content)
+            if metrics.word_count < 50:
+                self.results.content_issues.append(
+                    m.Quality.ContentIssue(
+                        type="insufficient_content",
+                        file=file_rel_path,
+                        word_count=metrics.word_count,
+                        warning="Document appears to be too short",
+                    ),
+                )
+            if metrics.readability_score < 60:
+                self.results.content_issues.append(
+                    m.Quality.ContentIssue(
+                        type="readability_issue",
+                        file=file_rel_path,
+                        readability_score=metrics.readability_score,
+                        warning="Content may be difficult to read",
+                    ),
+                )
+            self.results.files_checked += 1
         return self.results
 
     def _calculate_content_metrics(self, content: str) -> m.Quality.ContentMetrics:
@@ -760,7 +773,11 @@ class FlextQualityDocumentationValidator:
             link_errors = link_validator.results.errors
             content_issues = content_validator.results.content_issues
             total_errors = len(link_errors) + len(content_issues)
-            _ = link_validator.save_report(self.output)
+            save_result = link_validator.save_report(self.output)
+            if save_result.failure:
+                return r[bool].fail(
+                    save_result.error or "validation report write failed"
+                )
             if total_errors > 0:
                 return r[bool].fail(f"Validation found {total_errors} errors")
             return r[bool].ok(value=True)
