@@ -1,0 +1,24 @@
+src/flext_quality/docs/scripts/audit.py
+  s_9942ef7a89ba9a::t_c31b7f58afc547 779,786-788,790-797
+  s_9942ef7a89ba9a::t_8fe933f7ec9dba 332-333,338-366,368-377
+  s_9942ef7a89ba9a::t_cbb6a948cff61c 463-487,489,492,494-500
+  s_9942ef7a89ba9a::t_c84612221273e7 194-203
+  s_9942ef7a89ba9a::t_a175249dc30e0a 263-264,269,271-309
+  s_9942ef7a89ba9a::t_73450632747a0e 851-855
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "8d4359af3ca2a0fb7b69fa72d0e909c6d889f34e",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
