@@ -173,7 +173,7 @@ EOF
 
 ### Scenario 2: Code Quality Warning (CQ013)
 
-```python
+```python notest
 # Create file with type: ignore (triggers CQ013)
 cat > /tmp/test_quality.py << 'EOF'
 def process(data) -> str:

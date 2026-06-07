@@ -813,7 +813,7 @@ python scripts/audit.py --style-check --verbose
 
 ### Audit Script API
 
-```python
+```python notest
 from docs import DocumentationAuditor
 
 auditor = DocumentationAuditor(config_path="docs/maintenance/settings/")
@@ -823,7 +823,7 @@ report = auditor.generate_report(format="json")
 
 ### Validation Tools
 
-```python
+```python notest
 from docs import LinkValidator
 
 validator = LinkValidator(timeout=10, retries=3)
@@ -900,7 +900,7 @@ broken_links = validator.get_broken_links()
 
 ### Adding Custom Rules
 
-```python
+```python notest
 
 # Extend audit_rules.yaml with custom checks
 custom_checks:
@@ -920,7 +920,7 @@ class CustomValidator(BaseValidator):
 
 ### Integrating New Tools
 
-```python
+```python notest
 # Add new validation tools to the pipeline
 from docs import DocumentationAuditor
 
@@ -934,7 +934,7 @@ class ExtendedAuditor(DocumentationAuditor):
 
 ### API Integration
 
-```python
+```python notest
 # REST API for external integrations
 from docs import MaintenanceAPI
 

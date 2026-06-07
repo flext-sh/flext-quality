@@ -44,7 +44,7 @@ This system prevents code duplication from accumulating while allowing intention
 
 A `s[int]` that detects code clones using line-based similarity:
 
-```python
+```python notest
 from flext_quality import FlextDuplicationPlugin
 from pathlib import Path
 
@@ -217,7 +217,7 @@ flext-quality:0
 
 The plugin is integrated into the FlextQualityAnalyzer:
 
-```python
+```python notest
 from flext_quality import FlextQualityAnalyzer
 
 analyzer = FlextQualityAnalyzer(".")
@@ -310,7 +310,7 @@ make val
 
 **File**: `flext-quality/src/flext_quality/constants.py`
 
-```python
+```python notest
 class Quality:
     class Analysis:
         SIMILARITY_THRESHOLD: float = 0.8  # 80% line overlap

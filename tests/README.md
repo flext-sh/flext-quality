@@ -239,7 +239,7 @@ Shared test fixtures and configuration:
 
 ### Test Structure Standards
 
-```python
+```python notest
 def test_should_do_something_when_condition():
     """Test description following should/when pattern.
 

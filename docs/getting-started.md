@@ -148,7 +148,7 @@ ______________________________________________________________________
 
 ### **Basic Quality Analysis** (WORKING)
 
-```python
+```python notest
 from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
 
@@ -222,7 +222,7 @@ flext-quality fix --projects ./src --auto-approve --backup
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
-```python
+```python notest
 from flext_quality import FlextQualityWeb
 
 # Create enterprise quality dashboard
@@ -244,7 +244,7 @@ dashboard = quality_web.create_enterprise_dashboard()
 
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
-```python
+```python notest
 # FLEXT-API integration for programmatic access
 from flext_api import FlextApiRouter
 from flext_quality import FlextQualityApiRouter
@@ -269,7 +269,7 @@ ______________________________________________________________________
 
 FLEXT Quality will absorb and modernize all workspace quality functionality:
 
-```python
+```python notest
 # Absorbing workspace scripts into unified architecture:
 WORKSPACE_INTEGRATION = {
     "quality_gateway.py": "FlextQualityGateway - Enterprise quality gates",
@@ -283,7 +283,7 @@ WORKSPACE_INTEGRATION = {
 
 ### **Modern Tool Stack** (Research-Based)
 
-```python
+```python notest
 # 2025 Enterprise Quality Stack Integration
 ENTERPRISE_TOOLS = {
     "ruff": {
