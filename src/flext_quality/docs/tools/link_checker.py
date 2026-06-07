@@ -15,7 +15,6 @@ from collections.abc import (
     MutableSequence,
 )
 from concurrent.futures import ThreadPoolExecutor
-from datetime import UTC, datetime
 from typing import ClassVar
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
@@ -583,7 +582,7 @@ Broken Links:
         output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
         """Save validation report."""
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"link_validation_{timestamp}.json"
         filepath = pathlib.Path(output_path) / filename
         _ = u.Cli.json_write(
