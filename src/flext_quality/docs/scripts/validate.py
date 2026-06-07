@@ -17,7 +17,6 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import override
 
@@ -44,7 +43,7 @@ class FlextQualityLinkValidator:
         self.max_workers = max_workers
         self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
         self.results: m.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=u.now().isoformat(),
         )
 
     def find_all_links(
@@ -478,7 +477,7 @@ class FlextQualityLinkValidator:
     ) -> p.Result[Path]:
         """Save validation report."""
         output_dir = Path(output_path)
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"validation_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
@@ -504,7 +503,7 @@ class FlextQualityContentValidator:
         super().__init__()
         self.results: m.Quality.ContentValidatorResults = (
             m.Quality.ContentValidatorResults(
-                timestamp=datetime.now(UTC).isoformat(),
+                timestamp=u.now().isoformat(),
             )
         )
 
