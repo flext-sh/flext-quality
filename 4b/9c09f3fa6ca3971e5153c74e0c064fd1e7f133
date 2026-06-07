@@ -1,0 +1,19 @@
+src/flext_quality/docs/tools/link_checker.py
+  s_9942ef7a89ba9a::t_47ff34b3a6e4d2 589-593
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "4b9c09f3fa6ca3971e5153c74e0c064fd1e7f133",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
