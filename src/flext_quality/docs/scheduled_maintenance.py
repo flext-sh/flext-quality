@@ -14,7 +14,7 @@ import time
 from collections.abc import (
     Callable,
 )
-from datetime import UTC, datetime
+from datetime import datetime
 from pathlib import Path
 from typing import Annotated, ClassVar, override
 
@@ -104,7 +104,7 @@ class FlextQualityScheduledMaintenance:
 
         # Initialize results tracking
         self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
-            start_time=datetime.now(UTC).isoformat(),
+            start_time=u.now().isoformat(),
         )
 
     def load_config(self, config_path: str | None) -> None:
@@ -711,7 +711,7 @@ class FlextQualityScheduledMaintenance:
 
     def save_results(self) -> None:
         """Save maintenance results to file."""
-        self.results.end_time = datetime.now(UTC).isoformat()
+        self.results.end_time = u.now().isoformat()
         self.results.duration_seconds = int(
             (
                 datetime.fromisoformat(self.results.end_time)
@@ -721,7 +721,7 @@ class FlextQualityScheduledMaintenance:
 
         results_file = (
             self.reports_dir
-            / f"maintenance_results_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
+            / f"maintenance_results_{u.now().strftime('%Y%m%d_%H%M%S')}.json"
         )
 
         _ = u.Cli.json_write(
