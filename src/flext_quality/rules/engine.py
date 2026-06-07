@@ -112,7 +112,7 @@ class FlextQualityRulesEngine:
         """Get Python files from path."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
-        return list(path.rglob("*.py"))
+        return list(u.Infra.iter_matching_files(path, includes=["*.py"]))
 
     def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity."""
@@ -130,18 +130,18 @@ class FlextQualityRulesEngine:
     ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules."""
         validation_context = t.json_dict_adapter().validate_python(context or {})
-        try:
-            content = file_path.read_text(encoding="utf-8")
-        except c.EXC_BROAD_IO_TYPE as e:
+        read = u.Cli.files_read_text(file_path)
+        if read.failure:
             return [
                 {
                     "rule": "file-read-error",
                     "file": str(file_path),
-                    "message": f"Failed to read file: {e}",
+                    "message": f"Failed to read file: {read.error}",
                     "severity": c.Quality.Severity.ERROR,
                     "context": validation_context,
                 },
             ]
+        content = read.value
         violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
