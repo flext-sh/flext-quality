@@ -724,10 +724,11 @@ class FlextQualityScheduledMaintenance:
             / f"maintenance_results_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
         )
 
-        Path(results_file).write_text(
-            self.results.model_dump_json(indent=2),
-            encoding="utf-8",
-        )
+        _ = u.Cli.json_write(
+            results_file,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        ).unwrap()
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
