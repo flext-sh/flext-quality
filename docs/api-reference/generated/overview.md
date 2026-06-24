@@ -9,7 +9,7 @@
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: _none_
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextQualityLinkValidator`, `FlextQualityBaseHook`, `get_server`, `FlextQualityStyleValidator`, `FlextQualityConfigTypes`, `FlextQualityClaudeContextClient`, `FlextQualitySettings`, `FlextQuality`, `main`, `FlextQualityDocumentationReporter` (+27 more)
+- Public symbol exports: `FlextQualityConfigTypes`, `FlextQualityValidators`, `FlextQualityConfigManager`, `FlextQualityRulesEngine`, `FlextQualityStyleGuide`, `quality`, `FlextQualityValidationSettings`, `FlextQualitySettings`, `FlextQualityDocumentationAuditor`, `FlextQualityDocumentationReporter` (+27 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `29`
 
