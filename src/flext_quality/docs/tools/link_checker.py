@@ -155,9 +155,9 @@ class FlextQualityLinkChecker:
                 )
                 continue
             content = read.value
-            md_links = u.Quality.compile_pattern(
-                r"\[([^\]]+)\]\(([^)]+)\)"
-            ).findall(content)
+            md_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\(([^)]+)\)").findall(
+                content
+            )
             for text, url in md_links:
                 link_type = self._classify_link(url)
                 link_info = FlextQualityLinkChecker.LinkInfo(
@@ -169,12 +169,12 @@ class FlextQualityLinkChecker:
                 )
                 all_links.append(link_info)
 
-            ref_links = u.Quality.compile_pattern(
-                r"\[([^\]]+)\]\[([^\]]+)\]"
-            ).findall(content)
-            ref_defs = u.Quality.compile_pattern(
-                r"\[([^\]]+)\]:\s*([^\s]+)"
-            ).findall(content)
+            ref_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\[([^\]]+)\]").findall(
+                content
+            )
+            ref_defs = u.Quality.compile_pattern(r"\[([^\]]+)\]:\s*([^\s]+)").findall(
+                content
+            )
 
             ref_dict: t.StrMapping = dict(ref_defs)
             for text, ref in ref_links:

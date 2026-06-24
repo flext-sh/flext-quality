@@ -82,9 +82,7 @@ class FlextQualityLinkValidator:
                         ),
                     ),
                 )
-            html_link_pattern = (
-                "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
-            )
+            html_link_pattern = "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
             html_matches = u.Quality.compile_pattern(
                 html_link_pattern,
                 ignorecase=True,
@@ -104,9 +102,7 @@ class FlextQualityLinkValidator:
                     ),
                 )
             image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-            image_matches = u.Quality.compile_pattern(image_pattern).findall(
-                content
-            )
+            image_matches = u.Quality.compile_pattern(image_pattern).findall(content)
             for alt_text, src in image_matches:
                 all_links.append(
                     m.Quality.LinkRecord(
@@ -529,8 +525,7 @@ class FlextQualityContentValidator:
             issues = self._check_markdown_issues(content)
             if issues:
                 self.results.content_issues.extend([
-                    issue.model_copy(update={"file": file_rel_path})
-                    for issue in issues
+                    issue.model_copy(update={"file": file_rel_path}) for issue in issues
                 ])
             self.results.files_checked += 1
         return self.results

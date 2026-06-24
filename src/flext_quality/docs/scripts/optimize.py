@@ -123,9 +123,7 @@ class FlextQualityDocumentationOptimizer:
             if content != original_content:
                 save = self._save_with_backup(file_path, content)
                 if save.failure:
-                    self.logger.warning(
-                        "Failed to update TOC in file: %s", save.error
-                    )
+                    self.logger.warning("Failed to update TOC in file: %s", save.error)
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
@@ -431,7 +429,9 @@ class FlextQualityDocumentationOptimizer:
         )
         return report_text
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> p.Result[str]:
+    def save_report(
+        self, output_path: str = "docs/maintenance/reports/"
+    ) -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")

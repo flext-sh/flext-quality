@@ -540,8 +540,8 @@ class FlextQualityDocumentationReporter:
             try:
                 date_str = report_file.name.split("_")[1]
                 report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-                                    tzinfo=u.configured_timezone(),
-                                )
+                    tzinfo=u.configured_timezone(),
+                )
                 if report_date >= cutoff_date:
                     read = u.Cli.files_read_text(report_file)
                     if read.failure:
@@ -746,8 +746,7 @@ class FlextQualityDocumentationReporter:
             if self.monthly_trends:
                 trend_report = reporter.generate_trend_report(days=30)
                 filename = (
-                    self.filename
-                    or f"monthly_trends_{u.now().strftime('%Y%m%d')}"
+                    self.filename or f"monthly_trends_{u.now().strftime('%Y%m%d')}"
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
@@ -755,8 +754,7 @@ class FlextQualityDocumentationReporter:
             elif self.weekly_trends:
                 trend_report = reporter.generate_trend_report(days=7)
                 filename = (
-                    self.filename
-                    or f"weekly_trends_{u.now().strftime('%Y%m%d')}"
+                    self.filename or f"weekly_trends_{u.now().strftime('%Y%m%d')}"
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:

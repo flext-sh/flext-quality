@@ -111,9 +111,7 @@ class FlextQualityDocumentationDashboard:
                 "status": f"Error: {read.error}",
             }
         try:
-            data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                read.value
-            )
+            data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
             metrics_raw = data.get("metrics")
             metrics: t.JsonMapping = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
@@ -172,8 +170,8 @@ class FlextQualityDocumentationDashboard:
                     " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                                    tzinfo=u.configured_timezone(),
-                                )
+                    tzinfo=u.configured_timezone(),
+                )
 
                 if report_date >= cutoff_date:
                     read = u.Cli.files_read_text(report_file)
@@ -238,8 +236,8 @@ class FlextQualityDocumentationDashboard:
                     " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                                    tzinfo=u.configured_timezone(),
-                                )
+                    tzinfo=u.configured_timezone(),
+                )
 
                 read = u.Cli.files_read_text(report_file)
                 if read.failure:

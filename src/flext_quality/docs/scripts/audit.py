@@ -353,8 +353,7 @@ class FlextQualityDocumentationAuditor:
                 severity = (
                     "high"
                     if any(
-                        i["type"] == "missing_alt_text"
-                        for i in accessibility_issues
+                        i["type"] == "missing_alt_text" for i in accessibility_issues
                     )
                     else "medium"
                 )
