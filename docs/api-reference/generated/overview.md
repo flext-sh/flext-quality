@@ -3,15 +3,15 @@
 # flext-quality API Overview
 
 - Package: `flext_quality`
-- Version: ``
+- Version: `0.12.0-dev`
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code tooling
 - Project class: `platform`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
-- Main facades: `FlextQualityMcpClient`, `FlextQualityRulesEngine`, `FlextQualityBaseHook`, `FlextQualityDocumentationNotifier`, `FlextQualityStyleValidator`, `FlextQualityBaseReporter`, `FlextQualityClaudeContextClient`, `FlextQualityRulesLoader` (+30 more)
+- Main facades: _none_
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextQualityMcpClient`, `main`, `FlextQualityRulesEngine`, `FlextQualityBaseHook`, `FlextQualityDocumentationNotifier`, `FlextQualityStyleValidator`, `FlextQualityBaseReporter`, `FlextQualityClaudeContextClient`, `FlextQualityRulesLoader`, `FlextQualityContentAnalyzer` (+31 more)
+- Public symbol exports: `FlextQualityConfigManager`, `FlextQualityLinkValidator`, `FlextQualityStyleGuide`, `FlextQualityTypes`, `FlextQualityUtilities`, `get_server`, `FlextQualityCodeExecutionBridge`, `FlextQualityRulesEngine`, `FlextQualityValidators`, `FlextQuality` (+27 more)
 - Exported module shortcuts: _none_
-- Generated module pages: `32`
+- Generated module pages: `29`
 
 ## Next Pages
 

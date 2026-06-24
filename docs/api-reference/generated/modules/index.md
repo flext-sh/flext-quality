@@ -4,13 +4,11 @@
 
 These pages are generated from public modules and their docstrings.
 
-- [flext_quality](flext_quality.md)
 - [flext_quality.api](api.md)
+- [flext_quality.base](base.md)
 - [flext_quality.cli](cli.md)
 - [flext_quality.constants](constants.md)
-- [flext_quality.docs.core.base_classes](docs/core/base_classes.md)
 - [flext_quality.docs.core.config_manager](docs/core/config_manager.md)
-- [flext_quality.docs.core.file_discovery](docs/core/file_discovery.md)
 - [flext_quality.docs.dashboard](docs/dashboard.md)
 - [flext_quality.docs.notifications](docs/notifications.md)
 - [flext_quality.docs.scheduled_maintenance](docs/scheduled_maintenance.md)
@@ -18,7 +16,6 @@ These pages are generated from public modules and their docstrings.
 - [flext_quality.docs.scripts.optimize](docs/scripts/optimize.md)
 - [flext_quality.docs.scripts.report](docs/scripts/report.md)
 - [flext_quality.docs.scripts.validate](docs/scripts/validate.md)
-- [flext_quality.docs.tools.content_analyzer](docs/tools/content_analyzer.md)
 - [flext_quality.docs.tools.link_checker](docs/tools/link_checker.md)
 - [flext_quality.docs.tools.style_validator](docs/tools/style_validator.md)
 - [flext_quality.hooks.base](hooks/base.md)

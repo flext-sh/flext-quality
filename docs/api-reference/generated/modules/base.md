@@ -1,8 +1,8 @@
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
-# flext_quality.docs.core.file_discovery
+# flext_quality.base
 
-::: flext_quality.docs.core.file_discovery
+::: flext_quality.base
     options:
       show_root_heading: true
       show_root_full_path: false
