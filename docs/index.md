@@ -2,7 +2,7 @@
 
 # flext-quality Documentation
 
-- Version: `unknown`
+- Version: `0.12.0-dev`
 - Project class: `platform`
 - Package: `flext_quality`
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code tooling

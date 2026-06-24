@@ -19,7 +19,7 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: `FlextQualityMcpClient`, `FlextQualityRulesEngine`, `FlextQualityBaseHook`, `FlextQualityDocumentationNotifier`, `FlextQualityStyleValidator`, `FlextQualityBaseReporter` (+32 more)
-- Generated module pages: `32`
+- Primary facades: _none_
+- Generated module pages: `29`
 
 - [Back to project docs](../index.md)
