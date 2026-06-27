@@ -66,6 +66,8 @@ class FlextQualityAuditRules(m.Quality.AuditRulesConfig):
                 check_value = bool(self.style_checks.get(check_name, False))
             case "accessibility":
                 check_value = bool(self.accessibility_checks.get(check_name, False))
+            case _:
+                pass
         return check_value
 
 

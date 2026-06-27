@@ -132,6 +132,8 @@ class FlextQualityLinkValidator:
                 link_type = "image"
             case _ if url.startswith(("./", "../")) or url.endswith((".md", ".mdx")):
                 link_type = "internal"
+            case _:
+                pass
         return link_type
 
     def _find_line_number(self, content: str, search_text: str) -> int | None:
