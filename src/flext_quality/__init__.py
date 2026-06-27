@@ -22,53 +22,91 @@ from flext_quality.__version__ import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_web import d, e, h, r, x
+    from flext_web import d as d, e as e, h as h, r as r, x as x
 
-    from flext_quality.api import FlextQuality, quality
-    from flext_quality.base import FlextQualityServiceBase, s
-    from flext_quality.cli import FlextQualityCli, main
-    from flext_quality.constants import FlextQualityConstants, c
+    from flext_quality.api import FlextQuality as FlextQuality, quality as quality
+    from flext_quality.base import (
+        FlextQualityServiceBase as FlextQualityServiceBase,
+        s as s,
+    )
+    from flext_quality.cli import FlextQualityCli as FlextQualityCli, main as main
+    from flext_quality.constants import (
+        FlextQualityConstants as FlextQualityConstants,
+        c as c,
+    )
     from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules,
-        FlextQualityConfigManager,
-        FlextQualityConfigTypes,
-        FlextQualityStyleGuide,
-        FlextQualityValidationSettings,
+        FlextQualityAuditRules as FlextQualityAuditRules,
+        FlextQualityConfigManager as FlextQualityConfigManager,
+        FlextQualityConfigTypes as FlextQualityConfigTypes,
+        FlextQualityStyleGuide as FlextQualityStyleGuide,
+        FlextQualityValidationSettings as FlextQualityValidationSettings,
     )
-    from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
-    from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
+    from flext_quality.docs.dashboard import (
+        FlextQualityDocumentationDashboard as FlextQualityDocumentationDashboard,
+    )
+    from flext_quality.docs.notifications import (
+        FlextQualityDocumentationNotifier as FlextQualityDocumentationNotifier,
+    )
     from flext_quality.docs.scheduled_maintenance import (
-        FlextQualityScheduledMaintenance,
+        FlextQualityScheduledMaintenance as FlextQualityScheduledMaintenance,
     )
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-    from flext_quality.docs.scripts.optimize import FlextQualityDocumentationOptimizer
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
+    from flext_quality.docs.scripts.audit import (
+        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
+    )
+    from flext_quality.docs.scripts.optimize import (
+        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
+    )
+    from flext_quality.docs.scripts.report import (
+        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
+    )
     from flext_quality.docs.scripts.validate import (
-        FlextQualityContentValidator,
-        FlextQualityDocumentationValidator,
-        FlextQualityLinkValidator,
+        FlextQualityContentValidator as FlextQualityContentValidator,
+        FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
+        FlextQualityLinkValidator as FlextQualityLinkValidator,
     )
-    from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
-    from flext_quality.docs.tools.style_validator import FlextQualityStyleValidator
-    from flext_quality.hooks.base import FlextQualityBaseHook
-    from flext_quality.hooks.manager import FlextQualityHookManager
+    from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker as FlextQualityLinkChecker,
+    )
+    from flext_quality.docs.tools.style_validator import (
+        FlextQualityStyleValidator as FlextQualityStyleValidator,
+    )
+    from flext_quality.hooks.base import FlextQualityBaseHook as FlextQualityBaseHook
+    from flext_quality.hooks.manager import (
+        FlextQualityHookManager as FlextQualityHookManager,
+    )
     from flext_quality.integrations.claude_context import (
-        FlextQualityClaudeContextClient,
+        FlextQualityClaudeContextClient as FlextQualityClaudeContextClient,
     )
-    from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
+    from flext_quality.integrations.claude_mem import (
+        FlextQualityClaudeMemClient as FlextQualityClaudeMemClient,
+    )
     from flext_quality.integrations.code_execution import (
-        FlextQualityCodeExecutionBridge,
+        FlextQualityCodeExecutionBridge as FlextQualityCodeExecutionBridge,
     )
-    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
-    from flext_quality.mcp.server import get_server
-    from flext_quality.models import FlextQualityModels, m
-    from flext_quality.protocols import FlextQualityProtocols, p
-    from flext_quality.rules.engine import FlextQualityRulesEngine
-    from flext_quality.rules.loader import FlextQualityRulesLoader
-    from flext_quality.rules.validators import FlextQualityValidators
-    from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, t
-    from flext_quality.utilities import FlextQualityUtilities, u
+    from flext_quality.integrations.mcp_client import (
+        FlextQualityMcpClient as FlextQualityMcpClient,
+    )
+    from flext_quality.mcp.server import get_server as get_server
+    from flext_quality.models import FlextQualityModels as FlextQualityModels, m as m
+    from flext_quality.protocols import (
+        FlextQualityProtocols as FlextQualityProtocols,
+        p as p,
+    )
+    from flext_quality.rules.engine import (
+        FlextQualityRulesEngine as FlextQualityRulesEngine,
+    )
+    from flext_quality.rules.loader import (
+        FlextQualityRulesLoader as FlextQualityRulesLoader,
+    )
+    from flext_quality.rules.validators import (
+        FlextQualityValidators as FlextQualityValidators,
+    )
+    from flext_quality.settings import FlextQualitySettings as FlextQualitySettings
+    from flext_quality.typings import FlextQualityTypes as FlextQualityTypes, t as t
+    from flext_quality.utilities import (
+        FlextQualityUtilities as FlextQualityUtilities,
+        u as u,
+    )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".docs",
