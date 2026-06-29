@@ -146,6 +146,7 @@ ______________________________________________________________________
 | `flext-ldap`           | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, |                                                         |                            |                                                                                |                                               |                                                              |
 | `validate_style.py`)   | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                           | `settings.yaml`            | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |                                               |                                                              |
 | `flext-observability`  | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                       | ⚠️ Markdown summaries only | ❌                                                                              | settings embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
+
 - Observed schema divergence: JSON-based settings (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
 - Next: draft normalization checklist (settings schema conversion, capability gaps,
     wrapper migration plan) and define acceptance tests per capability pillar.
