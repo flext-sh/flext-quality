@@ -13,7 +13,7 @@ import pytest
 from flext_tests import reset_settings as _shared_reset_settings
 
 from flext_quality.settings import FlextQualitySettings
-from tests import u
+from tests.utilities import u
 
 reset_settings = _shared_reset_settings
 

@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TypeIs
 
-from tests import t
+from tests.typings import t
 
 
 def assert_is_dict(

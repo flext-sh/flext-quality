@@ -17,6 +17,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            ".core": ("core",),
             ".core.config_manager": (
                 "FlextQualityAuditRules",
                 "FlextQualityConfigManager",
@@ -27,6 +28,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".dashboard": ("FlextQualityDocumentationDashboard",),
             ".notifications": ("FlextQualityDocumentationNotifier",),
             ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+            ".scripts": ("scripts",),
             ".scripts.audit": ("FlextQualityDocumentationAuditor",),
             ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
             ".scripts.report": ("FlextQualityDocumentationReporter",),
@@ -35,6 +37,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityDocumentationValidator",
                 "FlextQualityLinkValidator",
             ),
+            ".tools": ("tools",),
             ".tools.link_checker": ("FlextQualityLinkChecker",),
             ".tools.style_validator": ("FlextQualityStyleValidator",),
         },
@@ -62,4 +65,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

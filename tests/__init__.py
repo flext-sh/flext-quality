@@ -3,48 +3,12 @@
 
 from __future__ import annotations
 
-import typing as _t
-
 from flext_core.lazy import (
     build_lazy_import_map,
     install_lazy_exports,
     merge_lazy_imports,
 )
 
-if _t.TYPE_CHECKING:
-    from flext_tests import td as td, tf as tf, tk as tk, tm as tm, tv as tv
-
-    from flext_quality import d as d, e as e, h as h, r as r, x as x
-    from tests.base import (
-        TestsFlextQualityServiceBase as TestsFlextQualityServiceBase,
-        s as s,
-    )
-    from tests.constants import (
-        TestsFlextQualityConstants as TestsFlextQualityConstants,
-        c as c,
-    )
-    from tests.helpers.assertions import (
-        assert_analysis_results_structure as assert_analysis_results_structure,
-        assert_dict_structure as assert_dict_structure,
-        assert_is_dict as assert_is_dict,
-        assert_is_list as assert_is_list,
-        assert_issues_structure as assert_issues_structure,
-        assert_metrics_structure as assert_metrics_structure,
-    )
-    from tests.models import TestsFlextQualityModels as TestsFlextQualityModels, m as m
-    from tests.protocols import (
-        TestsFlextQualityProtocols as TestsFlextQualityProtocols,
-        p as p,
-    )
-    from tests.settings import TestsFlextQualitySettings as TestsFlextQualitySettings
-    from tests.typings import TestsFlextQualityTypes as TestsFlextQualityTypes, t as t
-    from tests.unit.test_api import TestsFlextQualityApi as TestsFlextQualityApi
-    from tests.unit.test_basic import TestsFlextQualityBasic as TestsFlextQualityBasic
-    from tests.unit.test_cli import TestsFlextQualityCli as TestsFlextQualityCli
-    from tests.utilities import (
-        TestsFlextQualityUtilities as TestsFlextQualityUtilities,
-        u as u,
-    )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".helpers",
@@ -56,10 +20,12 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextQualityServiceBase",
                 "s",
             ),
+            ".conftest": ("conftest",),
             ".constants": (
                 "TestsFlextQualityConstants",
                 "c",
             ),
+            ".helpers": ("helpers",),
             ".helpers.assertions": (
                 "assert_analysis_results_structure",
                 "assert_dict_structure",
@@ -81,6 +47,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextQualityTypes",
                 "t",
             ),
+            ".unit": ("unit",),
             ".unit.test_api": ("TestsFlextQualityApi",),
             ".unit.test_basic": ("TestsFlextQualityBasic",),
             ".unit.test_cli": ("TestsFlextQualityCli",),
@@ -88,19 +55,17 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextQualityUtilities",
                 "u",
             ),
-            "flext_quality": (
+            "flext_tests": (
                 "d",
                 "e",
                 "h",
                 "r",
-                "x",
-            ),
-            "flext_tests": (
                 "td",
                 "tf",
                 "tk",
                 "tm",
                 "tv",
+                "x",
             ),
         },
     ),
@@ -127,39 +92,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
-
-__all__: list[str] = [
-    "TestsFlextQualityApi",
-    "TestsFlextQualityBasic",
-    "TestsFlextQualityCli",
-    "TestsFlextQualityConstants",
-    "TestsFlextQualityModels",
-    "TestsFlextQualityProtocols",
-    "TestsFlextQualityServiceBase",
-    "TestsFlextQualitySettings",
-    "TestsFlextQualityTypes",
-    "TestsFlextQualityUtilities",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "td",
-    "tf",
-    "tk",
-    "tm",
-    "tv",
-    "u",
-    "x",
-]
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)
