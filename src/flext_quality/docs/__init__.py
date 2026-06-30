@@ -3,12 +3,51 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from flext_core.lazy import (
     build_lazy_import_map,
     install_lazy_exports,
     merge_lazy_imports,
 )
 
+if TYPE_CHECKING:
+    from flext_quality.docs.core.config_manager import (
+        FlextQualityAuditRules as FlextQualityAuditRules,
+        FlextQualityConfigManager as FlextQualityConfigManager,
+        FlextQualityConfigTypes as FlextQualityConfigTypes,
+        FlextQualityStyleGuide as FlextQualityStyleGuide,
+        FlextQualityValidationSettings as FlextQualityValidationSettings,
+    )
+    from flext_quality.docs.dashboard import (
+        FlextQualityDocumentationDashboard as FlextQualityDocumentationDashboard,
+    )
+    from flext_quality.docs.notifications import (
+        FlextQualityDocumentationNotifier as FlextQualityDocumentationNotifier,
+    )
+    from flext_quality.docs.scheduled_maintenance import (
+        FlextQualityScheduledMaintenance as FlextQualityScheduledMaintenance,
+    )
+    from flext_quality.docs.scripts.audit import (
+        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
+    )
+    from flext_quality.docs.scripts.optimize import (
+        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
+    )
+    from flext_quality.docs.scripts.report import (
+        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
+    )
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator as FlextQualityContentValidator,
+        FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
+        FlextQualityLinkValidator as FlextQualityLinkValidator,
+    )
+    from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker as FlextQualityLinkChecker,
+    )
+    from flext_quality.docs.tools.style_validator import (
+        FlextQualityStyleValidator as FlextQualityStyleValidator,
+    )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".core",

@@ -3,8 +3,25 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
+if TYPE_CHECKING:
+    from flext_quality.docs.scripts.audit import (
+        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
+    )
+    from flext_quality.docs.scripts.optimize import (
+        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
+    )
+    from flext_quality.docs.scripts.report import (
+        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
+    )
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator as FlextQualityContentValidator,
+        FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
+        FlextQualityLinkValidator as FlextQualityLinkValidator,
+    )
 _LAZY_IMPORTS = build_lazy_import_map(
     {
         ".audit": ("FlextQualityDocumentationAuditor",),
