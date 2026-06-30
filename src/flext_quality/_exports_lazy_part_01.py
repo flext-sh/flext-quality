@@ -7,42 +7,53 @@ from flext_core.lazy import build_lazy_import_map
 
 FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
     {
-        ".api": ("FlextQuality",),
-        ".base": ("FlextQualityServiceBase",),
-        ".cli": ("FlextQualityCli",),
-        ".constants": ("FlextQualityConstants",),
-        ".docs.core.config_manager": (
-            "FlextQualityAuditRules",
-            "FlextQualityConfigManager",
-            "FlextQualityConfigTypes",
-            "FlextQualityStyleGuide",
+        ".api": (
+            "FlextQuality",
+            "quality",
         ),
-        ".docs.dashboard": ("FlextQualityDocumentationDashboard",),
-        ".docs.notifications": ("FlextQualityDocumentationNotifier",),
-        ".docs.scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
-        ".docs.scripts.audit": ("FlextQualityDocumentationAuditor",),
-        ".docs.scripts.optimize": ("FlextQualityDocumentationOptimizer",),
-        ".docs.scripts.report": ("FlextQualityDocumentationReporter",),
-        ".docs.scripts.validate": (
-            "FlextQualityContentValidator",
-            "FlextQualityDocumentationValidator",
-            "FlextQualityLinkValidator",
+        ".base": (
+            "FlextQualityServiceBase",
+            "s",
         ),
-        ".docs.tools.link_checker": ("FlextQualityLinkChecker",),
-        ".docs.tools.style_validator": ("FlextQualityStyleValidator",),
+        ".cli": (
+            "FlextQualityCli",
+            "main",
+        ),
+        ".constants": (
+            "FlextQualityConstants",
+            "c",
+        ),
+        ".docs": ("docs",),
+        ".hooks": ("hooks",),
         ".hooks.base": ("FlextQualityBaseHook",),
         ".hooks.manager": ("FlextQualityHookManager",),
+        ".integrations": ("integrations",),
         ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
         ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
         ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
         ".integrations.mcp_client": ("FlextQualityMcpClient",),
-        ".models": ("FlextQualityModels",),
-        ".protocols": ("FlextQualityProtocols",),
+        ".mcp": ("mcp",),
+        ".models": (
+            "FlextQualityModels",
+            "m",
+        ),
+        ".protocols": (
+            "FlextQualityProtocols",
+            "p",
+        ),
+        ".rules": ("rules",),
         ".rules.engine": ("FlextQualityRulesEngine",),
         ".rules.loader": ("FlextQualityRulesLoader",),
+        ".rules.validators": ("FlextQualityValidators",),
         ".settings": ("FlextQualitySettings",),
-        ".typings": ("FlextQualityTypes",),
-        ".utilities": ("FlextQualityUtilities",),
+        ".typings": (
+            "FlextQualityTypes",
+            "t",
+        ),
+        ".utilities": (
+            "FlextQualityUtilities",
+            "u",
+        ),
     },
 )
 
