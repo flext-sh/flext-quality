@@ -12,10 +12,10 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
-    get_server as _get_server,
     t,
     u,
 )
+from flext_quality.mcp.server import get_server as _get_server
 
 _mcp = _get_server()
 
