@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import re
-from collections.abc import Mapping
+from collections.abc import (
+    MutableSequence,
+)
 from pathlib import Path
 
-from flext_core import r
-
-from flext_quality import c, m
-from flext_quality.rules.loader import FlextQualityRulesLoader
+from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
 
 
 class FlextQualityRulesEngine:
@@ -18,70 +16,77 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: list[m.Quality.RuleDefinition] = []
+        self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> list[m.Quality.RuleDefinition]:
+    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
-        return self._rules.copy()
+        return list(self._rules)
 
-    def load_rules(self, rules_path: Path | None = None) -> r[int]:
+    def load_rules(self, rules_path: Path | None = None) -> p.Result[int]:
         """Load rules from YAML file."""
         path = rules_path or self._rules_path
         if path is None:
             path = Path(__file__).parent.parent.parent.parent / "rules" / "default.yaml"
         loader = FlextQualityRulesLoader()
         result = loader.load(path)
-        if result.is_failure:
+        if result.failure:
             return r[int].fail(result.error)
-        self._rules = result.value
+        self._rules = list(result.value)
         self._loaded = True
         return r[int].ok(len(self._rules))
 
     def validate(
-        self, path: str, context: Mapping[str, object] | None = None
-    ) -> r[list[Mapping[str, object]]]:
+        self,
+        path: str,
+        context: t.JsonMapping | None = None,
+    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
-            if load_result.is_failure:
-                return r[list[Mapping[str, object]]].fail(load_result.error)
+            if load_result.failure:
+                return r[t.SequenceOf[t.JsonMapping]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
-            return r[list[Mapping[str, object]]].fail(f"Path does not exist: {path}")
-        violations: list[Mapping[str, object]] = []
+            return r[t.SequenceOf[t.JsonMapping]].fail(f"Path does not exist: {path}")
+        violations: MutableSequence[t.JsonMapping] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[list[Mapping[str, object]]].ok(violations)
+        return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def validate_content(
-        self, content: str, filename: str = "<string>"
-    ) -> r[list[Mapping[str, object]]]:
+        self,
+        content: str,
+        filename: str = "<string>",
+    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
-            if load_result.is_failure:
-                return r[list[Mapping[str, object]]].fail(load_result.error)
-        violations: list[Mapping[str, object]] = []
+            if load_result.failure:
+                return r[t.SequenceOf[t.JsonMapping]].fail(load_result.error)
+        violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[list[Mapping[str, object]]].ok(violations)
+        return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def _check_rule(
-        self, rule: m.Quality.RuleDefinition, content: str, filename: str
-    ) -> list[Mapping[str, object]]:
+        self,
+        rule: m.Quality.RuleDefinition,
+        content: str,
+        filename: str,
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Check a single rule against content."""
-        violations: list[Mapping[str, object]] = []
+        violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
             return violations
         try:
-            pattern = re.compile(rule.pattern)
-        except re.error:
+            pattern = u.Quality.compile_pattern(rule.pattern)
+        except c.EXC_VALIDATION_VALUE:
             pattern = None
         lines = content.splitlines()
         for line_num, line in enumerate(lines, start=1):
@@ -103,11 +108,11 @@ class FlextQualityRulesEngine:
                 })
         return violations
 
-    def _get_files(self, path: Path) -> list[Path]:
+    def _get_files(self, path: Path) -> t.SequenceOf[Path]:
         """Get Python files from path."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
-        return list(path.rglob("*.py"))
+        return list(u.Infra.iter_matching_files(path, includes=["*.py"]))
 
     def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity."""
@@ -116,35 +121,36 @@ class FlextQualityRulesEngine:
             c.Quality.RuleType.WARNING: c.Quality.Severity.WARNING,
             c.Quality.RuleType.INFO: c.Quality.Severity.INFO,
         }
-        return mapping.get(rule_type, c.Quality.Severity.INFO)
+        return str(mapping.get(rule_type, c.Quality.Severity.INFO))
 
     def _validate_file(
-        self, file_path: Path, _context: Mapping[str, object]
-    ) -> list[Mapping[str, object]]:
+        self,
+        file_path: Path,
+        context: t.JsonMapping,
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules."""
-        try:
-            content = file_path.read_text(encoding="utf-8")
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        validation_context = t.json_dict_adapter().validate_python(context or {})
+        read = u.Cli.files_read_text(file_path)
+        if read.failure:
             return [
                 {
                     "rule": "file-read-error",
                     "file": str(file_path),
-                    "message": f"Failed to read file: {e}",
+                    "message": f"Failed to read file: {read.error}",
                     "severity": c.Quality.Severity.ERROR,
-                }
+                    "context": validation_context,
+                },
             ]
-        violations: list[Mapping[str, object]] = []
+        content = read.value
+        violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, str(file_path))
+            if validation_context:
+                rule_violations = [
+                    {**violation, "context": validation_context}
+                    for violation in rule_violations
+                ]
             violations.extend(rule_violations)
         return violations

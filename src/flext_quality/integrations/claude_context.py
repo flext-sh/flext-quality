@@ -9,13 +9,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import final
 
-from flext_core import r
-
-from flext_quality import c
-from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
+from flext_quality import (
+    FlextQualityMcpClient,
+    c,
+    m,
+    p,
+    t,
+)
 
 
 @final
@@ -32,53 +34,49 @@ class FlextQualityClaudeContextClient:
         """Initialize the Claude Context client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
+    def build_index_call(
+        self, path: str | None = None
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
-        params: dict[str, object] = {}
+        params: t.MutableJsonMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
 
     def build_search_call(
-        self, query: str, *, limit: int | None = None
-    ) -> r[McpToolCall]:
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
-            self.SERVER_NAME, "search_code", {"query": query, "limit": search_limit}
+            self.SERVER_NAME,
+            "search_code",
+            {"query": query, "limit": search_limit},
         )
 
-    def build_status_call(self) -> r[McpToolCall]:
+    def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_indexing_status", {})
 
-    def get_index_command(self, path: str | None = None) -> r[list[str]]:
+    def get_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing."""
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
     def get_search_command(
-        self, query: str, *, limit: int | None = None
-    ) -> r[list[str]]:
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
-            self._mcp.build_call_command
+            self._mcp.build_call_command,
         )
 
-    def health_check(self) -> r[Mapping[str, object]]:
+    def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-context is available."""
-        mcp_health = self._mcp.health_check()
-        if mcp_health.is_failure:
-            return r[Mapping[str, object]].fail(mcp_health.error)
-        health_data = mcp_health.value
-        status = (
-            c.Quality.IntegrationStatus.CONNECTED
-            if health_data.get("available", False)
-            else c.Quality.IntegrationStatus.DISCONNECTED
-        )
-        return r[Mapping[str, object]].ok({
-            "server": self.SERVER_NAME,
-            "status": status,
-            "available": health_data.get("available", False),
-            "mcp_cli": health_data.get("mcp_cli", False),
-        })
+        return self._mcp.build_server_health_result(self.SERVER_NAME)

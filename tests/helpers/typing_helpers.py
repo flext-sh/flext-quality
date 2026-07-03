@@ -11,11 +11,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeGuard
+from typing import TypeIs
+
+from tests.typings import t
 
 
-def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
-    """Type-safe dict[str, object] assertion following Single Responsibility Principle.
+def assert_is_dict(
+    value: t.Scalar | t.ScalarMapping,
+) -> TypeIs[t.ScalarMapping]:
+    """Type-safe t.JsonMapping assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -31,7 +35,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[object]]:
+def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -48,49 +52,11 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str) -> object:
-    """Type-safe dictionary access with proper error handling.
-
-    Args:
-      data: Object to access (must be a dict)
-      key: Key to access
-
-    Returns:
-      Value from dict
-
-    Raises:
-      AssertionError: If data is not a dict[str, object] or key missing
-
-    """
-    assert key in data, f"Key '{key}' not found in dict"
-    return data[key]
-
-
-def safe_list_access(data: list[object], index: int) -> object:
-    """Type-safe list access with proper error handling.
-
-    Args:
-      data: Object to access (must be a list)
-      index: Index to access
-
-    Returns:
-      Value from list
-
-    Raises:
-      AssertionError: If data is not a list or index out of bounds
-
-    """
-    assert_is_list(data)
-    assert 0 <= index < len(data), (
-        f"Index {index} out of bounds for list of length {len(data)}"
-    )
-    return data[index]
-
-
 def assert_dict_structure(
-    data: dict[str, object], required_keys: list[str]
-) -> dict[str, object]:
-    """Assert that object is dict[str, object] with required keys - DRY pattern.
+    data: t.ScalarMapping,
+    required_keys: t.StrSequence,
+) -> t.ScalarMapping:
+    """Assert that t.JsonValue is dict with required keys - DRY pattern.
 
     Args:
       data: Object to check
@@ -108,7 +74,9 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, object]:
+def assert_analysis_results_structure(
+    results: t.ScalarMapping,
+) -> t.ScalarMapping:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -126,7 +94,7 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, object]:
+def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -144,7 +112,7 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: object) -> dict[str, object]:
+def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
     """Assert issues have expected structure - specialized helper.
 
     Args:
@@ -160,5 +128,6 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
     if not assert_is_dict(issues):
         raise AssertionError(f"Expected dict, got {type(issues)}")
     return assert_dict_structure(
-        issues, ["security", "complexity", "dead_code", "duplicates"]
+        issues,
+        ["security", "complexity", "dead_code", "duplicates"],
     )

@@ -1,97 +1,46 @@
-"""Public API facade for flext-quality.
-
-Centralizes quality analysis, hook management, rule loading, and MCP
-integration exposed as attributes of `FlextQuality`, maintaining
-convenience wrappers that delegate to internal services.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Public API facade for flext-quality."""
 
 from __future__ import annotations
 
-import threading
-from collections.abc import Mapping
+from collections.abc import (
+    Sequence,
+)
 from pathlib import Path
-from typing import ClassVar
+from typing import override
 
-from flext_core import FlextContainer, FlextLogger, p, r
+from flext_quality import (
+    FlextQualityHookManager,
+    FlextQualityRulesLoader,
+    c,
+    m,
+    p,
+    r,
+    t,
+    u,
+)
+from flext_quality.base import FlextQualityServiceBase
 
-from flext_quality import FlextQualitySettings, c, m, t, u
-from flext_quality.hooks.manager import HookManager
-from flext_quality.rules.loader import FlextQualityRulesLoader
 
+class FlextQuality(FlextQualityServiceBase):
+    """Coordinate quality operations through the canonical facade instance."""
 
-class FlextQuality:
-    """Coordinate quality operations and expose domain services.
+    _hooks: FlextQualityHookManager = u.PrivateAttr(
+        default_factory=FlextQualityHookManager,
+    )
+    _rules_loader: FlextQualityRulesLoader = u.PrivateAttr(
+        default_factory=FlextQualityRulesLoader,
+    )
 
-    Business Rules:
-    ───────────────
-    1. Singleton pattern ensures single instance per process (thread-safe)
-    2. Service instances MUST be initialized before use (lazy initialization)
-    3. All operations MUST return r[T] for error handling
-    4. Configuration is auto-loaded via FlextSettings pattern
-    5. Hook and rule management centralized through this facade
-
-    Architecture Implications:
-    ───────────────────────────
-    - Singleton pattern with thread-safe locking prevents race conditions
-    - Service instances are created on-demand (lazy initialization)
-    - Railway-Oriented Programming via r for composable errors
-    - FlextSettings provides auto self.config and self.logger
-
-    Usage:
-        from flext_quality import FlextQuality
-
-        quality = FlextQuality.get_instance()
-        result = quality.load_rules(Path("rules.yaml"))
-    """
-
-    class Settings(FlextQualitySettings):
-        """Quality settings extending FlextQualitySettings via inheritance."""
-
-    class RulesLoader(FlextQualityRulesLoader):
-        """Rules loader extending FlextQualityRulesLoader via inheritance."""
-
-    _instance: ClassVar[FlextQuality | None] = None
-    _lock: ClassVar[threading.Lock] = threading.Lock()
-    _name: str
-    _version: str
-    _container: FlextContainer
-    logger: p.Log.StructlogLogger
-    config: FlextQualitySettings
-    hooks: HookManager
-    rules_loader: FlextQualityRulesLoader
-
-    def __init__(self) -> None:
-        """Initialize consolidated quality API with all functionality integrated."""
-        self._name = c.Quality.Mcp.SERVER_NAME
-        self._version = c.Quality.Mcp.SERVER_VERSION
-        self.logger = FlextLogger.create_module_logger(__name__)
-        self.config = FlextQualitySettings.get_instance()
-        self._container = FlextContainer.get_global()
-        if not self._container.has_service("flext_quality"):
-            _ = self._container.register("flext_quality", "flext_quality")
-        self.hooks = HookManager()
-        self.rules_loader = FlextQualityRulesLoader()
-
-    @classmethod
-    def _reset_instance(cls) -> None:
-        """Reset singleton instance (for testing)."""
-        cls._instance = None
-
-    @classmethod
-    def get_instance(cls) -> FlextQuality:
-        """Get singleton FlextQuality instance."""
-        if cls._instance is None:
-            with cls._lock:
-                if cls._instance is None:
-                    cls._instance = cls()
-        return cls._instance
+    @override
+    def execute(self) -> p.Result[t.JsonMapping]:
+        """Execute the default quality runtime operation."""
+        return self.fetch_status()
 
     def execute_hook(
-        self, event: str, input_data: t.Quality.HookInput
-    ) -> r[t.Quality.HookOutput]:
+        self,
+        event: str,
+        input_data: t.JsonMapping,
+    ) -> p.Result[t.JsonMapping]:
         """Execute hooks for an event.
 
         Args:
@@ -99,10 +48,10 @@ class FlextQuality:
             input_data: Hook input data
 
         Returns:
-            r[t.Quality.HookOutput]: Hook execution result or error
+            r[t.JsonMapping]: Hook execution result or error
 
         """
-        return self.hooks.execute(event, input_data)
+        return self._hooks.execute(event, input_data)
 
     def format_hook_output(
         self,
@@ -110,108 +59,99 @@ class FlextQuality:
         continue_exec: bool = True,
         message: str | None = None,
         blocked_reason: str | None = None,
-    ) -> str:
-        """Format hook output for Claude Code.
-
-        Args:
-            continue_exec: Whether to continue execution
-            message: Optional system message
-            blocked_reason: Optional reason for blocking
-
-        Returns:
-            str: JSON-formatted hook output
-
-        """
-        return u.Quality.format_hook_output(
-            continue_exec=continue_exec, message=message, blocked_reason=blocked_reason
+    ) -> p.Result[str]:
+        """Format hook output for Claude Code as JSON string."""
+        return r[str].ok(
+            u.Quality.format_hook_output(
+                continue_exec=continue_exec,
+                message=message,
+                blocked_reason=blocked_reason,
+            ),
         )
 
-    def get_hook_config_json(self) -> str:
-        """Get hooks configuration as JSON string."""
-        return self.hooks.get_config_json()
+    def fetch_hook_config_json(self) -> p.Result[str]:
+        """Return hooks configuration as JSON string."""
+        return r[str].ok(self._hooks.fetch_config_json())
 
-    def get_status(self) -> Mapping[str, t.NormalizedValue]:
-        """Get quality service status.
-
-        Returns:
-            dict[str, t.NormalizedValue]: Status information
-
-        """
-        return {
-            "name": self._name,
-            "version": self._version,
-            "config": {
-                "hook_timeout_ms": self.config.hook_timeout_ms,
-                "rule_timeout_seconds": self.config.rule_timeout_seconds,
-                "cache_enabled": self.config.cache_enabled,
-                "mcp_server_port": self.config.mcp_server_port,
+    def fetch_status(self) -> p.Result[t.JsonMapping]:
+        """Return quality service status snapshot."""
+        return r[t.JsonMapping].ok({
+            "name": c.Quality.MCP_SERVER_NAME,
+            "version": c.Quality.MCP_SERVER_VERSION,
+            "settings": {
+                "hook_timeout_ms": self.settings.hook_timeout_ms,
+                "rule_timeout_seconds": self.settings.rule_timeout_seconds,
+                "cache_enabled": self.settings.cache_enabled,
+                "mcp_server_port": self.settings.mcp_server_port,
             },
-            "hooks_registered": len(self.hooks.get_config()),
-        }
+            "hooks_registered": len(self._hooks.fetch_config()),
+        })
 
-    def load_rules(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
+    def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to rules YAML file
 
         Returns:
-            r[list[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
-        return self.rules_loader.load(path)
+        return self._rules_loader.load(path)
 
-    def load_rules_from_config(self) -> r[list[m.Quality.RuleDefinition]]:
+    def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
-            r[list[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
-        rules_path = self.config.get_rules_path()
+        rules_path = self.settings.resolve_rules_path()
         if not rules_path.exists():
-            return r[list[m.Quality.RuleDefinition]].fail(
-                f"Rules directory not found: {rules_path}"
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
+                f"Rules directory not found: {rules_path}",
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
-            return r[list[m.Quality.RuleDefinition]].ok([])
-        return self.rules_loader.load_multiple(yaml_files)
+            return r[Sequence[m.Quality.RuleDefinition]].ok([])
+        return self._rules_loader.load_multiple(yaml_files)
 
-    def process_stdin_hook(self) -> r[t.Quality.HookOutput]:
+    def process_stdin_hook(self) -> p.Result[t.JsonMapping]:
         """Process hook input from stdin (for Claude Code hooks).
 
         Returns:
-            r[t.Quality.HookOutput]: Hook execution result or error
+            r[t.JsonMapping]: Hook execution result or error
 
         """
         stdin_result = u.Quality.read_stdin()
-        if stdin_result.is_failure:
-            return r[t.Quality.HookOutput].fail(
-                stdin_result.error or "Failed to read stdin"
+        if stdin_result.failure:
+            return r[t.JsonMapping].fail(
+                stdin_result.error or "Failed to read stdin",
             )
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
-        if parse_result.is_failure:
-            return r[t.Quality.HookOutput].fail(
-                parse_result.error or "Failed to parse input"
+        if parse_result.failure:
+            return r[t.JsonMapping].fail(
+                parse_result.error or "Failed to parse input",
             )
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:
-            return r[t.Quality.HookOutput].ok({"continue": True})
+            return r[t.JsonMapping].ok({"continue": True})
         return self.execute_hook(event, input_data)
 
-    def validate_configuration(self) -> r[bool]:
+    def validate_configuration(self) -> p.Result[bool]:
         """Validate the current configuration.
 
         Returns:
             r[bool]: Success or validation error
 
         """
-        threshold_result = self.config.validate_thresholds()
-        if threshold_result.is_failure:
+        threshold_result = self.settings.validate_thresholds()
+        if threshold_result.failure:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
         return r[bool].ok(value=True)
 
 
-__all__ = ["FlextQuality"]
+quality = FlextQuality.fetch_global()
+
+__all__: list[str] = ["FlextQuality", "quality"]

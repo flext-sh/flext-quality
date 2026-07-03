@@ -1,49 +1,34 @@
-"""Rules engine - YAML-based declarative rules system."""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Rules package."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.rules.engine import FlextQualityRulesEngine
-    from flext_quality.rules.loader import FlextQualityRulesLoader
-    from flext_quality.rules.validators import FlextQualityValidators
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
-_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextQualityRulesEngine": (
-        "flext_quality.rules.engine",
-        "FlextQualityRulesEngine",
-    ),
-    "FlextQualityRulesLoader": (
-        "flext_quality.rules.loader",
-        "FlextQualityRulesLoader",
-    ),
-    "FlextQualityValidators": (
-        "flext_quality.rules.validators",
-        "FlextQualityValidators",
-    ),
-}
-
-__all__ = [
-    "FlextQualityRulesEngine",
-    "FlextQualityRulesLoader",
-    "FlextQualityValidators",
-]
+    from flext_quality.rules.engine import (
+        FlextQualityRulesEngine as FlextQualityRulesEngine,
+    )
+    from flext_quality.rules.loader import (
+        FlextQualityRulesLoader as FlextQualityRulesLoader,
+    )
+    from flext_quality.rules.validators import (
+        FlextQualityValidators as FlextQualityValidators,
+    )
+_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".engine": ("FlextQualityRulesEngine",),
+        ".loader": ("FlextQualityRulesLoader",),
+        ".validators": ("FlextQualityValidators",),
+    },
+)
 
 
-def __getattr__(
-    name: str,
-) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
-    """Lazy-load module attributes on first access (PEP 562)."""
-    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-
-
-def __dir__() -> list[str]:
-    """Return list of available attributes for dir() and autocomplete."""
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

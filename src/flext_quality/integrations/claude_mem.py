@@ -9,13 +9,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from typing import final
 
-from flext_core import r
-
-from flext_quality import c, t
-from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
+from flext_quality import (
+    FlextQualityMcpClient,
+    c,
+    m,
+    p,
+    t,
+)
 
 
 @final
@@ -32,17 +34,23 @@ class FlextQualityClaudeMemClient:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
+    def build_get_observations_call(
+        self, ids: t.SequenceOf[int]
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
-        params: dict[str, t.NormalizedValue] = {"ids": ids}
+        normalized_ids: t.JsonValueList = list(ids)
+        params = {"ids": normalized_ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
     def build_search_call(
-        self, query: str, *, limit: int | None = None
-    ) -> r[McpToolCall]:
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        params: dict[str, t.NormalizedValue] = {
+        search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
+        params = {
             "query": query,
             "limit": search_limit,
         }
@@ -54,11 +62,11 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a timeline tool call."""
-        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        params: dict[str, t.NormalizedValue] = {
+        before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
+        params = {
             "anchor": anchor,
             "depth_before": before,
             "depth_after": after,
@@ -69,19 +77,24 @@ class FlextQualityClaudeMemClient:
             params,
         )
 
-    def get_observations_command(self, ids: list[int]) -> r[list[str]]:
+    def get_observations_command(
+        self, ids: t.SequenceOf[int]
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations."""
         return self.build_get_observations_call(ids).flat_map(
-            self._mcp.build_call_command
+            self._mcp.build_call_command,
         )
 
     def get_search_command(
-        self, query: str, *, limit: int | None = None
-    ) -> r[list[str]]:
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
-            self._mcp.build_call_command
+            self._mcp.build_call_command,
         )
 
     def get_timeline_command(
@@ -90,28 +103,16 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[list[str]]:
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for timeline query."""
-        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
         return self.build_timeline_call(
-            anchor, depth_before=before, depth_after=after
+            anchor,
+            depth_before=before,
+            depth_after=after,
         ).flat_map(self._mcp.build_call_command)
 
-    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-mem is available."""
-        mcp_health = self._mcp.health_check()
-        if mcp_health.is_failure:
-            return r[Mapping[str, t.NormalizedValue]].fail(mcp_health.error)
-        health_data = mcp_health.value
-        status = (
-            c.Quality.IntegrationStatus.CONNECTED
-            if health_data.get("available", False)
-            else c.Quality.IntegrationStatus.DISCONNECTED
-        )
-        return r[Mapping[str, t.NormalizedValue]].ok({
-            "server": self.SERVER_NAME,
-            "status": status,
-            "available": health_data.get("available", False),
-            "mcp_cli": health_data.get("mcp_cli", False),
-        })
+        return self._mcp.build_server_health_result(self.SERVER_NAME)

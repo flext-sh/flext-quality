@@ -3,25 +3,22 @@
 from __future__ import annotations
 
 import fnmatch
-from typing import ClassVar, Protocol, runtime_checkable
+from typing import ClassVar
 
-from flext_core import r
-
-from flext_quality import c, t
+from flext_quality import c, p, t
 
 
-@runtime_checkable
-class BaseHookImpl(Protocol):
-    """Abstract base for hook implementations."""
+class FlextQualityBaseHook:
+    """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]
-    matcher: ClassVar[list[str] | None]
+    matcher: ClassVar[t.StrSequence | None] = None
 
-    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         """Execute the hook logic."""
-        ...
+        raise NotImplementedError
 
-    def should_run(self, input_data: t.Quality.HookInput) -> bool:
+    def should_run(self, input_data: t.JsonMapping) -> bool:
         """Check if hook should run for this input."""
         if self.matcher is None:
             return True

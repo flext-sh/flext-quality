@@ -9,32 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
-from typing import Annotated, final
+from typing import final
 
-from flext_core import r
-from pydantic import BaseModel, Field
-
-from flext_quality import c, t
-
-
-class ExecutionRequest(BaseModel):
-    """Request payload for a deferred command execution."""
-
-    script_path: Path
-    runtime: str
-    args: Annotated[list[str], Field(default_factory=list)]
-    timeout_ms: int
-
-
-class ExecutionResult(BaseModel):
-    """Structured result payload from a command execution."""
-
-    success: bool
-    exit_code: int
-    stdout: str = ""
-    stderr: str = ""
+from flext_quality import c, e, m, p, r, t
 
 
 @final
@@ -47,70 +25,91 @@ class FlextQualityCodeExecutionBridge:
     """
 
     def __init__(
-        self, *, timeout_ms: int | None = None, working_dir: Path | None = None
+        self,
+        *,
+        timeout_ms: int | None = None,
+        working_dir: Path | None = None,
     ) -> None:
         """Initialize the code execution bridge."""
-        self._timeout_ms = timeout_ms or c.Quality.Defaults.INTEGRATION_TIMEOUT_MS
+        self._timeout_ms = timeout_ms or c.Quality.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
-    def build_basedpyright_command(self, target_path: Path) -> r[list[str]]:
+    def build_basedpyright_command(self, target_path: Path) -> p.Result[t.StrSequence]:
         """Build command for basedpyright type checker."""
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
-        return r[list[str]].ok(cmd)
+        return r[t.StrSequence].ok(cmd)
 
     def build_python_command(
-        self, script_path: Path, *, args: list[str] | None = None
-    ) -> r[list[str]]:
+        self,
+        script_path: Path,
+        *,
+        args: t.StrSequence | None = None,
+    ) -> p.Result[t.StrSequence]:
         """Build command for Python execution."""
         if not script_path.exists():
-            return r[list[str]].fail(f"Script not found: {script_path}")
+            return e.fail_not_found(
+                "Script", str(script_path), result_type=r[t.StrSequence]
+            )
         cmd = ["python", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[list[str]].ok(cmd)
+        return r[t.StrSequence].ok(cmd)
 
     def build_ruff_command(
-        self, target_path: Path, *, fix: bool = False, output_format: str = "json"
-    ) -> r[list[str]]:
+        self,
+        target_path: Path,
+        *,
+        fix: bool = False,
+        output_format: str = "json",
+    ) -> p.Result[t.StrSequence]:
         """Build command for ruff linter."""
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
             cmd.append("--fix")
-        return r[list[str]].ok(cmd)
+        return r[t.StrSequence].ok(cmd)
 
     def build_typescript_command(
-        self, script_path: Path, *, args: list[str] | None = None
-    ) -> r[list[str]]:
+        self,
+        script_path: Path,
+        *,
+        args: t.StrSequence | None = None,
+    ) -> p.Result[t.StrSequence]:
         """Build command for TypeScript execution via npx tsx."""
         if not script_path.exists():
-            return r[list[str]].fail(f"Script not found: {script_path}")
+            return e.fail_not_found(
+                "Script", str(script_path), result_type=r[t.StrSequence]
+            )
         cmd = ["npx", "tsx", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[list[str]].ok(cmd)
+        return r[t.StrSequence].ok(cmd)
 
     def create_execution_request(
-        self, script_path: Path, runtime: str, *, args: list[str] | None = None
-    ) -> r[ExecutionRequest]:
+        self,
+        script_path: Path,
+        runtime: str,
+        *,
+        args: t.StrSequence | None = None,
+    ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
-            return r[ExecutionRequest].fail(f"Unknown runtime: {runtime}")
-        return r[ExecutionRequest].ok(
-            ExecutionRequest(
+            return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
+        return r[m.Quality.ExecutionRequest].ok(
+            m.Quality.ExecutionRequest(
                 script_path=script_path,
                 runtime=runtime,
                 args=args or [],
                 timeout_ms=self._timeout_ms,
-            )
+            ),
         )
 
-    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def health_check(self) -> p.Result[t.JsonMapping]:
         """Check availability of execution runtimes.
 
         Returns configuration status - actual runtime checks
         should be done via shell wrapper execution.
         """
-        return r[Mapping[str, t.NormalizedValue]].ok({
+        return r[t.JsonMapping].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,
             "available": True,
             "working_dir": str(self._working_dir),

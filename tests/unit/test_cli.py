@@ -1,4 +1,4 @@
-"""Tests for CLI service.
+"""Tests for canonical flext-quality CLI.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,137 +6,47 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
-import pytest
+from flext_tests import tm
 
-from flext_quality import FlextQualityCliService, main
-
-
-class TestFlextQualityCliService:
-    """Tests for FlextQualityCliService public interface."""
-
-    def test_init_creates_service(self) -> None:
-        """Test service initializes successfully."""
-        service = FlextQualityCliService()
-        assert service is not None
-
-    def test_display_status_returns_result(self) -> None:
-        """Test display_status returns a r with dict."""
-        service = FlextQualityCliService()
-        result = service.display_status()
-        assert result.is_success
-        assert isinstance(result.value, dict)
-
-    def test_build_check_commands_returns_commands(self, tmp_path: Path) -> None:
-        """Test build_check_commands returns list of commands."""
-        service = FlextQualityCliService()
-        result = service.build_check_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        assert isinstance(commands, list)
-        assert len(commands) == 2
-
-    def test_build_check_commands_includes_ruff(self, tmp_path: Path) -> None:
-        """Test build_check_commands includes ruff command."""
-        service = FlextQualityCliService()
-        result = service.build_check_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        ruff_cmd = commands[0]
-        assert "ruff" in ruff_cmd
-        assert "check" in ruff_cmd
-
-    def test_build_check_commands_includes_basedpyright(self, tmp_path: Path) -> None:
-        """Test build_check_commands includes basedpyright command."""
-        service = FlextQualityCliService()
-        result = service.build_check_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        pyright_cmd = commands[1]
-        assert "basedpyright" in pyright_cmd
-
-    def test_build_validate_commands_returns_all_commands(self, tmp_path: Path) -> None:
-        """Test build_validate_commands returns all validation commands."""
-        src_dir = tmp_path / "src"
-        src_dir.mkdir()
-        tests_dir = tmp_path / "tests"
-        tests_dir.mkdir()
-        service = FlextQualityCliService()
-        result = service.build_validate_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        assert isinstance(commands, list)
-        assert len(commands) == 5
-
-    def test_build_validate_commands_includes_coverage_report(
-        self, tmp_path: Path
-    ) -> None:
-        """Test build_validate_commands includes explicit coverage report command."""
-        src_dir = tmp_path / "src"
-        src_dir.mkdir()
-        tests_dir = tmp_path / "tests"
-        tests_dir.mkdir()
-        service = FlextQualityCliService()
-        result = service.build_validate_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        coverage_report_cmd = commands[4]
-        assert coverage_report_cmd == ["python", "-m", "coverage", "report"]
-
-    def test_build_validate_commands_includes_bandit(self, tmp_path: Path) -> None:
-        """Test build_validate_commands includes bandit command."""
-        src_dir = tmp_path / "src"
-        src_dir.mkdir()
-        tests_dir = tmp_path / "tests"
-        tests_dir.mkdir()
-        service = FlextQualityCliService()
-        result = service.build_validate_commands(tmp_path)
-        assert result.is_success
-        commands = result.value
-        bandit_cmd = commands[2]
-        assert "bandit" in bandit_cmd
+from flext_quality import FlextQualityCli, main
 
 
-class TestMainFunction:
-    """Tests for main CLI entry point."""
+class TestsFlextQualityCli:
+    """Direct unit tests against the nested Pydantic service classes."""
 
-    def test_main_with_no_args_exits_zero(self) -> None:
-        """Test main with no args exits with code 0."""
-        sys.argv = ["flext-quality"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+    def test_status(self) -> None:
+        result = FlextQualityCli.Status().execute()
+        tm.that(result.success, eq=True)
+        tm.that(result.value, is_=dict)
 
-    def test_main_with_status_command_exits_zero(self) -> None:
-        """Test main with status command exits with code 0."""
-        sys.argv = ["flext-quality", "status"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+    def test_check(self, tmp_path: Path) -> None:
+        result = FlextQualityCli.Check(target_path=tmp_path).execute()
+        tm.that(result.success, eq=True)
+        tm.that(len(result.value), eq=2)
+        tm.that(result.value[0], has="ruff")
+        tm.that(result.value[1], has="basedpyright")
 
-    def test_main_with_check_command_exits_zero(self, tmp_path: Path) -> None:
-        """Test main with check command exits with code 0."""
-        sys.argv = ["flext-quality", "check", str(tmp_path)]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+    def test_validate(self, tmp_path: Path) -> None:
+        (tmp_path / "src").mkdir()
+        (tmp_path / "tests").mkdir()
+        result = FlextQualityCli.Validate(target_path=tmp_path).execute()
+        tm.that(result.success, eq=True)
+        tm.that(len(result.value), eq=5)
+        tm.that(result.value[2], has="bandit")
+        tm.that(result.value[4], eq=["python", "-m", "coverage", "report"])
 
-    def test_main_with_validate_command_exits_zero(self, tmp_path: Path) -> None:
-        """Test main with validate command exits with code 0."""
-        src_dir = tmp_path / "src"
-        src_dir.mkdir()
-        tests_dir = tmp_path / "tests"
-        tests_dir.mkdir()
-        sys.argv = ["flext-quality", "validate", str(tmp_path)]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+    def test_status_ok(self) -> None:
+        tm.that(main(["status"]), eq=0)
 
-    def test_main_with_unknown_command_exits_one(self) -> None:
-        """Test main with unknown command exits with code 1."""
-        sys.argv = ["flext-quality", "unknown"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 1
+    def test_check_ok(self, tmp_path: Path) -> None:
+        tm.that(main(["check", "--target-path", str(tmp_path)]), eq=0)
+
+    def test_validate_ok(self, tmp_path: Path) -> None:
+        (tmp_path / "src").mkdir()
+        (tmp_path / "tests").mkdir()
+        tm.that(main(["validate", "--target-path", str(tmp_path)]), eq=0)
+
+    def test_unknown_fails(self) -> None:
+        tm.that(main(["unknown"]), eq=1)

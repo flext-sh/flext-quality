@@ -2,65 +2,84 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import (
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 from pathlib import Path
 from typing import final
 
-from flext_core import r
-from pydantic import TypeAdapter
-
-from flext_quality import c, t
-from flext_quality.hooks.base import BaseHookImpl
+from flext_quality import FlextQualityBaseHook, c, p, r, t, u
 
 
 @final
-class HookManager:
+class FlextQualityHookManager:
     """Manages hook lifecycle and execution."""
 
     def __init__(self, config_path: Path | None = None) -> None:
-        """Initialize hook manager with optional config path."""
-        self._hooks: dict[c.Quality.HookEvent, list[BaseHookImpl]] = {}
+        """Initialize hook manager with optional settings path."""
+        self._hooks: MutableMapping[
+            c.Quality.HookEvent,
+            MutableSequence[FlextQualityBaseHook],
+        ] = {}
         self._config_path = config_path
 
     def execute(
-        self, event: str, input_data: t.Quality.HookInput
-    ) -> r[t.Quality.HookOutput]:
+        self,
+        event: str,
+        input_data: t.JsonMapping,
+    ) -> p.Result[t.JsonMapping]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
         except ValueError:
-            return r[t.Quality.HookOutput].fail(f"Unknown event: {event}")
+            return r[t.JsonMapping].fail(f"Unknown event: {event}")
         hooks = self._hooks.get(hook_event, [])
         for hook in hooks:
             if not hook.should_run(input_data):
                 continue
             result = hook.execute(input_data)
-            if result.is_failure:
+            if result.failure:
                 return result
             output = result.value
             if not output.get("continue", True):
                 return result
-        return r[t.Quality.HookOutput].ok({"continue": True})
+        return r[t.JsonMapping].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, list[Mapping[str, object]]]:
+    def fetch_config(self) -> t.JsonMapping:
         """Get hooks configuration as dict."""
-        return {
-            event.value: [{"matcher": h.matcher} for h in hooks]
-            for event, hooks in self._hooks.items()
-        }
+        config: t.JsonDict = {}
+        for event, hooks in self._hooks.items():
+            hook_entries: t.JsonValueList = []
+            for hook in hooks:
+                matcher = hook.matcher
+                matcher_value: t.JsonValue
+                if isinstance(matcher, Sequence) and not isinstance(matcher, str):
+                    matcher_value = u.normalize_to_json_value(list(matcher))
+                else:
+                    matcher_value = matcher
+                hook_entries.append({"matcher": matcher_value})
+            config[event.value] = hook_entries
+        return config
 
-    def get_config_json(self) -> str:
+    def fetch_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        return (
-            TypeAdapter(dict[str, object])
-            .dump_json(dict(self.get_config()), indent=c.Quality.Defaults.JSON_INDENT)
+        config_json: str = (
+            t
+            .json_mapping_adapter()
+            .dump_json(
+                dict(self.fetch_config()),
+                indent=c.Quality.JSON_INDENT,
+            )
             .decode("utf-8")
         )
+        return config_json
 
-    def register(self, hook: BaseHookImpl) -> r[bool]:
+    def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
         """Register a hook."""
         event = hook.event
         if event not in self._hooks:
-            self._hooks[event] = []
+            self._hooks[event] = list[FlextQualityBaseHook]()
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)

@@ -1,36 +1,26 @@
-"""MCP Server module - FastMCP-based server for Claude Code integration."""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Mcp package."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.mcp.server import get_server, mcp
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
-_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "get_server": ("flext_quality.mcp.server", "get_server"),
-    "mcp": ("flext_quality.mcp.server", "mcp"),
-}
-
-__all__ = [
-    "get_server",
-    "mcp",
-]
+    from flext_quality.mcp.server import get_server as get_server
+_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".resources": ("resources",),
+        ".server": ("get_server",),
+        ".tools": ("tools",),
+    },
+)
 
 
-def __getattr__(
-    name: str,
-) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
-    """Lazy-load module attributes on first access (PEP 562)."""
-    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-
-
-def __dir__() -> list[str]:
-    """Return list of available attributes for dir() and autocomplete."""
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)

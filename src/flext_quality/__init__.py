@@ -1,83 +1,64 @@
-"""FLEXT Quality - Unified orchestration platform for Claude Code tooling.
-
-Exposes `FlextQuality` as the main API facade, along with domain models,
-settings, and utilities. Uses flext-core patterns: `r[T]`
-railway pattern, `FlextSettings`.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Quality package."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from flext_core.lazy import install_lazy_exports
+from flext_quality.__version__ import (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
+from flext_quality._exports import FLEXT_QUALITY_LAZY_IMPORTS
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+_LAZY_IMPORTS = FLEXT_QUALITY_LAZY_IMPORTS
 
-if TYPE_CHECKING:
-    from flext_core import (
-        FlextDecorators as d,
-        FlextExceptions as e,
-        FlextHandlers as h,
-        FlextMixins as x,
-        FlextService as s,
-        r as r,
-    )
 
-    from flext_quality.api import FlextQuality
-    from flext_quality.constants import (
-        FlextQualityConstants,
-        FlextQualityConstants as c,
-    )
-    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
-    from flext_quality.protocols import (
-        FlextQualityProtocols,
-        FlextQualityProtocols as p,
-    )
-    from flext_quality.services.cli import FlextQualityCliService, main
-    from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
-    from flext_quality.utilities import (
-        FlextQualityUtilities,
-        FlextQualityUtilities as u,
-    )
+_EAGER_EXPORTS = (
+    __author__,
+    __author_email__,
+    __description__,
+    __license__,
+    __title__,
+    __url__,
+    __version__,
+    __version_info__,
+)
 
-__version__ = "0.9.0"
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
-_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextQuality": ("flext_quality.api", "FlextQuality"),
-    "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
-    "FlextQualityConstants": ("flext_quality.constants", "FlextQualityConstants"),
-    "FlextQualityModels": ("flext_quality.models", "FlextQualityModels"),
-    "FlextQualityProtocols": ("flext_quality.protocols", "FlextQualityProtocols"),
-    "FlextQualitySettings": ("flext_quality.settings", "FlextQualitySettings"),
-    "FlextQualityTypes": ("flext_quality.typings", "FlextQualityTypes"),
-    "FlextQualityUtilities": ("flext_quality.utilities", "FlextQualityUtilities"),
-    "c": ("flext_quality.constants", "FlextQualityConstants"),
-    "d": ("flext_core", "FlextDecorators"),
-    "e": ("flext_core", "FlextExceptions"),
-    "h": ("flext_core", "FlextHandlers"),
-    "m": ("flext_quality.models", "FlextQualityModels"),
-    "main": ("flext_quality.services.cli", "main"),
-    "p": ("flext_quality.protocols", "FlextQualityProtocols"),
-    "r": ("flext_core", "r"),
-    "s": ("flext_core", "FlextService"),
-    "t": ("flext_quality.typings", "FlextQualityTypes"),
-    "u": ("flext_quality.utilities", "FlextQualityUtilities"),
-    "x": ("flext_core", "FlextMixins"),
-}
-
-__all__ = [
+_PUBLIC_EXPORTS: tuple[str, ...] = (
     "FlextQuality",
-    "FlextQualityCliService",
+    "FlextQualityBaseHook",
+    "FlextQualityClaudeContextClient",
+    "FlextQualityClaudeMemClient",
+    "FlextQualityCli",
+    "FlextQualityCodeExecutionBridge",
     "FlextQualityConstants",
+    "FlextQualityHookManager",
+    "FlextQualityMcpClient",
     "FlextQualityModels",
     "FlextQualityProtocols",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
+    "FlextQualityServiceBase",
     "FlextQualitySettings",
     "FlextQualityTypes",
     "FlextQualityUtilities",
+    "FlextQualityValidators",
+    "quality",
+    "__author__",
+    "__author_email__",
+    "__description__",
+    "__license__",
+    "__title__",
+    "__url__",
     "__version__",
+    "__version_info__",
     "c",
     "d",
     "e",
@@ -90,19 +71,12 @@ __all__ = [
     "t",
     "u",
     "x",
-]
+)
 
 
-def __getattr__(
-    name: str,
-) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
-    """Lazy-load module attributes on first access (PEP 562)."""
-    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-
-
-def __dir__() -> list[str]:
-    """Return list of available attributes for dir() and autocomplete."""
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    public_exports=_PUBLIC_EXPORTS,
+)

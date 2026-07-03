@@ -2,6 +2,9 @@
 
 Centralized, immutable constants for the flext-quality project providing
 hook events, rule types, validation thresholds, and runtime enumerations.
+Owns every fixed compiled ``re.Pattern`` for the Quality domain; runtime-
+supplied regex construction lives in ``u.Quality`` instead of this constants
+surface.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,72 +12,42 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum
-from typing import Final, Literal, TypeAlias
+import re
+from enum import StrEnum, unique
+from types import MappingProxyType
+from typing import TYPE_CHECKING, ClassVar, Final
 
-from flext_cli import FlextCliConstants
-from flext_web import FlextWebConstants
+from flext_infra import c
+from flext_web import c as web_c
+
+if TYPE_CHECKING:
+    from flext_quality import t
 
 
-class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
+class FlextQualityConstants(c, web_c):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,
     rule engines, validation, and quality enforcement.
 
     Usage:
-        from flext_quality import c
+        from flext_core import c
 
         event = c.Quality.HookEvent.PRE_TOOL_USE
-        threshold = c.Quality.Threshold.DEFAULT_LINES
+        threshold = c.Quality.THRESHOLD_DEFAULT_LINES
     """
 
     class Quality:
         """Quality-specific constants namespace."""
 
-        class Literals:
-            """Literal type aliases for quality domain values."""
-
-            AnalysisStatusLiteral: TypeAlias = Literal[
-                "pending", "running", "completed", "failed", "cancelled"
-            ]
-            IssueSeverityLiteral: TypeAlias = Literal[
-                "critical", "error", "warning", "info", "hint"
-            ]
-            IssueTypeLiteral: TypeAlias = Literal[
-                "lint", "type", "security", "complexity", "style", "documentation"
-            ]
-            ReportFormatLiteral: TypeAlias = Literal[
-                "json", "html", "markdown", "text", "sarif"
-            ]
-            BackendTypeLiteral: TypeAlias = Literal[
-                "ruff", "mypy", "pyrefly", "bandit", "vulture", "radon"
-            ]
-            LanguageLiteral: TypeAlias = Literal[
-                "python", "typescript", "javascript", "go", "rust"
-            ]
-            CheckStatusLiteral: TypeAlias = Literal["pass", "fail", "skip", "error"]
-
+        @unique
         class HookEvent(StrEnum):
             """Claude Code hook events."""
 
             PRE_TOOL_USE = "PreToolUse"
-            POST_TOOL_USE = "PostToolUse"
-            USER_PROMPT_SUBMIT = "UserPromptSubmit"
-            PRE_COMPACT = "PreCompact"
-            SESSION_START = "SessionStart"
             STOP = "Stop"
 
-        class ToolName(StrEnum):
-            """Tool names for hook filtering."""
-
-            EDIT = "Edit"
-            WRITE = "Write"
-            BASH = "Bash"
-            READ = "Read"
-            GLOB = "Glob"
-            GREP = "Grep"
-
+        @unique
         class RuleType(StrEnum):
             """Rule types for validation."""
 
@@ -82,16 +55,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             WARNING = "warning"
             INFO = "info"
 
-        class RuleCategory(StrEnum):
-            """Rule categories for organization."""
-
-            LINT = "lint"
-            TYPE = "type"
-            PATTERN = "pattern"
-            ARCHITECTURE = "architecture"
-            SECURITY = "security"
-            DOCUMENTATION = "documentation"
-
+        @unique
         class Severity(StrEnum):
             """Rule severity levels."""
 
@@ -99,6 +63,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             WARNING = "warning"
             INFO = "info"
 
+        @unique
         class RuleResult(StrEnum):
             """Rule evaluation results."""
 
@@ -106,6 +71,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             FAIL = "fail"
             SKIP = "skip"
 
+        @unique
         class IntegrationStatus(StrEnum):
             """External integration status."""
 
@@ -113,81 +79,106 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             DISCONNECTED = "disconnected"
             ERROR = "error"
 
-        class HookAction(StrEnum):
-            """Hook response actions."""
+        @unique
+        class NotificationPriority(StrEnum):
+            """Notification priority levels for quality alerts."""
 
-            CONTINUE = "continue"
-            BLOCK = "block"
-            MODIFY = "modify"
+            CRITICAL = "critical"
+            WARNING = "warning"
+            INFO = "info"
 
-        class Threshold:
-            """Quality thresholds for validation."""
+        @unique
+        class ArgumentAction(StrEnum):
+            """Supported argparse actions for quality tooling."""
 
-            DEFAULT_LINES: Final[int] = 500
-            MAX_LINES: Final[int] = 1000
-            MIN_LINES: Final[int] = 1
-            MAX_CYCLOMATIC_COMPLEXITY: Final[int] = 10
-            MAX_COGNITIVE_COMPLEXITY: Final[int] = 15
-            MAX_FUNCTION_LENGTH: Final[int] = 50
-            MAX_CLASS_LENGTH: Final[int] = 300
-            MIN_TEST_COVERAGE: Final[float] = 80.0
-            MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
-            MAX_LINE_LENGTH: Final[int] = 88
-            FLEXT_CORE_LINE_LENGTH: Final[int] = 79
+            STORE_TRUE = "store_true"
+            STORE_FALSE = "store_false"
 
-        class Errors:
-            """Quality-specific error codes."""
+        @unique
+        class ArgumentValueType(StrEnum):
+            """Supported argparse value coercions for quality tooling."""
 
-            RULE_FAILED: Final[str] = "QUALITY_RULE_FAILED"
-            THRESHOLD_EXCEEDED: Final[str] = "QUALITY_THRESHOLD_EXCEEDED"
-            PATTERN_VIOLATION: Final[str] = "QUALITY_PATTERN_VIOLATION"
-            ARCHITECTURE_VIOLATION: Final[str] = "QUALITY_ARCHITECTURE_VIOLATION"
-            TYPE_ERROR: Final[str] = "QUALITY_TYPE_ERROR"
-            LINT_ERROR: Final[str] = "QUALITY_LINT_ERROR"
+            STRING = "str"
+            INTEGER = "int"
 
-        class Defaults:
-            """Default configuration values."""
+        # ===== Quality Thresholds =====
+        THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
+        "Maximum broken links to show."
+        THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
+        "Minimum headings for table of contents."
 
-            HOOK_TIMEOUT_MS: Final[int] = 5000
-            MCP_TIMEOUT_MS: Final[int] = 30000
-            INTEGRATION_TIMEOUT_MS: Final[int] = 10000
-            RULE_TIMEOUT_SECONDS: Final[int] = 30
-            BATCH_SIZE: Final[int] = 100
-            MAX_PARALLEL_RULES: Final[int] = 4
-            CACHE_TTL_SECONDS: Final[int] = 300
-            MAX_CACHE_ENTRIES: Final[int] = 1000
-            DEFAULT_SEARCH_LIMIT: Final[int] = 20
-            DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
-            DEFAULT_TIMELINE_DEPTH: Final[int] = 5
-            JSON_INDENT: Final[int] = 2
-            MS_TO_SECONDS_DIVISOR: Final[int] = 1000
+        HOOK_TIMEOUT_MS: Final[int] = 5000
+        MCP_TIMEOUT_MS: Final[int] = 30000
+        INTEGRATION_TIMEOUT_MS: Final[int] = 10000
+        RULE_TIMEOUT_SECONDS: Final[int] = c.DEFAULT_TIMEOUT_SECONDS
+        BATCH_SIZE: Final[int] = 100
+        DEFAULT_SEARCH_LIMIT: Final[int] = 20
+        DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
+        DEFAULT_TIMELINE_DEPTH: Final[int] = 5
+        JSON_INDENT: Final[int] = 2
+        MS_TO_SECONDS_DIVISOR: Final[int] = 1000
 
-        class Mcp:
-            """MCP Server configuration."""
+        # ===== MCP Configuration =====
+        MCP_SERVER_NAME: Final[str] = "flext-quality"
+        "MCP server name."
+        MCP_SERVER_VERSION: Final[str] = "1.0.0"
+        "MCP server version."
+        MCP_DEFAULT_PORT: Final[int] = 3100
+        "MCP default port."
 
-            SERVER_NAME: Final[str] = "flext-quality"
-            SERVER_VERSION: Final[str] = "1.0.0"
-            DEFAULT_PORT: Final[int] = 3100
+        # ===== Standard Paths =====
+        PATHS_RULES_DIR: Final[str] = "rules"
+        "Rules directory path."
+        PATHS_DOCS_MAINTENANCE_REPORTS_DIR: Final[str] = "docs/maintenance/reports/"
+        "Documentation maintenance reports directory path."
+        PATHS_DOCS_MAINTENANCE_SETTINGS_DIR: Final[str] = "docs/maintenance/settings/"
+        "Documentation maintenance settings directory path."
 
-        class Paths:
-            """Standard paths for quality artifacts."""
+        # ===== Validation Patterns =====
+        PATTERNS_TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
+        "Type ignore comment pattern."
+        PATTERNS_CAST_USAGE: Final[str] = "cast\\s*\\("
+        "Cast function usage pattern."
+        PATTERNS_ANY_TYPE: Final[str] = ":\\s*Any\\b"
+        "Any type annotation pattern."
+        PATTERNS_TYPE_CHECKING: Final[str] = "if\\s+TYPE_CHECKING\\s*:"
+        "TYPE_CHECKING guard pattern."
+        PATTERNS_TIER_VIOLATION: Final[str] = "from flext_.*\\.(services|api) import"
+        "Tier violation import pattern."
+        PATTERNS_OPTIONAL_PATTERN: Final[str] = "Optional\\["
+        "Optional type pattern."
+        PATTERNS_UNION_PATTERN: Final[str] = "Union\\["
+        "Union type pattern."
 
-            RULES_DIR: Final[str] = "rules"
-            CONFIG_FILE: Final[str] = "quality.yaml"
-            CACHE_DIR: Final[str] = ".quality_cache"
-            REPORTS_DIR: Final[str] = "reports"
-
-        class Patterns:
-            """Regex patterns for validation."""
-
-            TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
-            CAST_USAGE: Final[str] = "cast\\s*\\("
-            ANY_TYPE: Final[str] = ":\\s*Any\\b"
-            TYPE_CHECKING: Final[str] = "if\\s+TYPE_CHECKING\\s*:"
-            TIER_VIOLATION: Final[str] = "from flext_.*\\.(services|api) import"
-            OPTIONAL_PATTERN: Final[str] = "Optional\\["
-            UNION_PATTERN: Final[str] = "Union\\["
+        # === Pre-compiled regex authorities ===
+        PATTERNS_TYPE_IGNORE_RE: ClassVar[t.RegexPattern] = re.compile(
+            PATTERNS_TYPE_IGNORE
+        )
+        PATTERNS_CAST_USAGE_RE: ClassVar[t.RegexPattern] = re.compile(
+            PATTERNS_CAST_USAGE
+        )
+        PATTERNS_ANY_TYPE_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_ANY_TYPE)
+        PATTERNS_TYPE_CHECKING_RE: ClassVar[t.RegexPattern] = re.compile(
+            PATTERNS_TYPE_CHECKING
+        )
+        PATTERNS_TIER_VIOLATION_RE: ClassVar[t.RegexPattern] = re.compile(
+            PATTERNS_TIER_VIOLATION
+        )
+        PATTERNS_OPTIONAL_RE: ClassVar[t.RegexPattern] = re.compile(
+            PATTERNS_OPTIONAL_PATTERN
+        )
+        PATTERNS_UNION_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_UNION_PATTERN)
+        FORBIDDEN_PATTERN_RE_MAP: ClassVar[t.MappingKV[str, t.RegexPattern]] = (
+            MappingProxyType({
+                "type-ignore": PATTERNS_TYPE_IGNORE_RE,
+                "cast-usage": PATTERNS_CAST_USAGE_RE,
+                "any-type": PATTERNS_ANY_TYPE_RE,
+                "type-checking": PATTERNS_TYPE_CHECKING_RE,
+                "optional-pattern": PATTERNS_OPTIONAL_RE,
+                "union-pattern": PATTERNS_UNION_RE,
+            })
+        )
 
 
 c = FlextQualityConstants
-__all__ = ["FlextQualityConstants", "c"]
+__all__: t.StrSequence = ("FlextQualityConstants", "c")

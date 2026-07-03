@@ -1,83 +1,38 @@
-"""Integrations - External service clients (Claude Mem, Claude Context, etc.).
-
-Provides clients for MCP servers and code execution capabilities
-for quality analysis workflows.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Integrations package."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality.integrations.claude_context import (
-        FlextQualityClaudeContextClient,
+        FlextQualityClaudeContextClient as FlextQualityClaudeContextClient,
     )
-    from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
+    from flext_quality.integrations.claude_mem import (
+        FlextQualityClaudeMemClient as FlextQualityClaudeMemClient,
+    )
     from flext_quality.integrations.code_execution import (
-        ExecutionRequest,
-        ExecutionResult,
-        FlextQualityCodeExecutionBridge,
+        FlextQualityCodeExecutionBridge as FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import (
-        FlextQualityMcpClient,
-        McpToolCall,
-        McpToolResult,
+        FlextQualityMcpClient as FlextQualityMcpClient,
     )
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
-_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "ExecutionRequest": (
-        "flext_quality.integrations.code_execution",
-        "ExecutionRequest",
-    ),
-    "ExecutionResult": ("flext_quality.integrations.code_execution", "ExecutionResult"),
-    "FlextQualityClaudeContextClient": (
-        "flext_quality.integrations.claude_context",
-        "FlextQualityClaudeContextClient",
-    ),
-    "FlextQualityClaudeMemClient": (
-        "flext_quality.integrations.claude_mem",
-        "FlextQualityClaudeMemClient",
-    ),
-    "FlextQualityCodeExecutionBridge": (
-        "flext_quality.integrations.code_execution",
-        "FlextQualityCodeExecutionBridge",
-    ),
-    "FlextQualityMcpClient": (
-        "flext_quality.integrations.mcp_client",
-        "FlextQualityMcpClient",
-    ),
-    "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
-    "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
-}
-
-__all__ = [
-    "ExecutionRequest",
-    "ExecutionResult",
-    "FlextQualityClaudeContextClient",
-    "FlextQualityClaudeMemClient",
-    "FlextQualityCodeExecutionBridge",
-    "FlextQualityMcpClient",
-    "McpToolCall",
-    "McpToolResult",
-]
+_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".claude_context": ("FlextQualityClaudeContextClient",),
+        ".claude_mem": ("FlextQualityClaudeMemClient",),
+        ".code_execution": ("FlextQualityCodeExecutionBridge",),
+        ".mcp_client": ("FlextQualityMcpClient",),
+    },
+)
 
 
-def __getattr__(
-    name: str,
-) -> Any:  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
-    """Lazy-load module attributes on first access (PEP 562)."""
-    return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-
-
-def __dir__() -> list[str]:
-    """Return list of available attributes for dir() and autocomplete."""
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(
+    __name__,
+    globals(),
+    _LAZY_IMPORTS,
+    publish_all=False,
+)
