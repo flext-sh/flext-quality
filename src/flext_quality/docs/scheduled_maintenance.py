@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """FLEXT Quality Scheduled Documentation Maintenance.
 
 Automated scheduled maintenance system for regular documentation quality checks,

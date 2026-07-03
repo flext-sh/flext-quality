@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """FLEXT Quality Style Validation Tool.
 
 Comprehensive style checking and consistency validation for documentation.

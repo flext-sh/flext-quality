@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """FLEXT Quality Link Validation Tool.
 
 Advanced link checking utility with retry logic, rate limiting,

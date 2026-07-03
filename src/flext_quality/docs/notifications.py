@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """FLEXT Quality Documentation Notification System.
 
 Automated notification system for documentation quality alerts,

@@ -11,10 +11,16 @@ from flext_infra import u
 from flext_web import u as web_u
 
 from flext_cli import cli
+from flext_core import FlextUtilitiesGuardsTypeCore, FlextUtilitiesReliability
 from flext_quality import c, p, r, t
 
 
-class FlextQualityUtilities(u, web_u):
+class FlextQualityUtilities(
+    u,
+    web_u,
+    FlextUtilitiesGuardsTypeCore,
+    FlextUtilitiesReliability,
+):
     """Namespace for flext-quality utilities.
 
     Marked as Pattern-B: this facade legitimately composes multiple parent
