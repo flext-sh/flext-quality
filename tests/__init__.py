@@ -25,15 +25,15 @@ if TYPE_CHECKING:
         x as x,
     )
 
-    from flext_quality.tests.base import (
+    from tests.base import (
         TestsFlextQualityServiceBase as TestsFlextQualityServiceBase,
         s as s,
     )
-    from flext_quality.tests.constants import (
+    from tests.constants import (
         TestsFlextQualityConstants as TestsFlextQualityConstants,
         c as c,
     )
-    from flext_quality.tests.helpers.assertions import (
+    from tests.helpers.assertions import (
         assert_analysis_results_structure as assert_analysis_results_structure,
         assert_dict_structure as assert_dict_structure,
         assert_is_dict as assert_is_dict,
@@ -41,31 +41,17 @@ if TYPE_CHECKING:
         assert_issues_structure as assert_issues_structure,
         assert_metrics_structure as assert_metrics_structure,
     )
-    from flext_quality.tests.models import (
-        TestsFlextQualityModels as TestsFlextQualityModels,
-        m as m,
-    )
-    from flext_quality.tests.protocols import (
+    from tests.models import TestsFlextQualityModels as TestsFlextQualityModels, m as m
+    from tests.protocols import (
         TestsFlextQualityProtocols as TestsFlextQualityProtocols,
         p as p,
     )
-    from flext_quality.tests.settings import (
-        TestsFlextQualitySettings as TestsFlextQualitySettings,
-    )
-    from flext_quality.tests.typings import (
-        TestsFlextQualityTypes as TestsFlextQualityTypes,
-        t as t,
-    )
-    from flext_quality.tests.unit.test_api import (
-        TestsFlextQualityApi as TestsFlextQualityApi,
-    )
-    from flext_quality.tests.unit.test_basic import (
-        TestsFlextQualityBasic as TestsFlextQualityBasic,
-    )
-    from flext_quality.tests.unit.test_cli import (
-        TestsFlextQualityCli as TestsFlextQualityCli,
-    )
-    from flext_quality.tests.utilities import (
+    from tests.settings import TestsFlextQualitySettings as TestsFlextQualitySettings
+    from tests.typings import TestsFlextQualityTypes as TestsFlextQualityTypes, t as t
+    from tests.unit.test_api import TestsFlextQualityApi as TestsFlextQualityApi
+    from tests.unit.test_basic import TestsFlextQualityBasic as TestsFlextQualityBasic
+    from tests.unit.test_cli import TestsFlextQualityCli as TestsFlextQualityCli
+    from tests.utilities import (
         TestsFlextQualityUtilities as TestsFlextQualityUtilities,
         u as u,
     )

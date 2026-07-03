@@ -11,10 +11,7 @@ FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
             "FlextQuality",
             "quality",
         ),
-        ".base": (
-            "FlextQualityServiceBase",
-            "s",
-        ),
+        ".base": ("FlextQualityServiceBase",),
         ".cli": (
             "FlextQualityCli",
             "main",
@@ -46,13 +43,13 @@ FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
         ".rules.loader": ("FlextQualityRulesLoader",),
         ".rules.validators": ("FlextQualityValidators",),
         ".settings": ("FlextQualitySettings",),
-        ".typings": (
-            "FlextQualityTypes",
-            "t",
-        ),
-        ".utilities": (
-            "FlextQualityUtilities",
-            "u",
+        ".typings": ("FlextQualityTypes",),
+        ".utilities": ("FlextQualityUtilities",),
+        "flext_core": (
+            "d",
+            "e",
+            "h",
+            "r",
         ),
     },
 )
