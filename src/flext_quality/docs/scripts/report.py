@@ -18,7 +18,7 @@ from collections.abc import (
 )
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Annotated, ClassVar, override
+from typing import Annotated, override
 
 from jinja2 import Template
 
@@ -104,8 +104,6 @@ class FlextQualityDocumentationReporter:
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: t.SequenceOf[FlextQualityDocumentationReporter.Recommendation]
 
-    REPORT_DATA_ADAPTER: ClassVar[m.TypeAdapter[ReportData]] = m.TypeAdapter(ReportData)
-
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
         """Initialize the documentation reporter with reports directory."""
         self.reports_dir = Path(reports_dir)
@@ -163,7 +161,8 @@ class FlextQualityDocumentationReporter:
         if report_format == "html":
             return self._generate_html_report(report_data)
         if report_format == "json":
-            report_text: str = self.REPORT_DATA_ADAPTER.dump_json(
+            adapter = m.TypeAdapter(FlextQualityDocumentationReporter.ReportData)
+            report_text: str = adapter.dump_json(
                 report_data,
                 indent=2,
             ).decode()
@@ -538,30 +537,41 @@ class FlextQualityDocumentationReporter:
             if "latest_" in report_file.name:
                 continue
             try:
-                date_str = report_file.name.split("_")[1]
-                report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-                    tzinfo=u.configured_timezone(),
-                )
-                if report_date >= cutoff_date:
-                    read = u.Cli.files_read_text(report_file)
-                    if read.failure:
-                        continue
-                    report_data_raw: t.MappingKV[
-                        str, t.Quality.DocumentationReportValue
-                    ] = t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
-                        read.value,
-                    )
-                    report_data_dict: t.MappingKV[
-                        str, t.Quality.DocumentationReportValue | datetime
-                    ] = {
-                        **report_data_raw,
-                        "date": report_date,
-                    }
-                    recent_reports.append(report_data_dict)
+                report_data_dict = self._load_recent_report(report_file, cutoff_date)
             except (ValueError, KeyError):
                 continue
+            if report_data_dict is not None:
+                recent_reports.append(report_data_dict)
         trend_data = self._analyze_trend_data(recent_reports)
         return self._generate_trend_report(trend_data, days)
+
+    def _load_recent_report(
+        self,
+        report_file: Path,
+        cutoff_date: datetime,
+    ) -> t.MappingKV[str, t.Quality.DocumentationReportValue | datetime] | None:
+        """Load one historical report when it falls inside the trend window."""
+        date_str = report_file.name.split("_")[1]
+        report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
+            tzinfo=u.configured_timezone(),
+        )
+        if report_date < cutoff_date:
+            return None
+        read = u.Cli.files_read_text(report_file)
+        if read.failure:
+            return None
+        report_data_raw: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
+            t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                read.value,
+            )
+        )
+        report_data_dict: t.MappingKV[
+            str, t.Quality.DocumentationReportValue | datetime
+        ] = {
+            **report_data_raw,
+            "date": report_date,
+        }
+        return report_data_dict
 
     def _analyze_trend_data(
         self,
@@ -775,22 +785,22 @@ class FlextQualityDocumentationReporter:
                     return r[bool].fail(save_result.error or "report write failed")
             return r[bool].ok(value=True)
 
-
-def main(args: t.StrSequence | None = None) -> int:
-    """Main entry point for reporting system via the canonical cli facade."""
-    exit_code: int = u.Quality.execute_result_command(
-        args=args,
-        app_name="flext-quality-docs-report",
-        app_help="FLEXT Quality Documentation Reporting",
-        route=m.Cli.ResultCommandRoute(
-            name="run",
-            help_text="Generate a documentation quality report",
-            model_cls=FlextQualityDocumentationReporter.Run,
-            handler=lambda params: params.execute(),
-        ),
-    )
-    return exit_code
+    @staticmethod
+    def main(args: t.StrSequence | None = None) -> int:
+        """Run the reporting system via the canonical cli facade."""
+        exit_code: int = u.Quality.execute_result_command(
+            args=args,
+            app_name="flext-quality-docs-report",
+            app_help="FLEXT Quality Documentation Reporting",
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Generate a documentation quality report",
+                model_cls=FlextQualityDocumentationReporter.Run,
+                handler=lambda params: params.execute(),
+            ),
+        )
+        return exit_code
 
 
 if __name__ == "__main__":
-    cli.exit(main())
+    cli.exit(FlextQualityDocumentationReporter.main())

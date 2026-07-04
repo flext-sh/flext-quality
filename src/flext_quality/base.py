@@ -6,8 +6,7 @@ from abc import ABC
 from typing import override
 
 from flext_core import s
-from flext_quality import FlextQualitySettings, t
-from flext_quality.protocols import p
+from flext_quality import FlextQualitySettings, p, t
 
 
 class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):

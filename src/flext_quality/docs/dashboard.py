@@ -111,36 +111,7 @@ class FlextQualityDocumentationDashboard:
                 "status": f"Error: {read.error}",
             }
         try:
-            data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
-            metrics_raw = data.get("metrics")
-            metrics: t.JsonMapping = (
-                metrics_raw if isinstance(metrics_raw, Mapping) else {}
-            )
-            severity_raw = metrics.get("severity_breakdown")
-            severity: t.JsonDict = {}
-            if isinstance(severity_raw, Mapping):
-                for key, value in severity_raw.items():
-                    severity[key] = value if isinstance(value, int) else 0
-            files_analyzed_raw = data.get("files_analyzed")
-            timestamp_raw = data.get("timestamp")
-            qs_raw = metrics.get("quality_score", 0)
-            quality_score_int: int = qs_raw if isinstance(qs_raw, int) else 0
-            ti_raw = metrics.get("total_issues", 0)
-            total_issues_int: int = ti_raw if isinstance(ti_raw, int) else 0
-            return {
-                "quality_score": quality_score_int,
-                "files_analyzed": (
-                    files_analyzed_raw if isinstance(files_analyzed_raw, int) else 0
-                ),
-                "total_issues": total_issues_int,
-                "severity_breakdown": severity,
-                "timestamp": (
-                    timestamp_raw
-                    if isinstance(timestamp_raw, str)
-                    else u.now().isoformat()
-                ),
-                "status": "Current",
-            }
+            return self._build_current_metrics(read.value)
         except c.EXC_FS_KEY_VALUE as e:
             return {
                 "quality_score": 0,
@@ -150,6 +121,35 @@ class FlextQualityDocumentationDashboard:
                 "timestamp": u.now().isoformat(),
                 "status": f"Error: {e!s}",
             }
+
+    def _build_current_metrics(self, audit_payload: str) -> t.JsonMapping:
+        """Build the dashboard metrics payload from the latest audit JSON."""
+        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
+        metrics_raw = data.get("metrics")
+        metrics: t.JsonMapping = metrics_raw if isinstance(metrics_raw, Mapping) else {}
+        severity_raw = metrics.get("severity_breakdown")
+        severity: t.JsonDict = {}
+        if isinstance(severity_raw, Mapping):
+            for key, value in severity_raw.items():
+                severity[key] = value if isinstance(value, int) else 0
+        files_analyzed_raw = data.get("files_analyzed")
+        timestamp_raw = data.get("timestamp")
+        qs_raw = metrics.get("quality_score", 0)
+        quality_score_int: int = qs_raw if isinstance(qs_raw, int) else 0
+        ti_raw = metrics.get("total_issues", 0)
+        total_issues_int: int = ti_raw if isinstance(ti_raw, int) else 0
+        return {
+            "quality_score": quality_score_int,
+            "files_analyzed": (
+                files_analyzed_raw if isinstance(files_analyzed_raw, int) else 0
+            ),
+            "total_issues": total_issues_int,
+            "severity_breakdown": severity,
+            "timestamp": (
+                timestamp_raw if isinstance(timestamp_raw, str) else u.now().isoformat()
+            ),
+            "status": "Current",
+        }
 
     def get_quality_trends(
         self,
@@ -164,54 +164,15 @@ class FlextQualityDocumentationDashboard:
         # Find all audit reports
         for report_file in reports_dir.glob("audit_report_*.json"):
             try:
-                # Extract date from filename
-                date_str = report_file.stem.replace("audit_report_", "").replace(
-                    "_",
-                    " ",
-                )
-                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=u.configured_timezone(),
-                )
-
-                if report_date >= cutoff_date:
-                    read = u.Cli.files_read_text(report_file)
-                    if read.failure:
-                        self._logger_instance.warning(
-                            "Skipping unreadable report", file=str(report_file)
-                        )
-                        continue
-                    data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                        read.value
-                    )
-                    metrics_v = data.get("metrics")
-                    metrics_m: t.JsonMapping = (
-                        t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                            metrics_v
-                        )
-                        if isinstance(metrics_v, Mapping)
-                        else {}
-                    )
-                    audit_metrics = m.Quality.AuditMetrics.model_validate(metrics_m)
-                    trend_entry: t.JsonDict = {
-                        "date": report_date.isoformat(),
-                        "quality_score": audit_metrics.quality_score,
-                        "total_issues": audit_metrics.total_issues,
-                        "critical_issues": audit_metrics.severity_breakdown.get(
-                            "critical",
-                            0,
-                        ),
-                        "high_issues": audit_metrics.severity_breakdown.get(
-                            "high",
-                            0,
-                        ),
-                    }
-                    trend_data.append(trend_entry)
+                trend_entry = self._load_quality_trend_entry(report_file, cutoff_date)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
                     "Failed to process trend data: %s",
                     str(e),
                 )
                 continue
+            if trend_entry is not None:
+                trend_data.append(trend_entry)
 
         # Sort by date
         trend_data = sorted(trend_data, key=operator.itemgetter("date"))
@@ -225,57 +186,90 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_values,
         }
 
+    def _load_quality_trend_entry(
+        self,
+        report_file: Path,
+        cutoff_date: datetime,
+    ) -> t.JsonDict | None:
+        """Load one audit report trend entry when it is inside the window."""
+        date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
+        report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
+            tzinfo=u.configured_timezone(),
+        )
+        if report_date < cutoff_date:
+            return None
+        read = u.Cli.files_read_text(report_file)
+        if read.failure:
+            self._logger_instance.warning(
+                "Skipping unreadable report", file=str(report_file)
+            )
+            return None
+        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+        metrics_v = data.get("metrics")
+        metrics_m: t.JsonMapping = (
+            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_v)
+            if isinstance(metrics_v, Mapping)
+            else {}
+        )
+        audit_metrics = m.Quality.AuditMetrics.model_validate(metrics_m)
+        return {
+            "date": report_date.isoformat(),
+            "quality_score": audit_metrics.quality_score,
+            "total_issues": audit_metrics.total_issues,
+            "critical_issues": audit_metrics.severity_breakdown.get("critical", 0),
+            "high_issues": audit_metrics.severity_breakdown.get("high", 0),
+        }
+
     def get_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
         """Get list of recent audit reports."""
         reports: MutableSequence[t.JsonMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
-                date_str = report_file.stem.replace("audit_report_", "").replace(
-                    "_",
-                    " ",
-                )
-                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=u.configured_timezone(),
-                )
-
-                read = u.Cli.files_read_text(report_file)
-                if read.failure:
-                    self._logger_instance.warning(
-                        "Skipping unreadable report", file=str(report_file)
-                    )
-                    continue
-                data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    read.value
-                )
-
-                metrics_rv = data.get("metrics")
-                metrics_rm: t.JsonMapping = (
-                    metrics_rv if isinstance(metrics_rv, Mapping) else {}
-                )
-                qs_rv = metrics_rm.get("quality_score", 0)
-                r_quality_score: int = qs_rv if isinstance(qs_rv, int) else 0
-                ti_rv = metrics_rm.get("total_issues", 0)
-                r_total_issues: int = ti_rv if isinstance(ti_rv, int) else 0
-                fa_rv = data.get("files_analyzed", 0)
-                r_files_analyzed: int = fa_rv if isinstance(fa_rv, int) else 0
-                reports.append({
-                    "filename": report_file.name,
-                    "date": report_date.isoformat(),
-                    "quality_score": r_quality_score,
-                    "total_issues": r_total_issues,
-                    "files_analyzed": r_files_analyzed,
-                })
+                report_summary = self._load_recent_report_summary(report_file)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
                     "Failed to process report file: %s",
                     str(e),
                 )
                 continue
+            if report_summary is not None:
+                reports.append(report_summary)
 
         # Sort by date descending and limit
         reports = sorted(reports, key=operator.itemgetter("date"), reverse=True)
         return reports[:limit]
+
+    def _load_recent_report_summary(self, report_file: Path) -> t.JsonMapping | None:
+        """Load one recent report summary for the dashboard list."""
+        date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
+        report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
+            tzinfo=u.configured_timezone(),
+        )
+        read = u.Cli.files_read_text(report_file)
+        if read.failure:
+            self._logger_instance.warning(
+                "Skipping unreadable report", file=str(report_file)
+            )
+            return None
+        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+        metrics_rv = data.get("metrics")
+        metrics_rm: t.JsonMapping = (
+            metrics_rv if isinstance(metrics_rv, Mapping) else {}
+        )
+        qs_rv = metrics_rm.get("quality_score", 0)
+        r_quality_score: int = qs_rv if isinstance(qs_rv, int) else 0
+        ti_rv = metrics_rm.get("total_issues", 0)
+        r_total_issues: int = ti_rv if isinstance(ti_rv, int) else 0
+        fa_rv = data.get("files_analyzed", 0)
+        r_files_analyzed: int = fa_rv if isinstance(fa_rv, int) else 0
+        return {
+            "filename": report_file.name,
+            "date": report_date.isoformat(),
+            "quality_score": r_quality_score,
+            "total_issues": r_total_issues,
+            "files_analyzed": r_files_analyzed,
+        }
 
     def get_dashboard_html(self) -> str:
         """Generate the main dashboard HTML."""
@@ -631,22 +625,22 @@ class FlextQualityDocumentationDashboard:
             dashboard.run(host=self.host, port=self.port, debug=self.debug)
             return r[bool].ok(value=True)
 
-
-def main(args: t.StrSequence | None = None) -> int:
-    """Main entry point for the dashboard via the canonical cli facade."""
-    exit_code: int = u.Quality.execute_result_command(
-        args=args,
-        app_name="flext-quality-dashboard",
-        app_help="FLEXT Quality Documentation Dashboard",
-        route=m.Cli.ResultCommandRoute(
-            name="run",
-            help_text="Start the dashboard server",
-            model_cls=FlextQualityDocumentationDashboard.Run,
-            handler=lambda params: params.execute(),
-        ),
-    )
-    return exit_code
+    @staticmethod
+    def main(args: t.StrSequence | None = None) -> int:
+        """Run the dashboard via the canonical cli facade."""
+        exit_code: int = u.Quality.execute_result_command(
+            args=args,
+            app_name="flext-quality-dashboard",
+            app_help="FLEXT Quality Documentation Dashboard",
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Start the dashboard server",
+                model_cls=FlextQualityDocumentationDashboard.Run,
+                handler=lambda params: params.execute(),
+            ),
+        )
+        return exit_code
 
 
 if __name__ == "__main__":
-    cli.exit(main())
+    cli.exit(FlextQualityDocumentationDashboard.main())

@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import override
 
 from flext_cli import cli
-from flext_quality import c, e, m, p, r, s, t, u
+from flext_quality import c, m, p, r, s, t, u
 
 
 class FlextQualityDocumentationOptimizer:
@@ -383,29 +383,30 @@ class FlextQualityDocumentationOptimizer:
                     end_idx = i + 1
                     break
             if end_idx > 0:
-                try:
-                    frontmatter_lines = lines[1 : end_idx - 1]
-                    frontmatter_content = "\n".join(frontmatter_lines)
-                    empty_frontmatter: t.JsonMapping = {}
-                    parsed_fm = u.Cli.yaml_parse(
-                        frontmatter_content,
-                    ).unwrap_or(empty_frontmatter)
-                    metadata: t.MutableJsonMapping = {
-                        k: v
-                        for k, v in (parsed_fm or {}).items()
-                        if isinstance(v, t.PRIMITIVES_TYPES)
-                    }
-                    metadata["updated"] = u.now().strftime("%Y-%m-%d")
-                    new_frontmatter = u.Cli.yaml_dump_str(
-                        metadata,
-                    ).strip()
-                    new_frontmatter_lines = (
-                        ["---"] + new_frontmatter.split("\n") + ["---"]
-                    )
-                    lines = new_frontmatter_lines + lines[end_idx:]
-                except (ValueError, e.ValidationError):
-                    pass
+                lines = self._replace_frontmatter_lines(lines, end_idx)
         return "\n".join(lines)
+
+    def _replace_frontmatter_lines(
+        self, lines: t.StrSequence, end_idx: int
+    ) -> list[str]:
+        """Return document lines with refreshed YAML frontmatter metadata."""
+        frontmatter_lines = lines[1 : end_idx - 1]
+        frontmatter_content = "\n".join(frontmatter_lines)
+        empty_frontmatter: t.JsonMapping = {}
+        parsed_fm = u.Cli.yaml_parse(
+            frontmatter_content,
+        ).unwrap_or(empty_frontmatter)
+        metadata: t.MutableJsonMapping = {
+            k: v
+            for k, v in (parsed_fm or {}).items()
+            if isinstance(v, t.PRIMITIVES_TYPES)
+        }
+        metadata["updated"] = u.now().strftime("%Y-%m-%d")
+        new_frontmatter = u.Cli.yaml_dump_str(
+            metadata,
+        ).strip()
+        new_frontmatter_lines = ["---"] + new_frontmatter.split("\n") + ["---"]
+        return new_frontmatter_lines + list(lines[end_idx:])
 
     def _save_with_backup(self, file_path: Path, content: str) -> p.Result[None]:
         """Save file with optional backup."""
@@ -537,22 +538,22 @@ class FlextQualityDocumentationOptimizer:
                 )
             return r[bool].ok(value=True)
 
-
-def main(args: t.StrSequence | None = None) -> int:
-    """Main entry point for optimization system via the canonical cli facade."""
-    exit_code: int = u.Quality.execute_result_command(
-        args=args,
-        app_name="flext-quality-docs-optimize",
-        app_help="FLEXT Quality Documentation Optimization",
-        route=m.Cli.ResultCommandRoute(
-            name="run",
-            help_text="Run documentation optimizations",
-            model_cls=FlextQualityDocumentationOptimizer.Run,
-            handler=lambda params: params.execute(),
-        ),
-    )
-    return exit_code
+    @staticmethod
+    def main(args: t.StrSequence | None = None) -> int:
+        """Run optimization system via the canonical cli facade."""
+        exit_code: int = u.Quality.execute_result_command(
+            args=args,
+            app_name="flext-quality-docs-optimize",
+            app_help="FLEXT Quality Documentation Optimization",
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Run documentation optimizations",
+                model_cls=FlextQualityDocumentationOptimizer.Run,
+                handler=lambda params: params.execute(),
+            ),
+        )
+        return exit_code
 
 
 if __name__ == "__main__":
-    cli.exit(main())
+    cli.exit(FlextQualityDocumentationOptimizer.main())

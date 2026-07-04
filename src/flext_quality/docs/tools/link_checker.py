@@ -21,13 +21,13 @@ from urllib.robotparser import RobotFileParser
 import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
-from flext_quality import c, m, t, u
-
-logger = u.fetch_logger(__name__)
+from flext_quality import c, m, p, t, u
 
 
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
+
+    logger: ClassVar[p.Logger] = u.fetch_logger(__name__)
 
     class LinkConfig(m.BaseModel):
         """Configuration dictionary for link validation."""
@@ -80,13 +80,6 @@ class FlextQualityLinkChecker:
         errors: MutableSequence[FlextQualityLinkChecker.LinkResult]
         warnings_list: MutableSequence[t.JsonMapping]
         performance: FlextQualityLinkChecker.PerformanceMetrics
-
-    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = m.TypeAdapter(Results)
-
-    MIN_PATH_PARTS_FOR_REPO = 2
-    MIN_PATH_PARTS_FOR_DETAILED_REPO = 3
-    MIN_PATH_PARTS_FOR_BRANCH = 3
-    MAX_BROKEN_LINKS_TO_SHOW = 10
 
     def __init__(
         self,
@@ -147,7 +140,7 @@ class FlextQualityLinkChecker:
         for file_path in file_paths:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
-                logger.warning(
+                self.logger.warning(
                     "failed_to_extract_links",
                     file_path=str(file_path),
                     error=read.error,
@@ -212,45 +205,7 @@ class FlextQualityLinkChecker:
         start_time = time.time()
 
         try:
-            if self.session is None:
-                return FlextQualityLinkChecker.LinkResult(
-                    url=url,
-                    error="session_not_initialized",
-                    valid=False,
-                    context=context or {},
-                )
-            external_timeout = self.settings.external_timeout
-            follow_redirects = self.settings.follow_redirects
-            max_redirects = self.settings.max_redirects
-            user_agent = self.settings.user_agent
-            acceptable_codes = self.settings.acceptable_status_codes
-
-            async with self.session.head(
-                url,
-                timeout=ClientTimeout(total=external_timeout),
-                allow_redirects=follow_redirects,
-                max_redirects=max_redirects,
-                headers={"User-Agent": user_agent},
-            ) as response:
-                response_time = time.time() - start_time
-
-                result = FlextQualityLinkChecker.LinkResult(
-                    url=url,
-                    status_code=response.status,
-                    response_time=response_time,
-                    valid=response.status in acceptable_codes,
-                    redirected=bool(response.history),
-                    final_url=str(response.url),
-                    content_type=response.headers.get("content-type", ""),
-                    context=context or {},
-                )
-
-                self.results.performance.slowest_response = max(
-                    self.results.performance.slowest_response,
-                    response_time,
-                )
-
-                return result
+            return await self._check_link_async_unchecked(url, start_time, context)
 
         except TimeoutError:
             return FlextQualityLinkChecker.LinkResult(
@@ -276,6 +231,45 @@ class FlextQualityLinkChecker:
                 valid=False,
                 context=context or {},
             )
+
+    async def _check_link_async_unchecked(
+        self,
+        url: str,
+        start_time: float,
+        context: t.JsonMapping | None,
+    ) -> FlextQualityLinkChecker.LinkResult:
+        """Check an async link while allowing transport exceptions to propagate."""
+        if self.session is None:
+            return FlextQualityLinkChecker.LinkResult(
+                url=url,
+                error="session_not_initialized",
+                valid=False,
+                context=context or {},
+            )
+
+        async with self.session.head(
+            url,
+            timeout=ClientTimeout(total=self.settings.external_timeout),
+            allow_redirects=self.settings.follow_redirects,
+            max_redirects=self.settings.max_redirects,
+            headers={"User-Agent": self.settings.user_agent},
+        ) as response:
+            response_time = time.time() - start_time
+            result = FlextQualityLinkChecker.LinkResult(
+                url=url,
+                status_code=response.status,
+                response_time=response_time,
+                valid=response.status in self.settings.acceptable_status_codes,
+                redirected=bool(response.history),
+                final_url=str(response.url),
+                content_type=response.headers.get("content-type", ""),
+                context=context or {},
+            )
+            self.results.performance.slowest_response = max(
+                self.results.performance.slowest_response,
+                response_time,
+            )
+            return result
 
     def check_link_sync(
         self,
@@ -517,10 +511,13 @@ class FlextQualityLinkChecker:
         path_parts = parsed.path.strip("/").split("/")
 
         # Basic GitHub URL patterns
-        if len(path_parts) >= self.MIN_PATH_PARTS_FOR_REPO:
+        if len(path_parts) >= c.Quality.LINK_CHECKER_MIN_PATH_PARTS_FOR_REPO:
             # user/repo or user/repo/tree/branch or user/repo/blob/branch/file
             if path_parts[1] in {"tree", "blob", "pull", "issues", "wiki", "releases"}:
-                return len(path_parts) >= self.MIN_PATH_PARTS_FOR_DETAILED_REPO
+                return (
+                    len(path_parts)
+                    >= c.Quality.LINK_CHECKER_MIN_PATH_PARTS_FOR_DETAILED_REPO
+                )
             if path_parts[1] in {"pulls", "issues", "wikis", "releases"}:
                 return True
             # Assume it's a valid repo reference
@@ -532,10 +529,11 @@ class FlextQualityLinkChecker:
         """Generate validation report."""
         if report_format == "summary":
             return self._generate_summary_report()
+        adapter = m.TypeAdapter(FlextQualityLinkChecker.Results)
         report_text: str = (
-            self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            adapter.dump_json(self.results, indent=2).decode()
             if report_format == "json"
-            else self.RESULTS_ADAPTER.dump_json(self.results).decode()
+            else adapter.dump_json(self.results).decode()
         )
         return report_text
 
@@ -560,14 +558,17 @@ Performance Metrics:
 Broken Links:
 """
 
-        for error in r.errors[:10]:  # Show first 10 broken links
+        for error in r.errors[: c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW]:
             url = error.url
             status = error.status_code or "N/A"
             error_msg = error.error or "Unknown error"
             report += f"- {url} (Status: {status}, Error: {error_msg})\n"
 
-        if len(r.errors) > self.MAX_BROKEN_LINKS_TO_SHOW:
-            report += f"... and {len(r.errors) - self.MAX_BROKEN_LINKS_TO_SHOW} more broken links\n"
+        if len(r.errors) > c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW:
+            remaining_links = (
+                len(r.errors) - c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW
+            )
+            report += f"... and {remaining_links} more broken links\n"
 
         if r.warnings_list:
             report += "\nWarnings:\n"
@@ -591,51 +592,51 @@ Broken Links:
         ).unwrap()
         return filepath
 
+    @staticmethod
+    def validate_links_sync(
+        links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
+        config_path: str | None = None,
+    ) -> FlextQualityLinkChecker.Results:
+        """Synchronously validate links."""
+        checker = FlextQualityLinkChecker(config_path)
+        return asyncio.run(checker.validate_links(links, use_async=True))
 
-def validate_links_sync(
-    links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
-    config_path: str | None = None,
-) -> FlextQualityLinkChecker.Results:
-    """Synchronous wrapper for link validation."""
-    checker = FlextQualityLinkChecker(config_path)
-    return asyncio.run(checker.validate_links(links, use_async=True))
+    @staticmethod
+    async def run_demo() -> None:
+        """Run the example validation without leaking module-level test data."""
+        test_links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo] = [
+            FlextQualityLinkChecker.LinkInfo(
+                url="https://github.com/microsoft/vscode",
+                text="VSCode",
+                type="external",
+                file="README.md",
+                context={"file": "README.md"},
+            ),
+            FlextQualityLinkChecker.LinkInfo(
+                url="https://httpbin.org/status/200",
+                text="httpbin",
+                type="external",
+                file="docs/setup.md",
+                context={"file": "docs/setup.md"},
+            ),
+            FlextQualityLinkChecker.LinkInfo(
+                url="https://httpbin.org/status/404",
+                text="broken",
+                type="external",
+                file="docs/broken.md",
+                context={"file": "docs/broken.md"},
+            ),
+        ]
+        checker = FlextQualityLinkChecker()
+        await checker.validate_links(test_links)
+        checker.save_report()
 
-
-async def _run_demo() -> None:
-    """Run the example validation without leaking module-level test data."""
-    test_links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo] = [
-        FlextQualityLinkChecker.LinkInfo(
-            url="https://github.com/microsoft/vscode",
-            text="VSCode",
-            type="external",
-            file="README.md",
-            context={"file": "README.md"},
-        ),
-        FlextQualityLinkChecker.LinkInfo(
-            url="https://httpbin.org/status/200",
-            text="httpbin",
-            type="external",
-            file="docs/setup.md",
-            context={"file": "docs/setup.md"},
-        ),
-        FlextQualityLinkChecker.LinkInfo(
-            url="https://httpbin.org/status/404",
-            text="broken",
-            type="external",
-            file="docs/broken.md",
-            context={"file": "docs/broken.md"},
-        ),
-    ]
-    checker = FlextQualityLinkChecker()
-    await checker.validate_links(test_links)
-    checker.save_report()
-
-
-def _main() -> int:
-    """Run the example CLI entrypoint."""
-    asyncio.run(_run_demo())
-    return 0
+    @staticmethod
+    def main() -> int:
+        """Run the example CLI entrypoint."""
+        asyncio.run(FlextQualityLinkChecker.run_demo())
+        return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(_main())
+    raise SystemExit(FlextQualityLinkChecker.main())

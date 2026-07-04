@@ -13,11 +13,7 @@ from flext_core.lazy import (
 
 if TYPE_CHECKING:
     from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules as FlextQualityAuditRules,
         FlextQualityConfigManager as FlextQualityConfigManager,
-        FlextQualityConfigTypes as FlextQualityConfigTypes,
-        FlextQualityStyleGuide as FlextQualityStyleGuide,
-        FlextQualityValidationSettings as FlextQualityValidationSettings,
     )
     from flext_quality.docs.dashboard import (
         FlextQualityDocumentationDashboard as FlextQualityDocumentationDashboard,
@@ -38,9 +34,7 @@ if TYPE_CHECKING:
         FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
     )
     from flext_quality.docs.scripts.validate import (
-        FlextQualityContentValidator as FlextQualityContentValidator,
         FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
-        FlextQualityLinkValidator as FlextQualityLinkValidator,
     )
     from flext_quality.docs.tools.link_checker import (
         FlextQualityLinkChecker as FlextQualityLinkChecker,
@@ -57,13 +51,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     build_lazy_import_map(
         {
             ".core": ("core",),
-            ".core.config_manager": (
-                "FlextQualityAuditRules",
-                "FlextQualityConfigManager",
-                "FlextQualityConfigTypes",
-                "FlextQualityStyleGuide",
-                "FlextQualityValidationSettings",
-            ),
+            ".core.config_manager": ("FlextQualityConfigManager",),
             ".dashboard": ("FlextQualityDocumentationDashboard",),
             ".notifications": ("FlextQualityDocumentationNotifier",),
             ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
@@ -71,11 +59,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".scripts.audit": ("FlextQualityDocumentationAuditor",),
             ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
             ".scripts.report": ("FlextQualityDocumentationReporter",),
-            ".scripts.validate": (
-                "FlextQualityContentValidator",
-                "FlextQualityDocumentationValidator",
-                "FlextQualityLinkValidator",
-            ),
+            ".scripts.validate": ("FlextQualityDocumentationValidator",),
             ".tools": ("tools",),
             ".tools.link_checker": ("FlextQualityLinkChecker",),
             ".tools.style_validator": ("FlextQualityStyleValidator",),

@@ -16,7 +16,7 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
-from datetime import timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from string import Template
 from typing import Annotated, override
@@ -188,39 +188,7 @@ class FlextQualityDocumentationAuditor:
         cutoff_date = u.now() - timedelta(days=max_age_days)
         for file_path in doc_files:
             try:
-                mtime = u.from_timestamp(file_path.stat().st_mtime)
-                if mtime < cutoff_date:
-                    age_days = (u.now() - mtime).days
-                    read = u.Cli.files_read_text(file_path)
-                    if read.failure:
-                        self.results.issues.append({
-                            "type": "file_access_error",
-                            "severity": "medium",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "error": read.error,
-                        })
-                        continue
-                    content = read.value
-                    outdated_indicators = self._check_outdated_indicators(content)
-                    issue: MutableMapping[
-                        str,
-                        str
-                        | int
-                        | float
-                        | bool
-                        | t.StrSequence
-                        | t.SequenceOf[t.StrMapping]
-                        | None,
-                    ] = {
-                        "type": "outdated_content",
-                        "severity": "high" if age_days > 180 else "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "age_days": age_days,
-                        "last_modified": mtime.isoformat(),
-                        "outdated_indicators": outdated_indicators,
-                        "recommendation": f"Review and update content (last modified {age_days} days ago)",
-                    }
-                    self.results.issues.append(issue)
+                issue = self._build_freshness_issue(file_path, cutoff_date)
             except c.EXC_FS_DECODING as e:
                 self.results.issues.append({
                     "type": "file_access_error",
@@ -228,6 +196,53 @@ class FlextQualityDocumentationAuditor:
                     "file": str(file_path.relative_to(self.project_root)),
                     "error": str(e),
                 })
+                continue
+            if issue is not None:
+                self.results.issues.append(issue)
+
+    def _build_freshness_issue(
+        self,
+        file_path: Path,
+        cutoff_date: datetime,
+    ) -> (
+        MutableMapping[
+            str,
+            str
+            | int
+            | float
+            | bool
+            | t.StrSequence
+            | t.SequenceOf[t.StrMapping]
+            | None,
+        ]
+        | None
+    ):
+        """Build one freshness issue when the file is older than the threshold."""
+        mtime = u.from_timestamp(file_path.stat().st_mtime)
+        if mtime >= cutoff_date:
+            return None
+        age_days = (u.now() - mtime).days
+        read = u.Cli.files_read_text(file_path)
+        if read.failure:
+            return {
+                "type": "file_access_error",
+                "severity": "medium",
+                "file": str(file_path.relative_to(self.project_root)),
+                "error": read.error,
+            }
+        content = read.value
+        outdated_indicators = self._check_outdated_indicators(content)
+        return {
+            "type": "outdated_content",
+            "severity": "high" if age_days > 180 else "medium",
+            "file": str(file_path.relative_to(self.project_root)),
+            "age_days": age_days,
+            "last_modified": mtime.isoformat(),
+            "outdated_indicators": outdated_indicators,
+            "recommendation": (
+                f"Review and update content (last modified {age_days} days ago)"
+            ),
+        }
 
     def _check_outdated_indicators(self, content: str) -> MutableSequence[str]:
         """Check for indicators of outdated content."""
@@ -892,22 +907,22 @@ class FlextQualityDocumentationAuditor:
                     return True
             return self.ci_mode and metrics.quality_score < 70
 
-
-def main(args: t.StrSequence | None = None) -> int:
-    """Main entry point for documentation audit via the canonical cli facade."""
-    exit_code: int = u.Quality.execute_result_command(
-        args=args,
-        app_name="flext-quality-docs-audit",
-        app_help="FLEXT Quality Documentation Audit",
-        route=m.Cli.ResultCommandRoute(
-            name="run",
-            help_text="Run documentation audit checks",
-            model_cls=FlextQualityDocumentationAuditor.Run,
-            handler=lambda params: params.execute(),
-        ),
-    )
-    return exit_code
+    @staticmethod
+    def main(args: t.StrSequence | None = None) -> int:
+        """Run documentation audit via the canonical cli facade."""
+        exit_code: int = u.Quality.execute_result_command(
+            args=args,
+            app_name="flext-quality-docs-audit",
+            app_help="FLEXT Quality Documentation Audit",
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Run documentation audit checks",
+                model_cls=FlextQualityDocumentationAuditor.Run,
+                handler=lambda params: params.execute(),
+            ),
+        )
+        return exit_code
 
 
 if __name__ == "__main__":
-    cli.exit(main())
+    cli.exit(FlextQualityDocumentationAuditor.main())

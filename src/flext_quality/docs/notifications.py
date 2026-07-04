@@ -15,7 +15,7 @@ from collections.abc import (
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Annotated, Final, override
+from typing import Annotated, override
 
 import requests
 
@@ -25,8 +25,6 @@ from flext_quality import c, m, p, r, s, t, u
 
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
-
-    MAX_BROKEN_LINKS: Final[int] = c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW
 
     class _ChannelConfig(m.BaseModel):
         enabled: bool
@@ -601,7 +599,7 @@ Found {len(broken_links)} broken links that need attention:
 """
 
         for i, link in enumerate(
-            broken_links[: self.MAX_BROKEN_LINKS],
+            broken_links[: c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW],
             1,
         ):  # Show first MAX_BROKEN_LINKS
             if isinstance(link, Mapping):
@@ -614,8 +612,11 @@ Found {len(broken_links)} broken links that need attention:
             message += f"   File: {file_v}\n"
             message += f"   Error: {err_v}\n\n"
 
-        if len(broken_links) > self.MAX_BROKEN_LINKS:
-            message += f"... and {len(broken_links) - self.MAX_BROKEN_LINKS} more broken links.\n\n"
+        if len(broken_links) > c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW:
+            remaining_links = (
+                len(broken_links) - c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW
+            )
+            message += f"... and {remaining_links} more broken links.\n\n"
 
         message += (
             "Please update or fix these broken links to maintain documentation quality."
@@ -726,22 +727,22 @@ Found {len(broken_links)} broken links that need attention:
                 "No action selected (use --test, --audit-data, --weekly-report or --monthly-report)",
             )
 
-
-def main(args: t.StrSequence | None = None) -> int:
-    """Main entry point for notification system via the canonical cli facade."""
-    exit_code: int = u.Quality.execute_result_command(
-        args=args,
-        app_name="flext-quality-notifications",
-        app_help="FLEXT Quality Documentation Notifications",
-        route=m.Cli.ResultCommandRoute(
-            name="run",
-            help_text="Send a documentation notification",
-            model_cls=FlextQualityDocumentationNotifier.Run,
-            handler=lambda params: params.execute(),
-        ),
-    )
-    return exit_code
+    @staticmethod
+    def main(args: t.StrSequence | None = None) -> int:
+        """Run the notification system via the canonical cli facade."""
+        exit_code: int = u.Quality.execute_result_command(
+            args=args,
+            app_name="flext-quality-notifications",
+            app_help="FLEXT Quality Documentation Notifications",
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Send a documentation notification",
+                model_cls=FlextQualityDocumentationNotifier.Run,
+                handler=lambda params: params.execute(),
+            ),
+        )
+        return exit_code
 
 
 if __name__ == "__main__":
-    cli.exit(main())
+    cli.exit(FlextQualityDocumentationNotifier.main())

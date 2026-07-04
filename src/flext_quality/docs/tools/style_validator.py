@@ -12,9 +12,8 @@ from collections.abc import (
     MutableSequence,
 )
 from pathlib import Path
-from typing import ClassVar
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityStyleValidator:
@@ -91,17 +90,6 @@ class FlextQualityStyleValidator:
         formatting_errors: MutableSequence[FlextQualityStyleValidator.StyleIssue]
         suggestions: MutableSequence[str]
         summary: FlextQualityStyleValidator.SummaryMetrics
-
-    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[ValidationResults]] = m.TypeAdapter(
-        ValidationResults
-    )
-
-    # Constants for magic numbers
-    MIN_INLINE_CODE_BACKTICKS: int = 2
-    MAX_LINE_PREVIEW_LENGTH: int = 50
-    MAX_LINE_TOO_LONG_VIOLATIONS: int = 5
-    MIN_COMMAND_LINE_ARGS: int = 2
-    CONFIG_ARG_INDEX: int = 2
 
     def __init__(
         self,
@@ -537,14 +525,18 @@ class FlextQualityStyleValidator:
             if len(line) > max_length and not (
                 line.strip().startswith(("```", "|", "http", "https"))
                 or "|" in line
-                or line.count("`") >= self.MIN_INLINE_CODE_BACKTICKS
+                or line.count("`")
+                >= c.Quality.STYLE_VALIDATOR_MIN_INLINE_CODE_BACKTICKS
             ):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
                         type="line_too_long",
                         line=i,
-                        content=line[: self.MAX_LINE_PREVIEW_LENGTH] + "..."
-                        if len(line) > self.MAX_LINE_PREVIEW_LENGTH
+                        content=line[
+                            : c.Quality.STYLE_VALIDATOR_MAX_LINE_PREVIEW_LENGTH
+                        ]
+                        + "..."
+                        if len(line) > c.Quality.STYLE_VALIDATOR_MAX_LINE_PREVIEW_LENGTH
                         else line,
                         message=f"Line exceeds {max_length} characters ({len(line)} chars)",
                         severity="low",
@@ -626,7 +618,10 @@ class FlextQualityStyleValidator:
                 "Add descriptive alt text to all images for accessibility",
             )
 
-        if violation_types.get("line_too_long", 0) > self.MAX_LINE_TOO_LONG_VIOLATIONS:
+        if (
+            violation_types.get("line_too_long", 0)
+            > c.Quality.STYLE_VALIDATOR_MAX_LINE_TOO_LONG_VIOLATIONS
+        ):
             suggestions.append("Consider breaking long lines or using line wrapping")
 
         return suggestions
@@ -664,10 +659,11 @@ class FlextQualityStyleValidator:
         """Generate style validation report."""
         if output_format == "summary":
             return self._generate_summary_report()
+        adapter = m.TypeAdapter(FlextQualityStyleValidator.ValidationResults)
         report_text: str = (
-            self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            adapter.dump_json(self.results, indent=2).decode()
             if output_format == "json"
-            else self.RESULTS_ADAPTER.dump_json(self.results).decode()
+            else adapter.dump_json(self.results).decode()
         )
         return report_text
 
@@ -714,44 +710,44 @@ Top Issues:
 
         return report
 
+    @staticmethod
+    def validate_file_style(
+        file_path: str,
+        config_path: str | None = None,
+    ) -> FlextQualityStyleValidator.FileResults:
+        """Validate a single file."""
+        validator = FlextQualityStyleValidator(config_path)
+        return validator.validate_file(Path(file_path))
 
-def validate_file_style(
-    file_path: str,
-    config_path: str | None = None,
-) -> FlextQualityStyleValidator.FileResults:
-    """Convenience function to validate a single file."""
-    validator = FlextQualityStyleValidator(config_path)
-    return validator.validate_file(Path(file_path))
+    @staticmethod
+    def validate_files_style(
+        file_paths: t.StrSequence,
+        config_path: str | None = None,
+    ) -> FlextQualityStyleValidator.ValidationResults:
+        """Validate multiple files."""
+        validator = FlextQualityStyleValidator(config_path)
+        paths = [Path(fp) for fp in file_paths]
+        return validator.validate_files_batch(paths)
 
+    @staticmethod
+    def main() -> int:
+        """Run the CLI entrypoint without exporting temporary module names."""
+        if len(sys.argv) < c.Quality.STYLE_VALIDATOR_MIN_COMMAND_LINE_ARGS:
+            return 1
 
-def validate_files_style(
-    file_paths: t.StrSequence,
-    config_path: str | None = None,
-) -> FlextQualityStyleValidator.ValidationResults:
-    """Convenience function to validate multiple files."""
-    validator = FlextQualityStyleValidator(config_path)
-    paths = [Path(fp) for fp in file_paths]
-    return validator.validate_files_batch(paths)
+        file_path = sys.argv[1]
+        config_path = (
+            sys.argv[c.Quality.STYLE_VALIDATOR_CONFIG_ARG_INDEX]
+            if len(sys.argv) > c.Quality.STYLE_VALIDATOR_CONFIG_ARG_INDEX
+            else None
+        )
 
+        results = FlextQualityStyleValidator.validate_file_style(file_path, config_path)
 
-def _main() -> int:
-    """Run the CLI entrypoint without exporting temporary module names."""
-    if len(sys.argv) < FlextQualityStyleValidator.MIN_COMMAND_LINE_ARGS:
-        return 1
-
-    file_path = sys.argv[1]
-    config_path = (
-        sys.argv[FlextQualityStyleValidator.CONFIG_ARG_INDEX]
-        if len(sys.argv) > FlextQualityStyleValidator.CONFIG_ARG_INDEX
-        else None
-    )
-
-    results = validate_file_style(file_path, config_path)
-
-    for _violation in results.violations[:3]:
-        pass
-    return 0
+        for _violation in results.violations[:3]:
+            pass
+        return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(_main())
+    raise SystemExit(FlextQualityStyleValidator.main())

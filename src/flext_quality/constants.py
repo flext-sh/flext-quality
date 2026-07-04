@@ -125,6 +125,10 @@ class FlextQualityConstants(c, web_c):
         "MCP server version."
         MCP_DEFAULT_PORT: Final[int] = 3100
         "MCP default port."
+        CLAUDE_CONTEXT_SERVER_NAME: Final[str] = "claude-context"
+        "MCP server name for claude-context integration."
+        CLAUDE_MEM_SERVER_NAME: Final[str] = "claude-mem"
+        "MCP server name for claude-mem integration."
 
         # ===== Standard Paths =====
         PATHS_RULES_DIR: Final[str] = "rules"
@@ -133,6 +137,26 @@ class FlextQualityConstants(c, web_c):
         "Documentation maintenance reports directory path."
         PATHS_DOCS_MAINTENANCE_SETTINGS_DIR: Final[str] = "docs/maintenance/settings/"
         "Documentation maintenance settings directory path."
+        SCHEDULED_MAINTENANCE_MIN_PYTHON_ARGS: Final[int] = 2
+        "Minimum command parts for a python -m invocation."
+        SCHEDULED_MAINTENANCE_MIN_GIT_ARGS: Final[int] = 2
+        "Minimum command parts for a git subcommand invocation."
+        SCHEDULED_MAINTENANCE_PYTHON_MODULE_INDEX: Final[int] = 2
+        "Index of the module name in a python -m command."
+        LINK_CHECKER_MIN_PATH_PARTS_FOR_REPO: Final[int] = 2
+        "Minimum GitHub path parts for a repository URL."
+        LINK_CHECKER_MIN_PATH_PARTS_FOR_DETAILED_REPO: Final[int] = 3
+        "Minimum GitHub path parts for a detailed repository URL."
+        STYLE_VALIDATOR_MIN_INLINE_CODE_BACKTICKS: Final[int] = 2
+        "Minimum inline-code backticks for detecting code-style lines."
+        STYLE_VALIDATOR_MAX_LINE_PREVIEW_LENGTH: Final[int] = 50
+        "Maximum line preview length in style validation diagnostics."
+        STYLE_VALIDATOR_MAX_LINE_TOO_LONG_VIOLATIONS: Final[int] = 5
+        "Maximum long-line violations before emitting a wrapping suggestion."
+        STYLE_VALIDATOR_MIN_COMMAND_LINE_ARGS: Final[int] = 2
+        "Minimum argv length for style validator CLI usage."
+        STYLE_VALIDATOR_CONFIG_ARG_INDEX: Final[int] = 2
+        "Index of optional config path in style validator CLI usage."
 
         # ===== Validation Patterns =====
         PATTERNS_TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
