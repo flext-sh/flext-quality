@@ -10,12 +10,9 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import (
-    Callable,
-)
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, ClassVar, override
+from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
 import pytest
 import schedule
@@ -23,6 +20,11 @@ from git import InvalidGitRepositoryError, Repo
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        Callable,
+    )
 
 
 class FlextQualityScheduledMaintenance:
@@ -774,7 +776,7 @@ class FlextQualityScheduledMaintenance:
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(
-            Path(__file__).resolve().parent / "settings" / "schedule_config.yaml"
+            Path(__file__).resolve().parent / "settings" / "schedule_config.yaml",
         )
 
         settings_path: Annotated[
@@ -788,13 +790,19 @@ class FlextQualityScheduledMaintenance:
             ),
         ]
         daemon: bool = u.Field(
-            False, description="Run scheduler daemon", validate_default=True
+            False,
+            description="Run scheduler daemon",
+            validate_default=True,
         )
         manual: str | None = u.Field(
-            None, description="Run one maintenance task", validate_default=True
+            None,
+            description="Run one maintenance task",
+            validate_default=True,
         )
         list_schedules: bool = u.Field(
-            False, description="List configured schedules", validate_default=True
+            False,
+            description="List configured schedules",
+            validate_default=True,
         )
 
         @override
@@ -815,7 +823,7 @@ class FlextQualityScheduledMaintenance:
                     else r[bool].fail(f"Manual task '{self.manual}' failed")
                 )
             return r[bool].fail(
-                "No action selected (use --daemon, --manual or --list-schedules)"
+                "No action selected (use --daemon, --manual or --list-schedules)",
             )
 
     @staticmethod

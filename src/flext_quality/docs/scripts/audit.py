@@ -12,19 +12,21 @@ Usage:
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-)
 from datetime import datetime, timedelta
 from pathlib import Path
 from string import Template
-from typing import Annotated, override
+from typing import TYPE_CHECKING, Annotated, override
 
 import requests
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableMapping,
+        MutableSequence,
+    )
 
 
 class FlextQualityDocumentationAuditor:
@@ -814,22 +816,34 @@ class FlextQualityDocumentationAuditor:
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(
-            False, description="Run all audit checks", validate_default=True
+            False,
+            description="Run all audit checks",
+            validate_default=True,
         )
         check_freshness: bool = u.Field(
-            False, description="Check content freshness", validate_default=True
+            False,
+            description="Check content freshness",
+            validate_default=True,
         )
         check_completeness: bool = u.Field(
-            False, description="Check documentation completeness", validate_default=True
+            False,
+            description="Check documentation completeness",
+            validate_default=True,
         )
         check_consistency: bool = u.Field(
-            False, description="Check content consistency", validate_default=True
+            False,
+            description="Check content consistency",
+            validate_default=True,
         )
         check_links: bool = u.Field(
-            False, description="Check documentation links", validate_default=True
+            False,
+            description="Check documentation links",
+            validate_default=True,
         )
         ci_mode: bool = u.Field(
-            False, description="Enable CI mode", validate_default=True
+            False,
+            description="Enable CI mode",
+            validate_default=True,
         )
         fail_on_errors: bool = u.Field(
             False,
@@ -844,7 +858,9 @@ class FlextQualityDocumentationAuditor:
         output_format: Annotated[
             str,
             u.Field(
-                alias="format", description="Audit report format", validate_default=True
+                alias="format",
+                description="Audit report format",
+                validate_default=True,
             ),
         ] = "json"
         config_dir: Annotated[
@@ -865,7 +881,7 @@ class FlextQualityDocumentationAuditor:
                 save_result = auditor.save_report(self.output_format, self.output)
                 if save_result.failure:
                     return r[bool].fail(
-                        save_result.error or "audit report write failed"
+                        save_result.error or "audit report write failed",
                     )
                 metrics = results.metrics
                 if self._should_fail(metrics):

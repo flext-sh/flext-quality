@@ -8,12 +8,15 @@ from __future__ import annotations
 
 import operator
 import sys
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from flext_quality import c, m, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableSequence,
+    )
 
 
 class FlextQualityStyleValidator:
@@ -295,7 +298,7 @@ class FlextQualityStyleValidator:
                 )
 
             if line.startswith("#") and not u.Quality.compile_pattern(
-                r"^#{1,6}\s"
+                r"^#{1,6}\s",
             ).match(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
@@ -469,7 +472,7 @@ class FlextQualityStyleValidator:
         )
         if require_alt_text is not False:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
-                content
+                content,
             )
             if images_without_alt:
                 for img in images_without_alt:

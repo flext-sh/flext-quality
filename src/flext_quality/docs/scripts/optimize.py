@@ -13,14 +13,16 @@ from __future__ import annotations
 
 import logging
 import shutil
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableSequence,
+    )
 
 
 class FlextQualityDocumentationOptimizer:
@@ -49,7 +51,8 @@ class FlextQualityDocumentationOptimizer:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.logger.warning(
-                    "Failed to optimize formatting in file: %s", read.error
+                    "Failed to optimize formatting in file: %s",
+                    read.error,
                 )
                 continue
             content = read.value
@@ -62,7 +65,8 @@ class FlextQualityDocumentationOptimizer:
                 save = self._save_with_backup(file_path, content)
                 if save.failure:
                     self.logger.warning(
-                        "Failed to optimize formatting in file: %s", save.error
+                        "Failed to optimize formatting in file: %s",
+                        save.error,
                     )
                     continue
                 self.results.changes_made += 1
@@ -193,7 +197,7 @@ class FlextQualityDocumentationOptimizer:
             lines = lines[:toc_start] + list(new_toc) + lines[toc_end:]
         else:
             insert_pos = self._find_toc_insertion_point(lines)
-            lines = lines[:insert_pos] + [""] + list(new_toc) + lines[insert_pos:]
+            lines = [*lines[:insert_pos], "", *list(new_toc), *lines[insert_pos:]]
         return "\n".join(lines)
 
     def _heading_to_anchor(self, heading: str) -> str:
@@ -387,7 +391,9 @@ class FlextQualityDocumentationOptimizer:
         return "\n".join(lines)
 
     def _replace_frontmatter_lines(
-        self, lines: t.StrSequence, end_idx: int
+        self,
+        lines: t.StrSequence,
+        end_idx: int,
     ) -> list[str]:
         """Return document lines with refreshed YAML frontmatter metadata."""
         frontmatter_lines = lines[1 : end_idx - 1]
@@ -405,7 +411,7 @@ class FlextQualityDocumentationOptimizer:
         new_frontmatter = u.Cli.yaml_dump_str(
             metadata,
         ).strip()
-        new_frontmatter_lines = ["---"] + new_frontmatter.split("\n") + ["---"]
+        new_frontmatter_lines = ["---", *new_frontmatter.split("\n"), "---"]
         return new_frontmatter_lines + list(lines[end_idx:])
 
     def _save_with_backup(self, file_path: Path, content: str) -> p.Result[None]:
@@ -431,7 +437,8 @@ class FlextQualityDocumentationOptimizer:
         return report_text
 
     def save_report(
-        self, output_path: str = "docs/maintenance/reports/"
+        self,
+        output_path: str = "docs/maintenance/reports/",
     ) -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
@@ -456,28 +463,44 @@ class FlextQualityDocumentationOptimizer:
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
-            False, description="Fix formatting", validate_default=True
+            False,
+            description="Fix formatting",
+            validate_default=True,
         )
         update_toc: bool = u.Field(
-            False, description="Update tables of contents", validate_default=True
+            False,
+            description="Update tables of contents",
+            validate_default=True,
         )
         add_alt_text: bool = u.Field(
-            False, description="Add missing alt text", validate_default=True
+            False,
+            description="Add missing alt text",
+            validate_default=True,
         )
         improve_accessibility: bool = u.Field(
-            False, description="Improve accessibility", validate_default=True
+            False,
+            description="Improve accessibility",
+            validate_default=True,
         )
         optimize_structure: bool = u.Field(
-            False, description="Optimize content structure", validate_default=True
+            False,
+            description="Optimize content structure",
+            validate_default=True,
         )
         update_metadata: bool = u.Field(
-            False, description="Update metadata", validate_default=True
+            False,
+            description="Update metadata",
+            validate_default=True,
         )
         comprehensive: bool = u.Field(
-            False, description="Run all optimizations", validate_default=True
+            False,
+            description="Run all optimizations",
+            validate_default=True,
         )
         backup: bool = u.Field(
-            True, description="Create file backups", validate_default=True
+            True,
+            description="Create file backups",
+            validate_default=True,
         )
         output: str = u.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
@@ -534,7 +557,7 @@ class FlextQualityDocumentationOptimizer:
             save_result = optimizer.save_report(self.output)
             if save_result.failure:
                 return r[bool].fail(
-                    save_result.error or "optimization report write failed"
+                    save_result.error or "optimization report write failed",
                 )
             return r[bool].ok(value=True)
 

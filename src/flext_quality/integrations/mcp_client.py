@@ -32,7 +32,8 @@ class FlextQualityMcpClient:
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
-        self, call: m.Quality.McpToolCall
+        self,
+        call: m.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
@@ -102,7 +103,9 @@ class FlextQualityMcpClient:
         return shutil.which("mcp-cli") is not None
 
     def parse_result(
-        self, output: str, exit_code: int
+        self,
+        output: str,
+        exit_code: int,
     ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
@@ -144,7 +147,7 @@ class FlextQualityMcpClient:
                         success=True,
                         data={
                             "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
-                                coerced_data
+                                coerced_data,
                             ).decode("utf-8"),
                         },
                         error=None,

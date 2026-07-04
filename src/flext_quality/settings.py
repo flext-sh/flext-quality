@@ -20,7 +20,8 @@ class FlextQualitySettings(FlextSettingsBase):
     """Runtime configuration for flext-quality services."""
 
     model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(
-        env_prefix="FLEXT_QUALITY_", extra="ignore"
+        env_prefix="FLEXT_QUALITY_",
+        extra="ignore",
     )
 
     hook_timeout_ms: Annotated[int, u.Field(ge=100, le=60000)] = (

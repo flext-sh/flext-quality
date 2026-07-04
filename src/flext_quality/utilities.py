@@ -4,8 +4,7 @@ from __future__ import annotations
 
 import re
 import sys
-from pathlib import Path
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from flext_infra import u
 from flext_web import u as web_u
@@ -13,6 +12,9 @@ from flext_web import u as web_u
 from flext_cli import cli
 from flext_core import FlextUtilitiesGuardsTypeCore, FlextUtilitiesReliability
 from flext_quality import c, p, r, t
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextQualityUtilities(
@@ -98,7 +100,7 @@ class FlextQualityUtilities(
                 output["blockedReason"] = blocked_reason
             serialized_output: bytes = (
                 t.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
-                    output
+                    output,
                 )
             )
             decoded_output: str = serialized_output.decode(c.DEFAULT_ENCODING)
@@ -121,7 +123,7 @@ class FlextQualityUtilities(
                         "Expected YAML dict",
                     )
                 parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
-                    parsed
+                    parsed,
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):

@@ -9,12 +9,8 @@ from __future__ import annotations
 import asyncio
 import pathlib
 import time
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-)
 from concurrent.futures import ThreadPoolExecutor
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -22,6 +18,12 @@ import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
 from flext_quality import c, m, p, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        Mapping,
+        MutableSequence,
+    )
 
 
 class FlextQualityLinkChecker:
@@ -148,7 +150,7 @@ class FlextQualityLinkChecker:
                 continue
             content = read.value
             md_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\(([^)]+)\)").findall(
-                content
+                content,
             )
             for text, url in md_links:
                 link_type = self._classify_link(url)
@@ -162,10 +164,10 @@ class FlextQualityLinkChecker:
                 all_links.append(link_info)
 
             ref_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\[([^\]]+)\]").findall(
-                content
+                content,
             )
             ref_defs = u.Quality.compile_pattern(r"\[([^\]]+)\]:\s*([^\s]+)").findall(
-                content
+                content,
             )
 
             ref_dict: t.StrMapping = dict(ref_defs)

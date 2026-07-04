@@ -7,10 +7,12 @@ from collections.abc import (
     MutableSequence,
     Sequence,
 )
-from pathlib import Path
-from typing import final
+from typing import TYPE_CHECKING, final
 
 from flext_quality import FlextQualityBaseHook, c, p, r, t, u
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 @final

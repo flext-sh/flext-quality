@@ -13,18 +13,20 @@ Usage:
 from __future__ import annotations
 
 import concurrent.futures
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-)
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 import requests
 from flext_api import FlextApiConstants
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableMapping,
+        MutableSequence,
+    )
 
 
 class FlextQualityDocumentationValidator:
@@ -110,7 +112,7 @@ class FlextQualityDocumentationValidator:
                     )
                 image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
                 image_matches = u.Quality.compile_pattern(image_pattern).findall(
-                    content
+                    content,
                 )
                 for alt_text, src in image_matches:
                     all_links.append(
@@ -178,7 +180,9 @@ class FlextQualityDocumentationValidator:
             ) as executor:
                 futures = [
                     executor.submit(
-                        self._check_single_external_link, link, verbose=verbose
+                        self._check_single_external_link,
+                        link,
+                        verbose=verbose,
                     )
                     for link in external_links
                 ]
@@ -348,7 +352,7 @@ class FlextQualityDocumentationValidator:
                                 "line": link.line_number,
                                 "error": "Target file not found",
                             },
-                        )
+                        ),
                     )
                     self.results.broken_links += 1
                 self.results.links_checked += 1
@@ -491,7 +495,8 @@ class FlextQualityDocumentationValidator:
             return report_text
 
         def save_report(
-            self, output_path: str = "docs/maintenance/reports/"
+            self,
+            output_path: str = "docs/maintenance/reports/",
         ) -> p.Result[Path]:
             """Save validation report."""
             output_dir = Path(output_path)
@@ -553,7 +558,8 @@ class FlextQualityDocumentationValidator:
             return self.results
 
         def _check_markdown_issues(
-            self, content: str
+            self,
+            content: str,
         ) -> t.SequenceOf[m.Quality.ContentIssue]:
             """Check for markdown syntax issues."""
             issues: MutableSequence[m.Quality.ContentIssue] = []
@@ -652,15 +658,16 @@ class FlextQualityDocumentationValidator:
                 has_code_blocks="```" in content,
                 has_lists=bool(
                     u.Quality.compile_pattern(
-                        r"^[\\s]*[-\\*\\+]", multiline=True
+                        r"^[\\s]*[-\\*\\+]",
+                        multiline=True,
                     ).search(
                         content,
-                    )
+                    ),
                 ),
                 has_headers=bool(
                     u.Quality.compile_pattern(r"^#{1,6}\\s", multiline=True).search(
-                        content
-                    )
+                        content,
+                    ),
                 ),
             )
 
@@ -694,31 +701,49 @@ class FlextQualityDocumentationValidator:
         """CLI command for FLEXT Quality documentation validation."""
 
         external_links: bool = u.Field(
-            False, description="Validate external links", validate_default=True
+            False,
+            description="Validate external links",
+            validate_default=True,
         )
         internal_links: bool = u.Field(
-            False, description="Validate internal links", validate_default=True
+            False,
+            description="Validate internal links",
+            validate_default=True,
         )
         images: bool = u.Field(
-            False, description="Validate image references", validate_default=True
+            False,
+            description="Validate image references",
+            validate_default=True,
         )
         anchors: bool = u.Field(
-            False, description="Validate anchor links", validate_default=True
+            False,
+            description="Validate anchor links",
+            validate_default=True,
         )
         link_text: bool = u.Field(
-            False, description="Check link text quality", validate_default=True
+            False,
+            description="Check link text quality",
+            validate_default=True,
         )
         markdown_syntax: bool = u.Field(
-            False, description="Validate markdown syntax", validate_default=True
+            False,
+            description="Validate markdown syntax",
+            validate_default=True,
         )
         content_quality: bool = u.Field(
-            False, description="Check content quality", validate_default=True
+            False,
+            description="Check content quality",
+            validate_default=True,
         )
         all: bool = u.Field(
-            False, description="Run all validation checks", validate_default=True
+            False,
+            description="Run all validation checks",
+            validate_default=True,
         )
         verbose: bool = u.Field(
-            False, description="Enable verbose output", validate_default=True
+            False,
+            description="Enable verbose output",
+            validate_default=True,
         )
         output: str = u.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
@@ -726,13 +751,19 @@ class FlextQualityDocumentationValidator:
             validate_default=True,
         )
         timeout: int = u.Field(
-            10, description="External request timeout", validate_default=True
+            10,
+            description="External request timeout",
+            validate_default=True,
         )
         retries: int = u.Field(
-            3, description="External request retries", validate_default=True
+            3,
+            description="External request retries",
+            validate_default=True,
         )
         workers: int = u.Field(
-            5, description="Concurrent link workers", validate_default=True
+            5,
+            description="Concurrent link workers",
+            validate_default=True,
         )
 
         def _execute_checks(
@@ -794,7 +825,7 @@ class FlextQualityDocumentationValidator:
             save_result = link_validator.save_report(self.output)
             if save_result.failure:
                 return r[bool].fail(
-                    save_result.error or "validation report write failed"
+                    save_result.error or "validation report write failed",
                 )
             if total_errors > 0:
                 return r[bool].fail(f"Validation found {total_errors} errors")

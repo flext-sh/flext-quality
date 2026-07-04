@@ -37,10 +37,10 @@ class FlextQualityConfigManager:
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
             u.Field(
@@ -198,7 +198,7 @@ class FlextQualityConfigManager:
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
             self._audit_rules = FlextQualityConfigManager.AuditRules.model_validate(
-                data
+                data,
             )
         return self._audit_rules
 
@@ -207,7 +207,7 @@ class FlextQualityConfigManager:
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
             self._style_guide = FlextQualityConfigManager.StyleGuide.model_validate(
-                data
+                data,
             )
         return self._style_guide
 
@@ -242,7 +242,8 @@ class FlextQualityConfigManager:
             return self._get_default_config(filename)
 
     def _get_default_config(
-        self, filename: str
+        self,
+        filename: str,
     ) -> FlextQualityConfigManager.ConfigData:
         """Get default configuration for a file."""
         defaults: t.MappingKV[str, FlextQualityConfigManager.RawConfigMap] = {
@@ -367,11 +368,11 @@ class FlextQualityConfigManager:
 
 
 FlextQualityConfigManager.AuditRules.model_rebuild(
-    _types_namespace={"FlextQualityModels": m}
+    _types_namespace={"FlextQualityModels": m},
 )
 FlextQualityConfigManager.StyleGuide.model_rebuild(
-    _types_namespace={"FlextQualityModels": m}
+    _types_namespace={"FlextQualityModels": m},
 )
 FlextQualityConfigManager.ValidationSettings.model_rebuild(
-    _types_namespace={"FlextQualityModels": m}
+    _types_namespace={"FlextQualityModels": m},
 )

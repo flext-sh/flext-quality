@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import fnmatch
-from typing import ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
-from flext_quality import c, p, t
+if TYPE_CHECKING:
+    from flext_quality import c, p, t
 
 
 class FlextQualityBaseHook:

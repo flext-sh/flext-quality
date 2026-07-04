@@ -51,7 +51,7 @@ class FlextQualityDocumentationDashboard:
             """API endpoint for current metrics."""
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_current_metrics()
+                    self.get_current_metrics(),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -64,7 +64,7 @@ class FlextQualityDocumentationDashboard:
             days = int(request.args.get("days", 30))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_quality_trends(days)
+                    self.get_quality_trends(days),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -77,7 +77,7 @@ class FlextQualityDocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-                    self.get_recent_reports(limit)
+                    self.get_recent_reports(limit),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -201,7 +201,8 @@ class FlextQualityDocumentationDashboard:
         read = u.Cli.files_read_text(report_file)
         if read.failure:
             self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
+                "Skipping unreadable report",
+                file=str(report_file),
             )
             return None
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
@@ -249,7 +250,8 @@ class FlextQualityDocumentationDashboard:
         read = u.Cli.files_read_text(report_file)
         if read.failure:
             self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
+                "Skipping unreadable report",
+                file=str(report_file),
             )
             return None
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
@@ -604,13 +606,19 @@ class FlextQualityDocumentationDashboard:
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(
-            "localhost", description="Dashboard bind host", validate_default=True
+            "localhost",
+            description="Dashboard bind host",
+            validate_default=True,
         )
         port: int = u.Field(
-            8080, description="Dashboard bind port", validate_default=True
+            8080,
+            description="Dashboard bind port",
+            validate_default=True,
         )
         debug: bool = u.Field(
-            False, description="Enable dashboard debug mode", validate_default=True
+            False,
+            description="Enable dashboard debug mode",
+            validate_default=True,
         )
         reports_dir: str = u.Field(
             "docs/maintenance/reports/",

@@ -10,13 +10,15 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
-from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from flext_infra import m, u
 from flext_web import m as web_m
 
 from flext_quality import c, t
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextQualityModels(m, web_m):
@@ -64,7 +66,8 @@ class FlextQualityModels(m, web_m):
             def to_dict(
                 self,
             ) -> t.MappingKV[
-                str, str | int | t.MappingKV[str, t.Primitives | None] | None
+                str,
+                str | int | t.MappingKV[str, t.Primitives | None] | None,
             ]:
                 """Convert issue to dictionary representation."""
                 return {
@@ -84,7 +87,7 @@ class FlextQualityModels(m, web_m):
             valid_items: int = 0
             invalid_items: int = 0
             issues: MutableSequence[FlextQualityModels.Quality.Issue] = u.Field(
-                default_factory=lambda: list[FlextQualityModels.Quality.Issue]()
+                default_factory=list[FlextQualityModels.Quality.Issue],
             )
             warnings: MutableSequence[str] = u.Field(default_factory=list)
             errors: MutableSequence[str] = u.Field(default_factory=list)
@@ -244,7 +247,7 @@ class FlextQualityModels(m, web_m):
                     t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
                 ]
             ] = u.Field(
-                default_factory=lambda: list[
+                default_factory=list[
                     MutableMapping[
                         str,
                         t.Primitives
@@ -252,17 +255,15 @@ class FlextQualityModels(m, web_m):
                         | t.SequenceOf[t.StrMapping]
                         | None,
                     ]
-                ]()
+                ],
             )
             metrics: FlextQualityModels.Quality.AuditMetrics = u.Field(
-                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
+                default_factory=FlextQualityModels.Quality.AuditMetrics,
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
             ] = u.Field(
-                default_factory=lambda: list[
-                    FlextQualityModels.Quality.AuditRecommendation
-                ]()
+                default_factory=list[FlextQualityModels.Quality.AuditRecommendation],
             )
 
         class LinkRecord(m.BaseModel):
@@ -312,17 +313,13 @@ class FlextQualityModels(m, web_m):
             warnings: int = 0
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = (
                 u.Field(
-                    default_factory=lambda: list[
-                        FlextQualityModels.Quality.LinkCheckResult
-                    ]()
+                    default_factory=list[FlextQualityModels.Quality.LinkCheckResult],
                 )
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
             ] = u.Field(
-                default_factory=lambda: list[
-                    FlextQualityModels.Quality.LinkCheckResult
-                ]()
+                default_factory=list[FlextQualityModels.Quality.LinkCheckResult],
             )
 
         class ContentValidatorResults(m.BaseModel):
@@ -332,9 +329,7 @@ class FlextQualityModels(m, web_m):
             files_checked: int = 0
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
                 u.Field(
-                    default_factory=lambda: list[
-                        FlextQualityModels.Quality.ContentIssue
-                    ]()
+                    default_factory=list[FlextQualityModels.Quality.ContentIssue],
                 )
             )
             quality_metrics: t.MutableScalarMapping = u.Field(default_factory=dict)
@@ -394,18 +389,14 @@ class FlextQualityModels(m, web_m):
 
             quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
                 u.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.QualityThresholdsConfig()
-                    ),
+                    default_factory=FlextQualityModels.Quality.QualityThresholdsConfig,
                 )
             )
             content_checks: FlextQualityModels.Quality.ContentChecksConfig = u.Field(
-                default_factory=lambda: FlextQualityModels.Quality.ContentChecksConfig()
+                default_factory=FlextQualityModels.Quality.ContentChecksConfig,
             )
             severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = u.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.SeverityLevelsConfig()
-                )
+                default_factory=FlextQualityModels.Quality.SeverityLevelsConfig,
             )
 
         class MarkdownStyleConfig(m.BaseModel):
@@ -449,13 +440,13 @@ class FlextQualityModels(m, web_m):
             """Configuration for style guide rules."""
 
             markdown: FlextQualityModels.Quality.MarkdownStyleConfig = u.Field(
-                default_factory=lambda: FlextQualityModels.Quality.MarkdownStyleConfig()
+                default_factory=FlextQualityModels.Quality.MarkdownStyleConfig,
             )
             accessibility: FlextQualityModels.Quality.AccessibilityConfig = u.Field(
-                default_factory=lambda: FlextQualityModels.Quality.AccessibilityConfig()
+                default_factory=FlextQualityModels.Quality.AccessibilityConfig,
             )
             formatting: FlextQualityModels.Quality.FormattingConfig = u.Field(
-                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig()
+                default_factory=FlextQualityModels.Quality.FormattingConfig,
             )
 
         class LinkValidationConfig(m.BaseModel):
@@ -470,11 +461,11 @@ class FlextQualityModels(m, web_m):
             follow_redirects: bool = True
             max_redirects: int = 5
             acceptable_status_codes: t.SequenceOf[int] = u.Field(
-                default_factory=lambda: [200, 201, 202, 206, 301, 302, 303, 307, 308]
+                default_factory=lambda: [200, 201, 202, 206, 301, 302, 303, 307, 308],
             )
             validate_content_type: bool = False
             expected_content_types: t.StrSequence = u.Field(
-                default_factory=lambda: ["text/html", "text/plain", "application/json"]
+                default_factory=lambda: ["text/html", "text/plain", "application/json"],
             )
             allowed_domains: t.StrSequence = u.Field(default_factory=list)
             blocked_domains: t.StrSequence = u.Field(default_factory=list)
@@ -484,7 +475,7 @@ class FlextQualityModels(m, web_m):
 
             min_section_depth: int = 2
             required_sections: t.StrSequence = u.Field(
-                default_factory=lambda: ["Overview", "Installation", "Usage"]
+                default_factory=lambda: ["Overview", "Installation", "Usage"],
             )
             min_word_count: int = 100
             check_readability: bool = False
@@ -496,15 +487,11 @@ class FlextQualityModels(m, web_m):
             """Configuration for validation settings."""
 
             link_validation: FlextQualityModels.Quality.LinkValidationConfig = u.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.LinkValidationConfig()
-                )
+                default_factory=FlextQualityModels.Quality.LinkValidationConfig,
             )
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
                 u.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.ContentAnalysisConfig()
-                    )
+                    default_factory=FlextQualityModels.Quality.ContentAnalysisConfig,
                 )
             )
 
@@ -516,7 +503,7 @@ class FlextQualityModels(m, web_m):
             changes_made: int = 0
             backups_created: MutableSequence[str] = u.Field(default_factory=list)
             optimizations: MutableSequence[t.MutableStrMapping] = u.Field(
-                default_factory=lambda: list[t.MutableStrMapping]()
+                default_factory=list[t.MutableStrMapping],
             )
 
         class ExecutionRequest(m.BaseModel):

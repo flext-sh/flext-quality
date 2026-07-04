@@ -11,19 +11,21 @@ Usage:
 
 from __future__ import annotations
 
-from collections.abc import (
-    Callable,
-    Mapping,
-    MutableSequence,
-)
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Annotated, override
+from typing import TYPE_CHECKING, Annotated, override
 
 from jinja2 import Template
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        Callable,
+        Mapping,
+        MutableSequence,
+    )
 
 
 class FlextQualityDocumentationReporter:
@@ -299,7 +301,7 @@ class FlextQualityDocumentationReporter:
                     for e_raw in validation_errors_list:
                         try:
                             error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                e_raw
+                                e_raw,
                             )
                         except c.EXC_TYPE_VALIDATION:
                             continue
@@ -384,7 +386,7 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        render_method: Callable[..., str] = getattr(template, "render")
+        render_method: Callable[..., str] = template.render
         rendered: str = render_method(**template_data)
         return rendered
 
@@ -566,7 +568,8 @@ class FlextQualityDocumentationReporter:
             )
         )
         report_data_dict: t.MappingKV[
-            str, t.Quality.DocumentationReportValue | datetime
+            str,
+            t.Quality.DocumentationReportValue | datetime,
         ] = {
             **report_data_raw,
             "date": report_date,
@@ -728,25 +731,39 @@ class FlextQualityDocumentationReporter:
             validate_default=True,
         )
         filename: str | None = u.Field(
-            None, description="Optional report filename", validate_default=True
+            None,
+            description="Optional report filename",
+            validate_default=True,
         )
         monthly_trends: bool = u.Field(
-            False, description="Generate monthly trend report", validate_default=True
+            False,
+            description="Generate monthly trend report",
+            validate_default=True,
         )
         weekly_trends: bool = u.Field(
-            False, description="Generate weekly trend report", validate_default=True
+            False,
+            description="Generate weekly trend report",
+            validate_default=True,
         )
         include_trends: bool = u.Field(
-            False, description="Include trend data", validate_default=True
+            False,
+            description="Include trend data",
+            validate_default=True,
         )
         notify: bool = u.Field(
-            False, description="Send report notification", validate_default=True
+            False,
+            description="Send report notification",
+            validate_default=True,
         )
         webhook_url: str | None = u.Field(
-            None, description="Notification webhook URL", validate_default=True
+            None,
+            description="Notification webhook URL",
+            validate_default=True,
         )
         serve: bool = u.Field(
-            False, description="Serve the report dashboard", validate_default=True
+            False,
+            description="Serve the report dashboard",
+            validate_default=True,
         )
 
         @override
@@ -779,7 +796,9 @@ class FlextQualityDocumentationReporter:
                     or f"quality_report_{u.now().strftime('%Y%m%d_%H%M%S')}"
                 )
                 save_result = reporter.save_report(
-                    report_content, filename, self.output_format
+                    report_content,
+                    filename,
+                    self.output_format,
                 )
                 if save_result.failure:
                     return r[bool].fail(save_result.error or "report write failed")

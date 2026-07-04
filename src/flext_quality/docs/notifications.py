@@ -277,7 +277,9 @@ class FlextQualityDocumentationNotifier:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
             message = self._format_critical_issues_message(audit_data)
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.CRITICAL.value
+                title,
+                message,
+                c.Quality.NotificationPriority.CRITICAL.value,
             )
 
         return True
@@ -303,7 +305,9 @@ This represents a significant degradation in documentation quality.
 Please review recent changes and address any identified issues.
             """.strip()
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.WARNING.value
+                title,
+                message,
+                c.Quality.NotificationPriority.WARNING.value,
             )
 
         return True
@@ -322,7 +326,9 @@ Please review recent changes and address any identified issues.
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
             message = self._format_broken_links_message(broken_links)
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.WARNING.value
+                title,
+                message,
+                c.Quality.NotificationPriority.WARNING.value,
             )
 
         return True
@@ -338,7 +344,9 @@ Please review recent changes and address any identified issues.
         title = "📊 Weekly Documentation Quality Report"
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(
-            title, message, c.Quality.NotificationPriority.INFO.value
+            title,
+            message,
+            c.Quality.NotificationPriority.INFO.value,
         )
 
     def notify_monthly_report(
@@ -352,7 +360,9 @@ Please review recent changes and address any identified issues.
         title = "📈 Monthly Documentation Quality Report"
         message = self._format_monthly_report_message(report_data)
         return self.send_notification(
-            title, message, c.Quality.NotificationPriority.INFO.value
+            title,
+            message,
+            c.Quality.NotificationPriority.INFO.value,
         )
 
     def send_notification(
@@ -653,16 +663,24 @@ Found {len(broken_links)} broken links that need attention:
             ),
         ] = "docs/maintenance/settings/notification_config.yaml"
         test: bool = u.Field(
-            False, description="Send a test notification", validate_default=True
+            False,
+            description="Send a test notification",
+            validate_default=True,
         )
         audit_data: str | None = u.Field(
-            None, description="Audit data JSON file", validate_default=True
+            None,
+            description="Audit data JSON file",
+            validate_default=True,
         )
         weekly_report: str | None = u.Field(
-            None, description="Weekly report JSON file", validate_default=True
+            None,
+            description="Weekly report JSON file",
+            validate_default=True,
         )
         monthly_report: str | None = u.Field(
-            None, description="Monthly report JSON file", validate_default=True
+            None,
+            description="Monthly report JSON file",
+            validate_default=True,
         )
 
         @override
@@ -684,7 +702,7 @@ Found {len(broken_links)} broken links that need attention:
                 audit_read = u.Cli.files_read_text(Path(self.audit_data))
                 if audit_read.failure:
                     return r[bool].fail(
-                        audit_read.error or f"cannot read {self.audit_data}"
+                        audit_read.error or f"cannot read {self.audit_data}",
                     )
                 audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     audit_read.value,
@@ -705,7 +723,7 @@ Found {len(broken_links)} broken links that need attention:
                 weekly_read = u.Cli.files_read_text(Path(self.weekly_report))
                 if weekly_read.failure:
                     return r[bool].fail(
-                        weekly_read.error or f"cannot read {self.weekly_report}"
+                        weekly_read.error or f"cannot read {self.weekly_report}",
                     )
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     weekly_read.value,
@@ -716,7 +734,7 @@ Found {len(broken_links)} broken links that need attention:
                 monthly_read = u.Cli.files_read_text(Path(self.monthly_report))
                 if monthly_read.failure:
                     return r[bool].fail(
-                        monthly_read.error or f"cannot read {self.monthly_report}"
+                        monthly_read.error or f"cannot read {self.monthly_report}",
                     )
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     monthly_read.value,
