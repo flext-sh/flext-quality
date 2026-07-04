@@ -153,5 +153,6 @@ class FlextQuality(FlextQualityServiceBase):
 
 
 quality = FlextQuality.fetch_global()
+"""Shared FlextQuality facade instance."""
 
 __all__: list[str] = ["FlextQuality", "quality"]
