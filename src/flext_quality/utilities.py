@@ -6,12 +6,14 @@ import re
 import sys
 from typing import TYPE_CHECKING, ClassVar
 
-from flext_infra import u
-from flext_web import u as web_u
+from flext_infra.utilities import FlextInfraUtilities as u
+from flext_web.utilities import FlextWebUtilities as web_u
 
 from flext_cli import cli
-from flext_core import FlextUtilitiesGuardsTypeCore, FlextUtilitiesReliability
-from flext_quality import c, p, r, t
+from flext_core.result import FlextResult as r
+from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.protocols import FlextQualityProtocols as p
+from flext_quality.typings import FlextQualityTypes as t
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -20,8 +22,6 @@ if TYPE_CHECKING:
 class FlextQualityUtilities(
     u,
     web_u,
-    FlextUtilitiesGuardsTypeCore,
-    FlextUtilitiesReliability,
 ):
     """Namespace for flext-quality utilities.
 
@@ -107,6 +107,30 @@ class FlextQualityUtilities(
             return decoded_output
 
         @staticmethod
+        def extract_rules_from_yaml(
+            parsed: t.JsonValue,
+        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+            """Validate and extract the rules list from parsed YAML."""
+            if not isinstance(parsed, dict):
+                return r[t.SequenceOf[t.JsonMapping]].fail(
+                    "Expected YAML dict",
+                )
+            parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
+                parsed,
+            )
+            raw_rules_val = parsed_dict.get("rules", [])
+            if not isinstance(raw_rules_val, list):
+                return r[t.SequenceOf[t.JsonMapping]].fail(
+                    "Expected rules list",
+                )
+            rules: t.SequenceOf[t.JsonMapping] = [
+                t.json_mapping_adapter().validate_python(item)
+                for item in raw_rules_val
+                if isinstance(item, dict)
+            ]
+            return r[t.SequenceOf[t.JsonMapping]].ok(rules)
+
+        @staticmethod
         def load_yaml_rules(
             path: Path,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
@@ -117,25 +141,9 @@ class FlextQualityUtilities(
                     return r[t.SequenceOf[t.JsonMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",
                     )
-                parsed = yaml_result.value
-                if not isinstance(parsed, dict):
-                    return r[t.SequenceOf[t.JsonMapping]].fail(
-                        "Expected YAML dict",
-                    )
-                parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
-                    parsed,
+                return FlextQualityUtilities.Quality.extract_rules_from_yaml(
+                    yaml_result.value,
                 )
-                raw_rules_val = parsed_dict.get("rules", [])
-                if not isinstance(raw_rules_val, list):
-                    return r[t.SequenceOf[t.JsonMapping]].fail(
-                        "Expected rules list",
-                    )
-                rules: t.SequenceOf[t.JsonMapping] = [
-                    t.json_mapping_adapter().validate_python(item)
-                    for item in raw_rules_val
-                    if isinstance(item, dict)
-                ]
-                return r[t.SequenceOf[t.JsonMapping]].ok(rules)
             except c.EXC_BROAD_IO_TYPE as e:
                 return r[t.SequenceOf[t.JsonMapping]].fail(
                     f"Failed to load rules: {e}",

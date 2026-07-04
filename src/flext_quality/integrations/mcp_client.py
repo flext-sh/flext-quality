@@ -16,7 +16,11 @@ from collections.abc import (
 )
 from typing import final
 
-from flext_quality import c, e, m, p, r, t
+from flext_core import e, r
+from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.models import FlextQualityModels as m
+from flext_quality.protocols import FlextQualityProtocols as p
+from flext_quality.typings import FlextQualityTypes as t
 
 
 @final
@@ -102,6 +106,65 @@ class FlextQualityMcpClient:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 
+    def _build_object_result(
+        self,
+        parsed: t.JsonMapping,
+    ) -> p.Result[m.Quality.McpToolResult]:
+        """Build an MCP tool result from parsed JSON object output."""
+        result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
+        return r[m.Quality.McpToolResult].ok(
+            m.Quality.McpToolResult.model_validate({
+                "success": True,
+                "data": result_data,
+                "error": None,
+            }),
+        )
+
+    def _build_list_result(
+        self,
+        output: str,
+    ) -> p.Result[m.Quality.McpToolResult]:
+        """Build an MCP tool result from parsed JSON list output."""
+        try:
+            parsed_list: t.JsonList = t.json_list_adapter().validate_json(output)
+        except ValueError:
+            return self._build_raw_result(output)
+        coerced_data: MutableSequence[t.StrMapping] = []
+        for item in parsed_list:
+            if isinstance(item, Mapping):
+                validated_item: t.JsonMapping = (
+                    t.json_mapping_adapter().validate_python(item)
+                )
+                coerced_data.append({
+                    key: str(value) for key, value in validated_item.items()
+                })
+            else:
+                coerced_data.append({"value": str(item)})
+        return r[m.Quality.McpToolResult].ok(
+            m.Quality.McpToolResult(
+                success=True,
+                data={
+                    "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
+                        coerced_data,
+                    ).decode("utf-8"),
+                },
+                error=None,
+            ),
+        )
+
+    def _build_raw_result(
+        self,
+        output: str,
+    ) -> p.Result[m.Quality.McpToolResult]:
+        """Build an MCP tool result preserving raw output."""
+        return r[m.Quality.McpToolResult].ok(
+            m.Quality.McpToolResult(
+                success=True,
+                data={"raw": output},
+                error=None,
+            ),
+        )
+
     def parse_result(
         self,
         output: str,
@@ -118,46 +181,6 @@ class FlextQualityMcpClient:
             )
         try:
             parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(output)
-            result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
-            return r[m.Quality.McpToolResult].ok(
-                m.Quality.McpToolResult.model_validate({
-                    "success": True,
-                    "data": result_data,
-                    "error": None,
-                }),
-            )
+            return self._build_object_result(parsed)
         except ValueError:
-            try:
-                parsed_list: t.JsonList = t.json_list_adapter().validate_json(
-                    output,
-                )
-                coerced_data: MutableSequence[t.StrMapping] = []
-                for item in parsed_list:
-                    if isinstance(item, Mapping):
-                        validated_item: t.JsonMapping = (
-                            t.json_mapping_adapter().validate_python(item)
-                        )
-                        coerced_data.append({
-                            key: str(value) for key, value in validated_item.items()
-                        })
-                    else:
-                        coerced_data.append({"value": str(item)})
-                return r[m.Quality.McpToolResult].ok(
-                    m.Quality.McpToolResult(
-                        success=True,
-                        data={
-                            "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
-                                coerced_data,
-                            ).decode("utf-8"),
-                        },
-                        error=None,
-                    ),
-                )
-            except ValueError:
-                return r[m.Quality.McpToolResult].ok(
-                    m.Quality.McpToolResult(
-                        success=True,
-                        data={"raw": output},
-                        error=None,
-                    ),
-                )
+            return self._build_list_result(output)
