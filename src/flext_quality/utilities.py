@@ -108,7 +108,7 @@ class FlextQualityUtilities(
 
         @staticmethod
         def extract_rules_from_yaml(
-            parsed: t.JsonValue,
+            parsed: t.JsonMapping,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate and extract the rules list from parsed YAML."""
             if not isinstance(parsed, dict):
