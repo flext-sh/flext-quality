@@ -7,10 +7,7 @@ from flext_core.lazy import build_lazy_import_map
 
 FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
     {
-        ".api": (
-            "FlextQuality",
-            "quality",
-        ),
+        ".api": ("FlextQuality",),
         ".base": ("FlextQualityServiceBase",),
         ".cli": (
             "FlextQualityCli",
@@ -30,6 +27,9 @@ FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
         ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
         ".integrations.mcp_client": ("FlextQualityMcpClient",),
         ".mcp": ("mcp",),
+        ".mcp.resources": ("FlextQualityMcpResources",),
+        ".mcp.server": ("FlextQualityMcpServer",),
+        ".mcp.tools": ("FlextQualityMcpTools",),
         ".models": (
             "FlextQualityModels",
             "m",
@@ -38,18 +38,16 @@ FLEXT_QUALITY_LAZY_IMPORTS_PART_01 = build_lazy_import_map(
             "FlextQualityProtocols",
             "p",
         ),
-        ".rules": ("rules",),
         ".rules.engine": ("FlextQualityRulesEngine",),
         ".rules.loader": ("FlextQualityRulesLoader",),
         ".rules.validators": ("FlextQualityValidators",),
         ".settings": ("FlextQualitySettings",),
         ".typings": ("FlextQualityTypes",),
         ".utilities": ("FlextQualityUtilities",),
-        "flext_core": (
+        "flext_core._root_typing_parts": (
             "d",
             "e",
             "h",
-            "r",
         ),
     },
 )

@@ -16,6 +16,7 @@ FLEXT_QUALITY_LAZY_IMPORTS = merge_lazy_imports(
     (
         ".hooks",
         ".integrations",
+        ".mcp",
         ".rules",
     ),
     _LOCAL_LAZY_IMPORTS,
