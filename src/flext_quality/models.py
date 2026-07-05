@@ -56,18 +56,32 @@ class FlextQualityModels(_InfraModels, _WebModels):
 
             type: Annotated[
                 str,
-                _InfraUtilities.Field(description="FlextQualityModels.Quality.Issue type identifier"),
+                _InfraUtilities.Field(
+                    description="FlextQualityModels.Quality.Issue type identifier"
+                ),
             ]
-            severity: Annotated[str, _InfraUtilities.Field(description="Severity level identifier")]
-            file: Annotated[str, _InfraUtilities.Field(description="File path where issue was found")]
+            severity: Annotated[
+                str, _InfraUtilities.Field(description="Severity level identifier")
+            ]
+            file: Annotated[
+                str,
+                _InfraUtilities.Field(description="File path where issue was found"),
+            ]
             line: Annotated[
                 int | None,
-                _InfraUtilities.Field(description="FlextQualityModels.Quality.Issue line number"),
+                _InfraUtilities.Field(
+                    description="FlextQualityModels.Quality.Issue line number"
+                ),
             ] = None
             description: Annotated[
-                str, _InfraUtilities.Field(description="FlextQualityModels.Quality.Issue description")
+                str,
+                _InfraUtilities.Field(
+                    description="FlextQualityModels.Quality.Issue description"
+                ),
             ] = ""
-            recommendation: Annotated[str, _InfraUtilities.Field(description="Recommended fix")] = ""
+            recommendation: Annotated[
+                str, _InfraUtilities.Field(description="Recommended fix")
+            ] = ""
             context: Annotated[
                 t.MappingKV[str, t.Primitives | None] | None,
                 _InfraUtilities.Field(default=None),
@@ -97,12 +111,16 @@ class FlextQualityModels(_InfraModels, _WebModels):
             total_items: int = 0
             valid_items: int = 0
             invalid_items: int = 0
-            issues: MutableSequence[FlextQualityModels.Quality.Issue] = _InfraUtilities.Field(
-                default_factory=list,
+            issues: MutableSequence[FlextQualityModels.Quality.Issue] = (
+                _InfraUtilities.Field(
+                    default_factory=list,
+                )
             )
             warnings: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
             errors: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
-            metadata: MutableMapping[str, t.Primitives] = _InfraUtilities.Field(default_factory=dict)
+            metadata: MutableMapping[str, t.Primitives] = _InfraUtilities.Field(
+                default_factory=dict
+            )
 
             @property
             def success_rate(self) -> float:
@@ -234,7 +252,9 @@ class FlextQualityModels(_InfraModels, _WebModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: t.MutableIntMapping = _InfraUtilities.Field(default_factory=dict)
+            severity_breakdown: t.MutableIntMapping = _InfraUtilities.Field(
+                default_factory=dict
+            )
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -343,7 +363,9 @@ class FlextQualityModels(_InfraModels, _WebModels):
                     default_factory=list,
                 )
             )
-            quality_metrics: t.MutableScalarMapping = _InfraUtilities.Field(default_factory=dict)
+            quality_metrics: t.MutableScalarMapping = _InfraUtilities.Field(
+                default_factory=dict
+            )
 
         class ContentMetrics(_InfraModels.BaseModel):
             """Content quality metrics for a documentation file."""
@@ -405,15 +427,19 @@ class FlextQualityModels(_InfraModels, _WebModels):
                     ),
                 )
             )
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig = _InfraUtilities.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.ContentChecksConfig()
-                ),
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.ContentChecksConfig()
+                    ),
+                )
             )
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = _InfraUtilities.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.SeverityLevelsConfig()
-                ),
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.SeverityLevelsConfig()
+                    ),
+                )
             )
 
         class MarkdownStyleConfig(_InfraModels.BaseModel):
@@ -456,18 +482,26 @@ class FlextQualityModels(_InfraModels, _WebModels):
         class StyleGuideConfig(_InfraModels.BaseModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = _InfraUtilities.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.MarkdownStyleConfig()
-                ),
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.MarkdownStyleConfig()
+                    ),
+                )
             )
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig = _InfraUtilities.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.AccessibilityConfig()
-                ),
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.AccessibilityConfig()
+                    ),
+                )
             )
-            formatting: FlextQualityModels.Quality.FormattingConfig = _InfraUtilities.Field(
-                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig(),
+            formatting: FlextQualityModels.Quality.FormattingConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.FormattingConfig()
+                    ),
+                )
             )
 
         class LinkValidationConfig(_InfraModels.BaseModel):
@@ -507,10 +541,12 @@ class FlextQualityModels(_InfraModels, _WebModels):
         class ValidationConfig(_InfraModels.BaseModel):
             """Configuration for validation settings."""
 
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig = _InfraUtilities.Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.LinkValidationConfig()
-                ),
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig = (
+                _InfraUtilities.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.LinkValidationConfig()
+                    ),
+                )
             )
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
                 _InfraUtilities.Field(
@@ -526,7 +562,9 @@ class FlextQualityModels(_InfraModels, _WebModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
+            backups_created: MutableSequence[str] = _InfraUtilities.Field(
+                default_factory=list
+            )
             optimizations: MutableSequence[t.MutableStrMapping] = _InfraUtilities.Field(
                 default_factory=list[t.MutableStrMapping],
             )

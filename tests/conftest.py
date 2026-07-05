@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 reset_settings = _shared_reset_settings
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def set_test_environment(reset_settings: None) -> Generator[None]:
     """Configure isolated test environment variables."""
     _ = reset_settings
