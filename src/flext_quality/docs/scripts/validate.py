@@ -272,8 +272,10 @@ class FlextQualityDocumentationValidator:
                     FlextApiConstants.Api.Method.GET,
                 )
             if response.status_code < 400:
-                retry_success_result: m.Quality.LinkCheckResult = base_result.model_copy(
-                    update={"valid": True, "status_code": response.status_code},
+                retry_success_result: m.Quality.LinkCheckResult = (
+                    base_result.model_copy(
+                        update={"valid": True, "status_code": response.status_code},
+                    )
                 )
                 return retry_success_result
             failure_result: m.Quality.LinkCheckResult = base_result.model_copy(
@@ -297,14 +299,16 @@ class FlextQualityDocumentationValidator:
                 attempt_result = self._handle_request_attempt(link, attempt)
                 if attempt_result is not None:
                     return attempt_result
-            max_retry_result: m.Quality.LinkCheckResult = m.Quality.LinkCheckResult.model_validate(
-                {
-                    "valid": False,
-                    "url": link.url,
-                    "file": link.file,
-                    "line": link.line_number,
-                    "error": "Max retries exceeded",
-                },
+            max_retry_result: m.Quality.LinkCheckResult = (
+                m.Quality.LinkCheckResult.model_validate(
+                    {
+                        "valid": False,
+                        "url": link.url,
+                        "file": link.file,
+                        "line": link.line_number,
+                        "error": "Max retries exceeded",
+                    },
+                )
             )
             return max_retry_result
 

@@ -110,9 +110,7 @@ class TestsFlextQualityCli:
         tm.that(main(["validate", "--target-path", str(tmp_path)]), eq=0)
 
     @pytest.mark.parametrize("bad_args", [["unknown"], ["not-a-command"], ["xyz"]])
-    def test_main_unknown_command_exits_nonzero(
-        self, bad_args: list[str]
-    ) -> None:
+    def test_main_unknown_command_exits_nonzero(self, bad_args: list[str]) -> None:
         tm.that(main(bad_args), eq=1)
 
 
