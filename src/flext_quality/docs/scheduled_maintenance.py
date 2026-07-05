@@ -232,14 +232,17 @@ class FlextQualityScheduledMaintenance:
                 ),
             }
 
-        return m.Quality.MaintenanceConfig.model_validate(merged)
+        config: m.Quality.MaintenanceConfig = (
+            m.Quality.MaintenanceConfig.model_validate(merged)
+        )
+        return config
 
     def get_default_config(self) -> m.Quality.MaintenanceConfig:
         """Default maintenance configuration."""
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        return m.Quality.MaintenanceConfig.model_validate({
+        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -346,6 +349,7 @@ class FlextQualityScheduledMaintenance:
                 "retention_days": 30,
             },
         })
+        return config
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
         """Extract task name list from settings for a schedule key."""

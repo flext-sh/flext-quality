@@ -23,7 +23,9 @@ from flext_quality import FlextQuality, p, quality, t
 class TestsFlextQualityApi:
     """Behavioral contract for the FlextQuality facade."""
 
-    @pytest.fixture(autouse=True)
+    pytestmark = pytest.mark.usefixtures("_restore_settings")
+
+    @pytest.fixture
     def _restore_settings(self) -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQuality().settings

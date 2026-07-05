@@ -262,25 +262,28 @@ class FlextQualityDocumentationValidator:
             """Handle one request attempt while letting transport exceptions propagate."""
             response = self._make_http_request(link.url)
             if response.status_code < 400:
-                return base_result.model_copy(
+                success_result: m.Quality.LinkCheckResult = base_result.model_copy(
                     update={"valid": True, "status_code": response.status_code},
                 )
+                return success_result
             if self._should_retry_with_get(response.status_code):
                 response = self._make_http_request(
                     link.url,
                     FlextApiConstants.Api.Method.GET,
                 )
             if response.status_code < 400:
-                return base_result.model_copy(
+                retry_success_result: m.Quality.LinkCheckResult = base_result.model_copy(
                     update={"valid": True, "status_code": response.status_code},
                 )
-            return base_result.model_copy(
+                return retry_success_result
+            failure_result: m.Quality.LinkCheckResult = base_result.model_copy(
                 update={
                     "valid": False,
                     "status_code": response.status_code,
                     "error": f"HTTP {response.status_code}",
                 },
             )
+            return failure_result
 
         def _check_single_external_link(
             self,
@@ -291,10 +294,10 @@ class FlextQualityDocumentationValidator:
             """Check a single external link."""
             _ = verbose
             for attempt in range(self.retries):
-                result = self._handle_request_attempt(link, attempt)
-                if result is not None:
-                    return result
-            return m.Quality.LinkCheckResult.model_validate(
+                attempt_result = self._handle_request_attempt(link, attempt)
+                if attempt_result is not None:
+                    return attempt_result
+            max_retry_result: m.Quality.LinkCheckResult = m.Quality.LinkCheckResult.model_validate(
                 {
                     "valid": False,
                     "url": link.url,
@@ -303,6 +306,7 @@ class FlextQualityDocumentationValidator:
                     "error": "Max retries exceeded",
                 },
             )
+            return max_retry_result
 
         def validate_internal_links(
             self,

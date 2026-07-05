@@ -516,10 +516,10 @@ class FlextQualityLinkChecker:
         if len(path_parts) >= c.Quality.LINK_CHECKER_MIN_PATH_PARTS_FOR_REPO:
             # user/repo or user/repo/tree/branch or user/repo/blob/branch/file
             if path_parts[1] in {"tree", "blob", "pull", "issues", "wiki", "releases"}:
-                return (
-                    len(path_parts)
-                    >= c.Quality.LINK_CHECKER_MIN_PATH_PARTS_FOR_DETAILED_REPO
+                min_detailed_parts: int = (
+                    c.Quality.LINK_CHECKER_MIN_PATH_PARTS_FOR_DETAILED_REPO
                 )
+                return len(path_parts) >= min_detailed_parts
             if path_parts[1] in {"pulls", "issues", "wikis", "releases"}:
                 return True
             # Assume it's a valid repo reference
