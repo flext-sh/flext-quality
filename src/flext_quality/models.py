@@ -94,7 +94,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
                 str | int | t.MappingKV[str, t.Primitives | None] | None,
             ]:
                 """Convert issue to dictionary representation."""
-                context: dict[str, t.Primitives | None] = {}
+                context: t.MutableMappingKV[str, t.Primitives | None] = {}
                 return {
                     "type": self.type,
                     "severity": self.severity,
