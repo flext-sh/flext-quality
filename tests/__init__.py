@@ -16,6 +16,14 @@ if TYPE_CHECKING:
 
     from tests.base import TestsFlextQualityServiceBase, s
     from tests.constants import TestsFlextQualityConstants, c
+    from tests.helpers.assertions import (
+        assert_analysis_results_structure,
+        assert_dict_structure,
+        assert_is_dict,
+        assert_is_list,
+        assert_issues_structure,
+        assert_metrics_structure,
+    )
     from tests.models import TestsFlextQualityModels, m
     from tests.protocols import TestsFlextQualityProtocols, p
     from tests.settings import TestsFlextQualitySettings

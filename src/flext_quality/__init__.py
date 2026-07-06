@@ -24,7 +24,7 @@ from flext_quality.__version__ import (
 if TYPE_CHECKING:
     from flext_infra import d, e, h, r, x
 
-    from flext_quality.api import FlextQuality
+    from flext_quality.api import FlextQuality, quality
     from flext_quality.base import FlextQualityServiceBase, s
     from flext_quality.cli import FlextQualityCli, main
     from flext_quality.constants import FlextQualityConstants, c
