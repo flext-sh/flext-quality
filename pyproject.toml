@@ -41,7 +41,7 @@ dependencies = [
   "rich>=14,<15",
   "schedule>=1.2.2",
   "typer>=0.25.1",
-  "uvicorn>=0.46.0",
+  "uvicorn>=0.50.0",
   "wrapt>=2.1.2",
 ]
 description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
