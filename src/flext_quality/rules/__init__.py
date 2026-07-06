@@ -8,15 +8,9 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.rules.engine import (
-        FlextQualityRulesEngine as FlextQualityRulesEngine,
-    )
-    from flext_quality.rules.loader import (
-        FlextQualityRulesLoader as FlextQualityRulesLoader,
-    )
-    from flext_quality.rules.validators import (
-        FlextQualityValidators as FlextQualityValidators,
-    )
+    from flext_quality.rules.engine import FlextQualityRulesEngine
+    from flext_quality.rules.loader import FlextQualityRulesLoader
+    from flext_quality.rules.validators import FlextQualityValidators
 _LAZY_IMPORTS = build_lazy_import_map(
     {
         ".engine": ("FlextQualityRulesEngine",),

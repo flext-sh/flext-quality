@@ -8,11 +8,9 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.mcp.resources import (
-        FlextQualityMcpResources as FlextQualityMcpResources,
-    )
-    from flext_quality.mcp.server import FlextQualityMcpServer as FlextQualityMcpServer
-    from flext_quality.mcp.tools import FlextQualityMcpTools as FlextQualityMcpTools
+    from flext_quality.mcp.resources import FlextQualityMcpResources
+    from flext_quality.mcp.server import FlextQualityMcpServer
+    from flext_quality.mcp.tools import FlextQualityMcpTools
 _LAZY_IMPORTS = build_lazy_import_map(
     {
         ".resources": ("FlextQualityMcpResources",),
