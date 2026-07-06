@@ -153,8 +153,6 @@ class FlextQualityDocumentationValidator:
                     ".mdx",
                 )):
                     link_type = "internal"
-                case _:
-                    pass
             return link_type
 
         def _find_line_number(self, content: str, search_text: str) -> int | None:
