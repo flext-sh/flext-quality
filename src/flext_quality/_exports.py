@@ -3,14 +3,69 @@
 
 from __future__ import annotations
 
-from flext_core.lazy import merge_lazy_imports
-from flext_quality._exports_lazy_part_01 import FLEXT_QUALITY_LAZY_IMPORTS_PART_01
-from flext_quality._exports_lazy_part_02 import FLEXT_QUALITY_LAZY_IMPORTS_PART_02
+from flext_core.lazy import build_lazy_import_map, merge_lazy_imports
 
-_LOCAL_LAZY_IMPORTS = {
-    **FLEXT_QUALITY_LAZY_IMPORTS_PART_01,
-    **FLEXT_QUALITY_LAZY_IMPORTS_PART_02,
-}
+_LOCAL_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".api": (
+            "FlextQuality",
+            "quality",
+        ),
+        ".base": (
+            "FlextQualityServiceBase",
+            "s",
+        ),
+        ".cli": (
+            "FlextQualityCli",
+            "main",
+        ),
+        ".constants": (
+            "FlextQualityConstants",
+            "c",
+        ),
+        ".docs": ("docs",),
+        ".hooks": ("hooks",),
+        ".hooks.base": ("FlextQualityBaseHook",),
+        ".hooks.manager": ("FlextQualityHookManager",),
+        ".integrations": ("integrations",),
+        ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
+        ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
+        ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
+        ".integrations.mcp_client": ("FlextQualityMcpClient",),
+        ".mcp": ("mcp",),
+        ".mcp.resources": ("FlextQualityMcpResources",),
+        ".mcp.server": ("FlextQualityMcpServer",),
+        ".mcp.tools": ("FlextQualityMcpTools",),
+        ".models": (
+            "FlextQualityModels",
+            "m",
+        ),
+        ".protocols": (
+            "FlextQualityProtocols",
+            "p",
+        ),
+        ".rules": ("rules",),
+        ".rules.engine": ("FlextQualityRulesEngine",),
+        ".rules.loader": ("FlextQualityRulesLoader",),
+        ".rules.validators": ("FlextQualityValidators",),
+        ".settings": ("FlextQualitySettings",),
+        ".typings": (
+            "FlextQualityTypes",
+            "t",
+        ),
+        ".utilities": (
+            "FlextQualityUtilities",
+            "u",
+        ),
+        "flext_core._root_typing_parts.facades": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "x",
+        ),
+    },
+)
 
 FLEXT_QUALITY_LAZY_IMPORTS = merge_lazy_imports(
     (
