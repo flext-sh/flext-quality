@@ -19,13 +19,8 @@ from flext_quality.__version__ import (
 from flext_quality._exports import FLEXT_QUALITY_LAZY_IMPORTS
 
 if TYPE_CHECKING:
-    from flext_core._root_typing_parts.facades import (
-        d as d,
-        e as e,
-        h as h,
-        r as r,
-        x as x,
-    )
+    from flext_infra import d as d, e as e, h as h, r as r, x as x
+
     from flext_quality.api import FlextQuality as FlextQuality, quality as quality
     from flext_quality.base import (
         FlextQualityServiceBase as FlextQualityServiceBase,
