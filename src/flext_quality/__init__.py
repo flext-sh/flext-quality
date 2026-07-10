@@ -24,6 +24,10 @@ from flext_quality.__version__ import (
 if TYPE_CHECKING:
     from flext_infra import d as d, e as e, h as h, r as r, x as x
 
+    from flext_quality._settings import (
+        FlextQualitySettings as FlextQualitySettings,
+        settings as settings,
+    )
     from flext_quality.api import FlextQuality as FlextQuality, quality as quality
     from flext_quality.base import (
         FlextQualityServiceBase as FlextQualityServiceBase,
