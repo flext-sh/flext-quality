@@ -5,7 +5,8 @@ from __future__ import annotations
 from collections.abc import (
     Sequence,
 )
-from typing import TYPE_CHECKING, override
+from pathlib import Path
+from typing import override
 
 from flext_quality import (
     FlextQualityHookManager,
@@ -19,9 +20,6 @@ from flext_quality import (
 )
 from flext_quality._settings import FlextQualitySettings
 from flext_quality.base import FlextQualityServiceBase
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextQuality(FlextQualityServiceBase):

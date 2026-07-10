@@ -161,8 +161,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
 
 
 __all__: tuple[str, ...] = (
-    "FlextQualitySettings",
-    "settings",
     "FlextQuality",
     "FlextQualityBaseHook",
     "FlextQualityClaudeContextClient",
@@ -180,6 +178,7 @@ __all__: tuple[str, ...] = (
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",
     "FlextQualityServiceBase",
+    "FlextQualitySettings",
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
@@ -201,6 +200,7 @@ __all__: tuple[str, ...] = (
     "quality",
     "r",
     "s",
+    "settings",
     "t",
     "u",
     "x",
