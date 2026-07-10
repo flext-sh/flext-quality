@@ -10,21 +10,19 @@ import runpy
 import shlex
 import threading
 import time
+from collections.abc import (
+    Callable,
+)
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, ClassVar, override
+from typing import Annotated, ClassVar, override
 
 import pytest
 import schedule
 from git import InvalidGitRepositoryError, Repo
 
 from flext_cli import cli
-from flext_quality import c, m, p, r, s, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import (
-        Callable,
-    )
+from flext_quality import c, m, p, r, s, settings, t, u
 
 
 class FlextQualityScheduledMaintenance:
@@ -92,10 +90,10 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        self.settings: m.Quality.MaintenanceConfig = self.get_default_config()
+        settings: m.Quality.MaintenanceConfig = self.get_default_config()
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.reports_dir = Path(self.settings.reports_dir)
+        self.reports_dir = Path(settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
@@ -116,11 +114,9 @@ class FlextQualityScheduledMaintenance:
                 resolved_config_path,
             )
             if u.mapping(loaded_untyped) and loaded_untyped:
-                self.settings = self._merge_config(default_config, loaded_untyped)
-            else:
-                self.settings = default_config
+                self._merge_config(default_config, loaded_untyped)
         except FileNotFoundError:
-            self.settings = default_config
+            pass
 
     def _merge_config(
         self,
@@ -353,7 +349,7 @@ class FlextQualityScheduledMaintenance:
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
         """Extract task name list from settings for a schedule key."""
-        schedules = self.settings.schedules
+        schedules = settings.schedules
         schedule_entry = schedules.get(schedule_key)
         return schedule_entry.tasks if schedule_entry else []
 
@@ -378,7 +374,7 @@ class FlextQualityScheduledMaintenance:
         success = True
 
         for task_name in task_names:
-            task_cfg = self.settings.tasks.get(task_name)
+            task_cfg = settings.tasks.get(task_name)
             if task_cfg is not None:
                 if self.run_single_task(task_cfg):
                     self.results.tasks_completed += 1
@@ -386,7 +382,7 @@ class FlextQualityScheduledMaintenance:
                     self.results.errors.append(f"Task {task_name} failed")
                     success = False
 
-                if self.settings.error_handling.fail_fast:
+                if settings.error_handling.fail_fast:
                     break
 
         return success
@@ -680,7 +676,7 @@ class FlextQualityScheduledMaintenance:
 
     def schedule_tasks(self) -> None:
         """Schedule all maintenance tasks."""
-        schedules = self.settings.schedules
+        schedules = settings.schedules
 
         # Daily audit
         if schedules["daily_audit"].enabled:

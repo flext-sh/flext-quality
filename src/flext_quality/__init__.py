@@ -69,7 +69,6 @@ if TYPE_CHECKING:
     from flext_quality.rules.validators import (
         FlextQualityValidators as FlextQualityValidators,
     )
-    from flext_quality.settings import FlextQualitySettings as FlextQualitySettings
     from flext_quality.typings import FlextQualityTypes as FlextQualityTypes, t as t
     from flext_quality.utilities import (
         FlextQualityUtilities as FlextQualityUtilities,
@@ -84,6 +83,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            "._settings": ("FlextQualitySettings", "settings"),
             ".api": (
                 "FlextQuality",
                 "quality",
@@ -120,7 +120,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".rules.engine": ("FlextQualityRulesEngine",),
             ".rules.loader": ("FlextQualityRulesLoader",),
             ".rules.validators": ("FlextQualityValidators",),
-            ".settings": ("FlextQualitySettings",),
             ".typings": (
                 "FlextQualityTypes",
                 "t",
@@ -162,6 +161,8 @@ _LAZY_IMPORTS = merge_lazy_imports(
 
 
 __all__: tuple[str, ...] = (
+    "FlextQualitySettings",
+    "settings",
     "FlextQuality",
     "FlextQualityBaseHook",
     "FlextQualityClaudeContextClient",
@@ -179,7 +180,6 @@ __all__: tuple[str, ...] = (
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",
     "FlextQualityServiceBase",
-    "FlextQualitySettings",
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
