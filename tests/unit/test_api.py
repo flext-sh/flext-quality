@@ -16,8 +16,9 @@ from pathlib import Path
 
 import pytest
 from flext_tests import tm
+from pydantic import ValidationError
 
-from flext_quality import FlextQuality, p, quality, t
+from flext_quality import FlextQuality, FlextQualitySettings, p, quality, t
 
 
 class TestsFlextQualityApi:
@@ -29,13 +30,13 @@ class TestsFlextQualityApi:
     def _restore_settings(self) -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQuality().settings
-        rules_dir = settings.rules_dir
-        max_function_length = settings.max_function_length
-        max_class_length = settings.max_class_length
+        rules_dir = settings.Quality.rules_dir
+        max_function_length = settings.Quality.max_function_length
+        max_class_length = settings.Quality.max_class_length
         yield
-        settings.rules_dir = rules_dir
-        settings.max_function_length = max_function_length
-        settings.max_class_length = max_class_length
+        settings.Quality.rules_dir = rules_dir
+        settings.Quality.max_function_length = max_function_length
+        settings.Quality.max_class_length = max_class_length
 
     # -- construction / status -------------------------------------------
 
@@ -85,13 +86,16 @@ class TestsFlextQualityApi:
     def test_validate_configuration_fails_when_function_exceeds_class_limit(
         self,
     ) -> None:
-        """max_function_length greater than max_class_length is rejected."""
-        service = FlextQuality()
-        service.settings.max_function_length = 500
-        service.settings.max_class_length = 100
-        result = service.validate_configuration()
-        tm.that(result.failure, eq=True)
-        tm.that((result.error or "").lower(), has="max_function_length")
+        """max_function_length greater than max_class_length is rejected.
+
+        The invariant is enforced at settings construction time (ADR-005), so
+        an invalid threshold pair must raise ValidationError on the public
+        settings model instead of passing through ``validate_configuration``.
+        """
+        with pytest.raises(ValidationError, match="max_function_length"):
+            FlextQualitySettings(
+                Quality={"max_function_length": 500, "max_class_length": 100},
+            )
 
     # -- hook output formatting ------------------------------------------
 
@@ -191,7 +195,7 @@ class TestsFlextQualityApi:
         """A configured but empty rules directory yields an empty rule list."""
         service = FlextQuality()
         with tempfile.TemporaryDirectory() as tmpdir:
-            service.settings.rules_dir = tmpdir
+            service.settings.Quality.rules_dir = tmpdir
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=0)
@@ -209,7 +213,7 @@ class TestsFlextQualityApi:
                 "\nrules:\n  - name: rule-two\n    type: blocking\n"
                 '    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
-            service.settings.rules_dir = str(rules_dir)
+            service.settings.Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=2)
@@ -217,7 +221,7 @@ class TestsFlextQualityApi:
     def test_load_rules_from_config_fails_for_missing_directory(self) -> None:
         """A configured rules directory that does not exist yields a failure."""
         service = FlextQuality()
-        service.settings.rules_dir = "/nonexistent/rules/dir"
+        service.settings.Quality.rules_dir = "/nonexistent/rules/dir"
         result = service.load_rules_from_config()
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")

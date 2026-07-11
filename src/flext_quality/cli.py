@@ -95,7 +95,6 @@ def main(args: t.StrSequence | None = None) -> int:
     app = cli.create_app_with_common_params(
         name=FlextQualityCli.app_name,
         help_text=FlextQualityCli.__doc__ or "",
-        settings=cli.settings,
     )
     cli.register_result_routes(
         app,

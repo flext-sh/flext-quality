@@ -17,6 +17,7 @@ class TestsFlextQualityServiceBase(tests_s):
     @override
     def fetch_settings(cls) -> TestsFlextQualitySettings:
         """Return the typed Quality+Tests settings singleton."""
+        return TestsFlextQualitySettings.fetch_global()
 
     @classmethod
     @override

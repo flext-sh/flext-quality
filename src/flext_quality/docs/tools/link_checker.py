@@ -88,7 +88,8 @@ class FlextQualityLinkChecker:
         config_path: str | None = "docs/maintenance/settings/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
-        self._get_default_config()
+        # Instance LinkConfig attribute restored (was dropped, leaving bare `settings` refs).
+        self.settings: FlextQualityLinkChecker.LinkConfig = self._get_default_config()
         self.load_config(config_path)
         self.session: ClientSession | None = None
         self.cache: t.MutableJsonMapping = {}
@@ -130,7 +131,7 @@ class FlextQualityLinkChecker:
 
     def load_config(self, _config_path: str | None) -> None:
         """Load validation configuration."""
-        self._get_default_config()
+        self.settings = self._get_default_config()
 
     def find_all_links(
         self,
@@ -213,7 +214,7 @@ class FlextQualityLinkChecker:
             return FlextQualityLinkChecker.LinkResult(
                 url=url,
                 error="timeout",
-                response_time=settings.external_timeout,
+                response_time=self.settings.external_timeout,
                 valid=False,
                 context=context or {},
             )
@@ -251,17 +252,17 @@ class FlextQualityLinkChecker:
 
         async with self.session.head(
             url,
-            timeout=ClientTimeout(total=settings.external_timeout),
-            allow_redirects=settings.follow_redirects,
-            max_redirects=settings.max_redirects,
-            headers={"User-Agent": settings.user_agent},
+            timeout=ClientTimeout(total=self.settings.external_timeout),
+            allow_redirects=self.settings.follow_redirects,
+            max_redirects=self.settings.max_redirects,
+            headers={"User-Agent": self.settings.user_agent},
         ) as response:
             response_time = time.time() - start_time
             result = FlextQualityLinkChecker.LinkResult(
                 url=url,
                 status_code=response.status,
                 response_time=response_time,
-                valid=response.status in settings.acceptable_status_codes,
+                valid=response.status in self.settings.acceptable_status_codes,
                 redirected=bool(response.history),
                 final_url=str(response.url),
                 content_type=response.headers.get("content-type", ""),
@@ -281,13 +282,13 @@ class FlextQualityLinkChecker:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
-        for attempt in range(settings.retry_attempts):
+        for attempt in range(self.settings.retry_attempts):
             try:
                 response = requests.head(
                     url,
-                    timeout=settings.external_timeout,
-                    headers={"User-Agent": settings.user_agent},
-                    allow_redirects=settings.follow_redirects,
+                    timeout=self.settings.external_timeout,
+                    headers={"User-Agent": self.settings.user_agent},
+                    allow_redirects=self.settings.follow_redirects,
                 )
 
                 response_time = time.time() - start_time
@@ -296,7 +297,7 @@ class FlextQualityLinkChecker:
                     url=url,
                     status_code=response.status_code,
                     response_time=response_time,
-                    valid=response.status_code in settings.acceptable_status_codes,
+                    valid=response.status_code in self.settings.acceptable_status_codes,
                     redirected=bool(response.history),
                     final_url=response.url,
                     content_type=response.headers.get("content-type", ""),
@@ -311,16 +312,16 @@ class FlextQualityLinkChecker:
                 return result
 
             except requests.exceptions.Timeout:
-                if attempt == settings.retry_attempts - 1:
+                if attempt == self.settings.retry_attempts - 1:
                     return FlextQualityLinkChecker.LinkResult(
                         url=url,
                         error="timeout",
-                        response_time=settings.external_timeout,
+                        response_time=self.settings.external_timeout,
                         valid=False,
                         context=context or {},
                     )
             except requests.exceptions.RequestException as e:
-                if attempt == settings.retry_attempts - 1:
+                if attempt == self.settings.retry_attempts - 1:
                     return FlextQualityLinkChecker.LinkResult(
                         url=url,
                         error=str(e),
@@ -457,7 +458,7 @@ class FlextQualityLinkChecker:
                     self.results.warnings_list.append({
                         "type": "slow_response",
                         "url": result.url,
-                        "message": f"Link timed out after {settings.external_timeout}s",
+                        "message": f"Link timed out after {self.settings.external_timeout}s",
                     })
 
         return self.results
@@ -469,7 +470,7 @@ class FlextQualityLinkChecker:
             rp.set_url(f"https://{domain}/robots.txt")
             rp.read()
 
-            return rp.can_fetch(settings.user_agent, "/")
+            return rp.can_fetch(self.settings.user_agent, "/")
         except (OSError, ConnectionError, TimeoutError, UnicodeDecodeError):
             # If robots.txt can't be read, assume crawling is allowed
             return True

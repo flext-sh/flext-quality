@@ -20,7 +20,7 @@ from typing import Annotated, override
 import requests
 
 from flext_cli import cli
-from flext_quality import c, m, p, r, s, settings, t, u
+from flext_quality import c, m, p, r, s, t, u
 
 
 class FlextQualityDocumentationNotifier:
@@ -85,30 +85,18 @@ class FlextQualityDocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
+        # Wire config_path: load YAML overrides into the typed notifier config.
+        loaded = u.Cli.yaml_load_mapping(Path(config_path))
+        self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
+            self._load_user_config(loaded)
+        )
         self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=u.now().isoformat(),
         )
 
     def _load_user_config(
         self,
-        loaded: t.MappingKV[
-            str,
-            int
-            | str
-            | float
-            | bool
-            | t.StrSequence
-            | t.MappingKV[
-                str,
-                int
-                | str
-                | float
-                | bool
-                | t.StrSequence
-                | t.MappingKV[str, str | int | bool],
-            ]
-            | None,
-        ],
+        loaded: t.JsonMapping,
     ) -> _NotifierConfig:
         cfg = self.get_default_config()
 
@@ -153,7 +141,9 @@ class FlextQualityDocumentationNotifier:
                 cfg.email.smtp_port = smtp_port
             to_addresses = email.get("to_addresses")
             if isinstance(to_addresses, list):
-                cfg.email.to_addresses = to_addresses
+                cfg.email.to_addresses = [
+                    address for address in to_addresses if isinstance(address, str)
+                ]
 
         slack = loaded.get("slack")
         if isinstance(slack, dict):
@@ -236,7 +226,7 @@ class FlextQualityDocumentationNotifier:
         audit_data: t.JsonMapping,
     ) -> bool:
         """Send notification for critical documentation issues."""
-        if not settings.alerts.critical_issues.enabled:
+        if not self.config.alerts.critical_issues.enabled:
             return True
 
         metrics_val = audit_data.get("metrics")
@@ -256,7 +246,7 @@ class FlextQualityDocumentationNotifier:
             kv = severity_m.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
         critical_count: int = severity_breakdown.get("critical", 0)
-        threshold = settings.alerts.critical_issues.threshold
+        threshold = self.config.alerts.critical_issues.threshold
 
         if critical_count >= threshold:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
@@ -271,10 +261,10 @@ class FlextQualityDocumentationNotifier:
 
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops."""
-        if not settings.alerts.quality_drop.enabled:
+        if not self.config.alerts.quality_drop.enabled:
             return True
 
-        threshold = settings.alerts.quality_drop.threshold
+        threshold = self.config.alerts.quality_drop.threshold
         drop = previous_score - current_score
 
         if drop >= threshold:
@@ -302,10 +292,10 @@ Please review recent changes and address any identified issues.
         broken_links: t.JsonList,
     ) -> bool:
         """Send notification for broken links."""
-        if not settings.alerts.broken_links.enabled:
+        if not self.config.alerts.broken_links.enabled:
             return True
 
-        threshold = settings.alerts.broken_links.threshold
+        threshold = self.config.alerts.broken_links.threshold
 
         if len(broken_links) >= threshold:
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
@@ -323,7 +313,7 @@ Please review recent changes and address any identified issues.
         report_data: t.JsonMapping,
     ) -> bool:
         """Send weekly quality report notification."""
-        if not settings.alerts.weekly_report.enabled:
+        if not self.config.alerts.weekly_report.enabled:
             return True
 
         title = "📊 Weekly Documentation Quality Report"
@@ -339,7 +329,7 @@ Please review recent changes and address any identified issues.
         report_data: t.JsonMapping,
     ) -> bool:
         """Send monthly comprehensive report notification."""
-        if not settings.alerts.monthly_report.enabled:
+        if not self.config.alerts.monthly_report.enabled:
             return True
 
         title = "📈 Monthly Documentation Quality Report"
@@ -360,11 +350,11 @@ Please review recent changes and address any identified issues.
         success = True
 
         # Console notification (always enabled)
-        if settings.channels.console.enabled:
+        if self.config.channels.console.enabled:
             self._send_console_notification(title, message, priority)
 
         # Email notification
-        if settings.channels.email.enabled:
+        if self.config.channels.email.enabled:
             try:
                 self._send_email_notification(title, message, priority)
             except (smtplib.SMTPException, ConnectionError, OSError) as e:
@@ -372,7 +362,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Slack notification
-        if settings.channels.slack.enabled:
+        if self.config.channels.slack.enabled:
             try:
                 self._send_slack_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -380,7 +370,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Webhook notification
-        if settings.channels.webhook.enabled:
+        if self.config.channels.webhook.enabled:
             try:
                 self._send_webhook_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -404,7 +394,7 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config = settings.email
+        email_config = self.config.email
 
         msg = MIMEMultipart()
         msg["From"] = email_config.from_address
@@ -444,7 +434,7 @@ Timestamp: {u.now().isoformat()}
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config = settings.slack
+        slack_config = self.config.slack
 
         color = {
             c.Quality.NotificationPriority.CRITICAL.value: "danger",
@@ -483,7 +473,7 @@ Timestamp: {u.now().isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config = settings.webhook
+        webhook_config = self.config.webhook
 
         payload = {
             "title": title,
