@@ -11,7 +11,7 @@
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: _none_
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextQualityMcpClient`, `quality`, `FlextQualityHookManager`, `FlextQualityTypes`, `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityRulesEngine`, `FlextQualityMcpServer`, `FlextQualityMcpTools`, `FlextQualityModels` (+14 more)
+- Public symbol exports: `FlextQualityClaudeMemClient`, `FlextQualityMcpClient`, `FlextQualityConstants`, `FlextQualityRulesEngine`, `FlextQualityModels`, `FlextQualityServiceBase`, `FlextQualityHookManager`, `FlextQualityMcpResources`, `FlextQualityMcpServer`, `quality` (+14 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `20`
 

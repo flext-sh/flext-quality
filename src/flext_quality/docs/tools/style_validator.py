@@ -281,7 +281,9 @@ class FlextQualityStyleValidator:
 
         for i, line in enumerate(lines, 1):
             emphasis_style = (
-                self.settings.markdown.emphasis_style if self.settings.markdown else None
+                self.settings.markdown.emphasis_style
+                if self.settings.markdown
+                else None
             )
             if emphasis_style == "*" and u.Quality.compile_pattern(
                 r"(?<!\\)_[^_]+_(?!\\)",
@@ -384,7 +386,9 @@ class FlextQualityStyleValidator:
             return violations
 
         markers = [item[1] for item in list_items]
-        preferred_marker = self.settings.markdown.list_style if self.settings.markdown else "dash"
+        preferred_marker = (
+            self.settings.markdown.list_style if self.settings.markdown else "dash"
+        )
 
         marker_map = {"dash": "-", "asterisk": "*", "plus": "+"}
         preferred = marker_map.get(preferred_marker or "dash", "-")
@@ -411,7 +415,9 @@ class FlextQualityStyleValidator:
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         code_block_style = (
-            self.settings.markdown.code_block_style if self.settings.markdown else "fenced"
+            self.settings.markdown.code_block_style
+            if self.settings.markdown
+            else "fenced"
         )
         if code_block_style == "fenced":
             code_blocks = u.Quality.compile_pattern(
@@ -461,7 +467,9 @@ class FlextQualityStyleValidator:
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         require_alt_text = (
-            self.settings.accessibility.require_alt_text if self.settings.accessibility else True
+            self.settings.accessibility.require_alt_text
+            if self.settings.accessibility
+            else True
         )
         if require_alt_text is not False:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
@@ -481,7 +489,9 @@ class FlextQualityStyleValidator:
                     )
 
         descriptive_links = (
-            self.settings.accessibility.descriptive_links if self.settings.accessibility else True
+            self.settings.accessibility.descriptive_links
+            if self.settings.accessibility
+            else True
         )
         if descriptive_links is not False:
             generic_links = u.Quality.compile_pattern(
@@ -550,7 +560,9 @@ class FlextQualityStyleValidator:
 
         for i, line in enumerate(lines, 1):
             trailing_spaces = (
-                self.settings.formatting.trailing_spaces if self.settings.formatting else False
+                self.settings.formatting.trailing_spaces
+                if self.settings.formatting
+                else False
             )
             if trailing_spaces is False and line.rstrip() != line:
                 violations.append(
@@ -600,7 +612,9 @@ class FlextQualityStyleValidator:
             suggestions.append("Fix heading hierarchy to avoid skipping levels")
 
         if violation_types.get("list_marker_consistency", 0) > 0:
-            preferred = self.settings.markdown.list_style if self.settings.markdown else "dash"
+            preferred = (
+                self.settings.markdown.list_style if self.settings.markdown else "dash"
+            )
             suggestions.append(f"Use consistent list markers ({preferred}) throughout")
 
         if violation_types.get("missing_alt_text", 0) > 0:
