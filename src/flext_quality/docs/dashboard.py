@@ -37,18 +37,18 @@ class FlextQualityDocumentationDashboard:
         return self._logger_instance
 
     def setup_routes(self) -> None:
-        """Setup Flask routes for the dashboard."""
+        """Set up Flask routes for the dashboard."""
 
         @self.app.route("/")
         def index() -> str:
-            """Main dashboard page."""
+            """Serve the main dashboard page."""
             return render_template_string(self.get_dashboard_html())
 
         _ = index
 
         @self.app.route("/api/metrics")
         def api_metrics() -> Response:
-            """API endpoint for current metrics."""
+            """Return current metrics as a JSON response."""
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
                     self.get_current_metrics(),
@@ -60,7 +60,7 @@ class FlextQualityDocumentationDashboard:
 
         @self.app.route("/api/trends")
         def api_trends() -> Response:
-            """API endpoint for quality trends."""
+            """Return quality trends as a JSON response."""
             days = int(request.args.get("days", 30))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
@@ -73,7 +73,7 @@ class FlextQualityDocumentationDashboard:
 
         @self.app.route("/api/reports")
         def api_reports() -> Response:
-            """API endpoint for recent reports."""
+            """Return recent reports as a JSON response."""
             limit = int(request.args.get("limit", 10))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(

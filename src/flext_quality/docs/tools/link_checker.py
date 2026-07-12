@@ -279,7 +279,7 @@ class FlextQualityLinkChecker:
         url: str,
         context: t.JsonMapping | None = None,
     ) -> FlextQualityLinkChecker.LinkResult:
-        """Synchronously check a single link (fallback method)."""
+        """Check a single link synchronously (fallback method)."""
         start_time = time.time()
 
         for attempt in range(self.settings.retry_attempts):
@@ -431,7 +431,7 @@ class FlextQualityLinkChecker:
         *,
         use_async: bool = True,
     ) -> FlextQualityLinkChecker.Results:
-        """Main link validation method."""
+        """Validate all provided links."""
         self.results.total_links = len(links)
 
         if use_async:
@@ -479,7 +479,7 @@ class FlextQualityLinkChecker:
         self,
         links: t.SequenceOf[t.JsonMapping],
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Special validation for GitHub links."""
+        """Perform special validation for GitHub links."""
         github_links: t.SequenceOf[t.JsonMapping] = [
             link
             for link in links
@@ -600,7 +600,7 @@ Broken Links:
         links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
         config_path: str | None = None,
     ) -> FlextQualityLinkChecker.Results:
-        """Synchronously validate links."""
+        """Validate links synchronously."""
         checker = FlextQualityLinkChecker(config_path)
         return asyncio.run(checker.validate_links(links, use_async=True))
 

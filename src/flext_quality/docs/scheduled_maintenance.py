@@ -830,7 +830,7 @@ class FlextQualityScheduledMaintenance:
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Main entry point for scheduled maintenance via the canonical cli facade."""
+        """Run scheduled maintenance via the canonical cli facade."""
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-scheduled-maintenance",
