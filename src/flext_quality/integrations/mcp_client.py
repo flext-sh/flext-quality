@@ -17,10 +17,12 @@ from collections.abc import (
 from typing import final
 
 from flext_core import e, r
-from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.models import FlextQualityModels as m
-from flext_quality.protocols import FlextQualityProtocols as p
-from flext_quality.typings import FlextQualityTypes as t
+from flext_quality import (
+    FlextQualityConstants as c,
+    FlextQualityModels as m,
+    FlextQualityProtocols as p,
+    FlextQualityTypes as t,
+)
 
 
 @final

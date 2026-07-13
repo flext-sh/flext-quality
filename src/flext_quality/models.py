@@ -12,12 +12,13 @@ from collections.abc import (
 )
 from typing import TYPE_CHECKING, Annotated, Self
 
-from flext_infra.models import FlextInfraModels as _InfraModels
-from flext_infra.utilities import FlextInfraUtilities as _InfraUtilities
-from flext_web.models import FlextWebModels as _WebModels
+from flext_infra import (
+    FlextInfraModels as _InfraModels,
+    FlextInfraUtilities as _InfraUtilities,
+)
+from flext_web import FlextWebModels as _WebModels
 
-from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.typings import FlextQualityTypes as t
+from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 
 if TYPE_CHECKING:
     from pathlib import Path

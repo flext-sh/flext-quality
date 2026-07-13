@@ -13,7 +13,7 @@ import pytest
 from flext_tests import reset_settings as _shared_reset_settings
 
 from flext_quality import FlextQualitySettings
-from tests.utilities import u
+from tests import u
 
 if TYPE_CHECKING:
     from collections.abc import Generator

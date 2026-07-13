@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, TypeIs
 
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 def assert_is_dict(

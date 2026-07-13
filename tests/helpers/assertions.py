@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from tests.typings import t
+    from tests import t
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:

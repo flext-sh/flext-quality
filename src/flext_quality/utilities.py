@@ -6,14 +6,16 @@ import re
 import sys
 from typing import TYPE_CHECKING, ClassVar
 
-from flext_infra.utilities import FlextInfraUtilities as u
-from flext_web.utilities import FlextWebUtilities as web_u
+from flext_infra import FlextInfraUtilities as u
+from flext_web import FlextWebUtilities as web_u
 
 from flext_cli import cli
 from flext_core.result import FlextResult as r
-from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.protocols import FlextQualityProtocols as p
-from flext_quality.typings import FlextQualityTypes as t
+from flext_quality import (
+    FlextQualityConstants as c,
+    FlextQualityProtocols as p,
+    FlextQualityTypes as t,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
