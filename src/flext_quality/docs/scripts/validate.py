@@ -131,29 +131,31 @@ class FlextQualityDocumentationValidator:
 
         def _classify_link(self, url: str) -> str:
             """Classify link type based on URL pattern."""
-            link_type = "reference"
-            match url:
-                case _ if url.startswith(("http://", "https://")):
-                    link_type = "external"
-                case _ if url.startswith("mailto:"):
-                    link_type = "email"
-                case _ if url.startswith("#"):
-                    link_type = "anchor"
-                case _ if url.endswith((
-                    ".png",
-                    ".jpg",
-                    ".jpeg",
-                    ".gif",
-                    ".svg",
-                    ".webp",
-                )):
-                    link_type = "image"
-                case _ if url.startswith(("./", "../")) or url.endswith((
-                    ".md",
-                    ".mdx",
-                )):
-                    link_type = "internal"
-            return link_type
+            # NOTE (multi-agent, mro-f8vk / kimi): match-with-guards was
+            # non-exhaustive by construction (reportMatchNotExhaustive); the
+            # if-chain keeps identical first-match semantics and an explicit
+            # default without a dummy `case _: pass`.
+            if url.startswith(("http://", "https://")):
+                return "external"
+            if url.startswith("mailto:"):
+                return "email"
+            if url.startswith("#"):
+                return "anchor"
+            if url.endswith((
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".gif",
+                ".svg",
+                ".webp",
+            )):
+                return "image"
+            if url.startswith(("./", "../")) or url.endswith((
+                ".md",
+                ".mdx",
+            )):
+                return "internal"
+            return "reference"
 
         def _find_line_number(self, content: str, search_text: str) -> int | None:
             """Find line number of specific text in content."""
