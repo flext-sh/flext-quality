@@ -44,7 +44,7 @@ class FlextQualityProtocols(p, web_p):
 
             @property
             def name(self) -> str:
-                """Return validator name."""
+                """The validator name."""
                 ...
 
             def validate(

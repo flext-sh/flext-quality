@@ -33,7 +33,7 @@ class FlextQualityDocumentationDashboard:
 
     @property
     def logger(self) -> p.Logger:
-        """Return the module logger."""
+        """The module logger."""
         return self._logger_instance
 
     def setup_routes(self) -> None:

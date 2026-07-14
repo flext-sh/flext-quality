@@ -33,7 +33,7 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "pattern"
 
         @override
@@ -76,7 +76,7 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "forbidden-patterns"
 
     class Tier(p.Quality.ValidatorBase):
@@ -85,7 +85,7 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "tier"
 
         @override
