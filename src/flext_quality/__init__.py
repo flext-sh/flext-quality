@@ -62,7 +62,7 @@ if TYPE_CHECKING:
     from flext_quality.models import FlextQualityModels as FlextQualityModels, m as m
     from flext_quality.protocols import (
         FlextQualityProtocols as FlextQualityProtocols,
-        p as p,
+        p,
     )
     from flext_quality.rules.engine import (
         FlextQualityRulesEngine as FlextQualityRulesEngine,
@@ -76,7 +76,7 @@ if TYPE_CHECKING:
     from flext_quality.typings import FlextQualityTypes as FlextQualityTypes, t as t
     from flext_quality.utilities import (
         FlextQualityUtilities as FlextQualityUtilities,
-        u as u,
+        u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (

@@ -44,7 +44,7 @@ if TYPE_CHECKING:
     from tests.models import TestsFlextQualityModels as TestsFlextQualityModels, m as m
     from tests.protocols import (
         TestsFlextQualityProtocols as TestsFlextQualityProtocols,
-        p as p,
+        p,
     )
     from tests.settings import TestsFlextQualitySettings as TestsFlextQualitySettings
     from tests.typings import TestsFlextQualityTypes as TestsFlextQualityTypes, t as t
@@ -53,7 +53,7 @@ if TYPE_CHECKING:
     from tests.unit.test_cli import TestsFlextQualityCli as TestsFlextQualityCli
     from tests.utilities import (
         TestsFlextQualityUtilities as TestsFlextQualityUtilities,
-        u as u,
+        u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
