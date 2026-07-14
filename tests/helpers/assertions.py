@@ -11,18 +11,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from flext_tests import tm
+
 if TYPE_CHECKING:
     from tests import t
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:
     """Assert that value is a dict."""
-    assert isinstance(value, dict), msg or f"Expected dict, got {type(value).__name__}"
+    tm.that(value, is_=dict)
 
 
 def assert_is_list(value: t.Scalar | t.ScalarList, msg: str = "") -> None:
     """Assert that value is a list."""
-    assert isinstance(value, list), msg or f"Expected list, got {type(value).__name__}"
+    tm.that(value, is_=list)
 
 
 def assert_dict_structure(
@@ -37,17 +39,17 @@ def assert_dict_structure(
 
 def assert_metrics_structure(metrics: t.ScalarMapping) -> None:
     """Assert that metrics dict has expected structure."""
-    assert isinstance(metrics, dict), f"Expected dict, got {type(metrics).__name__}"
+    tm.that(metrics, is_=dict)
 
 
 def assert_issues_structure(issues: t.ScalarList) -> None:
     """Assert that issues data has expected structure."""
-    assert isinstance(issues, list), f"Expected list, got {type(issues).__name__}"
+    tm.that(issues, is_=list)
 
 
 def assert_analysis_results_structure(results: t.ScalarMapping) -> None:
     """Assert that analysis results have expected structure."""
-    assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
+    tm.that(results, is_=dict)
 
 
 __all__: list[str] = [

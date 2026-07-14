@@ -13,6 +13,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeIs
 
+from flext_tests import tm
+
 if TYPE_CHECKING:
     from tests import t
 
@@ -32,7 +34,7 @@ def assert_is_dict(
       AssertionError: If value is not a dict
 
     """
-    assert isinstance(value, dict), f"Expected dict, got {type(value)}"
+    tm.that(value, is_=dict)
     return True
 
 
@@ -49,7 +51,7 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
       AssertionError: If value is not a list
 
     """
-    assert isinstance(value, list), f"Expected list, got {type(value)}"
+    tm.that(value, is_=list)
     return True
 
 
@@ -71,7 +73,7 @@ def assert_dict_structure(
 
     """
     for key in required_keys:
-        assert key in data, f"Required key '{key}' missing from dict"
+        tm.that(data, has=key)
     return data
 
 
