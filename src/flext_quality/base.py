@@ -19,7 +19,7 @@ class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
     @property
     @override
     def settings(self) -> FlextQualitySettings:
-        """Return the typed quality settings singleton (rule 1, propagating).
+        """The typed quality settings singleton (rule 1, propagating).
 
         An injected runtime snapshot wins; otherwise the shared
         ``FlextQualitySettings.fetch_global()`` singleton is returned, matching
