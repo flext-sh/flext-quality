@@ -182,9 +182,9 @@ class FlextQualityConfigManager:
         """
         if config_dir is None:
             # Find settings directory relative to this file
-            self.config_dir = Path(__file__).parent.parent / "settings"
+            Path(__file__).parent.parent / "settings"
         else:
-            self.config_dir = Path(config_dir)
+            Path(config_dir)
 
         self._cache: MutableMapping[str, FlextQualityConfigManager.ConfigData] = {}
         self._audit_rules: FlextQualityConfigManager.AuditRules | None = None
@@ -228,7 +228,7 @@ class FlextQualityConfigManager:
 
     def _load_config_file(self, filename: str) -> FlextQualityConfigManager.ConfigData:
         """Load a YAML configuration file."""
-        config_path = self.config_dir / filename
+        config_path = settings_dir / filename
 
         try:
             raw = u.Cli.yaml_load_mapping(config_path)
@@ -315,7 +315,7 @@ class FlextQualityConfigManager:
         issues = [
             f"Missing required settings file: {filename}"
             for filename in required_files
-            if not (self.config_dir / filename).exists()
+            if not (settings_dir / filename).exists()
         ]
 
         validations = (

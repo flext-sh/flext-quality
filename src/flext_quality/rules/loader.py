@@ -6,12 +6,9 @@ from collections.abc import (
     MutableSequence,
     Sequence,
 )
-from typing import TYPE_CHECKING
+from pathlib import Path
 
 from flext_quality import c, m, p, r, t, u
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextQualityRulesLoader:

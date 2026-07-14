@@ -7,16 +7,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from collections.abc import Generator
 
 import pytest
 from flext_tests import reset_settings as _shared_reset_settings
 
 from flext_quality import FlextQualitySettings
 from tests import u
-
-if TYPE_CHECKING:
-    from collections.abc import Generator
 
 reset_settings = _shared_reset_settings
 

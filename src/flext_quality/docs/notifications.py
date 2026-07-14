@@ -20,7 +20,7 @@ from typing import Annotated, override
 import requests
 
 from flext_cli import cli
-from flext_quality import c, m, p, r, s, t, u
+from flext_quality import c, m, p, r, s, settings, t, u
 
 
 class FlextQualityDocumentationNotifier:
@@ -87,9 +87,7 @@ class FlextQualityDocumentationNotifier:
         """
         # Wire config_path: load YAML overrides into the typed notifier config.
         loaded = u.Cli.yaml_load_mapping(Path(config_path))
-        self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
-            self._load_user_config(loaded)
-        )
+        (self._load_user_config(loaded))
         self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=u.now().isoformat(),
         )
@@ -226,7 +224,7 @@ class FlextQualityDocumentationNotifier:
         audit_data: t.JsonMapping,
     ) -> bool:
         """Send notification for critical documentation issues."""
-        if not self.config.alerts.critical_issues.enabled:
+        if not settings.alerts.critical_issues.enabled:
             return True
 
         metrics_val = audit_data.get("metrics")
@@ -246,7 +244,7 @@ class FlextQualityDocumentationNotifier:
             kv = severity_m.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
         critical_count: int = severity_breakdown.get("critical", 0)
-        threshold = self.config.alerts.critical_issues.threshold
+        threshold = settings.alerts.critical_issues.threshold
 
         if critical_count >= threshold:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
@@ -261,10 +259,10 @@ class FlextQualityDocumentationNotifier:
 
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops."""
-        if not self.config.alerts.quality_drop.enabled:
+        if not settings.alerts.quality_drop.enabled:
             return True
 
-        threshold = self.config.alerts.quality_drop.threshold
+        threshold = settings.alerts.quality_drop.threshold
         drop = previous_score - current_score
 
         if drop >= threshold:
@@ -292,10 +290,10 @@ Please review recent changes and address any identified issues.
         broken_links: t.JsonList,
     ) -> bool:
         """Send notification for broken links."""
-        if not self.config.alerts.broken_links.enabled:
+        if not settings.alerts.broken_links.enabled:
             return True
 
-        threshold = self.config.alerts.broken_links.threshold
+        threshold = settings.alerts.broken_links.threshold
 
         if len(broken_links) >= threshold:
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
@@ -313,7 +311,7 @@ Please review recent changes and address any identified issues.
         report_data: t.JsonMapping,
     ) -> bool:
         """Send weekly quality report notification."""
-        if not self.config.alerts.weekly_report.enabled:
+        if not settings.alerts.weekly_report.enabled:
             return True
 
         title = "📊 Weekly Documentation Quality Report"
@@ -329,7 +327,7 @@ Please review recent changes and address any identified issues.
         report_data: t.JsonMapping,
     ) -> bool:
         """Send monthly comprehensive report notification."""
-        if not self.config.alerts.monthly_report.enabled:
+        if not settings.alerts.monthly_report.enabled:
             return True
 
         title = "📈 Monthly Documentation Quality Report"
@@ -350,11 +348,11 @@ Please review recent changes and address any identified issues.
         success = True
 
         # Console notification (always enabled)
-        if self.config.channels.console.enabled:
+        if settings.channels.console.enabled:
             self._send_console_notification(title, message, priority)
 
         # Email notification
-        if self.config.channels.email.enabled:
+        if settings.channels.email.enabled:
             try:
                 self._send_email_notification(title, message, priority)
             except (smtplib.SMTPException, ConnectionError, OSError) as e:
@@ -362,7 +360,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Slack notification
-        if self.config.channels.slack.enabled:
+        if settings.channels.slack.enabled:
             try:
                 self._send_slack_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -370,7 +368,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Webhook notification
-        if self.config.channels.webhook.enabled:
+        if settings.channels.webhook.enabled:
             try:
                 self._send_webhook_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -394,7 +392,7 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config = self.config.email
+        email_config = settings.email
 
         msg = MIMEMultipart()
         msg["From"] = email_config.from_address
@@ -434,7 +432,7 @@ Timestamp: {u.now().isoformat()}
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config = self.config.slack
+        slack_config = settings.slack
 
         color = {
             c.Quality.NotificationPriority.CRITICAL.value: "danger",
@@ -473,7 +471,7 @@ Timestamp: {u.now().isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config = self.config.webhook
+        webhook_config = settings.webhook
 
         payload = {
             "title": title,
@@ -661,7 +659,7 @@ Found {len(broken_links)} broken links that need attention:
         @override
         def execute(self) -> p.Result[bool]:
             """Dispatch to the appropriate notification action."""
-            notifier = FlextQualityDocumentationNotifier(self.settings_path)
+            notifier = FlextQualityDocumentationNotifier(settings_path)
             if self.test:
                 notifier.send_notification(
                     "Test Notification",

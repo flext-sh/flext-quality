@@ -3,28 +3,4 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from flext_core.lazy import build_lazy_import_map, install_lazy_exports
-
-if TYPE_CHECKING:
-    from flext_quality.mcp.resources import (
-        FlextQualityMcpResources as FlextQualityMcpResources,
-    )
-    from flext_quality.mcp.server import FlextQualityMcpServer as FlextQualityMcpServer
-    from flext_quality.mcp.tools import FlextQualityMcpTools as FlextQualityMcpTools
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".resources": ("FlextQualityMcpResources",),
-        ".server": ("FlextQualityMcpServer",),
-        ".tools": ("FlextQualityMcpTools",),
-    },
-)
-
-
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+__all__: tuple[str, ...] = ()

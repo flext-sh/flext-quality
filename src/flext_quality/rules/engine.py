@@ -2,15 +2,12 @@
 
 from __future__ import annotations
 
+from collections.abc import (
+    MutableSequence,
+)
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import (
-        MutableSequence,
-    )
 
 
 class FlextQualityRulesEngine:

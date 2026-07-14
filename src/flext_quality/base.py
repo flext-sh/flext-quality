@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 from abc import ABC
-from typing import override
 
 from flext_core import s
-from flext_quality import FlextQualitySettings, p, t
+from flext_quality import p, t
 
 
 class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
@@ -15,20 +14,6 @@ class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
     Generic over the service result type so consumers can specialize:
     ``FlextQualityServiceBase[bool]`` for boolean-returning commands etc.
     """
-
-    @property
-    @override
-    def settings(self) -> FlextQualitySettings:
-        """The typed quality settings singleton (rule 1, propagating).
-
-        An injected runtime snapshot wins; otherwise the shared
-        ``FlextQualitySettings.fetch_global()`` singleton is returned, matching
-        the facade modules that read ``settings.Quality.*`` directly.
-        """
-        resolved = super().settings
-        if isinstance(resolved, FlextQualitySettings):
-            return resolved
-        return FlextQualitySettings.fetch_global()
 
 
 s = FlextQualityServiceBase

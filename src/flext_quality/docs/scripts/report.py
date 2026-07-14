@@ -11,21 +11,19 @@ Usage:
 
 from __future__ import annotations
 
+from collections.abc import (
+    Callable,
+    Mapping,
+    MutableSequence,
+)
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, override
+from typing import Annotated, override
 
 from jinja2 import Template
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import (
-        Callable,
-        Mapping,
-        MutableSequence,
-    )
 
 
 class FlextQualityDocumentationReporter:

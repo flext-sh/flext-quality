@@ -11,12 +11,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeIs
+from typing import TypeIs
 
 from flext_tests import tm
 
-if TYPE_CHECKING:
-    from tests import t
+from tests import t
 
 
 def assert_is_dict(

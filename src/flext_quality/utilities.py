@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, ClassVar
+from pathlib import Path
+from typing import ClassVar
 
 from flext_infra import FlextInfraUtilities as u
 from flext_web import FlextWebUtilities as web_u
@@ -16,9 +17,6 @@ from flext_quality import (
     FlextQualityProtocols as p,
     FlextQualityTypes as t,
 )
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextQualityUtilities(
