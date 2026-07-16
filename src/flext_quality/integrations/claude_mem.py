@@ -14,7 +14,6 @@ from typing import final
 from flext_quality import (
     FlextQualityMcpClient,
     c,
-    m,
     p,
     t,
 )
@@ -35,7 +34,7 @@ class FlextQualityClaudeMemClient:
     def build_get_observations_call(
         self,
         ids: t.SequenceOf[int],
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a get_observations tool call."""
         normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
@@ -50,7 +49,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         params = {
@@ -69,7 +68,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH

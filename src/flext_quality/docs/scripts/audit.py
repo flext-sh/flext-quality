@@ -84,7 +84,7 @@ class FlextQualityDocumentationAuditor:
         except c.EXC_FS_TYPE_VALIDATION:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
+    def get_default_audit_rules(self) -> p.Quality.AuditRulesConfig:
         """Default audit rules if settings file not found."""
         config: m.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
             "quality_thresholds": {
@@ -108,7 +108,7 @@ class FlextQualityDocumentationAuditor:
         })
         return config
 
-    def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
+    def get_default_style_guide(self) -> p.Quality.StyleGuideConfig:
         """Default style guide if settings file not found."""
         config: m.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
             "markdown": {
@@ -130,7 +130,7 @@ class FlextQualityDocumentationAuditor:
         })
         return config
 
-    def get_default_validation_config(self) -> m.Quality.ValidationConfig:
+    def get_default_validation_config(self) -> p.Quality.ValidationConfig:
         """Default validation settings if settings file not found."""
         return m.Quality.ValidationConfig()
 
@@ -167,7 +167,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> m.Quality.AuditorResults:
+    def run_comprehensive_audit(self) -> p.Quality.AuditorResults:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)
@@ -634,7 +634,7 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
+        recommendations: MutableSequence[p.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
             recommendations.append(
@@ -900,7 +900,7 @@ class FlextQualityDocumentationAuditor:
         def _execute_checks(
             self,
             auditor: FlextQualityDocumentationAuditor,
-        ) -> m.Quality.AuditorResults:
+        ) -> p.Quality.AuditorResults:
             if self.comprehensive:
                 return auditor.run_comprehensive_audit()
             doc_files = auditor.find_documentation_files()

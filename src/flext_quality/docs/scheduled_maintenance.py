@@ -102,7 +102,7 @@ class FlextQualityScheduledMaintenance:
             start_time=u.now().isoformat(),
         )
 
-    def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
+    def load_config(self, config_path: str | None) -> p.Quality.MaintenanceConfig:
         """Load maintenance schedule configuration, returning the merged config."""
         default_config = self.get_default_config()
         resolved_config_path = (
@@ -124,7 +124,7 @@ class FlextQualityScheduledMaintenance:
         self,
         base: m.Quality.MaintenanceConfig,
         overrides: t.JsonMapping,
-    ) -> m.Quality.MaintenanceConfig:
+    ) -> p.Quality.MaintenanceConfig:
         """Merge external settings mapping into default typed settings."""
         merged = base.model_dump()
         merged["enabled"] = self._as_bool(
@@ -235,7 +235,7 @@ class FlextQualityScheduledMaintenance:
         )
         return config
 
-    def get_default_config(self) -> m.Quality.MaintenanceConfig:
+    def get_default_config(self) -> p.Quality.MaintenanceConfig:
         """Default maintenance configuration."""
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())

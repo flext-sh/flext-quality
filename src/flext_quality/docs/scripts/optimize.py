@@ -43,7 +43,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_formatting(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Fix common formatting issues."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -107,7 +107,7 @@ class FlextQualityDocumentationOptimizer:
     def update_table_of_contents(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -208,7 +208,7 @@ class FlextQualityDocumentationOptimizer:
     def enhance_accessibility(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -271,7 +271,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_content_structure(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -331,7 +331,7 @@ class FlextQualityDocumentationOptimizer:
     def update_metadata(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)

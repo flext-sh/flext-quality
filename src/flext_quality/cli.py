@@ -80,7 +80,7 @@ class FlextQualityCli(s[bool]):
             cmds.append(["python", "-m", "coverage", "report"])
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
-    COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
+    COMMANDS: ClassVar[Sequence[type[p.BaseModel]]] = (Status, Check, Validate)
 
     @override
     def execute(self) -> p.Result[bool]:

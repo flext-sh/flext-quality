@@ -14,15 +14,15 @@ from flext_quality import c, m, p, r, t, u
 class FlextQualityRulesLoader:
     """Loads rules from YAML files."""
 
-    def load(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
+    def load(self, path: Path) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
         """Load rules from YAML file."""
         if not path.exists():
-            return r[Sequence[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[p.Quality.RuleDefinition]].fail(
                 f"Rules file not found: {path}",
             )
         yaml_result = u.Cli.yaml_safe_load(path)
         if yaml_result.failure:
-            return r[Sequence[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[p.Quality.RuleDefinition]].fail(
                 f"Failed to parse YAML: {yaml_result.error}",
             )
         parsed = yaml_result.value
@@ -31,11 +31,11 @@ class FlextQualityRulesLoader:
         ]
         for failed, msg in validations:
             if failed:
-                return r[Sequence[m.Quality.RuleDefinition]].fail(msg)
+                return r[Sequence[p.Quality.RuleDefinition]].fail(msg)
         parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(parsed)
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
-            return r[Sequence[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[p.Quality.RuleDefinition]].fail(
                 "Invalid YAML: 'rules' must be a list",
             )
         rules_data: t.SequenceOf[t.JsonMapping] = (
@@ -43,37 +43,37 @@ class FlextQualityRulesLoader:
                 rules_data_val,
             )
         )
-        rules: MutableSequence[m.Quality.RuleDefinition] = []
+        rules: MutableSequence[p.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_data):
             rule_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
                 dict(rule_data),
             )
             result = self._parse_rule(rule_dict, idx)
             if result.failure:
-                return r[Sequence[m.Quality.RuleDefinition]].fail(result.error)
+                return r[Sequence[p.Quality.RuleDefinition]].fail(result.error)
             rules.append(result.value)
-        return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
+        return r[Sequence[p.Quality.RuleDefinition]].ok(rules)
 
     def load_multiple(
         self,
         paths: t.SequenceOf[Path],
-    ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
+    ) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files."""
-        all_rules: MutableSequence[m.Quality.RuleDefinition] = []
+        all_rules: MutableSequence[p.Quality.RuleDefinition] = []
         for path in paths:
             result = self.load(path)
             if result.failure:
-                return r[Sequence[m.Quality.RuleDefinition]].fail(
+                return r[Sequence[p.Quality.RuleDefinition]].fail(
                     f"Error loading {path}: {result.error}",
                 )
             all_rules.extend(result.value)
-        return r[Sequence[m.Quality.RuleDefinition]].ok(all_rules)
+        return r[Sequence[p.Quality.RuleDefinition]].ok(all_rules)
 
     def _parse_rule(
         self,
         data: t.JsonMapping,
         index: int,
-    ) -> p.Result[m.Quality.RuleDefinition]:
+    ) -> p.Result[p.Quality.RuleDefinition]:
         """Parse a single rule from dict."""
         name = data.get("name")
         rule_type_str = data.get("type")
@@ -83,12 +83,12 @@ class FlextQualityRulesLoader:
         ]
         for failed, msg in validations:
             if failed:
-                return r[m.Quality.RuleDefinition].fail(msg)
+                return r[p.Quality.RuleDefinition].fail(msg)
         try:
             rule_type = c.Quality.RuleType(str(rule_type_str))
         except ValueError:
-            valid_types = [m.value for m in c.Quality.RuleType.__members__.values()]
-            return r[m.Quality.RuleDefinition].fail(
+            valid_types = [p.value for m in c.Quality.RuleType.__members__.values()]
+            return r[p.Quality.RuleDefinition].fail(
                 f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}",
             )
         description = data.get("description", "")
@@ -103,4 +103,4 @@ class FlextQualityRulesLoader:
             action=str(action),
             enabled=bool(enabled),
         )
-        return r[m.Quality.RuleDefinition].ok(rule)
+        return r[p.Quality.RuleDefinition].ok(rule)

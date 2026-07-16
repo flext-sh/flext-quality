@@ -12,7 +12,6 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesLoader,
     c,
-    m,
     p,
     r,
     t,
@@ -89,34 +88,34 @@ class FlextQuality(FlextQualityServiceBase):
             "hooks_registered": len(self._hooks.fetch_config()),
         })
 
-    def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
+    def load_rules(self, path: Path) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to rules YAML file
 
         Returns:
-            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[p.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         return self._rules_loader.load(path)
 
-    def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
+    def load_rules_from_config(self) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
-            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[p.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         settings = FlextQualitySettings.fetch_global()
         rules_path = Path(settings.Quality.rules_dir)
         if not rules_path.exists():
-            return r[Sequence[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[p.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}",
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
-            return r[Sequence[m.Quality.RuleDefinition]].ok([])
+            return r[Sequence[p.Quality.RuleDefinition]].ok([])
         return self._rules_loader.load_multiple(yaml_files)
 
     def process_stdin_hook(self) -> p.Result[t.JsonMapping]:
