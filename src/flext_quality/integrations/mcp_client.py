@@ -39,7 +39,7 @@ class FlextQualityMcpClient:
 
     def build_call_command(
         self,
-        call: m.Quality.McpToolCall,
+        call: p.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():

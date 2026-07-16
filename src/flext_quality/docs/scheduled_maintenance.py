@@ -92,13 +92,13 @@ class FlextQualityScheduledMaintenance:
         """
         # Load (and keep) the merged maintenance config on the instance; the bare
         # module-level `settings` refs below read from this attribute.
-        settings: m.Quality.MaintenanceConfig = self.load_config(config_path)
+        settings: p.Quality.MaintenanceConfig = self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
+        self.results: p.Quality.ScheduleResults = m.Quality.ScheduleResults(
             start_time=u.now().isoformat(),
         )
 
@@ -122,7 +122,7 @@ class FlextQualityScheduledMaintenance:
 
     def _merge_config(
         self,
-        base: m.Quality.MaintenanceConfig,
+        base: p.Quality.MaintenanceConfig,
         overrides: t.JsonMapping,
     ) -> p.Quality.MaintenanceConfig:
         """Merge external settings mapping into default typed settings."""
@@ -230,7 +230,7 @@ class FlextQualityScheduledMaintenance:
                 ),
             }
 
-        config: m.Quality.MaintenanceConfig = (
+        config: p.Quality.MaintenanceConfig = (
             m.Quality.MaintenanceConfig.model_validate(merged)
         )
         return config
@@ -240,7 +240,7 @@ class FlextQualityScheduledMaintenance:
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
+        config: p.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -389,7 +389,7 @@ class FlextQualityScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
+    def run_single_task(self, task_config: p.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             return self._run_single_task_unchecked(task_config)
@@ -401,7 +401,7 @@ class FlextQualityScheduledMaintenance:
 
     def _run_single_task_unchecked(
         self,
-        task_config: m.Quality.ScheduleTaskConfig,
+        task_config: p.Quality.ScheduleTaskConfig,
     ) -> bool:
         """Run a single task after exception boundary setup."""
         command = task_config.command

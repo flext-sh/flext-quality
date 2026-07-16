@@ -36,7 +36,7 @@ class FlextQualityDocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
+        self.results: p.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat(),
         )
 

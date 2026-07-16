@@ -88,7 +88,7 @@ class FlextQualityDocumentationNotifier:
         # Wire config_path: load YAML overrides into the typed notifier config.
         loaded = u.Cli.yaml_load_mapping(Path(config_path))
         (self._load_user_config(loaded))
-        self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
+        self.results: p.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=u.now().isoformat(),
         )
 

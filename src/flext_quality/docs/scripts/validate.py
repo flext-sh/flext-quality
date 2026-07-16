@@ -45,7 +45,7 @@ class FlextQualityDocumentationValidator:
             self.retries = retries
             self.max_workers = max_workers
             self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-            self.results: m.Quality.LinkValidatorResults = (
+            self.results: p.Quality.LinkValidatorResults = (
                 m.Quality.LinkValidatorResults(
                     timestamp=u.now().isoformat(),
                 )
@@ -221,11 +221,11 @@ class FlextQualityDocumentationValidator:
 
         def _handle_request_attempt(
             self,
-            link: m.Quality.LinkRecord,
+            link: p.Quality.LinkRecord,
             attempt: int,
         ) -> p.Quality.LinkCheckResult | None:
             """Handle a single request attempt."""
-            result: m.Quality.LinkCheckResult | None = None
+            result: p.Quality.LinkCheckResult | None = None
             base_result = m.Quality.LinkCheckResult(
                 url=link.url,
                 file=link.file,
@@ -254,13 +254,13 @@ class FlextQualityDocumentationValidator:
 
         def _handle_request_attempt_unchecked(
             self,
-            link: m.Quality.LinkRecord,
-            base_result: m.Quality.LinkCheckResult,
+            link: p.Quality.LinkRecord,
+            base_result: p.Quality.LinkCheckResult,
         ) -> p.Quality.LinkCheckResult:
             """Handle one request attempt while letting transport exceptions propagate."""
             response = self._make_http_request(link.url)
             if response.status_code < 400:
-                success_result: m.Quality.LinkCheckResult = base_result.model_copy(
+                success_result: p.Quality.LinkCheckResult = base_result.model_copy(
                     update={"valid": True, "status_code": response.status_code},
                 )
                 return success_result
@@ -270,13 +270,13 @@ class FlextQualityDocumentationValidator:
                     FlextApiConstants.Api.Method.GET,
                 )
             if response.status_code < 400:
-                retry_success_result: m.Quality.LinkCheckResult = (
+                retry_success_result: p.Quality.LinkCheckResult = (
                     base_result.model_copy(
                         update={"valid": True, "status_code": response.status_code},
                     )
                 )
                 return retry_success_result
-            failure_result: m.Quality.LinkCheckResult = base_result.model_copy(
+            failure_result: p.Quality.LinkCheckResult = base_result.model_copy(
                 update={
                     "valid": False,
                     "status_code": response.status_code,
@@ -287,7 +287,7 @@ class FlextQualityDocumentationValidator:
 
         def _check_single_external_link(
             self,
-            link: m.Quality.LinkRecord,
+            link: p.Quality.LinkRecord,
             *,
             verbose: bool = False,
         ) -> p.Quality.LinkCheckResult:
@@ -297,7 +297,7 @@ class FlextQualityDocumentationValidator:
                 attempt_result = self._handle_request_attempt(link, attempt)
                 if attempt_result is not None:
                     return attempt_result
-            max_retry_result: m.Quality.LinkCheckResult = (
+            max_retry_result: p.Quality.LinkCheckResult = (
                 m.Quality.LinkCheckResult.model_validate(
                     {
                         "valid": False,
@@ -529,7 +529,7 @@ class FlextQualityDocumentationValidator:
         def __init__(self) -> None:
             """Initialize the content validator."""
             super().__init__()
-            self.results: m.Quality.ContentValidatorResults = (
+            self.results: p.Quality.ContentValidatorResults = (
                 m.Quality.ContentValidatorResults(
                     timestamp=u.now().isoformat(),
                 )

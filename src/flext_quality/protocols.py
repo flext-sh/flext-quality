@@ -7,7 +7,7 @@ from typing import ClassVar, Protocol, runtime_checkable
 from flext_infra import p
 from flext_web import p as web_p
 
-from flext_quality import c, t
+from flext_quality import c, p, t
 
 
 class FlextQualityProtocols(p, web_p):

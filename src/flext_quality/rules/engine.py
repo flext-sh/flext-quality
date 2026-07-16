@@ -7,7 +7,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
+from flext_quality import FlextQualityRulesLoader, c, p, r, t, u
 
 
 class FlextQualityRulesEngine:
@@ -76,7 +76,7 @@ class FlextQualityRulesEngine:
 
     def _check_rule(
         self,
-        rule: m.Quality.RuleDefinition,
+        rule: p.Quality.RuleDefinition,
         content: str,
         filename: str,
     ) -> t.SequenceOf[t.JsonMapping]:

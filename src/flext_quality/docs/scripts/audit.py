@@ -39,13 +39,13 @@ class FlextQualityDocumentationAuditor:
         """
         Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: m.Quality.AuditRulesConfig = self.get_default_audit_rules()
-        self.style_guide: m.Quality.StyleGuideConfig = self.get_default_style_guide()
-        self.validation_config: m.Quality.ValidationConfig = (
+        self.audit_rules: p.Quality.AuditRulesConfig = self.get_default_audit_rules()
+        self.style_guide: p.Quality.StyleGuideConfig = self.get_default_style_guide()
+        self.validation_config: p.Quality.ValidationConfig = (
             self.get_default_validation_config()
         )
         self.load_config()
-        self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
+        self.results: p.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(),
         )
 
@@ -86,7 +86,7 @@ class FlextQualityDocumentationAuditor:
 
     def get_default_audit_rules(self) -> p.Quality.AuditRulesConfig:
         """Default audit rules if settings file not found."""
-        config: m.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
+        config: p.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
             "quality_thresholds": {
                 "max_age_days": 90,
                 "min_word_count": 100,
@@ -110,7 +110,7 @@ class FlextQualityDocumentationAuditor:
 
     def get_default_style_guide(self) -> p.Quality.StyleGuideConfig:
         """Default style guide if settings file not found."""
-        config: m.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
+        config: p.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
             "markdown": {
                 "heading_style": "atx",
                 "list_style": "dash",
@@ -916,7 +916,7 @@ class FlextQualityDocumentationAuditor:
             auditor.generate_recommendations()
             return auditor.results
 
-        def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
+        def _should_fail(self, metrics: p.Quality.AuditMetrics) -> bool:
             if self.fail_on_errors:
                 severity_breakdown = metrics.severity_breakdown
                 if severity_breakdown["critical"] + severity_breakdown["high"] > 0:
