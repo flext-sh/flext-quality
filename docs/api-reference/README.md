@@ -19,7 +19,7 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: _none_
+- Primary facades: `FlextQuality`, `FlextQualityBaseHook`, `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`, `FlextQualityCodeExecutionBridge` (+15 more)
 - Generated module pages: `20`
 
 - [Back to project docs](../index.md)
