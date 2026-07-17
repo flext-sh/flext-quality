@@ -25,8 +25,15 @@ if TYPE_CHECKING:
     from .base import FlextQualityServiceBase, s
     from .cli import FlextQualityCli, main
     from .constants import FlextQualityConstants, FlextQualityConstants as c
+    from .hooks.manager import FlextQualityHookManager
+    from .integrations.claude_context import FlextQualityClaudeContextClient
+    from .integrations.claude_mem import FlextQualityClaudeMemClient
+    from .integrations.code_execution import FlextQualityCodeExecutionBridge
+    from .integrations.mcp_client import FlextQualityMcpClient
     from .models import FlextQualityModels, FlextQualityModels as m
     from .protocols import FlextQualityProtocols, FlextQualityProtocols as p
+    from .rules.engine import FlextQualityRulesEngine
+    from .rules.loader import FlextQualityRulesLoader
     from .typings import FlextQualityTypes, FlextQualityTypes as t
     from .utilities import FlextQualityUtilities, FlextQualityUtilities as u
 
@@ -54,6 +61,13 @@ if TYPE_CHECKING:
         settings,
         FlextQuality,
         quality,
+        FlextQualityHookManager,
+        FlextQualityRulesLoader,
+        FlextQualityRulesEngine,
+        FlextQualityCodeExecutionBridge,
+        FlextQualityClaudeContextClient,
+        FlextQualityClaudeMemClient,
+        FlextQualityMcpClient,
     )
 
 
@@ -78,6 +92,11 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
         "FlextQualityConstants",
         "c",
     ),
+    ".hooks.manager": ("FlextQualityHookManager",),
+    ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
+    ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
+    ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
+    ".integrations.mcp_client": ("FlextQualityMcpClient",),
     ".models": (
         "FlextQualityModels",
         "m",
@@ -86,6 +105,8 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
         "FlextQualityProtocols",
         "p",
     ),
+    ".rules.engine": ("FlextQualityRulesEngine",),
+    ".rules.loader": ("FlextQualityRulesLoader",),
     ".typings": (
         "FlextQualityTypes",
         "t",
@@ -115,10 +136,17 @@ _LAZY_IMPORTS = build_lazy_import_map(
 
 _DIRECT_IMPORTS: tuple[str, ...] = (
     "FlextQuality",
+    "FlextQualityClaudeContextClient",
+    "FlextQualityClaudeMemClient",
     "FlextQualityCli",
+    "FlextQualityCodeExecutionBridge",
     "FlextQualityConstants",
+    "FlextQualityHookManager",
+    "FlextQualityMcpClient",
     "FlextQualityModels",
     "FlextQualityProtocols",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
     "FlextQualityTypes",
@@ -151,10 +179,17 @@ _DIRECT_IMPORTS: tuple[str, ...] = (
 
 __all__: tuple[str, ...] = (
     "FlextQuality",
+    "FlextQualityClaudeContextClient",
+    "FlextQualityClaudeMemClient",
     "FlextQualityCli",
+    "FlextQualityCodeExecutionBridge",
     "FlextQualityConstants",
+    "FlextQualityHookManager",
+    "FlextQualityMcpClient",
     "FlextQualityModels",
     "FlextQualityProtocols",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
     "FlextQualityTypes",

@@ -22,7 +22,7 @@ import schedule
 from git import InvalidGitRepositoryError, Repo
 
 from flext_cli import cli
-from flext_quality import c, m, p, r, s, settings, t, u
+from flext_quality import c, m, p, r, s, t, u
 
 
 class FlextQualityScheduledMaintenance:
@@ -90,11 +90,10 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        # Load (and keep) the merged maintenance config on the instance; the bare
-        # module-level `settings` refs below read from this attribute.
-        settings: p.Quality.MaintenanceConfig = self.load_config(config_path)
+        # Load (and keep) the merged maintenance config on the instance.
+        self.settings = self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.reports_dir = Path(settings.reports_dir)
+        self.reports_dir = Path(self.settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
@@ -351,7 +350,7 @@ class FlextQualityScheduledMaintenance:
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
         """Extract task name list from settings for a schedule key."""
-        schedules = settings.schedules
+        schedules = self.settings.schedules
         schedule_entry = schedules.get(schedule_key)
         return schedule_entry.tasks if schedule_entry else []
 
@@ -376,7 +375,7 @@ class FlextQualityScheduledMaintenance:
         success = True
 
         for task_name in task_names:
-            task_cfg = settings.tasks.get(task_name)
+            task_cfg = self.settings.tasks.get(task_name)
             if task_cfg is not None:
                 if self.run_single_task(task_cfg):
                     self.results.tasks_completed += 1
@@ -384,7 +383,7 @@ class FlextQualityScheduledMaintenance:
                     self.results.errors.append(f"Task {task_name} failed")
                     success = False
 
-                if settings.error_handling.fail_fast:
+                if self.settings.error_handling.fail_fast:
                     break
 
         return success
@@ -678,7 +677,7 @@ class FlextQualityScheduledMaintenance:
 
     def schedule_tasks(self) -> None:
         """Schedule all maintenance tasks."""
-        schedules = settings.schedules
+        schedules = self.settings.schedules
 
         # Daily audit
         if schedules["daily_audit"].enabled:

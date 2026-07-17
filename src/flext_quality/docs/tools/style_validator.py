@@ -13,7 +13,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import c, m, settings, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityStyleValidator:
@@ -101,9 +101,7 @@ class FlextQualityStyleValidator:
             config_path: Path to style guide configuration file
 
         """
-        # Instance StyleConfig attribute restored (was dropped, leaving bare `settings` refs).
-        (FlextQualityStyleValidator.StyleConfig())
-        self.load_config(config_path)
+        self._config = self.load_config(config_path)
         self.results: FlextQualityStyleValidator.ValidationResults = (
             FlextQualityStyleValidator.ValidationResults(
                 files_checked=0,
@@ -121,30 +119,19 @@ class FlextQualityStyleValidator:
             )
         )
 
-    def load_config(self, config_path: str | None) -> None:
+    def load_config(
+        self, config_path: str | None
+    ) -> FlextQualityStyleValidator.StyleConfig:
         """Load style guide configuration."""
         if config_path is None:
-            FlextQualityStyleValidator.StyleConfig(
-                markdown=FlextQualityStyleValidator.MarkdownConfig(
-                    heading_style="atx",
-                    list_style="dash",
-                    emphasis_style="*",
-                ),
-                accessibility=FlextQualityStyleValidator.AccessibilityConfig(
-                    require_alt_text=True,
-                    descriptive_links=True,
-                    heading_structure=True,
-                ),
-            )
-            return
+            return self._set_default_config()
         try:
             loaded_obj = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded_obj:
-                self._normalize_config(loaded_obj)
-            else:
-                self._set_default_config()
+                return self._normalize_config(loaded_obj)
+            return self._set_default_config()
         except (FileNotFoundError, KeyError, OSError):
-            self._set_default_config()
+            return self._set_default_config()
 
     def _normalize_config(
         self,
@@ -187,9 +174,9 @@ class FlextQualityStyleValidator:
             headings=headings,
         )
 
-    def _set_default_config(self) -> None:
+    def _set_default_config(self) -> FlextQualityStyleValidator.StyleConfig:
         """Set default configuration."""
-        FlextQualityStyleValidator.StyleConfig(
+        return FlextQualityStyleValidator.StyleConfig(
             markdown=FlextQualityStyleValidator.MarkdownConfig(
                 heading_style="atx",
                 list_style="dash",
@@ -276,7 +263,7 @@ class FlextQualityStyleValidator:
 
         for i, line in enumerate(lines, 1):
             emphasis_style = (
-                settings.markdown.emphasis_style if settings.markdown else None
+                self._config.markdown.emphasis_style if self._config.markdown else None
             )
             if emphasis_style == "*" and u.Quality.compile_pattern(
                 r"(?<!\\)_[^_]+_(?!\\)",
@@ -326,7 +313,7 @@ class FlextQualityStyleValidator:
         ]
 
         enforce_hierarchy = (
-            settings.headings.enforce_hierarchy if settings.headings else True
+            self._config.headings.enforce_hierarchy if self._config.headings else True
         )
         if enforce_hierarchy is not False:
             expected_level = 1
@@ -379,7 +366,9 @@ class FlextQualityStyleValidator:
             return violations
 
         markers = [item[1] for item in list_items]
-        preferred_marker = settings.markdown.list_style if settings.markdown else "dash"
+        preferred_marker = (
+            self._config.markdown.list_style if self._config.markdown else "dash"
+        )
 
         marker_map = {"dash": "-", "asterisk": "*", "plus": "+"}
         preferred = marker_map.get(preferred_marker or "dash", "-")
@@ -406,7 +395,9 @@ class FlextQualityStyleValidator:
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         code_block_style = (
-            settings.markdown.code_block_style if settings.markdown else "fenced"
+            self._config.markdown.code_block_style
+            if self._config.markdown
+            else "fenced"
         )
         if code_block_style == "fenced":
             code_blocks = u.Quality.compile_pattern(
@@ -456,7 +447,9 @@ class FlextQualityStyleValidator:
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         require_alt_text = (
-            settings.accessibility.require_alt_text if settings.accessibility else True
+            self._config.accessibility.require_alt_text
+            if self._config.accessibility
+            else True
         )
         if require_alt_text is not False:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
@@ -476,7 +469,9 @@ class FlextQualityStyleValidator:
                     )
 
         descriptive_links = (
-            settings.accessibility.descriptive_links if settings.accessibility else True
+            self._config.accessibility.descriptive_links
+            if self._config.accessibility
+            else True
         )
         if descriptive_links is not False:
             generic_links = u.Quality.compile_pattern(
@@ -505,7 +500,7 @@ class FlextQualityStyleValidator:
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         max_length_val = (
-            settings.formatting.max_line_length if settings.formatting else 88
+            self._config.formatting.max_line_length if self._config.formatting else 88
         )
         max_length = max_length_val or 88
         lines = content.split("\n")
@@ -545,7 +540,9 @@ class FlextQualityStyleValidator:
 
         for i, line in enumerate(lines, 1):
             trailing_spaces = (
-                settings.formatting.trailing_spaces if settings.formatting else False
+                self._config.formatting.trailing_spaces
+                if self._config.formatting
+                else False
             )
             if trailing_spaces is False and line.rstrip() != line:
                 violations.append(
@@ -595,7 +592,9 @@ class FlextQualityStyleValidator:
             suggestions.append("Fix heading hierarchy to avoid skipping levels")
 
         if violation_types.get("list_marker_consistency", 0) > 0:
-            preferred = settings.markdown.list_style if settings.markdown else "dash"
+            preferred = (
+                self._config.markdown.list_style if self._config.markdown else "dash"
+            )
             suggestions.append(f"Use consistent list markers ({preferred}) throughout")
 
         if violation_types.get("missing_alt_text", 0) > 0:
