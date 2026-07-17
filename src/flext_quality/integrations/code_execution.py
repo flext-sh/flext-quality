@@ -94,11 +94,11 @@ class FlextQualityCodeExecutionBridge:
         runtime: str,
         *,
         args: t.StrSequence | None = None,
-    ) -> p.Result[p.Quality.ExecutionRequest]:
+    ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
-            return r[p.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
-        return r[p.Quality.ExecutionRequest].ok(
+            return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
+        return r[m.Quality.ExecutionRequest].ok(
             m.Quality.ExecutionRequest(
                 script_path=script_path,
                 runtime=runtime,

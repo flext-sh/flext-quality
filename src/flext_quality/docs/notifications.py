@@ -443,7 +443,7 @@ Timestamp: {u.now().isoformat()}
             "good",
         )
 
-        payload = {
+        payload: t.JsonMapping = {
             "channel": slack_config.channel,
             "username": slack_config.username,
             "attachments": [
@@ -521,7 +521,7 @@ Timestamp: {u.now().isoformat()}
 
         issues_val = audit_data.get("issues")
         critical_issues: MutableSequence[t.JsonMapping] = []
-        if isinstance(issues_val, t.SEQUENCE_PAIR_TYPES):
+        if isinstance(issues_val, (list, tuple)):
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
                     i_m: t.JsonMapping = (

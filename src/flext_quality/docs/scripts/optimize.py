@@ -36,14 +36,14 @@ class FlextQualityDocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.results: p.Quality.OptimizerResults = m.Quality.OptimizerResults(
+        self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat(),
         )
 
     def optimize_formatting(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> p.Quality.OptimizerResults:
+    ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -107,7 +107,7 @@ class FlextQualityDocumentationOptimizer:
     def update_table_of_contents(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> p.Quality.OptimizerResults:
+    ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -208,7 +208,7 @@ class FlextQualityDocumentationOptimizer:
     def enhance_accessibility(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> p.Quality.OptimizerResults:
+    ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -271,7 +271,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_content_structure(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> p.Quality.OptimizerResults:
+    ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -331,7 +331,7 @@ class FlextQualityDocumentationOptimizer:
     def update_metadata(
         self,
         doc_files: t.SequenceOf[Path],
-    ) -> p.Quality.OptimizerResults:
+    ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -450,7 +450,7 @@ class FlextQualityDocumentationOptimizer:
         latest_file = output_dir / "latest_optimization.json"
         latest_write = u.Cli.json_write(
             latest_file,
-            self.results,
+            self.results.model_dump(),
             options=m.Cli.JsonWriteOptions(indent=2),
         )
         if latest_write.failure:

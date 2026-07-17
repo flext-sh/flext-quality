@@ -7,7 +7,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import FlextQualityRulesLoader, c, p, r, t, u
+from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
 
 
 class FlextQualityRulesEngine:
@@ -16,10 +16,10 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: MutableSequence[p.Quality.RuleDefinition] = []
+        self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> MutableSequence[p.Quality.RuleDefinition]:
+    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
         return list(self._rules)
 
@@ -76,7 +76,7 @@ class FlextQualityRulesEngine:
 
     def _check_rule(
         self,
-        rule: p.Quality.RuleDefinition,
+        rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
     ) -> t.SequenceOf[t.JsonMapping]:

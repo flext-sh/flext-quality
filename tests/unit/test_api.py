@@ -29,7 +29,7 @@ class TestsFlextQualityApi:
     @pytest.fixture
     def _restore_settings(self) -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
-        settings = FlextQuality().settings
+        settings = FlextQualitySettings.fetch_global()
         rules_dir = settings.Quality.rules_dir
         max_function_length = settings.Quality.max_function_length
         max_class_length = settings.Quality.max_class_length
@@ -93,9 +93,9 @@ class TestsFlextQualityApi:
         settings model instead of passing through ``validate_configuration``.
         """
         with pytest.raises(ValidationError, match="max_function_length"):
-            FlextQualitySettings(
-                Quality={"max_function_length": 500, "max_class_length": 100},
-            )
+            FlextQualitySettings.model_validate({
+                "Quality": {"max_function_length": 500, "max_class_length": 100},
+            })
 
     # -- hook output formatting ------------------------------------------
 
@@ -194,8 +194,9 @@ class TestsFlextQualityApi:
     def test_load_rules_from_config_returns_empty_for_empty_directory(self) -> None:
         """A configured but empty rules directory yields an empty rule list."""
         service = FlextQuality()
+        settings = FlextQualitySettings.fetch_global()
         with tempfile.TemporaryDirectory() as tmpdir:
-            service.settings.Quality.rules_dir = tmpdir
+            settings.Quality.rules_dir = tmpdir
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=0)
@@ -203,6 +204,7 @@ class TestsFlextQualityApi:
     def test_load_rules_from_config_loads_every_yaml_and_yml_file(self) -> None:
         """load_rules_from_config aggregates rules across .yaml and .yml files."""
         service = FlextQuality()
+        settings = FlextQualitySettings.fetch_global()
         with tempfile.TemporaryDirectory() as tmpdir:
             rules_dir = Path(tmpdir)
             (rules_dir / "rules1.yaml").write_text(
@@ -213,7 +215,7 @@ class TestsFlextQualityApi:
                 "\nrules:\n  - name: rule-two\n    type: blocking\n"
                 '    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
-            service.settings.Quality.rules_dir = str(rules_dir)
+            settings.Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=2)
@@ -221,7 +223,8 @@ class TestsFlextQualityApi:
     def test_load_rules_from_config_fails_for_missing_directory(self) -> None:
         """A configured rules directory that does not exist yields a failure."""
         service = FlextQuality()
-        service.settings.Quality.rules_dir = "/nonexistent/rules/dir"
+        settings = FlextQualitySettings.fetch_global()
+        settings.Quality.rules_dir = "/nonexistent/rules/dir"
         result = service.load_rules_from_config()
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")

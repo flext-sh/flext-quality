@@ -38,7 +38,7 @@ class FlextQualityValidators:
         def validate(
             self,
             content: str,
-            file_path: Path | None = None,
+            file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -90,14 +90,15 @@ class FlextQualityValidators:
         def validate(
             self,
             content: str,
-            file_path: Path | None = None,
+            file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
                 return r[t.SequenceOf[t.JsonMapping]].ok(violations)
-            file_tier = self._get_file_tier(file_path)
+            path = Path(file_path) if isinstance(file_path, str) else file_path
+            file_tier = self._get_file_tier(path)
             if file_tier is None:
                 return r[t.SequenceOf[t.JsonMapping]].ok(violations)
             lines = content.splitlines()
@@ -148,7 +149,7 @@ class FlextQualityValidators:
         def validate_all(
             self,
             content: str,
-            file_path: Path | None = None,
+            file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.JsonMapping] = []

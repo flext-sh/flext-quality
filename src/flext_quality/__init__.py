@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from .base import FlextQualityServiceBase, s
     from .cli import FlextQualityCli, main
     from .constants import FlextQualityConstants, FlextQualityConstants as c
+    from .hooks.base import FlextQualityBaseHook
     from .hooks.manager import FlextQualityHookManager
     from .integrations.claude_context import FlextQualityClaudeContextClient
     from .integrations.claude_mem import FlextQualityClaudeMemClient
@@ -61,6 +62,7 @@ if TYPE_CHECKING:
         settings,
         FlextQuality,
         quality,
+        FlextQualityBaseHook,
         FlextQualityHookManager,
         FlextQualityRulesLoader,
         FlextQualityRulesEngine,
@@ -92,6 +94,7 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
         "FlextQualityConstants",
         "c",
     ),
+    ".hooks.base": ("FlextQualityBaseHook",),
     ".hooks.manager": ("FlextQualityHookManager",),
     ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
     ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),

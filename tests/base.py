@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_tests import s as tests_s
+from flext_tests import p as tests_p, s as tests_s
 
-from flext_quality import m, p
+from flext_quality import m
 from tests.settings import TestsFlextQualitySettings
 
 
@@ -21,7 +21,7 @@ class TestsFlextQualityServiceBase(tests_s):
 
     @classmethod
     @override
-    def _runtime_bootstrap_options(cls) -> p.RuntimeBootstrapOptions:
+    def _runtime_bootstrap_options(cls) -> tests_p.RuntimeBootstrapOptions:
         return m.RuntimeBootstrapOptions(settings_type=TestsFlextQualitySettings)
 
 

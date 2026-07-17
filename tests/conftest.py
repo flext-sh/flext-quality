@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections.abc import Generator
 
 import pytest
-from flext_tests import reset_settings as _shared_reset_settings
+from flext_tests._fixtures.settings import reset_settings as _shared_reset_settings
 
 from flext_quality import FlextQualitySettings
 from tests import u

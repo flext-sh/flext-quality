@@ -14,6 +14,7 @@ from typing import final
 from flext_quality import (
     FlextQualityMcpClient,
     c,
+    m,
     p,
     t,
 )
@@ -34,7 +35,7 @@ class FlextQualityClaudeContextClient:
     def build_index_call(
         self,
         path: str | None = None,
-    ) -> p.Result[p.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
         params: t.MutableJsonMapping = {}
         if path:
@@ -50,7 +51,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[p.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
@@ -59,7 +60,7 @@ class FlextQualityClaudeContextClient:
             {"query": query, "limit": search_limit},
         )
 
-    def build_status_call(self) -> p.Result[p.Quality.McpToolCall]:
+    def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,

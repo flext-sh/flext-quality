@@ -39,13 +39,13 @@ class FlextQualityDocumentationAuditor:
         """
         self.settings_dir = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: p.Quality.AuditRulesConfig = self.get_default_audit_rules()
-        self.style_guide: p.Quality.StyleGuideConfig = self.get_default_style_guide()
-        self.validation_config: p.Quality.ValidationConfig = (
+        self.audit_rules: m.Quality.AuditRulesConfig = self.get_default_audit_rules()
+        self.style_guide: m.Quality.StyleGuideConfig = self.get_default_style_guide()
+        self.validation_config: m.Quality.ValidationConfig = (
             self.get_default_validation_config()
         )
         self.load_config()
-        self.results: p.Quality.AuditorResults = m.Quality.AuditorResults(
+        self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(),
         )
 
@@ -84,9 +84,9 @@ class FlextQualityDocumentationAuditor:
         except c.EXC_FS_TYPE_VALIDATION:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> p.Quality.AuditRulesConfig:
+    def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
         """Default audit rules if settings file not found."""
-        config: p.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
+        config: m.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
             "quality_thresholds": {
                 "max_age_days": 90,
                 "min_word_count": 100,
@@ -108,9 +108,9 @@ class FlextQualityDocumentationAuditor:
         })
         return config
 
-    def get_default_style_guide(self) -> p.Quality.StyleGuideConfig:
+    def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
         """Default style guide if settings file not found."""
-        config: p.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
+        config: m.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
             "markdown": {
                 "heading_style": "atx",
                 "list_style": "dash",
@@ -130,7 +130,7 @@ class FlextQualityDocumentationAuditor:
         })
         return config
 
-    def get_default_validation_config(self) -> p.Quality.ValidationConfig:
+    def get_default_validation_config(self) -> m.Quality.ValidationConfig:
         """Default validation settings if settings file not found."""
         return m.Quality.ValidationConfig()
 
@@ -167,7 +167,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> p.Quality.AuditorResults:
+    def run_comprehensive_audit(self) -> m.Quality.AuditorResults:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)
@@ -634,7 +634,7 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: MutableSequence[p.Quality.AuditRecommendation] = []
+        recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
             recommendations.append(
@@ -805,7 +805,7 @@ class FlextQualityDocumentationAuditor:
         latest_file = output_dir / "latest_audit.json"
         latest_write = u.Cli.json_write(
             latest_file,
-            self.results,
+            self.results.model_dump(),
             options=m.Cli.JsonWriteOptions(indent=2),
         )
         if latest_write.failure:
@@ -875,7 +875,7 @@ class FlextQualityDocumentationAuditor:
         @override
         def execute(self) -> p.Result[bool]:
             """Run audit checks per the parsed CLI arguments."""
-            auditor = FlextQualityDocumentationAuditor(self.settings_dir)
+            auditor = FlextQualityDocumentationAuditor(self.config_dir)
             try:
                 results = self._execute_checks(auditor)
                 save_result = auditor.save_report(self.output_format, self.output)
@@ -900,7 +900,7 @@ class FlextQualityDocumentationAuditor:
         def _execute_checks(
             self,
             auditor: FlextQualityDocumentationAuditor,
-        ) -> p.Quality.AuditorResults:
+        ) -> m.Quality.AuditorResults:
             if self.comprehensive:
                 return auditor.run_comprehensive_audit()
             doc_files = auditor.find_documentation_files()
@@ -916,7 +916,7 @@ class FlextQualityDocumentationAuditor:
             auditor.generate_recommendations()
             return auditor.results
 
-        def _should_fail(self, metrics: p.Quality.AuditMetrics) -> bool:
+        def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
             if self.fail_on_errors:
                 severity_breakdown = metrics.severity_breakdown
                 if severity_breakdown["critical"] + severity_breakdown["high"] > 0:

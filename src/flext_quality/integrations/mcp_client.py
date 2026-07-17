@@ -39,7 +39,7 @@ class FlextQualityMcpClient:
 
     def build_call_command(
         self,
-        call: p.Quality.McpToolCall,
+        call: m.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
@@ -60,10 +60,10 @@ class FlextQualityMcpClient:
         server: str,
         tool: str,
         params: t.JsonMapping | None = None,
-    ) -> p.Result[p.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
         call_params = t.json_dict_adapter().validate_python(params or {})
-        return r[p.Quality.McpToolCall].ok(
+        return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
                 "server": server,
                 "tool": tool,
@@ -111,10 +111,10 @@ class FlextQualityMcpClient:
     def _build_object_result(
         self,
         parsed: t.JsonMapping,
-    ) -> p.Result[p.Quality.McpToolResult]:
+    ) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result from parsed JSON object output."""
         result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
-        return r[p.Quality.McpToolResult].ok(
+        return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult.model_validate({
                 "success": True,
                 "data": result_data,
@@ -125,7 +125,7 @@ class FlextQualityMcpClient:
     def _build_list_result(
         self,
         output: str,
-    ) -> p.Result[p.Quality.McpToolResult]:
+    ) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result from parsed JSON list output."""
         try:
             parsed_list: t.JsonList = t.json_list_adapter().validate_json(output)
@@ -142,7 +142,7 @@ class FlextQualityMcpClient:
                 })
             else:
                 coerced_data.append({"value": str(item)})
-        return r[p.Quality.McpToolResult].ok(
+        return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult(
                 success=True,
                 data={
@@ -157,9 +157,9 @@ class FlextQualityMcpClient:
     def _build_raw_result(
         self,
         output: str,
-    ) -> p.Result[p.Quality.McpToolResult]:
+    ) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result preserving raw output."""
-        return r[p.Quality.McpToolResult].ok(
+        return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult(
                 success=True,
                 data={"raw": output},
@@ -171,10 +171,10 @@ class FlextQualityMcpClient:
         self,
         output: str,
         exit_code: int,
-    ) -> p.Result[p.Quality.McpToolResult]:
+    ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
-            return r[p.Quality.McpToolResult].ok(
+            return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult(
                     success=False,
                     data=None,

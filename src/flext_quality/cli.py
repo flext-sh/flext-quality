@@ -23,11 +23,11 @@ class FlextQualityCli(s[bool]):
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s[t.JsonMapping]):
+    class Status(s[t.JsonDict]):
         """Display quality service status."""
 
         @override
-        def execute(self) -> p.Result[t.JsonMapping]:
+        def execute(self) -> p.Result[t.JsonDict]:
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
@@ -80,7 +80,7 @@ class FlextQualityCli(s[bool]):
             cmds.append(["python", "-m", "coverage", "report"])
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
-    COMMANDS: ClassVar[Sequence[type[p.BaseModel]]] = (Status, Check, Validate)
+    COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
 
     @override
     def execute(self) -> p.Result[bool]:

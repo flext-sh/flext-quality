@@ -6,7 +6,7 @@ from collections.abc import (
     Mapping,
 )
 
-from flext_infra import m, p, t
+from flext_infra import m, t
 from flext_web import t as web_t
 
 
@@ -29,23 +29,23 @@ class FlextQualityTypes(t, web_t):
             | None
         )
 
-        RELAXED_CONTAINER_MAPPING_ADAPTER: p.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
+        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
             t.JsonMapping,
             config=m.ConfigDict(strict=False),
         )
-        RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: p.TypeAdapter[
+        RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
             t.SequenceOf[t.JsonMapping]
         ] = m.TypeAdapter(
             t.SequenceOf[t.JsonMapping],
             config=m.ConfigDict(strict=False),
         )
-        MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: p.TypeAdapter[
+        MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
             t.MutableOptionalFeatureFlagMapping
         ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
-        STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: p.TypeAdapter[
+        STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
             t.MutableSequenceOf[t.StrMapping]
         ] = m.TypeAdapter(t.MutableSequenceOf[t.StrMapping])
-        REPORT_VALUE_MAPPING_ADAPTER: p.TypeAdapter[
+        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, DocumentationReportValue]
         ] = m.TypeAdapter(
             t.MappingKV[str, DocumentationReportValue],

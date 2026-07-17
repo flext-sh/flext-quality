@@ -10,7 +10,8 @@ from collections.abc import (
 from pathlib import Path
 from typing import final
 
-from flext_quality import FlextQualityBaseHook, c, p, r, t, u
+from flext_quality import c, p, r, t, u
+from flext_quality.hooks.base import FlextQualityBaseHook
 
 
 @final

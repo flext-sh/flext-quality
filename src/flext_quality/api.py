@@ -12,6 +12,7 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesLoader,
     c,
+    m,
     p,
     r,
     t,
@@ -32,7 +33,7 @@ class FlextQuality(FlextQualityServiceBase):
     )
 
     @override
-    def execute(self) -> p.Result[t.JsonMapping]:
+    def execute(self) -> p.Result[t.JsonDict]:
         """Execute the default quality runtime operation."""
         return self.fetch_status()
 
@@ -73,10 +74,10 @@ class FlextQuality(FlextQualityServiceBase):
         """Return hooks configuration as JSON string."""
         return r[str].ok(self._hooks.fetch_config_json())
 
-    def fetch_status(self) -> p.Result[t.JsonMapping]:
+    def fetch_status(self) -> p.Result[t.JsonDict]:
         """Return quality service status snapshot."""
         settings = FlextQualitySettings.fetch_global()
-        return r[t.JsonMapping].ok({
+        return r[t.JsonDict].ok({
             "name": c.Quality.MCP_SERVER_NAME,
             "version": c.Quality.MCP_SERVER_VERSION,
             "settings": {
@@ -88,34 +89,34 @@ class FlextQuality(FlextQualityServiceBase):
             "hooks_registered": len(self._hooks.fetch_config()),
         })
 
-    def load_rules(self, path: Path) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
+    def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to rules YAML file
 
         Returns:
-            r[Sequence[p.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         return self._rules_loader.load(path)
 
-    def load_rules_from_config(self) -> p.Result[Sequence[p.Quality.RuleDefinition]]:
+    def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
-            r[Sequence[p.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         settings = FlextQualitySettings.fetch_global()
         rules_path = Path(settings.Quality.rules_dir)
         if not rules_path.exists():
-            return r[Sequence[p.Quality.RuleDefinition]].fail(
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}",
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
-            return r[Sequence[p.Quality.RuleDefinition]].ok([])
+            return r[Sequence[m.Quality.RuleDefinition]].ok([])
         return self._rules_loader.load_multiple(yaml_files)
 
     def process_stdin_hook(self) -> p.Result[t.JsonMapping]:
@@ -154,7 +155,7 @@ class FlextQuality(FlextQualityServiceBase):
         return r[bool].ok(value=True)
 
 
-quality = FlextQuality.fetch_global()
+quality: FlextQuality = FlextQuality.fetch_global()
 """Shared FlextQuality facade instance."""
 
 __all__: list[str] = ["FlextQuality", "quality"]

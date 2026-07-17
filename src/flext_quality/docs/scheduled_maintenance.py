@@ -15,7 +15,7 @@ from collections.abc import (
 )
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, ClassVar, override
+from typing import Annotated, ClassVar, cast, override
 
 import pytest
 import schedule
@@ -97,11 +97,11 @@ class FlextQualityScheduledMaintenance:
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results: p.Quality.ScheduleResults = m.Quality.ScheduleResults(
+        self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
             start_time=u.now().isoformat(),
         )
 
-    def load_config(self, config_path: str | None) -> p.Quality.MaintenanceConfig:
+    def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
         """Load maintenance schedule configuration, returning the merged config."""
         default_config = self.get_default_config()
         resolved_config_path = (
@@ -121,11 +121,11 @@ class FlextQualityScheduledMaintenance:
 
     def _merge_config(
         self,
-        base: p.Quality.MaintenanceConfig,
+        base: m.Quality.MaintenanceConfig,
         overrides: t.JsonMapping,
-    ) -> p.Quality.MaintenanceConfig:
+    ) -> m.Quality.MaintenanceConfig:
         """Merge external settings mapping into default typed settings."""
-        merged = base.model_dump()
+        merged: t.MutableJsonMapping = base.model_dump()
         merged["enabled"] = self._as_bool(
             overrides.get("enabled"),
             default=base.enabled,
@@ -141,49 +141,71 @@ class FlextQualityScheduledMaintenance:
 
         schedules_raw = overrides.get("schedules")
         if u.mapping(schedules_raw):
-            schedules = {
-                key: value.model_dump() for key, value in base.schedules.items()
-            }
+            schedules: t.MutableJsonMapping = cast(
+                "t.MutableJsonMapping",
+                {key: value.model_dump() for key, value in base.schedules.items()},
+            )
             for key, value in schedules_raw.items():
                 if u.mapping(value) and key in schedules:
                     current = schedules[key]
-                    updated = {
-                        "enabled": self._as_bool(
-                            value.get("enabled"),
-                            default=current["enabled"],
-                        ),
-                        "time": self._as_str(value.get("time"), current["time"]),
-                        "tasks": self._as_str_list(
-                            value.get("tasks"),
-                            current["tasks"],
-                        ),
-                        "day": self._as_str(value.get("day"), current.get("day") or "")
-                        or None,
-                    }
-                    schedules[key] = updated
-            merged["schedules"] = schedules
+                    if not u.mapping(current):
+                        continue
+                    updated: t.MutableJsonMapping = cast(
+                        "t.MutableJsonMapping",
+                        {
+                            "enabled": self._as_bool(
+                                value.get("enabled"),
+                                default=cast("bool", current["enabled"]),
+                            ),
+                            "time": self._as_str(
+                                value.get("time"),
+                                cast("str", current["time"]),
+                            ),
+                            "tasks": list(
+                                self._as_str_list(
+                                    value.get("tasks"),
+                                    cast("t.StrSequence", current["tasks"]),
+                                ),
+                            ),
+                            "day": self._as_str(
+                                value.get("day"),
+                                cast("str", current.get("day") or ""),
+                            )
+                            or None,
+                        },
+                    )
+                    schedules[key] = cast("t.JsonValue", updated)
+            merged["schedules"] = cast("t.JsonValue", schedules)
 
         tasks_raw = overrides.get("tasks")
         if u.mapping(tasks_raw):
-            tasks = {key: value.model_dump() for key, value in base.tasks.items()}
+            tasks: t.MutableJsonMapping = cast(
+                "t.MutableJsonMapping",
+                {key: value.model_dump() for key, value in base.tasks.items()},
+            )
             for key, value in tasks_raw.items():
                 if u.mapping(value) and key in tasks:
                     current = tasks[key]
-                    tasks[key] = {
-                        "description": self._as_str(
-                            value.get("description"),
-                            current["description"],
-                        ),
-                        "command": self._as_str(
-                            value.get("command"),
-                            current["command"],
-                        ),
-                        "timeout": self._as_int(
-                            value.get("timeout"),
-                            current["timeout"],
-                        ),
-                    }
-            merged["tasks"] = tasks
+                    if not u.mapping(current):
+                        continue
+                    tasks[key] = cast(
+                        "t.JsonValue",
+                        {
+                            "description": self._as_str(
+                                value.get("description"),
+                                cast("str", current["description"]),
+                            ),
+                            "command": self._as_str(
+                                value.get("command"),
+                                cast("str", current["command"]),
+                            ),
+                            "timeout": self._as_int(
+                                value.get("timeout"),
+                                cast("int", current["timeout"]),
+                            ),
+                        },
+                    )
+            merged["tasks"] = cast("t.JsonValue", tasks)
 
         error_handling_raw = overrides.get("error_handling")
         if u.mapping(error_handling_raw):
@@ -229,17 +251,17 @@ class FlextQualityScheduledMaintenance:
                 ),
             }
 
-        config: p.Quality.MaintenanceConfig = (
+        config: m.Quality.MaintenanceConfig = (
             m.Quality.MaintenanceConfig.model_validate(merged)
         )
         return config
 
-    def get_default_config(self) -> p.Quality.MaintenanceConfig:
+    def get_default_config(self) -> m.Quality.MaintenanceConfig:
         """Default maintenance configuration."""
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config: p.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
+        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -388,7 +410,7 @@ class FlextQualityScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config: p.Quality.ScheduleTaskConfig) -> bool:
+    def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             return self._run_single_task_unchecked(task_config)
@@ -400,7 +422,7 @@ class FlextQualityScheduledMaintenance:
 
     def _run_single_task_unchecked(
         self,
-        task_config: p.Quality.ScheduleTaskConfig,
+        task_config: m.Quality.ScheduleTaskConfig,
     ) -> bool:
         """Run a single task after exception boundary setup."""
         command = task_config.command
@@ -769,7 +791,7 @@ class FlextQualityScheduledMaintenance:
 
         _ = u.Cli.json_write(
             results_file,
-            self.results,
+            self.results.model_dump(),
             options=m.Cli.JsonWriteOptions(indent=2),
         ).unwrap()
 
