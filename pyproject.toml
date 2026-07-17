@@ -19,30 +19,30 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-    "aiohttp>=3.13.5",
-    "click>=8.3.3",
-    "fastapi>=0.136.1",
-    "fastmcp>=3.2.4",
-    "flext-api @ git+https://github.com/flext-sh/flext-api.git@0.12.0-dev",
-    "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
-    "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
-    "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
-    "flext-web @ git+https://github.com/flext-sh/flext-web.git@0.12.0-dev",
-    "gitpython>=3.1.49",
-    "httpx>=0.28.1",
-    "libcst>=1.8.6",
-    "mypy>=1.20.2",
-    "pydantic-core>=2.46.3",
-    "pydantic-settings>=2.14.0",
-    "pydantic>=2.13.3",
-    "pyright>=1.1.411",
-    "pyyaml>=6.0.3",
-    "referencing>=0.37.0",
-    "rich>=14,<15",
-    "schedule>=1.2.2",
-    "typer>=0.25.1",
-    "uvicorn>=0.46.0",
-    "wrapt>=2.1.2",
+  "aiohttp>=3.13.5",
+  "click>=8.3.3",
+  "fastapi>=0.136.1",
+  "fastmcp>=3.2.4",
+  "flext-api @ git+https://github.com/flext-sh/flext-api.git@0.12.0-dev",
+  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
+  "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
+  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
+  "flext-web @ git+https://github.com/flext-sh/flext-web.git@0.12.0-dev",
+  "gitpython>=3.1.49",
+  "httpx>=0.28.1",
+  "libcst>=1.8.6",
+  "mypy>=1.20.2",
+  "pydantic-core>=2.46.3",
+  "pydantic-settings>=2.14.0",
+  "pydantic>=2.13.3",
+  "pyright>=1.1.411",
+  "pyyaml>=6.0.3",
+  "referencing>=0.37.0",
+  "rich>=14,<15",
+  "schedule>=1.2.2",
+  "typer>=0.25.1",
+  "uvicorn>=0.46.0",
+  "wrapt>=2.1.2",
 ]
 description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
 keywords = [ "adapter", "enterprise", "flext", "integration", "typed" ]
@@ -229,24 +229,25 @@ project-excludes = [
   "**/typings/**",
   "**/vendor/**",
   "**/venv/**",
-  ".flext-deps/**",
   ".venv/**",
   "typings/**",
   "vendor/**",
 ]
-project-includes = [ "src/**/*.py*", "tests/**/*.py*" ]
+project-includes = [
+  "examples/**/*.py*",
+  "src/**/*.py*",
+  "tests/**/*.py*",
+]
 python-interpreter-path = "../.venv/bin/python"
 python-version = "3.13"
 search-path = [
   ".",
-  # mro-f1fe (agent: kimi-sweep): removed stale search-path to migrated examples (legado/)
+  "../flext-api/src",
   "../flext-cli/src",
-  "../flext-core/examples",
-  "../flext-core/scripts",
   "../flext-core/src",
   "../flext-infra/src",
-  "../flext-infra/tmp_flow_test",
   "../flext-tests/src",
+  "../flext-web/src",
   "src",
 ]
 use-ignore-files = false
