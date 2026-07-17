@@ -123,7 +123,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
 
             @property
             def success_rate(self) -> float:
-                """Calculate success rate as a percentage."""
+                """Success rate as a percentage."""
                 if self.total_items == 0:
                     return 100.0
                 return (self.valid_items / self.total_items) * 100.0
