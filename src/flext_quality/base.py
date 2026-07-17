@@ -8,7 +8,7 @@ from flext_core import s
 from flext_quality import p, t
 
 
-class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
+class FlextQualityServiceBase[TResult: p.ModelBase = t.JsonDict](s[TResult], ABC):
     """Base class for flext-quality services with typed settings access.
 
     Generic over the service result type so consumers can specialize:
