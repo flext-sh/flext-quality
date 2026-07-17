@@ -12,6 +12,7 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
+    p,
     t,
     u,
 )
@@ -81,12 +82,15 @@ class FlextQualityMcpTools:
     def execute_hook(event: str, input_data: t.JsonMapping) -> t.JsonMapping:
         """Execute a hook manually."""
         manager = FlextQualityHookManager()
-        result = manager.execute(event=event, input_data=input_data)
+        result: p.Result[t.JsonMapping] = manager.execute(
+            event=event, input_data=input_data
+        )
         if result.failure:
             error_msg = result.error if result.error is not None else "Unknown error"
             output: t.JsonMapping = {"error": error_msg}
             return output
-        return result.value
+        hook_result: t.JsonMapping = result.value
+        return hook_result
 
     @_mcp.tool()
     @staticmethod

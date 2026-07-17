@@ -53,7 +53,7 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
-        params = {
+        params: t.JsonMapping = {
             "query": query,
             "limit": search_limit,
         }
@@ -73,7 +73,7 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
-        params = {
+        params: t.JsonMapping = {
             "anchor": anchor,
             "depth_before": before,
             "depth_after": after,

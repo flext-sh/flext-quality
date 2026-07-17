@@ -137,7 +137,10 @@ class FlextQualityDocumentationReporter:
         if read.failure:
             return None
         try:
-            return t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
+            report_data: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
+                t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
+            )
+            return report_data
         except c.EXC_OS_VALUE:
             return None
 
