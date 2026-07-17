@@ -13,14 +13,16 @@ from __future__ import annotations
 
 import logging
 import shutil
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableSequence,
+    )
 
 
 class FlextQualityDocumentationOptimizer:

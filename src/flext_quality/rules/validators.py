@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-)
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_quality import c, p, r, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        MutableMapping,
+        MutableSequence,
+    )
 
 
 class FlextQualityValidators:

@@ -10,12 +10,9 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import (
-    Callable,
-)
 from datetime import datetime
 from pathlib import Path
-from typing import Annotated, ClassVar, cast, override
+from typing import TYPE_CHECKING, Annotated, ClassVar, cast, override
 
 import pytest
 import schedule
@@ -23,6 +20,11 @@ from git import InvalidGitRepositoryError, Repo
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import (
+        Callable,
+    )
 
 
 class FlextQualityScheduledMaintenance:

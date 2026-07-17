@@ -11,14 +11,17 @@ from __future__ import annotations
 import io
 import sys
 import tempfile
-from collections.abc import Iterator
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 from flext_tests import tm
 from pydantic import ValidationError
 
 from flext_quality import FlextQuality, FlextQualitySettings, p, quality, t
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 class TestsFlextQualityApi:

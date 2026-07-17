@@ -2,20 +2,19 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-)
-from pathlib import Path
 from typing import TYPE_CHECKING, ClassVar, Protocol, runtime_checkable
 
 from flext_infra import p as infra_p
 from flext_web import p as web_p
 
-from flext_quality import c, t
-
 if TYPE_CHECKING:
-    from flext_quality import m
+    from collections.abc import (
+        MutableMapping,
+        MutableSequence,
+    )
+    from pathlib import Path
+
+    from flext_quality import c, m, t
 
 
 class FlextQualityProtocols(infra_p, web_p):

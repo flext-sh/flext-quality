@@ -15,12 +15,13 @@ from __future__ import annotations
 import re
 from enum import StrEnum, unique
 from types import MappingProxyType
-from typing import ClassVar, Final
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from flext_infra import c
 from flext_web import c as web_c
 
-from flext_quality import t
+if TYPE_CHECKING:
+    from flext_quality import t
 
 
 class FlextQualityConstants(c, web_c):

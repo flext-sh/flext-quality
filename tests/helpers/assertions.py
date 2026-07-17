@@ -9,9 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from flext_tests import tm
 
-from tests import t
+if TYPE_CHECKING:
+    from tests import t
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:

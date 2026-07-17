@@ -10,8 +10,7 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
-from pathlib import Path
-from typing import Annotated, Self
+from typing import TYPE_CHECKING, Annotated, Self
 
 from flext_infra import (
     FlextInfraModels as _InfraModels,
@@ -20,6 +19,9 @@ from flext_infra import (
 from flext_web import FlextWebModels as _WebModels
 
 from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class FlextQualityModels(_InfraModels, _WebModels):
