@@ -810,7 +810,7 @@ class FlextQualityScheduledMaintenance:
         @override
         def execute(self) -> p.Result[bool]:
             """Dispatch to the appropriate maintenance action."""
-            maintenance = FlextQualityScheduledMaintenance(settings_path)
+            maintenance = FlextQualityScheduledMaintenance(self.settings_path)
             if self.list_schedules:
                 for _schedule_config in maintenance.settings.schedules.values():
                     pass

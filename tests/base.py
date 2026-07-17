@@ -6,7 +6,7 @@ from typing import override
 
 from flext_tests import s as tests_s
 
-from flext_quality import m
+from flext_quality import m, p
 from tests.settings import TestsFlextQualitySettings
 
 

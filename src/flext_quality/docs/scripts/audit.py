@@ -37,7 +37,7 @@ class FlextQualityDocumentationAuditor:
             config_path: Path to configuration directory for audit rules.
 
         """
-        Path(config_path)
+        self.settings_dir = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.audit_rules: p.Quality.AuditRulesConfig = self.get_default_audit_rules()
         self.style_guide: p.Quality.StyleGuideConfig = self.get_default_style_guide()
@@ -53,7 +53,7 @@ class FlextQualityDocumentationAuditor:
         """Load audit configuration files."""
         try:
             audit_data = u.Cli.yaml_load_mapping(
-                settings_path / "audit_rules.yaml",
+                self.settings_dir / "audit_rules.yaml",
             )
             if audit_data:
                 self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
@@ -64,7 +64,7 @@ class FlextQualityDocumentationAuditor:
 
         try:
             style_data = u.Cli.yaml_load_mapping(
-                settings_path / "style_guide.yaml",
+                self.settings_dir / "style_guide.yaml",
             )
             if style_data:
                 self.style_guide = m.Quality.StyleGuideConfig.model_validate(
@@ -75,7 +75,7 @@ class FlextQualityDocumentationAuditor:
 
         try:
             validation_data = u.Cli.yaml_load_mapping(
-                settings_path / "validation_config.yaml",
+                self.settings_dir / "validation_config.yaml",
             )
             if validation_data:
                 self.validation_config = m.Quality.ValidationConfig.model_validate(
@@ -875,7 +875,7 @@ class FlextQualityDocumentationAuditor:
         @override
         def execute(self) -> p.Result[bool]:
             """Run audit checks per the parsed CLI arguments."""
-            auditor = FlextQualityDocumentationAuditor(settings_dir)
+            auditor = FlextQualityDocumentationAuditor(self.settings_dir)
             try:
                 results = self._execute_checks(auditor)
                 save_result = auditor.save_report(self.output_format, self.output)

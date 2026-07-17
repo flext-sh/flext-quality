@@ -659,7 +659,7 @@ Found {len(broken_links)} broken links that need attention:
         @override
         def execute(self) -> p.Result[bool]:
             """Dispatch to the appropriate notification action."""
-            notifier = FlextQualityDocumentationNotifier(settings_path)
+            notifier = FlextQualityDocumentationNotifier(self.settings_path)
             if self.test:
                 notifier.send_notification(
                     "Test Notification",
