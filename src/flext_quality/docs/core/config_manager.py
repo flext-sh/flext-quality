@@ -12,7 +12,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import c, m, t, u
+from flext_quality import FlextQualityModels, c, m, t, u
 
 
 class FlextQualityConfigManager:
@@ -33,7 +33,7 @@ class FlextQualityConfigManager:
         t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
     ]
 
-    class AuditRules(m.Quality.AuditRulesConfig):
+    class AuditRules(FlextQualityModels.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
@@ -74,7 +74,7 @@ class FlextQualityConfigManager:
                     pass
             return check_value
 
-    class StyleGuide(m.Quality.StyleGuideConfig):
+    class StyleGuide(FlextQualityModels.Quality.StyleGuideConfig):
         """Configuration for style and formatting guidelines."""
 
         def get_markdown_rule(
@@ -97,7 +97,7 @@ class FlextQualityConfigManager:
             value = getattr(self.accessibility, rule, default)
             return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
-    class ValidationSettings(m.Quality.ValidationConfig):
+    class ValidationSettings(FlextQualityModels.Quality.ValidationConfig):
         """Configuration for validation operations."""
 
         content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
@@ -365,14 +365,3 @@ class FlextQualityConfigManager:
                 },
             },
         )
-
-
-FlextQualityConfigManager.AuditRules.model_rebuild(
-    _types_namespace={"FlextQualityModels": m},
-)
-FlextQualityConfigManager.StyleGuide.model_rebuild(
-    _types_namespace={"FlextQualityModels": m},
-)
-FlextQualityConfigManager.ValidationSettings.model_rebuild(
-    _types_namespace={"FlextQualityModels": m},
-)

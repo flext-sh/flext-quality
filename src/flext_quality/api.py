@@ -22,7 +22,7 @@ from flext_quality._settings import FlextQualitySettings
 from flext_quality.base import FlextQualityServiceBase
 
 
-class FlextQuality(FlextQualityServiceBase):
+class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
     """Coordinate quality operations through the canonical facade instance."""
 
     _hooks: FlextQualityHookManager = u.PrivateAttr(
