@@ -523,18 +523,19 @@ Timestamp: {u.now().isoformat()}
 
         issues_val = audit_data.get("issues")
         critical_issues: MutableSequence[t.JsonMapping] = []
-        if isinstance(issues_val, t.SEQUENCE_PAIR_TYPES):
-            for i_v in issues_val:
-                if isinstance(i_v, Mapping):
-                    i_m: t.JsonMapping = (
-                        t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
-                    )
-                    sev = i_m.get("severity")
-                    if sev == c.Quality.NotificationPriority.CRITICAL.value:
-                        critical_issues.append(i_m)
-                        max_critical_issues = 5
-                        if len(critical_issues) >= max_critical_issues:
-                            break
+        if isinstance(issues_val, list):
+            issues_seq: t.SequenceOf[t.JsonMapping] = (
+                t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+                    issues_val,
+                )
+            )
+            for i_m in issues_seq:
+                sev = i_m.get("severity")
+                if sev == c.Quality.NotificationPriority.CRITICAL.value:
+                    critical_issues.append(i_m)
+                    max_critical_issues = 5
+                    if len(critical_issues) >= max_critical_issues:
+                        break
 
         qs_v = metrics.get("quality_score", 0)
         quality_score: int = qs_v if isinstance(qs_v, int) else 0
