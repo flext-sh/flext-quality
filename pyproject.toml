@@ -21,7 +21,7 @@ dependencies = [
   "aiohttp>=3.13.5",
   "click>=8.3.3",
   "fastapi>=0.136.1",
-  "fastmcp>=3.2.4",
+  "fastmcp>=3.4.4",
   "flext-cli",
   "flext-core",
   "gitpython>=3.1.49",
