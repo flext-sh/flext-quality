@@ -8,10 +8,7 @@ including email, Slack, webhooks, and project management tools.
 from __future__ import annotations
 
 import smtplib
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-)
+from collections.abc import Mapping, MutableSequence
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path

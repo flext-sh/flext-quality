@@ -8,10 +8,7 @@ from flext_infra import p as infra_p
 from flext_web import p as web_p
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-        MutableSequence,
-    )
+    from collections.abc import MutableMapping, MutableSequence
     from pathlib import Path
 
     from flext_quality import c, m, t

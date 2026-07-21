@@ -7,10 +7,7 @@ Provides web interface to view audit results, trends, and quality scores.
 from __future__ import annotations
 
 import operator
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-)
+from collections.abc import Mapping, MutableSequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override

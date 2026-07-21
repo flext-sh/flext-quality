@@ -20,10 +20,7 @@ from aiohttp import ClientError, ClientSession, ClientTimeout
 from flext_quality import c, m, p, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        Mapping,
-        MutableSequence,
-    )
+    from collections.abc import Mapping, MutableSequence
 
 
 class FlextQualityLinkChecker:

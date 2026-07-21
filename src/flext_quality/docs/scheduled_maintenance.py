@@ -22,9 +22,7 @@ from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        Callable,
-    )
+    from collections.abc import Callable
 
 
 class FlextQualityScheduledMaintenance:

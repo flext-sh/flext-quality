@@ -8,10 +8,7 @@ from typing import TYPE_CHECKING, override
 from flext_quality import c, p, r, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-        MutableSequence,
-    )
+    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityValidators:

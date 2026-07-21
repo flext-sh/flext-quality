@@ -17,16 +17,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING, override
 
 import requests
-from flext_api import FlextApiConstants
 
+from flext_api import FlextApiConstants
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-        MutableSequence,
-    )
+    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityDocumentationValidator:
