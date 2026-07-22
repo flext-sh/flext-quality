@@ -2,11 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-    Sequence,
-)
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING, final
 
 from flext_quality import FlextQualityBaseHook, c, p, r, t, u
@@ -22,16 +18,11 @@ class FlextQualityHookManager:
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional settings path."""
         self._hooks: MutableMapping[
-            c.Quality.HookEvent,
-            MutableSequence[FlextQualityBaseHook],
+            c.Quality.HookEvent, MutableSequence[FlextQualityBaseHook]
         ] = {}
         self._config_path = config_path
 
-    def execute(
-        self,
-        event: str,
-        input_data: t.JsonMapping,
-    ) -> p.Result[t.JsonMapping]:
+    def execute(self, event: str, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
@@ -70,10 +61,7 @@ class FlextQualityHookManager:
         config_json: str = (
             t
             .json_mapping_adapter()
-            .dump_json(
-                dict(self.fetch_config()),
-                indent=c.Quality.JSON_INDENT,
-            )
+            .dump_json(dict(self.fetch_config()), indent=c.Quality.JSON_INDENT)
             .decode("utf-8")
         )
         return config_json

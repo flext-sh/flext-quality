@@ -7,10 +7,7 @@ from typing import TYPE_CHECKING, override
 from flext_quality import c, p, r, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-        MutableSequence,
-    )
+    from collections.abc import MutableMapping, MutableSequence
     from pathlib import Path
 
 
@@ -38,9 +35,7 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -90,9 +85,7 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -148,9 +141,7 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.JsonMapping] = []

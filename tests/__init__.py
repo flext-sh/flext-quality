@@ -24,7 +24,6 @@ if TYPE_CHECKING:
         tv as tv,
         x as x,
     )
-
     from tests.base import (
         TestsFlextQualityServiceBase as TestsFlextQualityServiceBase,
         s as s,
@@ -56,65 +55,31 @@ if TYPE_CHECKING:
         u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
-    (
-        ".helpers",
-        ".unit",
-    ),
-    build_lazy_import_map(
-        {
-            ".base": (
-                "TestsFlextQualityServiceBase",
-                "s",
-            ),
-            ".conftest": ("conftest",),
-            ".constants": (
-                "TestsFlextQualityConstants",
-                "c",
-            ),
-            ".helpers": ("helpers",),
-            ".helpers.assertions": (
-                "assert_analysis_results_structure",
-                "assert_dict_structure",
-                "assert_is_dict",
-                "assert_is_list",
-                "assert_issues_structure",
-                "assert_metrics_structure",
-            ),
-            ".models": (
-                "TestsFlextQualityModels",
-                "m",
-            ),
-            ".protocols": (
-                "TestsFlextQualityProtocols",
-                "p",
-            ),
-            ".settings": ("TestsFlextQualitySettings",),
-            ".typings": (
-                "TestsFlextQualityTypes",
-                "t",
-            ),
-            ".unit": ("unit",),
-            ".unit.test_api": ("TestsFlextQualityApi",),
-            ".unit.test_basic": ("TestsFlextQualityBasic",),
-            ".unit.test_cli": ("TestsFlextQualityCli",),
-            ".utilities": (
-                "TestsFlextQualityUtilities",
-                "u",
-            ),
-            "flext_tests": (
-                "d",
-                "e",
-                "h",
-                "r",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "x",
-            ),
-        },
-    ),
+    (".helpers", ".unit"),
+    build_lazy_import_map({
+        ".base": ("TestsFlextQualityServiceBase", "s"),
+        ".conftest": ("conftest",),
+        ".constants": ("TestsFlextQualityConstants", "c"),
+        ".helpers": ("helpers",),
+        ".helpers.assertions": (
+            "assert_analysis_results_structure",
+            "assert_dict_structure",
+            "assert_is_dict",
+            "assert_is_list",
+            "assert_issues_structure",
+            "assert_metrics_structure",
+        ),
+        ".models": ("TestsFlextQualityModels", "m"),
+        ".protocols": ("TestsFlextQualityProtocols", "p"),
+        ".settings": ("TestsFlextQualitySettings",),
+        ".typings": ("TestsFlextQualityTypes", "t"),
+        ".unit": ("unit",),
+        ".unit.test_api": ("TestsFlextQualityApi",),
+        ".unit.test_basic": ("TestsFlextQualityBasic",),
+        ".unit.test_cli": ("TestsFlextQualityCli",),
+        ".utilities": ("TestsFlextQualityUtilities", "u"),
+        "flext_tests": ("d", "e", "h", "r", "td", "tf", "tk", "tm", "tv", "x"),
+    }),
     exclude_names=(
         "cleanup_submodule_namespace",
         "install_lazy_exports",
@@ -138,9 +103,4 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

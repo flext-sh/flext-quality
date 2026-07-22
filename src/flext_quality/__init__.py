@@ -23,7 +23,6 @@ from flext_quality.__version__ import (
 
 if TYPE_CHECKING:
     from flext_infra import d as d, e as e, h as h, r as r, x as x
-
     from flext_quality._settings import (
         FlextQualitySettings as FlextQualitySettings,
         settings as settings,
@@ -79,68 +78,31 @@ if TYPE_CHECKING:
         u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
-    (
-        ".hooks",
-        ".integrations",
-        ".mcp",
-        ".rules",
-    ),
-    build_lazy_import_map(
-        {
-            "._settings": ("FlextQualitySettings", "settings"),
-            ".api": (
-                "FlextQuality",
-                "quality",
-            ),
-            ".base": (
-                "FlextQualityServiceBase",
-                "s",
-            ),
-            ".cli": (
-                "FlextQualityCli",
-                "main",
-            ),
-            ".constants": (
-                "FlextQualityConstants",
-                "c",
-            ),
-            ".hooks.base": ("FlextQualityBaseHook",),
-            ".hooks.manager": ("FlextQualityHookManager",),
-            ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
-            ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
-            ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
-            ".integrations.mcp_client": ("FlextQualityMcpClient",),
-            ".mcp.resources": ("FlextQualityMcpResources",),
-            ".mcp.server": ("FlextQualityMcpServer",),
-            ".mcp.tools": ("FlextQualityMcpTools",),
-            ".models": (
-                "FlextQualityModels",
-                "m",
-            ),
-            ".protocols": (
-                "FlextQualityProtocols",
-                "p",
-            ),
-            ".rules.engine": ("FlextQualityRulesEngine",),
-            ".rules.loader": ("FlextQualityRulesLoader",),
-            ".rules.validators": ("FlextQualityValidators",),
-            ".typings": (
-                "FlextQualityTypes",
-                "t",
-            ),
-            ".utilities": (
-                "FlextQualityUtilities",
-                "u",
-            ),
-            "flext_infra": (
-                "d",
-                "e",
-                "h",
-                "r",
-                "x",
-            ),
-        },
-    ),
+    (".hooks", ".integrations", ".mcp", ".rules"),
+    build_lazy_import_map({
+        "._settings": ("FlextQualitySettings", "settings"),
+        ".api": ("FlextQuality", "quality"),
+        ".base": ("FlextQualityServiceBase", "s"),
+        ".cli": ("FlextQualityCli", "main"),
+        ".constants": ("FlextQualityConstants", "c"),
+        ".hooks.base": ("FlextQualityBaseHook",),
+        ".hooks.manager": ("FlextQualityHookManager",),
+        ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
+        ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
+        ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
+        ".integrations.mcp_client": ("FlextQualityMcpClient",),
+        ".mcp.resources": ("FlextQualityMcpResources",),
+        ".mcp.server": ("FlextQualityMcpServer",),
+        ".mcp.tools": ("FlextQualityMcpTools",),
+        ".models": ("FlextQualityModels", "m"),
+        ".protocols": ("FlextQualityProtocols", "p"),
+        ".rules.engine": ("FlextQualityRulesEngine",),
+        ".rules.loader": ("FlextQualityRulesLoader",),
+        ".rules.validators": ("FlextQualityValidators",),
+        ".typings": ("FlextQualityTypes", "t"),
+        ".utilities": ("FlextQualityUtilities", "u"),
+        "flext_infra": ("d", "e", "h", "r", "x"),
+    }),
     exclude_names=(
         "cleanup_submodule_namespace",
         "install_lazy_exports",
@@ -211,9 +173,4 @@ __all__: tuple[str, ...] = (
 )
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    public_exports=__all__,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

@@ -14,17 +14,10 @@ if TYPE_CHECKING:
     from flext_quality.docs.tools.style_validator import (
         FlextQualityStyleValidator as FlextQualityStyleValidator,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".link_checker": ("FlextQualityLinkChecker",),
-        ".style_validator": ("FlextQualityStyleValidator",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".link_checker": ("FlextQualityLinkChecker",),
+    ".style_validator": ("FlextQualityStyleValidator",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

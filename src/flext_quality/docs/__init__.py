@@ -43,28 +43,22 @@ if TYPE_CHECKING:
         FlextQualityStyleValidator as FlextQualityStyleValidator,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
-    (
-        ".core",
-        ".scripts",
-        ".tools",
-    ),
-    build_lazy_import_map(
-        {
-            ".core": ("core",),
-            ".core.config_manager": ("FlextQualityConfigManager",),
-            ".dashboard": ("FlextQualityDocumentationDashboard",),
-            ".notifications": ("FlextQualityDocumentationNotifier",),
-            ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
-            ".scripts": ("scripts",),
-            ".scripts.audit": ("FlextQualityDocumentationAuditor",),
-            ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
-            ".scripts.report": ("FlextQualityDocumentationReporter",),
-            ".scripts.validate": ("FlextQualityDocumentationValidator",),
-            ".tools": ("tools",),
-            ".tools.link_checker": ("FlextQualityLinkChecker",),
-            ".tools.style_validator": ("FlextQualityStyleValidator",),
-        },
-    ),
+    (".core", ".scripts", ".tools"),
+    build_lazy_import_map({
+        ".core": ("core",),
+        ".core.config_manager": ("FlextQualityConfigManager",),
+        ".dashboard": ("FlextQualityDocumentationDashboard",),
+        ".notifications": ("FlextQualityDocumentationNotifier",),
+        ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+        ".scripts": ("scripts",),
+        ".scripts.audit": ("FlextQualityDocumentationAuditor",),
+        ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
+        ".scripts.report": ("FlextQualityDocumentationReporter",),
+        ".scripts.validate": ("FlextQualityDocumentationValidator",),
+        ".tools": ("tools",),
+        ".tools.link_checker": ("FlextQualityLinkChecker",),
+        ".tools.style_validator": ("FlextQualityStyleValidator",),
+    }),
     exclude_names=(
         "cleanup_submodule_namespace",
         "install_lazy_exports",
@@ -88,9 +82,4 @@ _LAZY_IMPORTS = merge_lazy_imports(
 )
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

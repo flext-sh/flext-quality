@@ -17,18 +17,11 @@ if TYPE_CHECKING:
     from flext_quality.rules.validators import (
         FlextQualityValidators as FlextQualityValidators,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".engine": ("FlextQualityRulesEngine",),
-        ".loader": ("FlextQualityRulesLoader",),
-        ".validators": ("FlextQualityValidators",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".engine": ("FlextQualityRulesEngine",),
+    ".loader": ("FlextQualityRulesLoader",),
+    ".validators": ("FlextQualityValidators",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

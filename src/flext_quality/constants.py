@@ -176,20 +176,20 @@ class FlextQualityConstants(c, web_c):
 
         # === Pre-compiled regex authorities ===
         PATTERNS_TYPE_IGNORE_RE: ClassVar[t.RegexPattern] = re.compile(
-            PATTERNS_TYPE_IGNORE,
+            PATTERNS_TYPE_IGNORE
         )
         PATTERNS_CAST_USAGE_RE: ClassVar[t.RegexPattern] = re.compile(
-            PATTERNS_CAST_USAGE,
+            PATTERNS_CAST_USAGE
         )
         PATTERNS_ANY_TYPE_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_ANY_TYPE)
         PATTERNS_TYPE_CHECKING_RE: ClassVar[t.RegexPattern] = re.compile(
-            PATTERNS_TYPE_CHECKING,
+            PATTERNS_TYPE_CHECKING
         )
         PATTERNS_TIER_VIOLATION_RE: ClassVar[t.RegexPattern] = re.compile(
-            PATTERNS_TIER_VIOLATION,
+            PATTERNS_TIER_VIOLATION
         )
         PATTERNS_OPTIONAL_RE: ClassVar[t.RegexPattern] = re.compile(
-            PATTERNS_OPTIONAL_PATTERN,
+            PATTERNS_OPTIONAL_PATTERN
         )
         PATTERNS_UNION_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_UNION_PATTERN)
         FORBIDDEN_PATTERN_RE_MAP: ClassVar[t.MappingKV[str, t.RegexPattern]] = (

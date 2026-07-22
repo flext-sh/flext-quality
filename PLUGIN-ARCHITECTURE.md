@@ -89,9 +89,7 @@ class QualityPlugin(Protocol):
         ...
 
     def analyze(
-        self,
-        path: Path,
-        settings: m.Quality.PluginConfigModel | None = None,
+        self, path: Path, settings: m.Quality.PluginConfigModel | None = None
     ) -> p.Result[AnalysisResult]:
         """Run analysis on path."""
         ...
@@ -100,11 +98,7 @@ class QualityPlugin(Protocol):
         """Whether plugin can auto-fix issues."""
         ...
 
-    def fix(
-        self,
-        path: Path,
-        issues: t.SequenceOf[Issue],
-    ) -> p.Result[FixResult]:
+    def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
         ...
 ```

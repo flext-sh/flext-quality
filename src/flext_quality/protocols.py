@@ -48,9 +48,7 @@ class FlextQualityProtocols(p, web_p):
                 ...
 
             def validate(
-                self,
-                content: str,
-                file_path: t.Cli.TextPath | None = None,
+                self, content: str, file_path: t.Cli.TextPath | None = None
             ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
                 """Validate content and return violations."""
                 ...
@@ -62,10 +60,7 @@ class FlextQualityProtocols(p, web_p):
             event: ClassVar[type]
             matcher: ClassVar[t.StrSequence | None]
 
-            def execute(
-                self,
-                input_data: t.JsonMapping,
-            ) -> p.Result[t.JsonMapping]:
+            def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
                 """Execute the hook logic."""
                 ...
 
@@ -78,10 +73,7 @@ class FlextQualityProtocols(p, web_p):
             """Protocol for documentation configuration objects."""
 
             def get(
-                self,
-                key: str,
-                *,
-                default: str | float | bool | None = None,
+                self, key: str, *, default: str | float | bool | None = None
             ) -> t.Primitives | None:
                 """Get a configuration value."""
                 ...
@@ -97,10 +89,7 @@ class FlextQualityProtocols(p, web_p):
             event: str
             matcher: t.StrSequence | None
 
-            def execute(
-                self,
-                input_data: t.JsonMapping,
-            ) -> p.Result[t.JsonMapping]:
+            def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
                 """Execute the hook logic."""
                 ...
 
@@ -115,9 +104,7 @@ class FlextQualityProtocols(p, web_p):
             rule_type: str
 
             def validate(
-                self,
-                settings: t.JsonMapping,
-                context: t.JsonMapping,
+                self, settings: t.JsonMapping, context: t.JsonMapping
             ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -145,10 +132,7 @@ class FlextQualityProtocols(p, web_p):
             name: str
             description: str
 
-            def execute(
-                self,
-                params: t.JsonMapping,
-            ) -> p.Result[t.JsonMapping]:
+            def execute(self, params: t.JsonMapping) -> p.Result[t.JsonMapping]:
                 """Execute MCP tool."""
                 ...
 

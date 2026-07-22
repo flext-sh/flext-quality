@@ -14,9 +14,7 @@ from typing import TYPE_CHECKING
 from flext_quality import c, m, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableSequence,
-    )
+    from collections.abc import MutableSequence
 
 
 class FlextQualityStyleValidator:
@@ -95,8 +93,7 @@ class FlextQualityStyleValidator:
         summary: FlextQualityStyleValidator.SummaryMetrics
 
     def __init__(
-        self,
-        config_path: str | None = "docs/maintenance/settings/style_guide.yaml",
+        self, config_path: str | None = "docs/maintenance/settings/style_guide.yaml"
     ) -> None:
         """Initialize style validator with configuration.
 
@@ -131,9 +128,7 @@ class FlextQualityStyleValidator:
         if config_path is None:
             self.settings = FlextQualityStyleValidator.StyleConfig(
                 markdown=FlextQualityStyleValidator.MarkdownConfig(
-                    heading_style="atx",
-                    list_style="dash",
-                    emphasis_style="*",
+                    heading_style="atx", list_style="dash", emphasis_style="*"
                 ),
                 accessibility=FlextQualityStyleValidator.AccessibilityConfig(
                     require_alt_text=True,
@@ -152,8 +147,7 @@ class FlextQualityStyleValidator:
             self._set_default_config()
 
     def _normalize_config(
-        self,
-        raw: t.JsonMapping,
+        self, raw: t.JsonMapping
     ) -> FlextQualityStyleValidator.StyleConfig:
         markdown_raw = raw.get("markdown")
         markdown = (
@@ -172,7 +166,7 @@ class FlextQualityStyleValidator:
         accessibility_raw = raw.get("accessibility")
         accessibility = (
             FlextQualityStyleValidator.AccessibilityConfig.model_validate(
-                accessibility_raw,
+                accessibility_raw
             )
             if isinstance(accessibility_raw, dict)
             else None
@@ -202,21 +196,14 @@ class FlextQualityStyleValidator:
                 code_block_style="fenced",
             ),
             formatting=FlextQualityStyleValidator.FormattingConfig(
-                max_line_length=88,
-                trailing_spaces=False,
-                consistent_indentation=True,
+                max_line_length=88, trailing_spaces=False, consistent_indentation=True
             ),
             accessibility=FlextQualityStyleValidator.AccessibilityConfig(
-                require_alt_text=True,
-                descriptive_links=True,
-                proper_headings=True,
+                require_alt_text=True, descriptive_links=True, proper_headings=True
             ),
         )
 
-    def validate_file(
-        self,
-        file_path: Path,
-    ) -> FlextQualityStyleValidator.FileResults:
+    def validate_file(self, file_path: Path) -> FlextQualityStyleValidator.FileResults:
         """Validate a single documentation file."""
         read = u.Cli.files_read_text(file_path)
         if read.failure:
@@ -230,7 +217,7 @@ class FlextQualityStyleValidator:
                         content="",
                         message=f"Failed to read file: {read.error}",
                         severity="error",
-                    ),
+                    )
                 ],
                 suggestions=[],
             )
@@ -258,9 +245,7 @@ class FlextQualityStyleValidator:
         file_results.violations.extend(self._check_whitespace(content))
 
         file_results.suggestions = list(
-            self._generate_suggestions(
-                file_results.violations,
-            ),
+            self._generate_suggestions(file_results.violations)
         )
 
         self.results.files_checked += 1
@@ -271,8 +256,7 @@ class FlextQualityStyleValidator:
         return file_results
 
     def _check_markdown_formatting(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check basic markdown formatting consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -286,7 +270,7 @@ class FlextQualityStyleValidator:
                 else None
             )
             if emphasis_style == "*" and u.Quality.compile_pattern(
-                r"(?<!\\)_[^_]+_(?!\\)",
+                r"(?<!\\)_[^_]+_(?!\\)"
             ).search(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
@@ -295,11 +279,11 @@ class FlextQualityStyleValidator:
                         content=line.strip(),
                         message="Use * for emphasis instead of _",
                         severity="low",
-                    ),
+                    )
                 )
 
             if line.startswith("#") and not u.Quality.compile_pattern(
-                r"^#{1,6}\s",
+                r"^#{1,6}\s"
             ).match(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
@@ -308,14 +292,13 @@ class FlextQualityStyleValidator:
                         content=line.strip(),
                         message="Headings should have a space after #",
                         severity="medium",
-                    ),
+                    )
                 )
 
         return violations
 
     def _check_heading_consistency(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check heading hierarchy and consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -327,8 +310,7 @@ class FlextQualityStyleValidator:
                 content[: match.start()].count("\n") + 1,
             )
             for match in u.Quality.compile_pattern(
-                r"^(#{1,6})\s+(.+)$",
-                multiline=True,
+                r"^(#{1,6})\s+(.+)$", multiline=True
             ).finditer(content)
         ]
 
@@ -346,7 +328,7 @@ class FlextQualityStyleValidator:
                             content=f"{'#' * level} {text}",
                             message=f"Heading skips level (expected H{expected_level} or H{expected_level + 1}, got H{level})",
                             severity="medium",
-                        ),
+                        )
                     )
                 expected_level = level
 
@@ -358,27 +340,21 @@ class FlextQualityStyleValidator:
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
                     message="Document should start with H1 heading",
                     severity="low",
-                ),
+                )
             )
 
         return violations
 
     def _check_list_consistency(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check list formatting consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
         list_items: t.SequenceOf[tuple[str, str, int]] = [
-            (
-                match.group(1),
-                match.group(2),
-                content[: match.start()].count("\n") + 1,
-            )
+            (match.group(1), match.group(2), content[: match.start()].count("\n") + 1)
             for match in u.Quality.compile_pattern(
-                r"^(\s*)([-\*\+])\s+",
-                multiline=True,
+                r"^(\s*)([-\*\+])\s+", multiline=True
             ).finditer(content)
         ]
 
@@ -402,14 +378,13 @@ class FlextQualityStyleValidator:
                     content=f"List using {inconsistent_markers[0]}",
                     message=f"Use {preferred} for list markers instead of mixed styles",
                     severity="low",
-                ),
+                )
             )
 
         return violations
 
     def _check_code_formatting(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check code block and inline code formatting."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -421,8 +396,7 @@ class FlextQualityStyleValidator:
         )
         if code_block_style == "fenced":
             code_blocks = u.Quality.compile_pattern(
-                r"```\n(.*?)\n```",
-                dotall=True,
+                r"```\n(.*?)\n```", dotall=True
             ).findall(content)
             violations.extend(
                 FlextQualityStyleValidator.StyleIssue(
@@ -434,7 +408,7 @@ class FlextQualityStyleValidator:
                 )
                 for block in code_blocks
                 if not u.Quality.compile_pattern(r"```\w+").match(
-                    content[content.find(block) - 10 : content.find(block)],
+                    content[content.find(block) - 10 : content.find(block)]
                 )
             )
 
@@ -454,14 +428,13 @@ class FlextQualityStyleValidator:
                             content=line.strip(),
                             message="Add space before inline code",
                             severity="low",
-                        ),
+                        )
                     )
 
         return violations
 
     def _check_accessibility(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check accessibility compliance."""
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -473,7 +446,7 @@ class FlextQualityStyleValidator:
         )
         if require_alt_text is not False:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
-                content,
+                content
             )
             if images_without_alt:
                 for img in images_without_alt:
@@ -485,7 +458,7 @@ class FlextQualityStyleValidator:
                             content=img,
                             message="Images must have descriptive alt text",
                             severity="high",
-                        ),
+                        )
                     )
 
         descriptive_links = (
@@ -495,8 +468,7 @@ class FlextQualityStyleValidator:
         )
         if descriptive_links is not False:
             generic_links = u.Quality.compile_pattern(
-                r"\[here|click here|link|read more\]\([^)]+\)",
-                ignorecase=True,
+                r"\[here|click here|link|read more\]\([^)]+\)", ignorecase=True
             ).findall(content)
             for link in generic_links:
                 line_num = content[: content.find(link)].count("\n") + 1
@@ -507,14 +479,13 @@ class FlextQualityStyleValidator:
                         content=link,
                         message="Use descriptive link text instead of generic terms",
                         severity="medium",
-                    ),
+                    )
                 )
 
         return issues
 
     def _check_line_length(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check line length compliance."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -544,14 +515,13 @@ class FlextQualityStyleValidator:
                         else line,
                         message=f"Line exceeds {max_length} characters ({len(line)} chars)",
                         severity="low",
-                    ),
+                    )
                 )
 
         return violations
 
     def _check_whitespace(
-        self,
-        content: str,
+        self, content: str
     ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check whitespace formatting."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -572,7 +542,7 @@ class FlextQualityStyleValidator:
                         content=line,
                         message="Remove trailing whitespace",
                         severity="low",
-                    ),
+                    )
                 )
 
             if i < len(lines) - 1:
@@ -586,14 +556,13 @@ class FlextQualityStyleValidator:
                             content="",
                             message="Multiple consecutive blank lines",
                             severity="low",
-                        ),
+                        )
                     )
 
         return violations
 
     def _generate_suggestions(
-        self,
-        violations: t.SequenceOf[FlextQualityStyleValidator.StyleIssue],
+        self, violations: t.SequenceOf[FlextQualityStyleValidator.StyleIssue]
     ) -> t.StrSequence:
         """Generate improvement suggestions based on violations."""
         suggestions: MutableSequence[str] = []
@@ -605,7 +574,7 @@ class FlextQualityStyleValidator:
 
         if violation_types.get("emphasis_style", 0) > 0:
             suggestions.append(
-                "Standardize emphasis markers (*bold* and _italic_ vs mixed usage)",
+                "Standardize emphasis markers (*bold* and _italic_ vs mixed usage)"
             )
 
         if violation_types.get("heading_hierarchy", 0) > 0:
@@ -619,7 +588,7 @@ class FlextQualityStyleValidator:
 
         if violation_types.get("missing_alt_text", 0) > 0:
             suggestions.append(
-                "Add descriptive alt text to all images for accessibility",
+                "Add descriptive alt text to all images for accessibility"
             )
 
         if (
@@ -631,8 +600,7 @@ class FlextQualityStyleValidator:
         return suggestions
 
     def validate_files_batch(
-        self,
-        file_paths: t.SequenceOf[Path],
+        self, file_paths: t.SequenceOf[Path]
     ) -> FlextQualityStyleValidator.ValidationResults:
         """Validate multiple files and aggregate results."""
         for file_path in file_paths:
@@ -700,9 +668,7 @@ Top Issues:
 
         # Show top 5 issues
         sorted_issues = sorted(
-            issue_types.items(),
-            key=operator.itemgetter(1),
-            reverse=True,
+            issue_types.items(), key=operator.itemgetter(1), reverse=True
         )
         for issue_type, count in sorted_issues[:5]:
             report += f"- {issue_type.replace('_', ' ').title()}: {count}\n"
@@ -716,8 +682,7 @@ Top Issues:
 
     @staticmethod
     def validate_file_style(
-        file_path: str,
-        config_path: str | None = None,
+        file_path: str, config_path: str | None = None
     ) -> FlextQualityStyleValidator.FileResults:
         """Validate a single file."""
         validator = FlextQualityStyleValidator(config_path)
@@ -725,8 +690,7 @@ Top Issues:
 
     @staticmethod
     def validate_files_style(
-        file_paths: t.StrSequence,
-        config_path: str | None = None,
+        file_paths: t.StrSequence, config_path: str | None = None
     ) -> FlextQualityStyleValidator.ValidationResults:
         """Validate multiple files."""
         validator = FlextQualityStyleValidator(config_path)

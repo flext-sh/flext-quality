@@ -7,10 +7,7 @@ Provides web interface to view audit results, trends, and quality scores.
 from __future__ import annotations
 
 import operator
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-)
+from collections.abc import Mapping, MutableSequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
@@ -51,7 +48,7 @@ class FlextQualityDocumentationDashboard:
             """Return current metrics as a JSON response."""
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_current_metrics(),
+                    self.get_current_metrics()
                 ).decode(),
                 mimetype="application/json",
             )
@@ -64,7 +61,7 @@ class FlextQualityDocumentationDashboard:
             days = int(request.args.get("days", 30))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_quality_trends(days),
+                    self.get_quality_trends(days)
                 ).decode(),
                 mimetype="application/json",
             )
@@ -77,16 +74,14 @@ class FlextQualityDocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-                    self.get_recent_reports(limit),
+                    self.get_recent_reports(limit)
                 ).decode(),
                 mimetype="application/json",
             )
 
         _ = api_reports
 
-    def get_current_metrics(
-        self,
-    ) -> t.JsonMapping:
+    def get_current_metrics(self) -> t.JsonMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -151,10 +146,7 @@ class FlextQualityDocumentationDashboard:
             "status": "Current",
         }
 
-    def get_quality_trends(
-        self,
-        days: int = 30,
-    ) -> t.JsonMapping:
+    def get_quality_trends(self, days: int = 30) -> t.JsonMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = u.now() - timedelta(days=days)
 
@@ -167,8 +159,7 @@ class FlextQualityDocumentationDashboard:
                 trend_entry = self._load_quality_trend_entry(report_file, cutoff_date)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process trend data: %s",
-                    str(e),
+                    "Failed to process trend data: %s", str(e)
                 )
                 continue
             if trend_entry is not None:
@@ -187,22 +178,19 @@ class FlextQualityDocumentationDashboard:
         }
 
     def _load_quality_trend_entry(
-        self,
-        report_file: Path,
-        cutoff_date: datetime,
+        self, report_file: Path, cutoff_date: datetime
     ) -> t.JsonDict | None:
         """Load one audit report trend entry when it is inside the window."""
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone(),
+            tzinfo=u.configured_timezone()
         )
         if report_date < cutoff_date:
             return None
         read = u.Cli.files_read_text(report_file)
         if read.failure:
             self._logger_instance.warning(
-                "Skipping unreadable report",
-                file=str(report_file),
+                "Skipping unreadable report", file=str(report_file)
             )
             return None
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
@@ -230,8 +218,7 @@ class FlextQualityDocumentationDashboard:
                 report_summary = self._load_recent_report_summary(report_file)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process report file: %s",
-                    str(e),
+                    "Failed to process report file: %s", str(e)
                 )
                 continue
             if report_summary is not None:
@@ -245,13 +232,12 @@ class FlextQualityDocumentationDashboard:
         """Load one recent report summary for the dashboard list."""
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone(),
+            tzinfo=u.configured_timezone()
         )
         read = u.Cli.files_read_text(report_file)
         if read.failure:
             self._logger_instance.warning(
-                "Skipping unreadable report",
-                file=str(report_file),
+                "Skipping unreadable report", file=str(report_file)
             )
             return None
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
@@ -593,11 +579,7 @@ class FlextQualityDocumentationDashboard:
         """
 
     def run(
-        self,
-        host: str = "localhost",
-        port: int = 8080,
-        *,
-        debug: bool = False,
+        self, host: str = "localhost", port: int = 8080, *, debug: bool = False
     ) -> None:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
@@ -606,19 +588,13 @@ class FlextQualityDocumentationDashboard:
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(
-            "localhost",
-            description="Dashboard bind host",
-            validate_default=True,
+            "localhost", description="Dashboard bind host", validate_default=True
         )
         port: int = u.Field(
-            8080,
-            description="Dashboard bind port",
-            validate_default=True,
+            8080, description="Dashboard bind port", validate_default=True
         )
         debug: bool = u.Field(
-            False,
-            description="Enable dashboard debug mode",
-            validate_default=True,
+            False, description="Enable dashboard debug mode", validate_default=True
         )
         reports_dir: str = u.Field(
             "docs/maintenance/reports/",

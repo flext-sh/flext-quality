@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_tests import tm
 
 from flext_quality import FlextQuality, c, quality
+from flext_tests import tm
 
 
 class TestsFlextQualityBasic:
@@ -30,10 +30,7 @@ class TestsFlextQualityBasic:
         tm.that(result.success, eq=True)
         tm.that(result.value, is_=dict)
 
-    @pytest.mark.parametrize(
-        "key",
-        ["name", "version", "settings", "hooks_registered"],
-    )
+    @pytest.mark.parametrize("key", ["name", "version", "settings", "hooks_registered"])
     def test_execute_status_exposes_public_keys(self, key: str) -> None:
         """The status snapshot from execute() carries every documented key."""
         tm.that(FlextQuality().execute().value, has=key)

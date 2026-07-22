@@ -20,19 +20,12 @@ if TYPE_CHECKING:
     from flext_quality.docs.scripts.validate import (
         FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".audit": ("FlextQualityDocumentationAuditor",),
-        ".optimize": ("FlextQualityDocumentationOptimizer",),
-        ".report": ("FlextQualityDocumentationReporter",),
-        ".validate": ("FlextQualityDocumentationValidator",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".audit": ("FlextQualityDocumentationAuditor",),
+    ".optimize": ("FlextQualityDocumentationOptimizer",),
+    ".report": ("FlextQualityDocumentationReporter",),
+    ".validate": ("FlextQualityDocumentationValidator",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

@@ -10,10 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import shutil
-from collections.abc import (
-    Mapping,
-    MutableSequence,
-)
+from collections.abc import Mapping, MutableSequence
 from typing import final
 
 from flext_core import e, r
@@ -38,8 +35,7 @@ class FlextQualityMcpClient:
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
-        self,
-        call: m.Quality.McpToolCall,
+        self, call: m.Quality.McpToolCall
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
@@ -56,10 +52,7 @@ class FlextQualityMcpClient:
         return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
-        self,
-        server: str,
-        tool: str,
-        params: t.JsonMapping | None = None,
+        self, server: str, tool: str, params: t.JsonMapping | None = None
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
         call_params = t.json_dict_adapter().validate_python(params or {})
@@ -68,7 +61,7 @@ class FlextQualityMcpClient:
                 "server": server,
                 "tool": tool,
                 "params": call_params,
-            }),
+            })
         )
 
     def health_check(self) -> p.Result[t.JsonMapping]:
@@ -109,8 +102,7 @@ class FlextQualityMcpClient:
         return shutil.which("mcp-cli") is not None
 
     def _build_object_result(
-        self,
-        parsed: t.JsonMapping,
+        self, parsed: t.JsonMapping
     ) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result from parsed JSON object output."""
         result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
@@ -119,13 +111,10 @@ class FlextQualityMcpClient:
                 "success": True,
                 "data": result_data,
                 "error": None,
-            }),
+            })
         )
 
-    def _build_list_result(
-        self,
-        output: str,
-    ) -> p.Result[m.Quality.McpToolResult]:
+    def _build_list_result(self, output: str) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result from parsed JSON list output."""
         try:
             parsed_list: t.JsonList = t.json_list_adapter().validate_json(output)
@@ -147,30 +136,21 @@ class FlextQualityMcpClient:
                 success=True,
                 data={
                     "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
-                        coerced_data,
-                    ).decode("utf-8"),
+                        coerced_data
+                    ).decode("utf-8")
                 },
                 error=None,
-            ),
+            )
         )
 
-    def _build_raw_result(
-        self,
-        output: str,
-    ) -> p.Result[m.Quality.McpToolResult]:
+    def _build_raw_result(self, output: str) -> p.Result[m.Quality.McpToolResult]:
         """Build an MCP tool result preserving raw output."""
         return r[m.Quality.McpToolResult].ok(
-            m.Quality.McpToolResult(
-                success=True,
-                data={"raw": output},
-                error=None,
-            ),
+            m.Quality.McpToolResult(success=True, data={"raw": output}, error=None)
         )
 
     def parse_result(
-        self,
-        output: str,
-        exit_code: int,
+        self, output: str, exit_code: int
     ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
@@ -179,7 +159,7 @@ class FlextQualityMcpClient:
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
-                ),
+                )
             )
         try:
             parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(output)

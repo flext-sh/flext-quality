@@ -20,9 +20,7 @@ from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableSequence,
-    )
+    from collections.abc import MutableSequence
 
 
 class FlextQualityDocumentationOptimizer:
@@ -39,20 +37,18 @@ class FlextQualityDocumentationOptimizer:
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
-            timestamp=u.now().isoformat(),
+            timestamp=u.now().isoformat()
         )
 
     def optimize_formatting(
-        self,
-        doc_files: t.SequenceOf[Path],
+        self, doc_files: t.SequenceOf[Path]
     ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.logger.warning(
-                    "Failed to optimize formatting in file: %s",
-                    read.error,
+                    "Failed to optimize formatting in file: %s", read.error
                 )
                 continue
             content = read.value
@@ -65,8 +61,7 @@ class FlextQualityDocumentationOptimizer:
                 save = self._save_with_backup(file_path, content)
                 if save.failure:
                     self.logger.warning(
-                        "Failed to optimize formatting in file: %s",
-                        save.error,
+                        "Failed to optimize formatting in file: %s", save.error
                     )
                     continue
                 self.results.changes_made += 1
@@ -107,8 +102,7 @@ class FlextQualityDocumentationOptimizer:
         return content
 
     def update_table_of_contents(
-        self,
-        doc_files: t.SequenceOf[Path],
+        self, doc_files: t.SequenceOf[Path]
     ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
@@ -119,8 +113,7 @@ class FlextQualityDocumentationOptimizer:
             content = read.value
             original_content = content
             headings = u.Quality.compile_pattern(
-                r"^(#{1,6})\\s+(.+)$",
-                multiline=True,
+                r"^(#{1,6})\\s+(.+)$", multiline=True
             ).findall(content)
             if len(headings) > c.Quality.THRESHOLD_MIN_HEADINGS_FOR_TOC:
                 content = self._add_or_update_toc(content)
@@ -144,8 +137,7 @@ class FlextQualityDocumentationOptimizer:
         toc_end = -1
         for i, line in enumerate(lines):
             if u.Quality.compile_pattern(
-                r"^##+\\s+Table of Contents",
-                ignorecase=True,
+                r"^##+\\s+Table of Contents", ignorecase=True
             ).match(line):
                 toc_start = i
             elif toc_start != -1 and (
@@ -208,17 +200,14 @@ class FlextQualityDocumentationOptimizer:
         return slug
 
     def enhance_accessibility(
-        self,
-        doc_files: t.SequenceOf[Path],
+        self, doc_files: t.SequenceOf[Path]
     ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s",
-                    file_path,
-                    read.error,
+                    "Failed to enhance accessibility in %s: %s", file_path, read.error
                 )
                 continue
             content = read.value
@@ -265,23 +254,19 @@ class FlextQualityDocumentationOptimizer:
         }
         for pattern, replacement in improvements.items():
             content = u.Quality.compile_pattern(pattern, ignorecase=True).sub(
-                replacement,
-                content,
+                replacement, content
             )
         return content
 
     def optimize_content_structure(
-        self,
-        doc_files: t.SequenceOf[Path],
+        self, doc_files: t.SequenceOf[Path]
     ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.logger.warning(
-                    "Failed to optimize structure in %s: %s",
-                    file_path,
-                    read.error,
+                    "Failed to optimize structure in %s: %s", file_path, read.error
                 )
                 continue
             content = read.value
@@ -293,9 +278,7 @@ class FlextQualityDocumentationOptimizer:
                 save = self._save_with_backup(file_path, content)
                 if save.failure:
                     self.logger.warning(
-                        "Failed to optimize structure in %s: %s",
-                        file_path,
-                        save.error,
+                        "Failed to optimize structure in %s: %s", file_path, save.error
                     )
                     continue
                 self.results.changes_made += 1
@@ -331,17 +314,14 @@ class FlextQualityDocumentationOptimizer:
         return "\n".join(enhanced_lines)
 
     def update_metadata(
-        self,
-        doc_files: t.SequenceOf[Path],
+        self, doc_files: t.SequenceOf[Path]
     ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.logger.warning(
-                    "Failed to update metadata in %s: %s",
-                    file_path,
-                    read.error,
+                    "Failed to update metadata in %s: %s", file_path, read.error
                 )
                 continue
             content = read.value
@@ -349,23 +329,17 @@ class FlextQualityDocumentationOptimizer:
             if content.startswith("---"):
                 content = self._update_frontmatter(content)
             if not u.Quality.compile_pattern(
-                r"<!--.*updated.*-->",
-                ignorecase=True,
+                r"<!--.*updated.*-->", ignorecase=True
             ).search(content):
                 lines = content.split("\n")
                 if lines and lines[0].strip():
-                    lines.insert(
-                        1,
-                        f"<!-- Updated: {u.now().strftime('%Y-%m-%d')} -->",
-                    )
+                    lines.insert(1, f"<!-- Updated: {u.now().strftime('%Y-%m-%d')} -->")
                     content = "\n".join(lines)
             if content != original_content:
                 save = self._save_with_backup(file_path, content)
                 if save.failure:
                     self.logger.warning(
-                        "Failed to update metadata in %s: %s",
-                        file_path,
-                        save.error,
+                        "Failed to update metadata in %s: %s", file_path, save.error
                     )
                     continue
                 self.results.changes_made += 1
@@ -391,26 +365,20 @@ class FlextQualityDocumentationOptimizer:
         return "\n".join(lines)
 
     def _replace_frontmatter_lines(
-        self,
-        lines: t.StrSequence,
-        end_idx: int,
+        self, lines: t.StrSequence, end_idx: int
     ) -> list[str]:
         """Return document lines with refreshed YAML frontmatter metadata."""
         frontmatter_lines = lines[1 : end_idx - 1]
         frontmatter_content = "\n".join(frontmatter_lines)
         empty_frontmatter: t.JsonMapping = {}
-        parsed_fm = u.Cli.yaml_parse(
-            frontmatter_content,
-        ).unwrap_or(empty_frontmatter)
+        parsed_fm = u.Cli.yaml_parse(frontmatter_content).unwrap_or(empty_frontmatter)
         metadata: t.MutableJsonMapping = {
             k: v
             for k, v in (parsed_fm or {}).items()
             if isinstance(v, t.PRIMITIVES_TYPES)
         }
         metadata["updated"] = u.now().strftime("%Y-%m-%d")
-        new_frontmatter = u.Cli.yaml_dump_str(
-            metadata,
-        ).strip()
+        new_frontmatter = u.Cli.yaml_dump_str(metadata).strip()
         new_frontmatter_lines = ["---", *new_frontmatter.split("\n"), "---"]
         return new_frontmatter_lines + list(lines[end_idx:])
 
@@ -420,7 +388,7 @@ class FlextQualityDocumentationOptimizer:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
             self.results.backups_created.append(
-                str(backup_path.relative_to(self.project_root)),
+                str(backup_path.relative_to(self.project_root))
             )
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
@@ -437,8 +405,7 @@ class FlextQualityDocumentationOptimizer:
         return report_text
 
     def save_report(
-        self,
-        output_path: str = "docs/maintenance/reports/",
+        self, output_path: str = "docs/maintenance/reports/"
     ) -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
@@ -451,9 +418,7 @@ class FlextQualityDocumentationOptimizer:
             return r[str].fail(report_write.error or f"cannot write {filepath}")
         latest_file = output_dir / "latest_optimization.json"
         latest_write = u.Cli.json_write(
-            latest_file,
-            self.results,
-            options=m.Cli.JsonWriteOptions(indent=2),
+            latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
@@ -463,44 +428,28 @@ class FlextQualityDocumentationOptimizer:
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
-            False,
-            description="Fix formatting",
-            validate_default=True,
+            False, description="Fix formatting", validate_default=True
         )
         update_toc: bool = u.Field(
-            False,
-            description="Update tables of contents",
-            validate_default=True,
+            False, description="Update tables of contents", validate_default=True
         )
         add_alt_text: bool = u.Field(
-            False,
-            description="Add missing alt text",
-            validate_default=True,
+            False, description="Add missing alt text", validate_default=True
         )
         improve_accessibility: bool = u.Field(
-            False,
-            description="Improve accessibility",
-            validate_default=True,
+            False, description="Improve accessibility", validate_default=True
         )
         optimize_structure: bool = u.Field(
-            False,
-            description="Optimize content structure",
-            validate_default=True,
+            False, description="Optimize content structure", validate_default=True
         )
         update_metadata: bool = u.Field(
-            False,
-            description="Update metadata",
-            validate_default=True,
+            False, description="Update metadata", validate_default=True
         )
         comprehensive: bool = u.Field(
-            False,
-            description="Run all optimizations",
-            validate_default=True,
+            False, description="Run all optimizations", validate_default=True
         )
         backup: bool = u.Field(
-            True,
-            description="Create file backups",
-            validate_default=True,
+            True, description="Create file backups", validate_default=True
         )
         output: str = u.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
@@ -508,9 +457,7 @@ class FlextQualityDocumentationOptimizer:
             validate_default=True,
         )
         files: t.StrSequence = u.Field(
-            (),
-            description="Documentation files to optimize",
-            validate_default=True,
+            (), description="Documentation files to optimize", validate_default=True
         )
 
         def discover_files(self) -> t.SequenceOf[Path]:
@@ -557,7 +504,7 @@ class FlextQualityDocumentationOptimizer:
             save_result = optimizer.save_report(self.output)
             if save_result.failure:
                 return r[bool].fail(
-                    save_result.error or "optimization report write failed",
+                    save_result.error or "optimization report write failed"
                 )
             return r[bool].ok(value=True)
 

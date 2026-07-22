@@ -15,10 +15,10 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from flext_tests import tm
 from pydantic import ValidationError
 
 from flext_quality import FlextQuality, FlextQualitySettings, p, quality, t
+from flext_tests import tm
 
 
 class TestsFlextQualityApi:
@@ -94,23 +94,17 @@ class TestsFlextQualityApi:
         """
         with pytest.raises(ValidationError, match="max_function_length"):
             FlextQualitySettings(
-                Quality={"max_function_length": 500, "max_class_length": 100},
+                Quality={"max_function_length": 500, "max_class_length": 100}
             )
 
     # -- hook output formatting ------------------------------------------
 
     @pytest.mark.parametrize(
         ("continue_exec", "expected"),
-        [
-            (True, '"continue":true'),
-            (False, '"continue":false'),
-        ],
+        [(True, '"continue":true'), (False, '"continue":false')],
     )
     def test_format_hook_output_encodes_continue_flag(
-        self,
-        *,
-        continue_exec: bool,
-        expected: str,
+        self, *, continue_exec: bool, expected: str
     ) -> None:
         """The continue flag is serialized into the JSON output string."""
         output = FlextQuality().format_hook_output(continue_exec=continue_exec).value
@@ -132,8 +126,7 @@ class TestsFlextQualityApi:
         output = (
             FlextQuality()
             .format_hook_output(
-                continue_exec=False,
-                blocked_reason="Blocked for testing",
+                continue_exec=False, blocked_reason="Blocked for testing"
             )
             .value
         )
@@ -170,10 +163,7 @@ class TestsFlextQualityApi:
             '    description: Test rule\n    pattern: "test"\n    enabled: true\n'
         )
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8",
-            mode="w",
-            suffix=".yaml",
-            delete=False,
+            encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as handle:
             handle.write(rules_yaml)
             rules_path = Path(handle.name)
@@ -207,11 +197,11 @@ class TestsFlextQualityApi:
             rules_dir = Path(tmpdir)
             (rules_dir / "rules1.yaml").write_text(
                 "\nrules:\n  - name: rule-one\n    type: warning\n"
-                '    description: First rule\n    pattern: "one"\n    enabled: true\n',
+                '    description: First rule\n    pattern: "one"\n    enabled: true\n'
             )
             (rules_dir / "rules2.yml").write_text(
                 "\nrules:\n  - name: rule-two\n    type: blocking\n"
-                '    description: Second rule\n    pattern: "two"\n    enabled: true\n',
+                '    description: Second rule\n    pattern: "two"\n    enabled: true\n'
             )
             service.settings.Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
@@ -239,9 +229,7 @@ class TestsFlextQualityApi:
 
     def test_process_stdin_hook_executes_known_event(self) -> None:
         """A well-formed known event on stdin is executed successfully."""
-        result = self._run_with_stdin(
-            '{"event": "PreToolUse", "tool_name": "Edit"}',
-        )
+        result = self._run_with_stdin('{"event": "PreToolUse", "tool_name": "Edit"}')
         tm.that(result.success, eq=True)
         tm.that(result.value.get("continue"), eq=True)
 

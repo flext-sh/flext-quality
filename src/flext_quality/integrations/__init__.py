@@ -20,19 +20,12 @@ if TYPE_CHECKING:
     from flext_quality.integrations.mcp_client import (
         FlextQualityMcpClient as FlextQualityMcpClient,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".claude_context": ("FlextQualityClaudeContextClient",),
-        ".claude_mem": ("FlextQualityClaudeMemClient",),
-        ".code_execution": ("FlextQualityCodeExecutionBridge",),
-        ".mcp_client": ("FlextQualityMcpClient",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".claude_context": ("FlextQualityClaudeContextClient",),
+    ".claude_mem": ("FlextQualityClaudeMemClient",),
+    ".code_execution": ("FlextQualityCodeExecutionBridge",),
+    ".mcp_client": ("FlextQualityMcpClient",),
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

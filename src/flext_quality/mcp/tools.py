@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
+from collections.abc import Mapping
 
 from flext_quality import (
     FlextQualityClaudeContextClient,
@@ -26,10 +24,7 @@ class FlextQualityMcpTools:
     @_mcp.tool()
     @staticmethod
     def search_memory(
-        query: str,
-        *,
-        search_type: str = "observations",
-        limit: int | None = None,
+        query: str, *, search_type: str = "observations", limit: int | None = None
     ) -> t.JsonMapping:
         """Build command to search cross-session memory via claude-mem."""
         client = FlextQualityClaudeMemClient()
@@ -53,11 +48,7 @@ class FlextQualityMcpTools:
 
     @_mcp.tool()
     @staticmethod
-    def search_code(
-        query: str,
-        *,
-        limit: int | None = None,
-    ) -> t.JsonMapping:
+    def search_code(query: str, *, limit: int | None = None) -> t.JsonMapping:
         """Build command for semantic code search via claude-context."""
         client = FlextQualityClaudeContextClient()
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
@@ -91,9 +82,7 @@ class FlextQualityMcpTools:
     @_mcp.tool()
     @staticmethod
     def validate_rules(
-        path: str,
-        *,
-        context: t.JsonMapping | None = None,
+        path: str, *, context: t.JsonMapping | None = None
     ) -> t.JsonMapping:
         """Validate code against YAML rules."""
         engine = FlextQualityRulesEngine()

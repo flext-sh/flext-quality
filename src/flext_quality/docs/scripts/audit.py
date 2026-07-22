@@ -23,10 +23,7 @@ from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableMapping,
-        MutableSequence,
-    )
+    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityDocumentationAuditor:
@@ -48,40 +45,32 @@ class FlextQualityDocumentationAuditor:
         )
         self.load_config()
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
-            timestamp=u.now().isoformat(),
+            timestamp=u.now().isoformat()
         )
 
     def load_config(self) -> None:
         """Load audit configuration files."""
         try:
-            audit_data = u.Cli.yaml_load_mapping(
-                self.config_path / "audit_rules.yaml",
-            )
+            audit_data = u.Cli.yaml_load_mapping(self.config_path / "audit_rules.yaml")
             if audit_data:
-                self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
-                    audit_data,
-                )
+                self.audit_rules = m.Quality.AuditRulesConfig.model_validate(audit_data)
         except c.EXC_FS_TYPE_VALIDATION:
             self.audit_rules = self.get_default_audit_rules()
 
         try:
-            style_data = u.Cli.yaml_load_mapping(
-                self.config_path / "style_guide.yaml",
-            )
+            style_data = u.Cli.yaml_load_mapping(self.config_path / "style_guide.yaml")
             if style_data:
-                self.style_guide = m.Quality.StyleGuideConfig.model_validate(
-                    style_data,
-                )
+                self.style_guide = m.Quality.StyleGuideConfig.model_validate(style_data)
         except c.EXC_FS_TYPE_VALIDATION:
             self.style_guide = self.get_default_style_guide()
 
         try:
             validation_data = u.Cli.yaml_load_mapping(
-                self.config_path / "validation_config.yaml",
+                self.config_path / "validation_config.yaml"
             )
             if validation_data:
                 self.validation_config = m.Quality.ValidationConfig.model_validate(
-                    validation_data,
+                    validation_data
                 )
         except c.EXC_FS_TYPE_VALIDATION:
             self.validation_config = self.get_default_validation_config()
@@ -205,9 +194,7 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append(issue)
 
     def _build_freshness_issue(
-        self,
-        file_path: Path,
-        cutoff_date: datetime,
+        self, file_path: Path, cutoff_date: datetime
     ) -> (
         MutableMapping[
             str,
@@ -252,23 +239,19 @@ class FlextQualityDocumentationAuditor:
         """Check for indicators of outdated content."""
         indicators: MutableSequence[str] = []
         if u.Quality.compile_pattern(
-            r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder",
-            ignorecase=True,
+            r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", ignorecase=True
         ).search(content):
             indicators.append("version placeholders")
         if u.Quality.compile_pattern(
-            r"\\b202\\d.*TODO|FIXME|update.*date",
-            ignorecase=True,
+            r"\\b202\\d.*TODO|FIXME|update.*date", ignorecase=True
         ).search(content):
             indicators.append("date placeholders")
         if u.Quality.compile_pattern(
-            r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)",
-            ignorecase=True,
+            r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)", ignorecase=True
         ).search(content):
             indicators.append("incomplete sections")
         if u.Quality.compile_pattern(
-            r"❌.*working|✅.*broken|⚠️.*complete",
-            ignorecase=True,
+            r"❌.*working|✅.*broken|⚠️.*complete", ignorecase=True
         ).search(content):
             indicators.append("potentially inconsistent status")
         return indicators
@@ -301,8 +284,7 @@ class FlextQualityDocumentationAuditor:
                 })
             if "README.md" in str(file_path) or "docs/" in str(file_path):
                 missing_sections = self._check_required_sections(
-                    content,
-                    required_sections,
+                    content, required_sections
                 )
                 if missing_sections:
                     self.results.issues.append({
@@ -314,8 +296,7 @@ class FlextQualityDocumentationAuditor:
                     })
             if check_todos:
                 todos = u.Quality.compile_pattern(
-                    r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
-                    ignorecase=True,
+                    r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", ignorecase=True
                 ).findall(content)
                 if todos:
                     self.results.issues.append({
@@ -328,9 +309,7 @@ class FlextQualityDocumentationAuditor:
                     })
 
     def _check_required_sections(
-        self,
-        content: str,
-        required_sections: t.StrSequence,
+        self, content: str, required_sections: t.StrSequence
     ) -> t.StrSequence:
         """Check for required sections in documentation."""
         missing: t.StrSequence = [
@@ -399,8 +378,7 @@ class FlextQualityDocumentationAuditor:
         issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
         unordered_lists = u.Quality.compile_pattern(
-            r"^[\\s]*[-\\*\\+]",
-            multiline=True,
+            r"^[\\s]*[-\\*\\+]", multiline=True
         ).findall(content)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
@@ -414,8 +392,7 @@ class FlextQualityDocumentationAuditor:
             issues.append("mixed emphasis styles (* vs _)")
         if formatting_cfg.trailing_spaces:
             trailing_spaces = u.Quality.compile_pattern(
-                r"[ \\t]+$",
-                multiline=True,
+                r"[ \\t]+$", multiline=True
             ).findall(content)
             if trailing_spaces:
                 issues.append(f"{len(trailing_spaces)} lines with trailing spaces")
@@ -431,7 +408,7 @@ class FlextQualityDocumentationAuditor:
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = u.Quality.compile_pattern(
-                r"!\\[\\]\\([^)]+\\)",
+                r"!\\[\\]\\([^)]+\\)"
             ).findall(content)
             if images_without_alt:
                 issues.extend([
@@ -443,8 +420,7 @@ class FlextQualityDocumentationAuditor:
                 ])
         if accessibility_cfg.descriptive_links:
             generic_links = u.Quality.compile_pattern(
-                r"\\[here|click here|link|read more\\]\\([^)]+\\)",
-                ignorecase=True,
+                r"\\[here|click here|link|read more\\]\\([^)]+\\)", ignorecase=True
             ).findall(content)
             if generic_links:
                 issues.extend([
@@ -458,10 +434,9 @@ class FlextQualityDocumentationAuditor:
 
     def _check_heading_hierarchy(self, content: str) -> t.StrSequence:
         """Check heading hierarchy for logical structure."""
-        headings = u.Quality.compile_pattern(
-            r"^(#+)\\s+(.+)$",
-            multiline=True,
-        ).findall(content)
+        headings = u.Quality.compile_pattern(r"^(#+)\\s+(.+)$", multiline=True).findall(
+            content
+        )
         heading_levels = [len(level) for level, _ in headings]
         issues = [
             f"Skipped heading level at line with H{heading_levels[i]}"
@@ -489,7 +464,7 @@ class FlextQualityDocumentationAuditor:
                 continue
             content = read.value
             external_links = u.Quality.compile_pattern(
-                r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
+                r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)"
             ).findall(content)
             for text, url in external_links:
                 all_links.append({
@@ -499,7 +474,7 @@ class FlextQualityDocumentationAuditor:
                     "type": "external",
                 })
             internal_links = u.Quality.compile_pattern(
-                r"\\[([^\\]]+)\\]\\(([^)]+)\\)",
+                r"\\[([^\\]]+)\\]\\(([^)]+)\\)"
             ).findall(content)
             for text, link in internal_links:
                 if not link.startswith(("http://", "https://", "#", "mailto:")):
@@ -510,7 +485,7 @@ class FlextQualityDocumentationAuditor:
                         "type": "internal",
                     })
             images = u.Quality.compile_pattern(
-                r"!\\[([^\\]]*)\\]\\(([^)]+)\\)",
+                r"!\\[([^\\]]*)\\]\\(([^)]+)\\)"
             ).findall(content)
             for alt_text, src in images:
                 image_refs.append({
@@ -525,10 +500,7 @@ class FlextQualityDocumentationAuditor:
         if link_validation.check_images:
             self._validate_images(image_refs)
 
-    def _validate_external_links(
-        self,
-        links: t.SequenceOf[t.HeaderMapping],
-    ) -> None:
+    def _validate_external_links(self, links: t.SequenceOf[t.HeaderMapping]) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
         timeout = link_validation.timeout
@@ -562,9 +534,7 @@ class FlextQualityDocumentationAuditor:
                 })
 
     def _validate_internal_links(
-        self,
-        links: t.SequenceOf[t.HeaderMapping],
-        doc_files: t.SequenceOf[Path],
+        self, links: t.SequenceOf[t.HeaderMapping], doc_files: t.SequenceOf[Path]
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -649,7 +619,7 @@ class FlextQualityDocumentationAuditor:
                         "Implement automated quality gates in CI/CD",
                         "Schedule regular maintenance reviews",
                     ],
-                ),
+                )
             )
         elif quality_score < 75:
             recommendations.append(
@@ -662,7 +632,7 @@ class FlextQualityDocumentationAuditor:
                         "Implement regular audit schedule",
                         "Consider documentation training for team",
                     ],
-                ),
+                )
             )
         broken_links = [
             i
@@ -681,7 +651,7 @@ class FlextQualityDocumentationAuditor:
                         "Fix internal reference paths",
                         "Implement automated link checking in CI/CD",
                     ],
-                ),
+                )
             )
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
@@ -695,7 +665,7 @@ class FlextQualityDocumentationAuditor:
                         "Update version numbers and dates",
                         "Implement content freshness monitoring",
                     ],
-                ),
+                )
             )
         accessibility_issues = [
             i for i in issues if i["type"] == "accessibility_issues"
@@ -711,14 +681,12 @@ class FlextQualityDocumentationAuditor:
                         "Use descriptive link text",
                         "Ensure proper heading hierarchy",
                     ],
-                ),
+                )
             )
         self.results.recommendations = recommendations
 
     def generate_report(
-        self,
-        output_format: str = "json",
-        output_path: str | None = None,
+        self, output_format: str = "json", output_path: str | None = None
     ) -> str:
         """Generate audit report in specified format.
 
@@ -752,7 +720,7 @@ class FlextQualityDocumentationAuditor:
         generated_at = self.results.timestamp
         score_color = self._get_score_color(quality_score)
         html = Template(
-            """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: $files_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n""",
+            """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: $files_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
         ).substitute(
             generated_at=generated_at,
             files_analyzed=files_analyzed,
@@ -806,9 +774,7 @@ class FlextQualityDocumentationAuditor:
             return r[str].fail(report_write.error or f"cannot write {filepath}")
         latest_file = output_dir / "latest_audit.json"
         latest_write = u.Cli.json_write(
-            latest_file,
-            self.results,
-            options=m.Cli.JsonWriteOptions(indent=2),
+            latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
@@ -818,34 +784,22 @@ class FlextQualityDocumentationAuditor:
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(
-            False,
-            description="Run all audit checks",
-            validate_default=True,
+            False, description="Run all audit checks", validate_default=True
         )
         check_freshness: bool = u.Field(
-            False,
-            description="Check content freshness",
-            validate_default=True,
+            False, description="Check content freshness", validate_default=True
         )
         check_completeness: bool = u.Field(
-            False,
-            description="Check documentation completeness",
-            validate_default=True,
+            False, description="Check documentation completeness", validate_default=True
         )
         check_consistency: bool = u.Field(
-            False,
-            description="Check content consistency",
-            validate_default=True,
+            False, description="Check content consistency", validate_default=True
         )
         check_links: bool = u.Field(
-            False,
-            description="Check documentation links",
-            validate_default=True,
+            False, description="Check documentation links", validate_default=True
         )
         ci_mode: bool = u.Field(
-            False,
-            description="Enable CI mode",
-            validate_default=True,
+            False, description="Enable CI mode", validate_default=True
         )
         fail_on_errors: bool = u.Field(
             False,
@@ -860,9 +814,7 @@ class FlextQualityDocumentationAuditor:
         output_format: Annotated[
             str,
             u.Field(
-                alias="format",
-                description="Audit report format",
-                validate_default=True,
+                alias="format", description="Audit report format", validate_default=True
             ),
         ] = "json"
         config_dir: Annotated[
@@ -883,7 +835,7 @@ class FlextQualityDocumentationAuditor:
                 save_result = auditor.save_report(self.output_format, self.output)
                 if save_result.failure:
                     return r[bool].fail(
-                        save_result.error or "audit report write failed",
+                        save_result.error or "audit report write failed"
                     )
                 metrics = results.metrics
                 if self._should_fail(metrics):
@@ -900,8 +852,7 @@ class FlextQualityDocumentationAuditor:
             return r[bool].ok(value=True)
 
         def _execute_checks(
-            self,
-            auditor: FlextQualityDocumentationAuditor,
+            self, auditor: FlextQualityDocumentationAuditor
         ) -> m.Quality.AuditorResults:
             if self.comprehensive:
                 return auditor.run_comprehensive_audit()

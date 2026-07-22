@@ -11,16 +11,9 @@ if TYPE_CHECKING:
     from flext_quality.docs.core.config_manager import (
         FlextQualityConfigManager as FlextQualityConfigManager,
     )
-_LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".config_manager": ("FlextQualityConfigManager",),
-    },
-)
+_LAZY_IMPORTS = build_lazy_import_map({
+    ".config_manager": ("FlextQualityConfigManager",)
+})
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)

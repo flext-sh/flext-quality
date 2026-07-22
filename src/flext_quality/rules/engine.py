@@ -8,9 +8,7 @@ from typing import TYPE_CHECKING
 from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import (
-        MutableSequence,
-    )
+    from collections.abc import MutableSequence
 
 
 class FlextQualityRulesEngine:
@@ -40,9 +38,7 @@ class FlextQualityRulesEngine:
         return r[int].ok(len(self._rules))
 
     def validate(
-        self,
-        path: str,
-        context: t.JsonMapping | None = None,
+        self, path: str, context: t.JsonMapping | None = None
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate code against loaded rules."""
         if not self._loaded:
@@ -60,9 +56,7 @@ class FlextQualityRulesEngine:
         return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def validate_content(
-        self,
-        content: str,
-        filename: str = "<string>",
+        self, content: str, filename: str = "<string>"
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
@@ -78,10 +72,7 @@ class FlextQualityRulesEngine:
         return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def _check_rule(
-        self,
-        rule: m.Quality.RuleDefinition,
-        content: str,
-        filename: str,
+        self, rule: m.Quality.RuleDefinition, content: str, filename: str
     ) -> t.SequenceOf[t.JsonMapping]:
         """Check a single rule against content."""
         violations: MutableSequence[t.JsonMapping] = []
@@ -127,9 +118,7 @@ class FlextQualityRulesEngine:
         return str(mapping.get(rule_type, c.Quality.Severity.INFO))
 
     def _validate_file(
-        self,
-        file_path: Path,
-        context: t.JsonMapping,
+        self, file_path: Path, context: t.JsonMapping
     ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules."""
         validation_context = t.json_dict_adapter().validate_python(context or {})
@@ -142,7 +131,7 @@ class FlextQualityRulesEngine:
                     "message": f"Failed to read file: {read.error}",
                     "severity": c.Quality.Severity.ERROR,
                     "context": validation_context,
-                },
+                }
             ]
         content = read.value
         violations: MutableSequence[t.JsonMapping] = []

@@ -6,10 +6,7 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    MutableMapping,
-)
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 
 from flext_quality import FlextQualityModels, c, m, t, u
@@ -21,38 +18,28 @@ class FlextQualityConfigManager:
     type ConfigValue = t.Primitives | t.StrSequence
     type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
     type ConfigData = MutableMapping[
-        str,
-        MutableMapping[str, t.Primitives | t.StrSequence],
+        str, MutableMapping[str, t.Primitives | t.StrSequence]
     ]
-    type RawSectionMap = t.MappingKV[
-        str,
-        t.Primitives | t.SequenceOf[t.Primitives],
-    ]
+    type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
     type RawConfigMap = t.MappingKV[
-        str,
-        t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
+        str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
     ]
 
     class AuditRules(FlextQualityModels.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=dict
         )
         style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=dict
         )
         accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(
-                default_factory=dict,
-            )
+            u.Field(default_factory=dict)
         )
 
         def get_threshold(
-            self,
-            key: str,
-            *,
-            default: t.Primitives | None = None,
+            self, key: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get a quality threshold value."""
             threshold = getattr(self.quality_thresholds, key, default)
@@ -78,20 +65,14 @@ class FlextQualityConfigManager:
         """Configuration for style and formatting guidelines."""
 
         def get_markdown_rule(
-            self,
-            rule: str,
-            *,
-            default: t.Primitives | None = None,
+            self, rule: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get a markdown formatting rule."""
             value = getattr(self.markdown, rule, default)
             return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
         def get_accessibility_rule(
-            self,
-            rule: str,
-            *,
-            default: t.Primitives | None = None,
+            self, rule: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get an accessibility rule."""
             value = getattr(self.accessibility, rule, default)
@@ -101,42 +82,30 @@ class FlextQualityConfigManager:
         """Configuration for validation operations."""
 
         content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=dict
         )
         image_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=dict
         )
         accessibility_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(
-                default_factory=dict,
-            )
+            u.Field(default_factory=dict)
         )
         security_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(
-                default_factory=dict,
-            )
+            u.Field(default_factory=dict)
         )
         performance_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(
-                default_factory=dict,
-            )
+            u.Field(default_factory=dict)
         )
 
         def get_link_setting(
-            self,
-            setting: str,
-            *,
-            default: t.Primitives | None = None,
+            self, setting: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get a link validation setting."""
             value = getattr(self.link_validation, setting, default)
             return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
         def get_content_setting(
-            self,
-            setting: str,
-            *,
-            default: t.Primitives | None = None,
+            self, setting: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get a content validation setting."""
             value = self.content_validation.get(setting, default)
@@ -198,7 +167,7 @@ class FlextQualityConfigManager:
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
             self._audit_rules = FlextQualityConfigManager.AuditRules.model_validate(
-                data,
+                data
             )
         return self._audit_rules
 
@@ -207,7 +176,7 @@ class FlextQualityConfigManager:
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
             self._style_guide = FlextQualityConfigManager.StyleGuide.model_validate(
-                data,
+                data
             )
         return self._style_guide
 
@@ -242,8 +211,7 @@ class FlextQualityConfigManager:
             return self._get_default_config(filename)
 
     def _get_default_config(
-        self,
-        filename: str,
+        self, filename: str
     ) -> FlextQualityConfigManager.ConfigData:
         """Get default configuration for a file."""
         defaults: t.MappingKV[str, FlextQualityConfigManager.RawConfigMap] = {
@@ -289,9 +257,7 @@ class FlextQualityConfigManager:
                     "trailing_spaces": False,
                 },
             },
-            "validation_config.yaml": {
-                **m.Quality.ValidationConfig().model_dump(),
-            },
+            "validation_config.yaml": {**m.Quality.ValidationConfig().model_dump()},
         }
 
         default_value = defaults.get(filename)
@@ -348,20 +314,14 @@ class FlextQualityConfigManager:
 
         return issues
 
-    def get_all_configs(
-        self,
-    ) -> t.JsonMapping:
+    def get_all_configs(self) -> t.JsonMapping:
         """Get all configurations as a single dictionary."""
-        return t.json_mapping_adapter().validate_python(
-            {
-                "audit_rules": self.get_audit_rules().model_dump(mode="json"),
-                "style_guide": self.get_style_guide().model_dump(mode="json"),
-                "validation_config": self.get_validation_config().model_dump(
-                    mode="json",
-                ),
-                "raw_configs": {
-                    name: self.get_config(name)
-                    for name in ["audit_rules", "style_guide", "validation_config"]
-                },
+        return t.json_mapping_adapter().validate_python({
+            "audit_rules": self.get_audit_rules().model_dump(mode="json"),
+            "style_guide": self.get_style_guide().model_dump(mode="json"),
+            "validation_config": self.get_validation_config().model_dump(mode="json"),
+            "raw_configs": {
+                name: self.get_config(name)
+                for name in ["audit_rules", "style_guide", "validation_config"]
             },
-        )
+        })
