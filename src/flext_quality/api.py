@@ -24,10 +24,10 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
     """Coordinate quality operations through the canonical facade instance."""
 
     _hooks: FlextQualityHookManager = u.PrivateAttr(
-        default_factory=FlextQualityHookManager,
+        default_factory=FlextQualityHookManager
     )
     _rules_loader: FlextQualityRulesLoader = u.PrivateAttr(
-        default_factory=FlextQualityRulesLoader,
+        default_factory=FlextQualityRulesLoader
     )
 
     @override
@@ -36,9 +36,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         return self.fetch_status()
 
     def execute_hook(
-        self,
-        event: str,
-        input_data: t.JsonMapping,
+        self, event: str, input_data: t.JsonMapping
     ) -> p.Result[t.JsonMapping]:
         """Execute hooks for an event.
 
@@ -65,7 +63,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
                 continue_exec=continue_exec,
                 message=message,
                 blocked_reason=blocked_reason,
-            ),
+            )
         )
 
     def fetch_hook_config_json(self) -> p.Result[str]:
@@ -110,7 +108,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         rules_path = Path(settings.Quality.rules_dir)
         if not rules_path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Rules directory not found: {rules_path}",
+                f"Rules directory not found: {rules_path}"
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
@@ -126,14 +124,10 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         """
         stdin_result = u.Quality.read_stdin()
         if stdin_result.failure:
-            return r[t.JsonMapping].fail(
-                stdin_result.error or "Failed to read stdin",
-            )
+            return r[t.JsonMapping].fail(stdin_result.error or "Failed to read stdin")
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.failure:
-            return r[t.JsonMapping].fail(
-                parse_result.error or "Failed to parse input",
-            )
+            return r[t.JsonMapping].fail(parse_result.error or "Failed to parse input")
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:

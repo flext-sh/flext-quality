@@ -22,9 +22,7 @@ class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality; fields under ``settings.Quality.*``."""
 
     model_config = SettingsConfigDict(
-        env_prefix="FLEXT_QUALITY_",
-        env_nested_delimiter="__",
-        extra="ignore",
+        env_prefix="FLEXT_QUALITY_", env_nested_delimiter="__", extra="ignore"
     )
 
     class _Quality(BaseModel):
@@ -53,8 +51,7 @@ class FlextQualitySettings(FlextSettings):
         Quality: _Quality
     else:
         Quality: _Quality = Field(
-            default_factory=_Quality,
-            description="Namespaced quality settings.",
+            default_factory=_Quality, description="Namespaced quality settings."
         )
 
 

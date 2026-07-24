@@ -28,10 +28,7 @@ class FlextQualityMcpResources:
         config_json: str = (
             t
             .json_mapping_adapter()
-            .dump_json(
-                settings,
-                indent=c.Quality.JSON_INDENT,
-            )
+            .dump_json(settings, indent=c.Quality.JSON_INDENT)
             .decode("utf-8")
         )
         return config_json
@@ -46,8 +43,7 @@ class FlextQualityMcpResources:
             t
             .json_mapping_sequence_adapter()
             .dump_json(
-                [rule.model_dump() for rule in rules],
-                indent=c.Quality.JSON_INDENT,
+                [rule.model_dump() for rule in rules], indent=c.Quality.JSON_INDENT
             )
             .decode("utf-8")
         )
@@ -71,17 +67,11 @@ class FlextQualityMcpResources:
             if ctx_health.success
             else u.normalize_to_json_value({"error": ctx_health.error})
         )
-        status = {
-            "claude_mem": mem_status,
-            "claude_context": ctx_status,
-        }
+        status = {"claude_mem": mem_status, "claude_context": ctx_status}
         status_json: str = (
             t
             .json_mapping_adapter()
-            .dump_json(
-                status,
-                indent=c.Quality.JSON_INDENT,
-            )
+            .dump_json(status, indent=c.Quality.JSON_INDENT)
             .decode("utf-8")
         )
         return status_json

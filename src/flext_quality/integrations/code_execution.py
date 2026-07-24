@@ -25,10 +25,7 @@ class FlextQualityCodeExecutionBridge:
     """
 
     def __init__(
-        self,
-        *,
-        timeout_ms: int | None = None,
-        working_dir: Path | None = None,
+        self, *, timeout_ms: int | None = None, working_dir: Path | None = None
     ) -> None:
         """Initialize the code execution bridge."""
         self._timeout_ms = timeout_ms or c.Quality.INTEGRATION_TIMEOUT_MS
@@ -40,17 +37,12 @@ class FlextQualityCodeExecutionBridge:
         return r[t.StrSequence].ok(cmd)
 
     def build_python_command(
-        self,
-        script_path: Path,
-        *,
-        args: t.StrSequence | None = None,
+        self, script_path: Path, *, args: t.StrSequence | None = None
     ) -> p.Result[t.StrSequence]:
         """Build command for Python execution."""
         if not script_path.exists():
             return e.fail_not_found(
-                "Script",
-                str(script_path),
-                result_type=r[t.StrSequence],
+                "Script", str(script_path), result_type=r[t.StrSequence]
             )
         cmd = ["python", str(script_path)]
         if args:
@@ -58,11 +50,7 @@ class FlextQualityCodeExecutionBridge:
         return r[t.StrSequence].ok(cmd)
 
     def build_ruff_command(
-        self,
-        target_path: Path,
-        *,
-        fix: bool = False,
-        output_format: str = "json",
+        self, target_path: Path, *, fix: bool = False, output_format: str = "json"
     ) -> p.Result[t.StrSequence]:
         """Build command for ruff linter."""
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
@@ -71,17 +59,12 @@ class FlextQualityCodeExecutionBridge:
         return r[t.StrSequence].ok(cmd)
 
     def build_typescript_command(
-        self,
-        script_path: Path,
-        *,
-        args: t.StrSequence | None = None,
+        self, script_path: Path, *, args: t.StrSequence | None = None
     ) -> p.Result[t.StrSequence]:
         """Build command for TypeScript execution via npx tsx."""
         if not script_path.exists():
             return e.fail_not_found(
-                "Script",
-                str(script_path),
-                result_type=r[t.StrSequence],
+                "Script", str(script_path), result_type=r[t.StrSequence]
             )
         cmd = ["npx", "tsx", str(script_path)]
         if args:
@@ -89,11 +72,7 @@ class FlextQualityCodeExecutionBridge:
         return r[t.StrSequence].ok(cmd)
 
     def create_execution_request(
-        self,
-        script_path: Path,
-        runtime: str,
-        *,
-        args: t.StrSequence | None = None,
+        self, script_path: Path, runtime: str, *, args: t.StrSequence | None = None
     ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
@@ -104,7 +83,7 @@ class FlextQualityCodeExecutionBridge:
                 runtime=runtime,
                 args=args or [],
                 timeout_ms=self._timeout_ms,
-            ),
+            )
         )
 
     def health_check(self) -> p.Result[t.JsonMapping]:

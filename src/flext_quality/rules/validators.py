@@ -35,9 +35,7 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: t.Cli.TextPath | None = None,
+            self, content: str, file_path: t.Cli.TextPath | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -87,9 +85,7 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: t.Cli.TextPath | None = None,
+            self, content: str, file_path: t.Cli.TextPath | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -146,9 +142,7 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self,
-            content: str,
-            file_path: t.Cli.TextPath | None = None,
+            self, content: str, file_path: t.Cli.TextPath | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.JsonMapping] = []

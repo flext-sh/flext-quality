@@ -19,9 +19,7 @@ if TYPE_CHECKING:
     from tests import t
 
 
-def assert_is_dict(
-    value: t.Scalar | t.ScalarMapping,
-) -> TypeIs[t.ScalarMapping]:
+def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]:
     """Type-safe t.JsonMapping assertion following Single Responsibility Principle.
 
     Args:
@@ -56,8 +54,7 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping,
-    required_keys: t.StrSequence,
+    data: t.ScalarMapping, required_keys: t.StrSequence
 ) -> t.ScalarMapping:
     """Assert that t.JsonValue is dict with required keys - DRY pattern.
 
@@ -77,9 +74,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(
-    results: t.ScalarMapping,
-) -> t.ScalarMapping:
+def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMapping:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -131,6 +126,5 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
     if not assert_is_dict(issues):
         raise AssertionError(f"Expected dict, got {type(issues)}")
     return assert_dict_structure(
-        issues,
-        ["security", "complexity", "dead_code", "duplicates"],
+        issues, ["security", "complexity", "dead_code", "duplicates"]
     )

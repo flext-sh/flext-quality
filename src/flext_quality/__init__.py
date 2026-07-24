@@ -74,57 +74,24 @@ if TYPE_CHECKING:
 
 
 _LAZY_MODULES: dict[str, tuple[str, ...]] = {
-    "._settings": (
-        "FlextQualitySettings",
-        "settings",
-    ),
-    ".api": (
-        "FlextQuality",
-        "quality",
-    ),
-    ".base": (
-        "FlextQualityServiceBase",
-        "s",
-    ),
-    ".cli": (
-        "FlextQualityCli",
-        "main",
-    ),
-    ".constants": (
-        "FlextQualityConstants",
-        "c",
-    ),
+    "._settings": ("FlextQualitySettings", "settings"),
+    ".api": ("FlextQuality", "quality"),
+    ".base": ("FlextQualityServiceBase", "s"),
+    ".cli": ("FlextQualityCli", "main"),
+    ".constants": ("FlextQualityConstants", "c"),
     ".hooks.base": ("FlextQualityBaseHook",),
     ".hooks.manager": ("FlextQualityHookManager",),
     ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
     ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
     ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
     ".integrations.mcp_client": ("FlextQualityMcpClient",),
-    ".models": (
-        "FlextQualityModels",
-        "m",
-    ),
-    ".protocols": (
-        "FlextQualityProtocols",
-        "p",
-    ),
+    ".models": ("FlextQualityModels", "m"),
+    ".protocols": ("FlextQualityProtocols", "p"),
     ".rules.engine": ("FlextQualityRulesEngine",),
     ".rules.loader": ("FlextQualityRulesLoader",),
-    ".typings": (
-        "FlextQualityTypes",
-        "t",
-    ),
-    ".utilities": (
-        "FlextQualityUtilities",
-        "u",
-    ),
-    "flext_infra": (
-        "d",
-        "e",
-        "h",
-        "r",
-        "x",
-    ),
+    ".typings": ("FlextQualityTypes", "t"),
+    ".utilities": ("FlextQualityUtilities", "u"),
+    "flext_infra": ("d", "e", "h", "r", "x"),
 }
 
 
@@ -132,9 +99,7 @@ _LAZY_ALIAS_GROUPS: dict[str, tuple[tuple[str, str], ...]] = {}
 
 
 _LAZY_IMPORTS = build_lazy_import_map(
-    _LAZY_MODULES,
-    alias_groups=_LAZY_ALIAS_GROUPS,
-    sort_keys=False,
+    _LAZY_MODULES, alias_groups=_LAZY_ALIAS_GROUPS, sort_keys=False
 )
 
 _DIRECT_IMPORTS: tuple[str, ...] = (
@@ -222,9 +187,4 @@ __all__: tuple[str, ...] = (
 )
 
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    public_exports=__all__,
-)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

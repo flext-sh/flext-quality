@@ -126,8 +126,7 @@ class FlextQualityDocumentationReporter:
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
     def _load_json_report(
-        self,
-        filename: str,
+        self, filename: str
     ) -> t.MappingKV[str, t.Quality.DocumentationReportValue] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
@@ -143,10 +142,7 @@ class FlextQualityDocumentationReporter:
             return None
 
     def generate_quality_report(
-        self,
-        report_format: str = "html",
-        *,
-        include_trends: bool = False,
+        self, report_format: str = "html", *, include_trends: bool = False
     ) -> str:
         """Generate comprehensive quality report."""
         report_data = FlextQualityDocumentationReporter.ReportData(
@@ -163,10 +159,7 @@ class FlextQualityDocumentationReporter:
             return self._generate_html_report(report_data)
         if report_format == "json":
             adapter = m.TypeAdapter(FlextQualityDocumentationReporter.ReportData)
-            report_text: str = adapter.dump_json(
-                report_data,
-                indent=2,
-            ).decode()
+            report_text: str = adapter.dump_json(report_data, indent=2).decode()
             return report_text
         if report_format == "markdown":
             return self._generate_markdown_report(report_data)
@@ -232,9 +225,7 @@ class FlextQualityDocumentationReporter:
             quality_trend=quality_trend,
         )
 
-    def _analyze_trends(
-        self,
-    ) -> FlextQualityDocumentationReporter.TrendData | None:
+    def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
         """Analyze quality trends over time."""
         return None
 
@@ -265,7 +256,7 @@ class FlextQualityDocumentationReporter:
                                 "Prioritize fixes",
                                 "Re-run audit after fixes",
                             ],
-                        ),
+                        )
                     )
                 outdated: MutableSequence[Mapping[str, t.Primitives]] = [
                     i
@@ -284,7 +275,7 @@ class FlextQualityDocumentationReporter:
                                 "Review content accuracy",
                                 "Update timestamps and version info",
                             ],
-                        ),
+                        )
                     )
         if self.validation_data and isinstance(self.validation_data, dict):
             link_validation = self.validation_data.get("link_validation")
@@ -292,15 +283,13 @@ class FlextQualityDocumentationReporter:
                 validation_errors_raw = link_validation.get("errors")
                 if not isinstance(validation_errors_raw, list):
                     return recommendations
-                validation_errors_list: t.JsonList = list(
-                    validation_errors_raw,
-                )
+                validation_errors_list: t.JsonList = list(validation_errors_raw)
                 if validation_errors_list:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
                             error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                e_raw,
+                                e_raw
                             )
                         except c.EXC_TYPE_VALIDATION:
                             continue
@@ -328,7 +317,7 @@ class FlextQualityDocumentationReporter:
                                     "Update or remove invalid URLs",
                                     "Test links after fixes",
                                 ],
-                            ),
+                            )
                         )
         if self.optimization_data and isinstance(self.optimization_data, dict):
             optimizations = self.optimization_data.get("optimizations")
@@ -346,7 +335,7 @@ class FlextQualityDocumentationReporter:
                             "Configure CI/CD optimization",
                             "Schedule regular optimization runs",
                         ],
-                    ),
+                    )
                 )
         if not recommendations:
             recommendations.append(
@@ -360,19 +349,16 @@ class FlextQualityDocumentationReporter:
                         "Configure automated reporting",
                         "Set up team notifications",
                     ],
-                ),
+                )
             )
         return recommendations
 
     def _generate_html_report(
-        self,
-        data: FlextQualityDocumentationReporter.ReportData,
+        self, data: FlextQualityDocumentationReporter.ReportData
     ) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
-        timestamp = datetime.fromisoformat(data.timestamp).strftime(
-            "%Y-%m-%d %H:%M:%S",
-        )
+        timestamp = datetime.fromisoformat(data.timestamp).strftime("%Y-%m-%d %H:%M:%S")
         template_data = {
             "title": data.title,
             "timestamp": timestamp,
@@ -380,7 +366,7 @@ class FlextQualityDocumentationReporter:
             "audit_summary": self._summarize_audit_data(data.audit),
             "validation_summary": self._summarize_validation_data(data.validation),
             "optimization_summary": self._summarize_optimization_data(
-                data.optimization,
+                data.optimization
             ),
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
@@ -395,8 +381,7 @@ class FlextQualityDocumentationReporter:
         return Template(template_content)
 
     def _generate_markdown_report(
-        self,
-        data: FlextQualityDocumentationReporter.ReportData,
+        self, data: FlextQualityDocumentationReporter.ReportData
     ) -> str:
         """Generate markdown quality report."""
         md = [f"# {data.title}", "", f"**Generated:** {data.timestamp}", ""]
@@ -425,8 +410,7 @@ class FlextQualityDocumentationReporter:
         return "\n".join(md)
 
     def _summarize_audit_data(
-        self,
-        audit_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None,
+        self, audit_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None
     ) -> FlextQualityDocumentationReporter.AuditSummary | None:
         """Summarize audit data for reporting."""
         if not audit_data or not isinstance(audit_data, dict):
@@ -520,8 +504,7 @@ class FlextQualityDocumentationReporter:
         )
 
     def _generate_charts(
-        self,
-        data: FlextQualityDocumentationReporter.ReportData,
+        self, data: FlextQualityDocumentationReporter.ReportData
     ) -> t.StrMapping | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
@@ -547,14 +530,12 @@ class FlextQualityDocumentationReporter:
         return self._generate_trend_report(trend_data, days)
 
     def _load_recent_report(
-        self,
-        report_file: Path,
-        cutoff_date: datetime,
+        self, report_file: Path, cutoff_date: datetime
     ) -> t.MappingKV[str, t.Quality.DocumentationReportValue | datetime] | None:
         """Load one historical report when it falls inside the trend window."""
         date_str = report_file.name.split("_")[1]
         report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-            tzinfo=u.configured_timezone(),
+            tzinfo=u.configured_timezone()
         )
         if report_date < cutoff_date:
             return None
@@ -562,17 +543,11 @@ class FlextQualityDocumentationReporter:
         if read.failure:
             return None
         report_data_raw: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
-            t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
-                read.value,
-            )
+            t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
         )
         report_data_dict: t.MappingKV[
-            str,
-            t.Quality.DocumentationReportValue | datetime,
-        ] = {
-            **report_data_raw,
-            "date": report_date,
-        }
+            str, t.Quality.DocumentationReportValue | datetime
+        ] = {**report_data_raw, "date": report_date}
         return report_data_dict
 
     def _analyze_trend_data(
@@ -607,7 +582,7 @@ class FlextQualityDocumentationReporter:
                                 date=date_val,
                                 quality_score=quality_score,
                                 total_issues=len(issues),
-                            ),
+                            )
                         )
             if "link_validation" in report:
                 link_validation = report.get("link_validation")
@@ -620,7 +595,7 @@ class FlextQualityDocumentationReporter:
                                 date=date_val,
                                 links_checked=links_checked,
                                 broken_links=broken_links,
-                            ),
+                            )
                         )
             if "changes_made" in report:
                 changes_made = report.get("changes_made")
@@ -631,7 +606,7 @@ class FlextQualityDocumentationReporter:
                             date=date_val,
                             changes_made=changes_made,
                             files_processed=files_processed,
-                        ),
+                        )
                     )
         return FlextQualityDocumentationReporter.TrendData(
             audit_trends=sorted(audit_trends, key=lambda e: e.date),
@@ -671,7 +646,7 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.audit_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |",
+                    f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |"
                 )
             md.append("")
         if typed_trend_data.validation_trends:
@@ -683,7 +658,7 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.validation_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.links_checked} | {trend.broken_links} |",
+                    f"| {date_str} | {trend.links_checked} | {trend.broken_links} |"
                 )
             md.append("")
         if typed_trend_data.optimization_trends:
@@ -695,16 +670,13 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.optimization_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.files_processed} | {trend.changes_made} |",
+                    f"| {date_str} | {trend.files_processed} | {trend.changes_made} |"
                 )
             md.append("")
         return "\n".join(md)
 
     def save_report(
-        self,
-        content: str,
-        filename: str,
-        report_format: str = "html",
+        self, content: str, filename: str, report_format: str = "html"
     ) -> p.Result[Path]:
         """Save report to file."""
         filepath = self.reports_dir / f"{filename}.{report_format}"
@@ -730,39 +702,25 @@ class FlextQualityDocumentationReporter:
             validate_default=True,
         )
         filename: str | None = u.Field(
-            None,
-            description="Optional report filename",
-            validate_default=True,
+            None, description="Optional report filename", validate_default=True
         )
         monthly_trends: bool = u.Field(
-            False,
-            description="Generate monthly trend report",
-            validate_default=True,
+            False, description="Generate monthly trend report", validate_default=True
         )
         weekly_trends: bool = u.Field(
-            False,
-            description="Generate weekly trend report",
-            validate_default=True,
+            False, description="Generate weekly trend report", validate_default=True
         )
         include_trends: bool = u.Field(
-            False,
-            description="Include trend data",
-            validate_default=True,
+            False, description="Include trend data", validate_default=True
         )
         notify: bool = u.Field(
-            False,
-            description="Send report notification",
-            validate_default=True,
+            False, description="Send report notification", validate_default=True
         )
         webhook_url: str | None = u.Field(
-            None,
-            description="Notification webhook URL",
-            validate_default=True,
+            None, description="Notification webhook URL", validate_default=True
         )
         serve: bool = u.Field(
-            False,
-            description="Serve the report dashboard",
-            validate_default=True,
+            False, description="Serve the report dashboard", validate_default=True
         )
 
         @override
@@ -787,17 +745,14 @@ class FlextQualityDocumentationReporter:
                     return r[bool].fail(save_result.error or "report write failed")
             else:
                 report_content = reporter.generate_quality_report(
-                    self.output_format,
-                    include_trends=self.include_trends,
+                    self.output_format, include_trends=self.include_trends
                 )
                 filename = (
                     self.filename
                     or f"quality_report_{u.now().strftime('%Y%m%d_%H%M%S')}"
                 )
                 save_result = reporter.save_report(
-                    report_content,
-                    filename,
-                    self.output_format,
+                    report_content, filename, self.output_format
                 )
                 if save_result.failure:
                     return r[bool].fail(save_result.error or "report write failed")
