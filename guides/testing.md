@@ -336,6 +336,7 @@ from flext_core import FlextSettings, r
 def my_function():
     """Example function that delegates to an external service."""
     from flext_ldif import external_service
+
     return external_service.process()
 
 
@@ -671,6 +672,7 @@ def test_parse_invalid_ldif_shared():
 
    ```python
    import pytest
+
 
    # Check fixture scope and dependencies
    @pytest.fixture(scope="function")

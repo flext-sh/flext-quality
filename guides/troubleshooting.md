@@ -687,6 +687,7 @@ When reporting issues, include:
    ```python
    # Full error traceback
    import traceback
+
    try:
        # Your code here
        pass

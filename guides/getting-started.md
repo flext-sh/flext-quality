@@ -210,7 +210,9 @@ dispatcher = FlextDispatcher()
 _ = dispatcher.register_handler(UserService())
 _ = dispatcher.register_handler(UserQueryHandler())
 
-create_result = dispatcher.dispatch(CreateUserCommand(username="john", email="john@example.com"))
+create_result = dispatcher.dispatch(
+    CreateUserCommand(username="john", email="john@example.com")
+)
 get_result = dispatcher.dispatch(GetUserQuery(user_id="user123"))
 
 u.Cli.info(f"Created: {create_result.unwrap()}")
@@ -237,10 +239,7 @@ from __future__ import annotations
 
 from flext_ldif import FlextLdifSettings, ldif
 
-settings = FlextLdifSettings(
-    default_encoding="utf-8",
-    strict_validation=True,
-)
+settings = FlextLdifSettings(default_encoding="utf-8", strict_validation=True)
 
 configured = ldif.with_settings(settings)
 assert configured.runtime_settings.Ldif.ldif_encoding == "utf-8"
