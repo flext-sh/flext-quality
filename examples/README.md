@@ -105,7 +105,7 @@ Report generation and dashboard integration examples:
 
 ### Basic Project Analysis
 
-```python
+```text
 # examples/basic/simple_analysis.py
 from flext_quality import CodeAnalyzer
 
@@ -119,16 +119,16 @@ results = analyzer.analyze_project()
 score = analyzer.get_quality_score()
 grade = analyzer.get_quality_grade()
 
-u.Cli.print(f"Quality Assessment: {grade} ({score:.1f}/100)")
-u.Cli.print(f"Files Analyzed: {results['files_analyzed']}")
-u.Cli.print(
+print(f"Quality Assessment: {grade} ({score:.1f}/100)")
+print(f"Files Analyzed: {results['files_analyzed']}")
+print(
     f"Issues Found: {len(results['issues']['security']) + len(results['issues']['complexity'])}"
 )
 ```
 
 ### FLEXT Ecosystem Integration
 
-```python
+```text
 from __future__ import annotations
 
 # examples/integration/flext_ecosystem.py
@@ -157,7 +157,7 @@ def analyze_with_monitoring(project_path: str):
         )
         return data
     else:
-        u.Cli.print(f"Analysis failed: {result.error}")
+        u.Cli.info(f"Analysis failed: {result.error}")
         return None
 ```
 

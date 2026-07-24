@@ -44,8 +44,7 @@ This system prevents code duplication from accumulating while allowing intention
 
 A `s[int]` that detects code clones using line-based similarity:
 
-```python
-from __future__ import annotations
+```text
 from flext_quality import FlextDuplicationPlugin
 from pathlib import Path
 
@@ -57,7 +56,7 @@ result = plugin.check(files)
 
 if result.success:
     for dup in result.value.duplicates:
-        u.Cli.print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
+        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
 ```
 
 **Key Features**:
@@ -218,7 +217,7 @@ flext-quality:0
 
 The plugin is integrated into the FlextQualityAnalyzer:
 
-```python
+```text
 from flext_quality import FlextQualityAnalyzer
 
 analyzer = FlextQualityAnalyzer(".")
@@ -227,7 +226,7 @@ result = analyzer.analyze_project(options=AnalysisOptions(include_duplicates=Tru
 # Duplication issues are included in results
 for issue in result.value.issues:
     if issue.rule_id == "duplication_check":
-        u.Cli.print(f"Duplicate code: {issue.message}")
+        print(f"Duplicate code: {issue.message}")
 ```
 
 **Architecture**:

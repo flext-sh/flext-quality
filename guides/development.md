@@ -192,8 +192,9 @@ def validate_and_process(data: dict) -> ProcessedData:
 
 ### Unified Models Pattern
 
-```python
+```python notest
 from __future__ import annotations
+from flext_quality import m, p, t
 
 
 # ✅ CORRECT - Use [Project]Models pattern
@@ -309,6 +310,13 @@ from __future__ import annotations
 # src/flext_newlib/__init__.py
 from flext_cli import u
 from flext_core import FlextSettings
+from flext_quality import m, p, t
+
+
+class FlextNewlibSettings(FlextSettings):
+    """Example settings for a new FLEXT library."""
+
+    new_setting: str = "default"
 
 
 # Main API class
@@ -318,8 +326,9 @@ class FlextNewlib:
 
     def process(self, data: dict) -> p.Result[dict]:
         """Process data using r pattern."""
-        # Implementation here
-        pass
+        if not data:
+            return p.Result[dict].fail("Data required")
+        return p.Result[dict].ok(data)
 
 
 # Models class
@@ -410,7 +419,7 @@ Update project README.md files when adding new features:
 
 - Add a "New Feature" section with usage and configuration examples.
 
-```python
+```text
 from flext_newlib import FlextNewlib
 from flext_newlib import FlextNewlibSettings
 

@@ -159,6 +159,7 @@ settings = FlextApiSettings(
 ### flext-auth Configuration
 
 ```python
+from flext_auth import c
 from flext_auth import FlextAuthSettings
 
 settings = FlextAuthSettings(
@@ -213,6 +214,7 @@ All configuration is validated using Pydantic v2 models:
 
 ```python
 from flext_cli import u
+from flext_core import c
 from flext_core import FlextSettings
 
 try:
@@ -220,7 +222,7 @@ try:
         log_level="INVALID_LEVEL"  # This will raise ValidationError
     )
 except c.ValidationError as e:
-    u.Cli.print(f"Configuration error: {e}")
+    u.Cli.info(f"Configuration error: {e}")
 ```
 
 ## Configuration Inheritance
@@ -234,9 +236,10 @@ from flext_core import FlextSettings
 # Base configuration
 base_config = FlextSettings(log_level="INFO", environment="production")
 
-# Extended configuration
+# Extended configuration (exclude the field you want to override)
+base_values = base_config.model_dump(exclude={"debug"})
 extended_config = FlextSettings(
-    **base_config.dict(),
+    **base_values,
     debug=True,  # Override for development
     custom_setting="value",
 )
@@ -257,18 +260,20 @@ export FLEXT_API_KEY=your_api_key
 ```python
 from __future__ import annotations
 from flext_cli import u
+from flext_core import c
 from flext_core import FlextSettings
 
 
 def main():
     # Validate configuration at startup
-    settings = FlextSettings()
-
-    if not settings.is_valid():
-        u.Cli.print("Invalid configuration")
+    try:
+        settings = FlextSettings()
+    except c.ValidationError as e:
+        u.Cli.info(f"Invalid configuration: {e}")
         return 1
 
     # Continue with application logic
+    u.Cli.info("Configuration is valid")
     return 0
 ```
 
@@ -296,6 +301,8 @@ class MyAppConfig(FlextSettings):
 
 ```python
 from __future__ import annotations
+from flext_cli import u
+from flext_quality import m
 
 
 class FlextLdifSettings(m.BaseModel):
@@ -342,13 +349,14 @@ from flext_core import FlextSettings
 settings = FlextSettings(debug=True)
 
 # Print configuration
-u.Cli.print(settings.dict())
+u.Cli.info(settings.model_dump())
 
 # Validate configuration
-if settings.is_valid():
-    u.Cli.print("Configuration is valid")
-else:
-    u.Cli.print("Configuration has errors")
+try:
+    _ = FlextSettings()
+    u.Cli.info("Configuration is valid")
+except Exception as e:
+    u.Cli.info(f"Configuration has errors: {e}")
 ```
 
 ## Examples
@@ -385,10 +393,10 @@ def main():
         timeout=int(os.getenv("FLEXT_API_TIMEOUT", "30")),
     )
 
-    u.Cli.print("Configuration loaded successfully")
-    u.Cli.print(f"Log level: {settings.log_level}")
-    u.Cli.print(f"LDIF batch size: {ldif_config.batch_size}")
-    u.Cli.print(f"API base URL: {api_config.base_url}")
+    u.Cli.info("Configuration loaded successfully")
+    u.Cli.info(f"Log level: {settings.log_level}")
+    u.Cli.info(f"LDIF batch size: {ldif_config.batch_size}")
+    u.Cli.info(f"API base URL: {api_config.base_url}")
 
 
 if __name__ == "__main__":

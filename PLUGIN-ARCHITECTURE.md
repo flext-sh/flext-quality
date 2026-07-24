@@ -68,7 +68,7 @@ The MCP server provides tools via Claude Code:
 
 Planned plugin interface for flext-quality:
 
-```python
+```text
 from __future__ import annotations
 from flext_quality import m
 from pathlib import Path

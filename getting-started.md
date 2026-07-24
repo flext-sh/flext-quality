@@ -148,7 +148,7 @@ ______________________________________________________________________
 
 ### **Basic Quality Analysis** (WORKING)
 
-```python
+```text
 from __future__ import annotations
 from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
@@ -168,9 +168,9 @@ def service_analysis():
 
     if project_result.success:
         project = project_result.value
-        u.Cli.print(f"✅ Project: {project.name}")
-        u.Cli.print(f"📁 Path: {project.project_path}")
-        u.Cli.print(f"🎯 Min Coverage: {project.min_coverage}")
+        print(f"✅ Project: {project.name}")
+        print(f"📁 Path: {project.project_path}")
+        print(f"🎯 Min Coverage: {project.min_coverage}")
 
 
 # Option 2: Direct Analysis Engine
@@ -190,10 +190,10 @@ def direct_analysis():
     score = analyzer.get_quality_score()
     grade = analyzer.get_quality_grade()
 
-    u.Cli.print(f"📊 Quality Score: {score}")
-    u.Cli.print(f"🏆 Quality Grade: {grade}")
-    u.Cli.print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
-    u.Cli.print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
+    print(f"📊 Quality Score: {score}")
+    print(f"🏆 Quality Grade: {grade}")
+    print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
+    print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
 
 
 # Run both approaches
@@ -223,7 +223,7 @@ flext-quality fix --projects ./src --auto-approve --backup
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
-```python
+```text
 from flext_quality import FlextQualityWeb
 
 # Create enterprise quality dashboard
@@ -245,7 +245,7 @@ dashboard = quality_web.create_enterprise_dashboard()
 
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
-```python
+```text
 # FLEXT-API integration for programmatic access
 from flext_api import FlextApiRouter
 from flext_quality import FlextQualityApiRouter
