@@ -108,7 +108,7 @@ objectClass: inetOrgPerson"""
 
 Test component interactions and workflows:
 
-```text
+```python
 from __future__ import annotations
 import pytest
 from flext_cli import u
@@ -356,7 +356,7 @@ def test_with_mocked_dependency():
 
 ### Integration Test Stubbing
 
-```text
+```python
 from __future__ import annotations
 from unittest.mock import Mock
 from flext_cli import u

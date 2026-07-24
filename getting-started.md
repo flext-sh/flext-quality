@@ -148,7 +148,7 @@ ______________________________________________________________________
 
 ### **Basic Quality Analysis** (WORKING)
 
-```text
+```python
 from __future__ import annotations
 from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
@@ -223,7 +223,7 @@ flext-quality fix --projects ./src --auto-approve --backup
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
-```text
+```python
 from flext_quality import FlextQualityWeb
 
 # Create enterprise quality dashboard

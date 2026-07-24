@@ -128,7 +128,7 @@ print(
 
 ### FLEXT Ecosystem Integration
 
-```text
+```python
 from __future__ import annotations
 
 # examples/integration/flext_ecosystem.py

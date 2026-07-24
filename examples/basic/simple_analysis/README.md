@@ -268,7 +268,7 @@ analyzer.configure_backends({
 
 ### Integration with FLEXT Services
 
-```text
+```python
 from flext_observability import create_metric
 
 # Publish quality metrics to observability stack
@@ -281,7 +281,7 @@ create_metric(
 
 ### Report Generation
 
-```text
+```python
 from flext_quality import QualityReport
 
 # Generate detailed quality report

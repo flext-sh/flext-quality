@@ -192,7 +192,7 @@ def validate_and_process(data: dict) -> ProcessedData:
 
 ### Unified Models Pattern
 
-```python notest
+```python
 from __future__ import annotations
 from flext_quality import m, p, t
 
@@ -419,7 +419,7 @@ Update project README.md files when adding new features:
 
 - Add a "New Feature" section with usage and configuration examples.
 
-```text
+```python
 from flext_newlib import FlextNewlib
 from flext_newlib import FlextNewlibSettings
 
