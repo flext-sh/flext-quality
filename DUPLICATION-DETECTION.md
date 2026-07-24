@@ -178,6 +178,7 @@ Generates and manages duplicate code baselines for all FLEXT projects.
 **Baseline Format**:
 
 ```
+
 # FLEXT Duplicate Code Baseline - date
 # Format: project_name:duplicate_pair_count
 # Threshold: 0.8 (80% line similarity)
