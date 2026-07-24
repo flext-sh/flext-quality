@@ -13,9 +13,10 @@ Usage:
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from http import HTTPStatus
 from pathlib import Path
 from string import Template
-from typing import TYPE_CHECKING, Annotated, override
+from typing import TYPE_CHECKING, Annotated, Final, override
 
 import requests
 
@@ -24,6 +25,13 @@ from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
+
+_FRESHNESS_AGE_HIGH_DAYS: Final[int] = 180
+_QUALITY_SCORE_CRITICAL_THRESHOLD: Final[int] = 50
+_QUALITY_SCORE_HIGH_THRESHOLD: Final[int] = 75
+_QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
+_QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
+_QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
 
 
 class FlextQualityDocumentationAuditor:
@@ -225,7 +233,7 @@ class FlextQualityDocumentationAuditor:
         outdated_indicators = self._check_outdated_indicators(content)
         return {
             "type": "outdated_content",
-            "severity": "high" if age_days > 180 else "medium",
+            "severity": "high" if age_days > _FRESHNESS_AGE_HIGH_DAYS else "medium",
             "file": str(file_path.relative_to(self.project_root)),
             "age_days": age_days,
             "last_modified": mtime.isoformat(),
@@ -514,7 +522,7 @@ class FlextQualityDocumentationAuditor:
                     headers={"User-Agent": user_agent},
                     allow_redirects=True,
                 )
-                if response.status_code >= 400:
+                if response.status_code >= HTTPStatus.BAD_REQUEST:
                     self.results.issues.append({
                         "type": "broken_external_link",
                         "severity": "high",
@@ -608,7 +616,7 @@ class FlextQualityDocumentationAuditor:
         issues = self.results.issues
         recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
-        if quality_score < 50:
+        if quality_score < _QUALITY_SCORE_CRITICAL_THRESHOLD:
             recommendations.append(
                 m.Quality.AuditRecommendation(
                     priority="critical",
@@ -621,7 +629,7 @@ class FlextQualityDocumentationAuditor:
                     ],
                 )
             )
-        elif quality_score < 75:
+        elif quality_score < _QUALITY_SCORE_HIGH_THRESHOLD:
             recommendations.append(
                 m.Quality.AuditRecommendation(
                     priority="high",
@@ -752,9 +760,9 @@ class FlextQualityDocumentationAuditor:
 
     def _get_score_color(self, score: int) -> str:
         """Get color for quality score."""
-        if score >= 80:
+        if score >= _QUALITY_SCORE_HIGH_COLOR_THRESHOLD:
             return "#28a745"
-        if score >= 60:
+        if score >= _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD:
             return "#ffc107"
         return "#dc3545"
 
@@ -874,7 +882,7 @@ class FlextQualityDocumentationAuditor:
                 severity_breakdown = metrics.severity_breakdown
                 if severity_breakdown["critical"] + severity_breakdown["high"] > 0:
                     return True
-            return self.ci_mode and metrics.quality_score < 70
+            return self.ci_mode and metrics.quality_score < _QUALITY_SCORE_CI_THRESHOLD
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:

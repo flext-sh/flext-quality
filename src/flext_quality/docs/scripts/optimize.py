@@ -14,13 +14,15 @@ from __future__ import annotations
 import logging
 import shutil
 from pathlib import Path
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING, Final, override
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
+
+_MAX_TOC_HEADING_LEVEL: Final[int] = 3
 
 
 class FlextQualityDocumentationOptimizer:
@@ -156,7 +158,7 @@ class FlextQualityDocumentationOptimizer:
                 level = len(match.group(1))
                 title = match.group(2)
                 anchor = self._heading_to_anchor(title)
-                if level <= 3:
+                if level <= _MAX_TOC_HEADING_LEVEL:
                     indent = "  " * (level - 1)
                     toc_lines.append(f"{indent}- [{title}](#{anchor})")
         return toc_lines

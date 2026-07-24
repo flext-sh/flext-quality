@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import re
-from enum import StrEnum, unique
+from enum import StrEnum, auto, unique
 from types import MappingProxyType
 from typing import TYPE_CHECKING, ClassVar, Final
 
@@ -67,7 +67,7 @@ class FlextQualityConstants(c, web_c):
         class RuleResult(StrEnum):
             """Rule evaluation results."""
 
-            PASS = "pass"
+            PASS = auto()
             FAIL = "fail"
             SKIP = "skip"
 

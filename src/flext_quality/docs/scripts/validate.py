@@ -13,8 +13,9 @@ Usage:
 from __future__ import annotations
 
 import concurrent.futures
+from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, override
+from typing import TYPE_CHECKING, Final, override
 
 import requests
 
@@ -24,6 +25,10 @@ from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
+
+_MIN_LINK_TEXT_LENGTH: Final[int] = 3
+_MIN_WORD_COUNT: Final[int] = 50
+_MIN_READABILITY_SCORE: Final[int] = 60
 
 
 class FlextQualityDocumentationValidator:
@@ -222,7 +227,7 @@ class FlextQualityDocumentationValidator:
         ) -> m.Quality.LinkCheckResult:
             """Handle one request attempt while letting transport exceptions propagate."""
             response = self._make_http_request(link.url)
-            if response.status_code < 400:
+            if response.status_code < HTTPStatus.BAD_REQUEST:
                 success_result: m.Quality.LinkCheckResult = base_result.model_copy(
                     update={"valid": True, "status_code": response.status_code}
                 )
@@ -231,7 +236,7 @@ class FlextQualityDocumentationValidator:
                 response = self._make_http_request(
                     link.url, FlextApiConstants.Api.Method.GET
                 )
-            if response.status_code < 400:
+            if response.status_code < HTTPStatus.BAD_REQUEST:
                 retry_success_result: m.Quality.LinkCheckResult = (
                     base_result.model_copy(
                         update={"valid": True, "status_code": response.status_code}
@@ -428,7 +433,7 @@ class FlextQualityDocumentationValidator:
             ]
             for link in links:
                 text = link.text.lower().strip()
-                if text in poor_link_texts or len(text) < 3:
+                if text in poor_link_texts or len(text) < _MIN_LINK_TEXT_LENGTH:
                     self.results.warnings_list.append(
                         m.Quality.LinkCheckResult(
                             type="poor_link_text",
@@ -564,7 +569,7 @@ class FlextQualityDocumentationValidator:
                 content = read.value
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 metrics = self._calculate_content_metrics(content)
-                if metrics.word_count < 50:
+                if metrics.word_count < _MIN_WORD_COUNT:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="insufficient_content",
@@ -573,7 +578,7 @@ class FlextQualityDocumentationValidator:
                             warning="Document appears to be too short",
                         )
                     )
-                if metrics.readability_score < 60:
+                if metrics.readability_score < _MIN_READABILITY_SCORE:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="readability_issue",

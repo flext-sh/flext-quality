@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, override
+from typing import TYPE_CHECKING, Annotated, Final, override
 
 from jinja2 import Template
 
@@ -22,6 +22,10 @@ from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping, MutableSequence
+
+_QUALITY_SCORE_EXCELLENT: Final[int] = 80
+_QUALITY_SCORE_GOOD: Final[int] = 60
+_QUALITY_SCORE_ACCEPTABLE: Final[int] = 40
 
 
 class FlextQualityDocumentationReporter:
@@ -207,11 +211,11 @@ class FlextQualityDocumentationReporter:
             changes_made = self.optimization_data.get("changes_made", 0)
             if isinstance(changes_made, int):
                 optimizations_applied = changes_made
-        if overall_score >= 80:
+        if overall_score >= _QUALITY_SCORE_EXCELLENT:
             quality_trend = "excellent"
-        elif overall_score >= 60:
+        elif overall_score >= _QUALITY_SCORE_GOOD:
             quality_trend = "good"
-        elif overall_score >= 40:
+        elif overall_score >= _QUALITY_SCORE_ACCEPTABLE:
             quality_trend = "needs_improvement"
         else:
             quality_trend = "critical"
