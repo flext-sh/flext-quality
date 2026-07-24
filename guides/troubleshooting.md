@@ -785,23 +785,23 @@ def process_untyped(items):
 1. **Test Thoroughly**
 
    ```python
+   from flext_core import p, r
 
-from flext_core import p, r
 
-def process_data(data: dict | None) -> p.Result[dict]:
-    if not data:
-        return r[dict].fail("Data required")
-    return r[dict].ok(data)
+   def process_data(data: dict | None) -> p.Result[dict]:
+       if not data:
+           return r[dict].fail("Data required")
+       return r[dict].ok(data)
 
-def test_process_data():
-    # Test success case
-    result = process_data({"key": "value"})
-    assert result.success
 
-    # Test failure case
-    result = process_data(None)
-    assert result.failure
+   def test_process_data():
+       # Test success case
+       result = process_data({"key": "value"})
+       assert result.success
 
+       # Test failure case
+       result = process_data(None)
+       assert result.failure
 ```
 
 ## Resources
