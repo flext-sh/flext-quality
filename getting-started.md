@@ -121,7 +121,7 @@ mypy src/flext_quality/ --strict  # Cannot run until imports work
 pytest tests/ -v  # AttributeError expected
 
 # Direct analyzer import works (bypasses model issues)
-python -c "from flext_quality import FlextQualityCodeAnalyzer; print('Direct import successful')"
+python -c "from flext_quality import FlextQualityCodeAnalyzer; u.Cli.print('Direct import successful')"
 ```
 
 ### **Step 3: Review Architecture**
@@ -167,9 +167,9 @@ def service_analysis():
 
     if project_result.success:
         project = project_result.value
-        print(f"✅ Project: {project.name}")
-        print(f"📁 Path: {project.project_path}")
-        print(f"🎯 Min Coverage: {project.min_coverage}")
+        u.Cli.print(f"✅ Project: {project.name}")
+        u.Cli.print(f"📁 Path: {project.project_path}")
+        u.Cli.print(f"🎯 Min Coverage: {project.min_coverage}")
 
 
 # Option 2: Direct Analysis Engine
@@ -189,10 +189,10 @@ def direct_analysis():
     score = analyzer.get_quality_score()
     grade = analyzer.get_quality_grade()
 
-    print(f"📊 Quality Score: {score}")
-    print(f"🏆 Quality Grade: {grade}")
-    print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
-    print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
+    u.Cli.print(f"📊 Quality Score: {score}")
+    u.Cli.print(f"🏆 Quality Grade: {grade}")
+    u.Cli.print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
+    u.Cli.print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
 
 
 # Run both approaches

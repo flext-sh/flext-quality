@@ -119,9 +119,9 @@ results = analyzer.analyze_project()
 score = analyzer.get_quality_score()
 grade = analyzer.get_quality_grade()
 
-print(f"Quality Assessment: {grade} ({score:.1f}/100)")
-print(f"Files Analyzed: {results['files_analyzed']}")
-print(
+u.Cli.print(f"Quality Assessment: {grade} ({score:.1f}/100)")
+u.Cli.print(f"Files Analyzed: {results['files_analyzed']}")
+u.Cli.print(
     f"Issues Found: {len(results['issues']['security']) + len(results['issues']['complexity'])}"
 )
 ```
@@ -172,7 +172,7 @@ def analyze_with_monitoring(project_path: str):
         )
         return data
     else:
-        print(f"Analysis failed: {result.error}")
+        u.Cli.print(f"Analysis failed: {result.error}")
         return None
 ```
 
@@ -359,7 +359,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 pip install --upgrade flext-quality
 
 # Check Python path
-python -c "import flext_quality; print(flext_quality.__version__)"
+python -c "import flext_quality; u.Cli.print(flext_quality.__version__)"
 ```
 
 #### **Configuration Issues**

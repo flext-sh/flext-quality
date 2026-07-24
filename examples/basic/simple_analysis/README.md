@@ -183,12 +183,12 @@ issues = results.get("issues", {})
 
 for category, issue_list in issues.items():
     if isinstance(issue_list, list) and issue_list:
-        print(f"{category.title()}: {len(issue_list)} issues")
+        u.Cli.print(f"{category.title()}: {len(issue_list)} issues")
 
         for issue in issue_list[:3]:  # Show first 3 issues
             file_path = issue.get("file", "unknown")
             message = issue.get("message", "No description")
-            print(f"  - {file_path}: {message}")
+            u.Cli.print(f"  - {file_path}: {message}")
 ```
 
 ## Configuration

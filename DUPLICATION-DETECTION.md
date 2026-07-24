@@ -56,7 +56,7 @@ result = plugin.check(files)
 
 if result.success:
     for dup in result.value.duplicates:
-        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
+        u.Cli.print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
 ```
 
 **Key Features**:
@@ -226,7 +226,7 @@ result = analyzer.analyze_project(options=AnalysisOptions(include_duplicates=Tru
 # Duplication issues are included in results
 for issue in result.value.issues:
     if issue.rule_id == "duplication_check":
-        print(f"Duplicate code: {issue.message}")
+        u.Cli.print(f"Duplicate code: {issue.message}")
 ```
 
 **Architecture**:

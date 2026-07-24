@@ -332,7 +332,7 @@ ls docs/maintenance/settings/
 python -c "
 from docs import  DocumentationAuditor
 auditor = DocumentationAuditor()
-print('✅ Configuration loaded successfully')
+u.Cli.print('✅ Configuration loaded successfully')
 "
 ```
 
