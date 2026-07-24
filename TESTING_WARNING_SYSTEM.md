@@ -173,7 +173,8 @@ EOF
 
 ### Scenario 2: Code Quality Warning (CQ013)
 
-```python notest
+```python
+from __future__ import annotations
 # Create file with type: ignore (triggers CQ013)
 cat > /tmp/test_quality.py << 'EOF'
 def process(data) -> str:

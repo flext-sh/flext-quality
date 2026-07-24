@@ -148,7 +148,8 @@ ______________________________________________________________________
 
 ### **Basic Quality Analysis** (WORKING)
 
-```python notest
+```python
+from __future__ import annotations
 from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
 
@@ -222,7 +223,7 @@ flext-quality fix --projects ./src --auto-approve --backup
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
-```python notest
+```python
 from flext_quality import FlextQualityWeb
 
 # Create enterprise quality dashboard
@@ -244,7 +245,7 @@ dashboard = quality_web.create_enterprise_dashboard()
 
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
-```python notest
+```python
 # FLEXT-API integration for programmatic access
 from flext_api import FlextApiRouter
 from flext_quality import FlextQualityApiRouter

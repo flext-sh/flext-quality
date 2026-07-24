@@ -157,7 +157,7 @@ Entry point handling command-line interface and execution flow:
 
 The example demonstrates FLEXT Quality's comprehensive scoring system:
 
-```python notest
+```python
 # Basic analysis execution
 results = analyzer.analyze_project(
     include_security=True,  # Security vulnerability detection
@@ -178,7 +178,7 @@ metrics = QualityMetrics.from_analysis_results(results)
 
 The example shows how to process and interpret different types of quality issues:
 
-```python notest
+```python
 issues = results.get("issues", {})
 
 for category, issue_list in issues.items():
@@ -197,7 +197,7 @@ for category, issue_list in issues.items():
 
 The example uses default analysis settings, but can be customized:
 
-```python notest
+```python
 # Custom analysis configuration
 results = analyzer.analyze_project(
     include_security=True,  # Enable security analysis
@@ -256,7 +256,7 @@ The example provides contextual recommendations based on analysis results:
 
 ### Custom Analysis Backends
 
-```python notest
+```python
 # Add custom analysis configuration
 analyzer = CodeAnalyzer(project_path)
 analyzer.configure_backends({
@@ -268,7 +268,7 @@ analyzer.configure_backends({
 
 ### Integration with FLEXT Services
 
-```python notest
+```python
 from flext_observability import create_metric
 
 # Publish quality metrics to observability stack
@@ -281,7 +281,7 @@ create_metric(
 
 ### Report Generation
 
-```python notest
+```python
 from flext_quality import QualityReport
 
 # Generate detailed quality report

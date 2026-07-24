@@ -105,7 +105,7 @@ Report generation and dashboard integration examples:
 
 ### Basic Project Analysis
 
-```python notest
+```python
 # examples/basic/simple_analysis.py
 from flext_quality import CodeAnalyzer
 
@@ -128,7 +128,9 @@ u.Cli.print(
 
 ### FLEXT Ecosystem Integration
 
-```python notest
+```python
+from __future__ import annotations
+
 # examples/integration/flext_ecosystem.py
 from flext_quality import QualityAPI
 from flext_cli import u
