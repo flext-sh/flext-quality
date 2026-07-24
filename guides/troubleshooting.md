@@ -742,9 +742,9 @@ def process_unsafe(data: dict) -> ProcessedData:
 1. **Validate Input Early**
 
    ```python
-from __future__ import annotations
-from flext_core import p, r
 
+from **future** import annotations
+from flext_core import p, r
 
 def process_data(data: dict) -> p.Result[dict]:
     if not data:
@@ -753,6 +753,7 @@ def process_data(data: dict) -> p.Result[dict]:
     # Process data
     processed_data = {k: v for k, v in data.items()}
     return r[dict].ok(processed_data)
+
 ```
 
 1. **Use Type Hints**
@@ -784,14 +785,13 @@ def process_untyped(items):
 1. **Test Thoroughly**
 
    ```python
-from flext_core import p, r
 
+from flext_core import p, r
 
 def process_data(data: dict | None) -> p.Result[dict]:
     if not data:
         return r[dict].fail("Data required")
     return r[dict].ok(data)
-
 
 def test_process_data():
     # Test success case
@@ -801,6 +801,7 @@ def test_process_data():
     # Test failure case
     result = process_data(None)
     assert result.failure
+
 ```
 
 ## Resources
