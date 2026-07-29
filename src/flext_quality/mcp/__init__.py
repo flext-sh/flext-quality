@@ -1,5 +1,5 @@
-# AUTO-GENERATED FILE — Regenerate with: make gen
-"""Mcp package."""
+# @generated AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Quality.mcp package."""
 
 from __future__ import annotations
 
@@ -8,16 +8,30 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.mcp.resources import (
-        FlextQualityMcpResources as FlextQualityMcpResources,
-    )
-    from flext_quality.mcp.server import FlextQualityMcpServer as FlextQualityMcpServer
-    from flext_quality.mcp.tools import FlextQualityMcpTools as FlextQualityMcpTools
-_LAZY_IMPORTS = build_lazy_import_map({
+    from .resources import FlextQualityMcpResources as FlextQualityMcpResources
+    from .server import FlextQualityMcpServer as FlextQualityMcpServer
+    from .tools import FlextQualityMcpTools as FlextQualityMcpTools
+
+_LAZY_MODULES: dict[str, tuple[str, ...]] = {
     ".resources": ("FlextQualityMcpResources",),
     ".server": ("FlextQualityMcpServer",),
     ".tools": ("FlextQualityMcpTools",),
-})
+}
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+_LAZY_ALIAS_GROUPS: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
+_LAZY_IMPORTS = build_lazy_import_map(
+    _LAZY_MODULES, alias_groups=_LAZY_ALIAS_GROUPS, sort_keys=False
+)
+
+_PUBLIC_EXPORTS: tuple[str, ...] = (
+    "FlextQualityMcpResources",
+    "FlextQualityMcpServer",
+    "FlextQualityMcpTools",
+)
+
+__all__: tuple[str, ...] = tuple(_PUBLIC_EXPORTS)
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
