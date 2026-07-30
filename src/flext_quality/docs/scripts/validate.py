@@ -647,7 +647,7 @@ class FlextQualityDocumentationValidator:
             if not any(pattern in str(f) for pattern in ignored_patterns)
         ]
 
-    class Run(s[bool]):
+    class Run(s):
         """CLI command for FLEXT Quality documentation validation."""
 
         external_links: bool = u.Field(

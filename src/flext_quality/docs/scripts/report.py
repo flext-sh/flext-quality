@@ -689,7 +689,7 @@ class FlextQualityDocumentationReporter:
             return r[Path].fail(write.error or f"cannot write {filepath}")
         return r[Path].ok(filepath)
 
-    class Run(s[bool]):
+    class Run(s):
         """CLI command for FLEXT Quality documentation reporting."""
 
         output_format: Annotated[

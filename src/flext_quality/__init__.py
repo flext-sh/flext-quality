@@ -7,33 +7,30 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-from .__version__ import __author__ as __author__
-from .__version__ import __author_email__ as __author_email__
-from .__version__ import __description__ as __description__
-from .__version__ import __license__ as __license__
-from .__version__ import __title__ as __title__
-from .__version__ import __url__ as __url__
-from .__version__ import __version__ as __version__
-from .__version__ import __version_info__ as __version_info__
+from .__version__ import (
+    __author__ as __author__,
+    __author_email__ as __author_email__,
+    __description__ as __description__,
+    __license__ as __license__,
+    __title__ as __title__,
+    __url__ as __url__,
+    __version__ as __version__,
+    __version_info__ as __version_info__,
+)
 
 if TYPE_CHECKING:
-    from flext_infra import d as d
-    from flext_infra import e as e
-    from flext_infra import h as h
-    from flext_infra import r as r
-    from flext_infra import x as x
+    from flext_infra import d as d, e as e, h as h, r as r, x as x
 
-    from ._config import FlextQualityConfig as FlextQualityConfig
-    from ._config import config as config
-    from ._settings import FlextQualitySettings as FlextQualitySettings
-    from ._settings import settings as settings
-    from .api import FlextQuality as FlextQuality
-    from .api import quality as quality
+    from ._config import FlextQualityConfig as FlextQualityConfig, config as config
+    from ._settings import (
+        FlextQualitySettings as FlextQualitySettings,
+        settings as settings,
+    )
+    from .api import FlextQuality as FlextQuality, quality as quality
     from .base import FlextQualityServiceBase as FlextQualityServiceBase
 
     s: type[FlextQualityServiceBase]
-    from .cli import FlextQualityCli as FlextQualityCli
-    from .cli import main as main
+    from .cli import FlextQualityCli as FlextQualityCli, main as main
     from .constants import FlextQualityConstants as FlextQualityConstants
 
     c: type[FlextQualityConstants]

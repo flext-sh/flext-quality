@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     from collections.abc import MutableSequence, Sequence
 
 
-class FlextQualityCli(s[bool]):
+class FlextQualityCli(s):
     """FLEXT Quality analysis toolkit."""
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s[t.JsonMapping]):
+    class Status(s):
         """Display quality service status."""
 
         @override
@@ -30,7 +30,7 @@ class FlextQualityCli(s[bool]):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s[t.SequenceOf[t.StrSequence]]):
+    class Check(s):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[

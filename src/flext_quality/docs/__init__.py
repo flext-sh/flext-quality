@@ -8,9 +8,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from . import core as core
-    from . import scripts as scripts
-    from . import tools as tools
+    from . import core as core, scripts as scripts, tools as tools
     from .core.config_manager import (
         FlextQualityConfigManager as FlextQualityConfigManager,
     )
