@@ -1,85 +1,65 @@
-# AUTO-GENERATED FILE — Regenerate with: make gen
-"""Docs package."""
+# @generated AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Quality.docs package."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import (
-    build_lazy_import_map,
-    install_lazy_exports,
-    merge_lazy_imports,
-)
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs.core.config_manager import (
+    from . import core as core
+    from . import scripts as scripts
+    from . import tools as tools
+    from .core.config_manager import (
         FlextQualityConfigManager as FlextQualityConfigManager,
     )
-    from flext_quality.docs.dashboard import (
+    from .dashboard import (
         FlextQualityDocumentationDashboard as FlextQualityDocumentationDashboard,
     )
-    from flext_quality.docs.notifications import (
+    from .notifications import (
         FlextQualityDocumentationNotifier as FlextQualityDocumentationNotifier,
     )
-    from flext_quality.docs.scheduled_maintenance import (
+    from .scheduled_maintenance import (
         FlextQualityScheduledMaintenance as FlextQualityScheduledMaintenance,
     )
-    from flext_quality.docs.scripts.audit import (
-        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
-    )
-    from flext_quality.docs.scripts.optimize import (
-        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
-    )
-    from flext_quality.docs.scripts.report import (
-        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
-    )
-    from flext_quality.docs.scripts.validate import (
-        FlextQualityDocumentationValidator as FlextQualityDocumentationValidator,
-    )
-    from flext_quality.docs.tools.link_checker import (
-        FlextQualityLinkChecker as FlextQualityLinkChecker,
-    )
-    from flext_quality.docs.tools.style_validator import (
+    from .tools.link_checker import FlextQualityLinkChecker as FlextQualityLinkChecker
+    from .tools.style_validator import (
         FlextQualityStyleValidator as FlextQualityStyleValidator,
     )
-_LAZY_IMPORTS = merge_lazy_imports(
-    (".core", ".scripts", ".tools"),
-    build_lazy_import_map({
-        ".core": ("core",),
-        ".core.config_manager": ("FlextQualityConfigManager",),
-        ".dashboard": ("FlextQualityDocumentationDashboard",),
-        ".notifications": ("FlextQualityDocumentationNotifier",),
-        ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
-        ".scripts": ("scripts",),
-        ".scripts.audit": ("FlextQualityDocumentationAuditor",),
-        ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
-        ".scripts.report": ("FlextQualityDocumentationReporter",),
-        ".scripts.validate": ("FlextQualityDocumentationValidator",),
-        ".tools": ("tools",),
-        ".tools.link_checker": ("FlextQualityLinkChecker",),
-        ".tools.style_validator": ("FlextQualityStyleValidator",),
-    }),
-    exclude_names=(
-        "cleanup_submodule_namespace",
-        "install_lazy_exports",
-        "lazy_getattr",
-        "logger",
-        "merge_lazy_imports",
-        "output",
-        "output_reporting",
-        "pytest_addoption",
-        "pytest_collect_file",
-        "pytest_collection_modifyitems",
-        "pytest_configure",
-        "pytest_runtest_setup",
-        "pytest_runtest_teardown",
-        "pytest_sessionfinish",
-        "pytest_sessionstart",
-        "pytest_terminal_summary",
-        "pytest_warning_recorded",
-    ),
-    module_name=__name__,
+
+_LAZY_MODULES: dict[str, tuple[str, ...]] = {
+    ".core": ("core",),
+    ".core.config_manager": ("FlextQualityConfigManager",),
+    ".dashboard": ("FlextQualityDocumentationDashboard",),
+    ".notifications": ("FlextQualityDocumentationNotifier",),
+    ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+    ".scripts": ("scripts",),
+    ".tools": ("tools",),
+    ".tools.link_checker": ("FlextQualityLinkChecker",),
+    ".tools.style_validator": ("FlextQualityStyleValidator",),
+}
+
+
+_LAZY_ALIAS_GROUPS: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
+_LAZY_IMPORTS = build_lazy_import_map(
+    _LAZY_MODULES, alias_groups=_LAZY_ALIAS_GROUPS, sort_keys=False
 )
 
+_PUBLIC_EXPORTS: tuple[str, ...] = (
+    "FlextQualityConfigManager",
+    "FlextQualityDocumentationDashboard",
+    "FlextQualityDocumentationNotifier",
+    "FlextQualityLinkChecker",
+    "FlextQualityScheduledMaintenance",
+    "FlextQualityStyleValidator",
+    "core",
+    "scripts",
+    "tools",
+)
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
+__all__: tuple[str, ...] = tuple(_PUBLIC_EXPORTS)
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
