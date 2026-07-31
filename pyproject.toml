@@ -53,10 +53,8 @@ dev = [
   "pre-commit>=4.6.0",
   "pylint>=3.3",
   "pyrefly>=1.1.1",
-  "pyrefly>=1.1.1,<1.2.0",
   "pyright>=1.1.411",
   "pytest>=8.4",
-  "pytest>=9.0.3",
   "pytest-benchmark>=5.2.3",
   "pytest-clarity>=1.0.1",
   "pytest-codeblocks>=0.18.0",
@@ -74,7 +72,7 @@ dev = [
   "refurb>=2",
   "rope>=1.11",
   "ruff>=0.12.3",
-  "ruff>=0.15.12",
+  "rumdl>=0.2.46",
   "types-cachetools>=6.2",
   "types-cffi>=2.0.0.20260518",
   "types-click>=7.1",
@@ -98,9 +96,7 @@ dev = [
   "types-tabulate>=0.10",
   "types-toml>=0.10.8.20260518",
   "vulture>=2.13",
-  "vulture>=2.16",
   "yamlfix>=1.19.1",
-  "yamlfix>=1.19.1,<2",
 ]
 
 # [CUSTOM] project metadata
@@ -284,7 +280,16 @@ project-excludes = [
 ]
 project-includes = ["examples/**/*.py*", "src/**/*.py*", "tests/**/*.py*"]
 python-version = "3.13"
-search-path = [".", "src"]
+search-path = [
+  ".",
+  "../flext-api/src",
+  "../flext-cli/src",
+  "../flext-core/src",
+  "../flext-infra/src",
+  "../flext-tests/src",
+  "../flext-web/src",
+  "src",
+]
 use-ignore-files = false
 
 [tool.pyrefly.errors]
@@ -528,7 +533,6 @@ testpaths = [".", "docs", "examples", "scripts", "src", "tests"]
 exclude = [
   "**/.archive/**",
   "**/__pyrefly_virtual__/**",
-  "**/archive/**",
   ".archive",
   ".archive/**",
   ".git",
@@ -538,7 +542,6 @@ exclude = [
   ".venv",
   "__pycache__",
   "archive",
-  "archive/**",
   "backup",
   "build",
   "dist",
@@ -718,7 +721,6 @@ sort_first = ["build-system", "dependency-groups", "project", "tool"]
 
 [tool.uv]
 link-mode = "copy"
-required-version = ">=0.11.0"
 
 [tool.vulture]
 exclude = ["*/_protocols/*"]
