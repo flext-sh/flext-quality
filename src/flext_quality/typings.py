@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
+from collections.abc import Mapping
 
 from flext_infra import m, t
 from flext_web import t as web_t
@@ -30,14 +28,12 @@ class FlextQualityTypes(t, web_t):
         )
 
         RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
-            t.JsonMapping,
-            config=m.ConfigDict(strict=False),
+            t.JsonMapping, config=m.ConfigDict(strict=False)
         )
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
             t.SequenceOf[t.JsonMapping]
         ] = m.TypeAdapter(
-            t.SequenceOf[t.JsonMapping],
-            config=m.ConfigDict(strict=False),
+            t.SequenceOf[t.JsonMapping], config=m.ConfigDict(strict=False)
         )
         MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
             t.MutableOptionalFeatureFlagMapping
@@ -47,9 +43,7 @@ class FlextQualityTypes(t, web_t):
         ] = m.TypeAdapter(t.MutableSequenceOf[t.StrMapping])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, DocumentationReportValue]
-        ] = m.TypeAdapter(
-            t.MappingKV[str, DocumentationReportValue],
-        )
+        ] = m.TypeAdapter(t.MappingKV[str, DocumentationReportValue])
 
 
 t = FlextQualityTypes

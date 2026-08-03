@@ -11,13 +11,7 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_quality import (
-    FlextQualityMcpClient,
-    c,
-    m,
-    p,
-    t,
-)
+from flext_quality import FlextQualityMcpClient, c, m, p, t
 
 
 @final
@@ -27,8 +21,6 @@ class FlextQualityClaudeMemClient:
     Provides cross-session memory search via the claude-mem server.
     Uses mcp-cli for server communication.
     """
-
-    SERVER_NAME = "claude-mem"
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
         """Initialize the Claude Mem client."""
@@ -40,21 +32,19 @@ class FlextQualityClaudeMemClient:
         """Build a get_observations tool call."""
         normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
-        return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
+        return self._mcp.build_tool_call(
+            c.Quality.CLAUDE_MEM_SERVER_NAME, "get_observations", params
+        )
 
     def build_search_call(
-        self,
-        query: str,
-        *,
-        limit: int | None = None,
+        self, query: str, *, limit: int | None = None
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
-        params = {
-            "query": query,
-            "limit": search_limit,
-        }
-        return self._mcp.build_tool_call(self.SERVER_NAME, "search", params)
+        params = {"query": query, "limit": search_limit}
+        return self._mcp.build_tool_call(
+            c.Quality.CLAUDE_MEM_SERVER_NAME, "search", params
+        )
 
     def build_timeline_call(
         self,
@@ -66,15 +56,9 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
-        params = {
-            "anchor": anchor,
-            "depth_before": before,
-            "depth_after": after,
-        }
+        params = {"anchor": anchor, "depth_before": before, "depth_after": after}
         return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "timeline",
-            params,
+            c.Quality.CLAUDE_MEM_SERVER_NAME, "timeline", params
         )
 
     def get_observations_command(
@@ -82,19 +66,16 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations."""
         return self.build_get_observations_call(ids).flat_map(
-            self._mcp.build_call_command,
+            self._mcp.build_call_command
         )
 
     def get_search_command(
-        self,
-        query: str,
-        *,
-        limit: int | None = None,
+        self, query: str, *, limit: int | None = None
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search."""
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
-            self._mcp.build_call_command,
+            self._mcp.build_call_command
         )
 
     def get_timeline_command(
@@ -108,11 +89,9 @@ class FlextQualityClaudeMemClient:
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
         return self.build_timeline_call(
-            anchor,
-            depth_before=before,
-            depth_after=after,
+            anchor, depth_before=before, depth_after=after
         ).flat_map(self._mcp.build_call_command)
 
     def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-mem is available."""
-        return self._mcp.build_server_health_result(self.SERVER_NAME)
+        return self._mcp.build_server_health_result(c.Quality.CLAUDE_MEM_SERVER_NAME)

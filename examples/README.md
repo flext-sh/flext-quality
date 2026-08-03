@@ -105,7 +105,7 @@ Report generation and dashboard integration examples:
 
 ### Basic Project Analysis
 
-```python notest
+```text
 # examples/basic/simple_analysis.py
 from flext_quality import CodeAnalyzer
 
@@ -128,28 +128,13 @@ print(
 
 ### FLEXT Ecosystem Integration
 
-```python notest
+```python
+from __future__ import annotations
+
 # examples/integration/flext_ecosystem.py
 from flext_quality import QualityAPI
-from flext_core import FlextBus
+from flext_cli import u
 from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import t
-from flext_core import u
 from flext_observability import create_metric
 
 # Initialize with dependency injection
@@ -172,7 +157,7 @@ def analyze_with_monitoring(project_path: str):
         )
         return data
     else:
-        print(f"Analysis failed: {result.error}")
+        u.Cli.info(f"Analysis failed: {result.error}")
         return None
 ```
 
@@ -359,7 +344,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 pip install --upgrade flext-quality
 
 # Check Python path
-python -c "import flext_quality; print(flext_quality.__version__)"
+python -c "import flext_quality; u.Cli.print(flext_quality.__version__)"
 ```
 
 #### **Configuration Issues**

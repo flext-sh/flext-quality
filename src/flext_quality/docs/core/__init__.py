@@ -1,5 +1,5 @@
-# AUTO-GENERATED FILE — Regenerate with: make gen
-"""Core package."""
+# @generated AUTO-GENERATED FILE — Regenerate with: make gen
+"""Flext Quality.docs.core package."""
 
 from __future__ import annotations
 
@@ -8,29 +8,22 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules as FlextQualityAuditRules,
-        FlextQualityConfigManager as FlextQualityConfigManager,
-        FlextQualityConfigTypes as FlextQualityConfigTypes,
-        FlextQualityStyleGuide as FlextQualityStyleGuide,
-        FlextQualityValidationSettings as FlextQualityValidationSettings,
-    )
+    from .config_manager import FlextQualityConfigManager as FlextQualityConfigManager
+
+_LAZY_MODULES: dict[str, tuple[str, ...]] = {
+    ".config_manager": ("FlextQualityConfigManager",)
+}
+
+
+_LAZY_ALIAS_GROUPS: dict[str, tuple[tuple[str, str], ...]] = {}
+
+
 _LAZY_IMPORTS = build_lazy_import_map(
-    {
-        ".config_manager": (
-            "FlextQualityAuditRules",
-            "FlextQualityConfigManager",
-            "FlextQualityConfigTypes",
-            "FlextQualityStyleGuide",
-            "FlextQualityValidationSettings",
-        ),
-    },
+    _LAZY_MODULES, alias_groups=_LAZY_ALIAS_GROUPS, sort_keys=False
 )
 
+_PUBLIC_EXPORTS: tuple[str, ...] = ("FlextQualityConfigManager",)
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    _LAZY_IMPORTS,
-    publish_all=False,
-)
+__all__: tuple[str, ...] = tuple(_PUBLIC_EXPORTS)
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

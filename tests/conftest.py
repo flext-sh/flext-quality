@@ -7,18 +7,21 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Generator
+from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests import reset_settings as _shared_reset_settings
 
-from flext_quality.settings import FlextQualitySettings
-from tests.utilities import u
+from flext_quality import FlextQualitySettings
+from flext_tests import reset_settings as _shared_reset_settings
+from tests import u
+
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
 reset_settings = _shared_reset_settings
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def set_test_environment(reset_settings: None) -> Generator[None]:
     """Configure isolated test environment variables."""
     _ = reset_settings

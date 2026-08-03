@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    MutableMapping,
-    MutableSequence,
-)
-from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 
 from flext_quality import c, p, r, t, u
+
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping, MutableSequence
+    from pathlib import Path
 
 
 class FlextQualityValidators:
@@ -31,14 +30,12 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "pattern"
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -74,7 +71,7 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "forbidden-patterns"
 
     class Tier(p.Quality.ValidatorBase):
@@ -83,14 +80,12 @@ class FlextQualityValidators:
         @property
         @override
         def name(self) -> str:
-            """Return validator name."""
+            """The validator name."""
             return "tier"
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -146,9 +141,7 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.JsonMapping] = []

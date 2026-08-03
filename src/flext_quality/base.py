@@ -6,8 +6,7 @@ from abc import ABC
 from typing import override
 
 from flext_core import s
-from flext_quality import FlextQualitySettings, t
-from flext_quality.protocols import p
+from flext_quality import FlextQualitySettings, p, t
 
 
 class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
@@ -20,7 +19,15 @@ class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
     @property
     @override
     def settings(self) -> FlextQualitySettings:
-        """Return the typed quality settings singleton (rule 1, propagating)."""
+        """The typed quality settings singleton (rule 1, propagating).
+
+        An injected runtime snapshot wins; otherwise the shared
+        ``FlextQualitySettings.fetch_global()`` singleton is returned, matching
+        the facade modules that read ``settings.Quality.*`` directly.
+        """
+        resolved = super().settings
+        if isinstance(resolved, FlextQualitySettings):
+            return resolved
         return FlextQualitySettings.fetch_global()
 
 

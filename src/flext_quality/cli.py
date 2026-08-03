@@ -7,23 +7,22 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import (
-    MutableSequence,
-    Sequence,
-)
 from pathlib import Path
-from typing import Annotated, ClassVar, Self, override
+from typing import TYPE_CHECKING, Annotated, ClassVar, Self, override
 
 from flext_cli import cli
 from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
 
+if TYPE_CHECKING:
+    from collections.abc import MutableSequence, Sequence
 
-class FlextQualityCli(s[bool]):
+
+class FlextQualityCli(s):
     """FLEXT Quality analysis toolkit."""
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s[t.JsonMapping]):
+    class Status(s):
         """Display quality service status."""
 
         @override
@@ -31,12 +30,11 @@ class FlextQualityCli(s[bool]):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s[t.SequenceOf[t.StrSequence]]):
+    class Check(s):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
-            Path,
-            u.Field(default_factory=Path.cwd, description="Target path"),
+            Path, u.Field(default_factory=Path.cwd, description="Target path")
         ]
 
         @override
@@ -52,8 +50,7 @@ class FlextQualityCli(s[bool]):
             return self._extend(cmds)
 
         def _extend(
-            self: Self,
-            cmds: MutableSequence[t.StrSequence],
+            self: Self, cmds: MutableSequence[t.StrSequence]
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
@@ -62,8 +59,7 @@ class FlextQualityCli(s[bool]):
 
         @override
         def _extend(
-            self: Self,
-            cmds: MutableSequence[t.StrSequence],
+            self: Self, cmds: MutableSequence[t.StrSequence]
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             src = (
                 self.target_path / "src"
@@ -91,9 +87,7 @@ class FlextQualityCli(s[bool]):
 def main(args: t.StrSequence | None = None) -> int:
     """flext-quality CLI entry point."""
     app = cli.create_app_with_common_params(
-        name=FlextQualityCli.app_name,
-        help_text=FlextQualityCli.__doc__ or "",
-        settings=cli.settings,
+        name=FlextQualityCli.app_name, help_text=FlextQualityCli.__doc__ or ""
     )
     cli.register_result_routes(
         app,

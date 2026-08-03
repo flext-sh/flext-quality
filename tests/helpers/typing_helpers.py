@@ -11,14 +11,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeIs
+from typing import TYPE_CHECKING, TypeIs
 
-from tests.typings import t
+from flext_tests import tm
+
+if TYPE_CHECKING:
+    from tests import t
 
 
-def assert_is_dict(
-    value: t.Scalar | t.ScalarMapping,
-) -> TypeIs[t.ScalarMapping]:
+def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]:
     """Type-safe t.JsonMapping assertion following Single Responsibility Principle.
 
     Args:
@@ -31,7 +32,7 @@ def assert_is_dict(
       AssertionError: If value is not a dict
 
     """
-    assert isinstance(value, dict), f"Expected dict, got {type(value)}"
+    tm.that(value, is_=dict)
     return True
 
 
@@ -48,13 +49,12 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
       AssertionError: If value is not a list
 
     """
-    assert isinstance(value, list), f"Expected list, got {type(value)}"
+    tm.that(value, is_=list)
     return True
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping,
-    required_keys: t.StrSequence,
+    data: t.ScalarMapping, required_keys: t.StrSequence
 ) -> t.ScalarMapping:
     """Assert that t.JsonValue is dict with required keys - DRY pattern.
 
@@ -70,13 +70,11 @@ def assert_dict_structure(
 
     """
     for key in required_keys:
-        assert key in data, f"Required key '{key}' missing from dict"
+        tm.that(data, has=key)
     return data
 
 
-def assert_analysis_results_structure(
-    results: t.ScalarMapping,
-) -> t.ScalarMapping:
+def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMapping:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -90,7 +88,8 @@ def assert_analysis_results_structure(
 
     """
     if not assert_is_dict(results):
-        raise AssertionError(f"Expected dict, got {type(results)}")
+        msg = f"Expected dict, got {type(results)}"
+        raise AssertionError(msg)
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
@@ -108,7 +107,8 @@ def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
 
     """
     if not assert_is_dict(metrics):
-        raise AssertionError(f"Expected dict, got {type(metrics)}")
+        msg = f"Expected dict, got {type(metrics)}"
+        raise AssertionError(msg)
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
@@ -126,8 +126,8 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
 
     """
     if not assert_is_dict(issues):
-        raise AssertionError(f"Expected dict, got {type(issues)}")
+        msg = f"Expected dict, got {type(issues)}"
+        raise AssertionError(msg)
     return assert_dict_structure(
-        issues,
-        ["security", "complexity", "dead_code", "duplicates"],
+        issues, ["security", "complexity", "dead_code", "duplicates"]
     )
