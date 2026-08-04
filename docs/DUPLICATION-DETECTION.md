@@ -56,9 +56,7 @@ result = plugin.check(files)
 
 if result.success:
     for dup in result.value.duplicates:
-        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
-```
-
+        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")```
 **Key Features**:
 
 - **Line-based similarity**: Uses set intersection of source lines
@@ -86,9 +84,7 @@ if result.success:
 
 Prevents Edit/Write operations that increase code duplication.
 
-**Behavior**:
-
-```
+**Behavior**:```
 First Attempt (Edit Increases Duplication):
   ├─ Calculate duplicate pair count for project
   ├─ Compare against baseline
@@ -227,9 +223,7 @@ result = analyzer.analyze_project(options=AnalysisOptions(include_duplicates=Tru
 # Duplication issues are included in results
 for issue in result.value.issues:
     if issue.rule_id == "duplication_check":
-        print(f"Duplicate code: {issue.message}")
-```
-
+        print(f"Duplicate code: {issue.message}")```
 **Architecture**:
 
 - Old code: `_DuplicationAnalyzer` inner class (508-591 lines)
@@ -253,9 +247,7 @@ for issue in result.value.issues:
 #    - Delete the duplicate copy
 #    - Edit now succeeds
 
-# 3. Duplication count stays at baseline
-```
-
+# 3. Duplication count stays at baseline```
 ### Example 2: Intentional Duplication with Retry
 
 **Scenario**: Two similar but intentionally separate implementations
@@ -319,9 +311,7 @@ class Quality:
     class Analysis:
         SIMILARITY_THRESHOLD: float = 0.8  # 80% line overlap
         MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
-        MIN_FILES_FOR_PAIR_COMPARISON: int = 2  # Need ≥2 files
-```
-
+        MIN_FILES_FOR_PAIR_COMPARISON: int = 2  # Need ≥2 files```
 ## Hook Configuration
 
 **Pre-tool Event**: Edit/Write operations on Python files in FLEXT projects

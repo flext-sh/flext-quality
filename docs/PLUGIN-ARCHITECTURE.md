@@ -9,7 +9,7 @@
   - [3. MCP Server Access (Available)](#3-mcp-server-access-available)
   - [4. Future: Plugin Interface](#4-future-plugin-interface)
   - [5. Baseline Management](#5-baseline-management)
-- [Architecture Diagram](#architecture-diagram)
+- [Architecture Diagram```](#architecture-diagram)
 - [Summary](#summary)
 <!-- TOC END -->
 
@@ -73,8 +73,6 @@ from __future__ import annotations
 from flext_quality import m
 from pathlib import Path
 from flext_core import p
-from collections.abc import Mapping, Sequence
-from flext_core import r, p
 from flext_core import t
 
 
@@ -103,9 +101,7 @@ class QualityPlugin(Protocol):
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
-        ...
-```
-
+        ...```
 ### 5. Baseline Management
 
 Baseline tracking for dead code:
@@ -114,9 +110,7 @@ Baseline tracking for dead code:
 - Generator: `~/flext/scripts/create-dead-code-baseline.sh`
 - Hook auto-updates on retry
 
-## Architecture Diagram
-
-```
+## Architecture Diagram```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Claude Code Hooks                        │
 ├─────────────────────────────────────────────────────────────┤
