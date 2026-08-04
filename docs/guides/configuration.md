@@ -104,7 +104,6 @@ api:
 Configure FLEXT programmatically in your code:
 
 ```python
-from flext_cli import u
 from flext_core import FlextSettings
 from flext_ldif import FlextLdifSettings
 
@@ -117,9 +116,7 @@ ldif_config = FlextLdifSettings(
     strict_validation=True,
     servers_enabled=True,
     batch_size=1000,
-)
-```
-
+)```
 ## Project-Specific Configuration
 
 ### flext-ldif Configuration
@@ -139,9 +136,7 @@ settings = FlextLdifSettings(
     batch_size=1000,
     parallel_processing=True,
     max_workers=4,
-)
-```
-
+)```
 ### flext-api Configuration
 
 ```python
@@ -153,9 +148,7 @@ settings = FlextApiSettings(
     retry_attempts=3,
     verify_ssl=True,
     headers={"User-Agent": "FLEXT-API/1.0"},
-)
-```
-
+)```
 ### flext-auth Configuration
 
 ```python
@@ -167,9 +160,7 @@ settings = FlextAuthSettings(
     algorithm=c.Auth.Algorithms.HS256,
     access_token_expire_minutes=30,
     refresh_token_expire_days=7,
-)
-```
-
+)```
 ## Environment-Specific Configuration
 
 ### Development Environment
@@ -186,9 +177,7 @@ ldif:
 
 api:
   base_url: http://localhost:8000
-  timeout: 60
-```
-
+  timeout: 60```
 ### Production Environment
 
 ```yaml
@@ -222,15 +211,12 @@ try:
         log_level="INVALID_LEVEL"  # This will raise ValidationError
     )
 except c.ValidationError as e:
-    u.Cli.info(f"Configuration error: {e}")
-```
-
+    u.Cli.info(f"Configuration error: {e}")```
 ## Configuration Inheritance
 
 FLEXT supports configuration inheritance for complex setups:
 
 ```python
-from flext_cli import u
 from flext_core import FlextSettings
 
 # Base configuration
@@ -242,9 +228,7 @@ extended_config = FlextSettings(
     **base_values,
     debug=True,  # Override for development
     custom_setting="value",
-)
-```
-
+)```
 ## Best Practices
 
 ### 1. Use Environment Variables for Secrets
@@ -252,9 +236,7 @@ extended_config = FlextSettings(
 ```bash
 # Never put secrets in configuration files
 export FLEXT_DATABASE_PASSWORD=secret_password
-export FLEXT_API_KEY=your_api_key
-```
-
+export FLEXT_API_KEY=your_api_key```
 ### 2. Validate Configuration Early
 
 ```python
@@ -274,9 +256,7 @@ def main():
 
     # Continue with application logic
     u.Cli.info("Configuration is valid")
-    return 0
-```
-
+    return 0```
 ### 3. Use Configuration Classes
 
 ```python
@@ -294,9 +274,7 @@ class MyAppConfig(FlextSettings):
     def validate_another_setting(cls, v):
         if v < 0:
             raise ValueError("another_setting must be positive")
-        return v
-```
-
+        return v```
 ### 4. Document Configuration Options
 
 ```python
@@ -314,9 +292,7 @@ class FlextLdifSettings(m.BaseModel):
 
     strict_validation: bool = u.Field(
         default=True, description="Enable strict RFC validation"
-    )
-```
-
+    )```
 ## Troubleshooting
 
 ### Common Configuration Issues
@@ -356,9 +332,7 @@ try:
     _ = FlextSettings()
     u.Cli.info("Configuration is valid")
 except Exception as e:
-    u.Cli.info(f"Configuration has errors: {e}")
-```
-
+    u.Cli.info(f"Configuration has errors: {e}")```
 ## Examples
 
 ### Complete Configuration Example
@@ -366,7 +340,7 @@ except Exception as e:
 ```python
 from __future__ import annotations
 
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """Complete FLEXT configuration example."""
 
 import os
@@ -400,9 +374,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
-```
-
+    main()```
 ## Reference
 
 - FLEXT Core Configuration

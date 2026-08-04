@@ -198,9 +198,7 @@ def direct_analysis():
 
 # Run both approaches
 run(service_analysis())
-direct_analysis()
-```
-
+direct_analysis()```
 ### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
 
 ```bash
@@ -218,9 +216,7 @@ flext-quality workspace-analyze --parallel --security-scan
 flext-quality metrics --projects ./src --export json
 
 # Code fixing automation (absorbing gradual_lint_fixer.py)
-flext-quality fix --projects ./src --auto-approve --backup
-```
-
+flext-quality fix --projects ./src --auto-approve --backup```
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
 ```python
@@ -240,9 +236,7 @@ dashboard = quality_web.create_enterprise_dashboard()
 
 # - Executive reporting with quality KPIs
 
-# - Team collaboration and code review integration
-```
-
+# - Team collaboration and code review integration```
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
 ```text
@@ -259,9 +253,7 @@ from flext_quality import FlextQualityAuthenticatedService
 
 quality_service = FlextQualityAuthenticatedService(
     auth_middleware=FlextAuthMiddleware()
-)
-```
-
+)```
 ______________________________________________________________________
 
 ## Enterprise Features (Post-Transformation)
@@ -279,9 +271,7 @@ WORKSPACE_INTEGRATION = {
     "mypy_analyzer.py": "Type analysis integration with dual MyPy/PyRight",
     "pattern_audit_system.py": "FlextQualityValidator - Pattern detection",
     "flext_tools/quality_*": "Core quality bridge and gateway integration",
-}
-```
-
+}```
 ### **Modern Tool Stack** (Research-Based)
 
 ```python
@@ -303,9 +293,7 @@ ENTERPRISE_TOOLS = {
         "description": "Test coverage measurement and reporting",
         "features": "Branch coverage, HTML/XML reports, threshold enforcement",
     },
-}
-```
-
+}```
 ### **Configuration Management** (Modern Standards)
 
 ```toml
@@ -334,9 +322,7 @@ warn_return_any = true
 [tool.flext_quality.reporting]
 formats = ["html", "json", "pdf"]
 include_executive_summary = true
-include_trend_analysis = true
-```
-
+include_trend_analysis = true```
 ______________________________________________________________________
 
 ## Development Status & Roadmap
@@ -419,8 +405,8 @@ absorbing workspace functionality and providing unified interfaces to Python's b
 
 **Across Projects**:
 
-- [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
-- [flext-core Service Patterns](https://github.com/organization/flext/tree/main/flext-core/docs/guides/service-patterns.md) - Service patterns and dependency injection
+- [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
+- [flext-core Service Patterns](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/guides/service-patterns.md) - Service patterns and dependency injection
 - [FLEXT Workspace Documentation](../README.md) - Ecosystem overview
 
 **External Resources**:

@@ -87,9 +87,7 @@ def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMappi
       AssertionError: If structure is invalid
 
     """
-    if not assert_is_dict(results):
-        msg = f"Expected dict, got {type(results)}"
-        raise AssertionError(msg)
+    assert_is_dict(results)
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
@@ -106,9 +104,7 @@ def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
       AssertionError: If structure is invalid
 
     """
-    if not assert_is_dict(metrics):
-        msg = f"Expected dict, got {type(metrics)}"
-        raise AssertionError(msg)
+    assert_is_dict(metrics)
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
@@ -125,9 +121,7 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
       AssertionError: If structure is invalid
 
     """
-    if not assert_is_dict(issues):
-        msg = f"Expected dict, got {type(issues)}"
-        raise AssertionError(msg)
+    assert_is_dict(issues)
     return assert_dict_structure(
         issues, ["security", "complexity", "dead_code", "duplicates"]
     )
