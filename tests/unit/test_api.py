@@ -94,10 +94,7 @@ class TestsFlextQualityApi:
         """
         with pytest.raises(ValidationError, match="max_function_length"):
             FlextQualitySettings.model_validate({
-                "Quality": {
-                    "max_function_length": 500,
-                    "max_class_length": 100,
-                }
+                "Quality": {"max_function_length": 500, "max_class_length": 100}
             })
 
     # -- hook output formatting ------------------------------------------
