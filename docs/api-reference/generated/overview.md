@@ -17,11 +17,18 @@
   Software Development :: Libraries :: Python Modules` (+1 more)
 - Project class: `platform`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
-- Main facades: _none_
-- Alias exports: _none_
-- Public symbol exports: _none_
+- Main facades: `FlextQuality`, `FlextQualityBaseHook`, `FlextQualityCli`,
+  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`,
+  `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`,
+  `FlextQualityConstants` (+14 more)
+- Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
+- Public symbol exports: `FlextQuality`, `FlextQualityBaseHook`,
+  `FlextQualityCli`, `FlextQualityClaudeContextClient`,
+  `FlextQualityClaudeMemClient`, `FlextQualityCodeExecutionBridge`,
+  `FlextQualityConfig`, `FlextQualityConstants`, `FlextQualityHookManager`,
+  `FlextQualityMcpClient` (+16 more)
 - Exported module shortcuts: _none_
-- Generated module pages: `0`
+- Generated module pages: `12`
 
 ## Next Pages
 
