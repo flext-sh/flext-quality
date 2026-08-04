@@ -53,7 +53,9 @@ slot registry verification).
 - Parent MRO chain: read this project's `pyproject.toml` `dependencies` array
   filtered by `flext-*`. The MRO cascade is encoded in the inheritance lists of
   the facade classes listed under Module Map above.
-- Public extensions exposed by this project: _none_.
+- Public extensions exposed by this project: `FlextQuality`,
+  `FlextQualityBaseHook`, `FlextQualityCli`, `FlextQualityClaudeContextClient`,
+  `FlextQualityClaudeMemClient`, `FlextQualityCodeExecutionBridge` (+16 more).
 - Library abstraction boundaries: see AGENTS.md §2.7.
 
 ## Quality Gates
