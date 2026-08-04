@@ -384,7 +384,7 @@ class FlextQualityDocumentationOptimizer:
         new_frontmatter_lines = ["---", *new_frontmatter.split("\n"), "---"]
         return new_frontmatter_lines + list(lines[end_idx:])
 
-    def _save_with_backup(self, file_path: Path, content: str) -> p.Result[None]:
+    def _save_with_backup(self, file_path: Path, content: str) -> p.Result[bool]:
         """Save file with optional backup."""
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
@@ -394,8 +394,8 @@ class FlextQualityDocumentationOptimizer:
             )
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
-            return r[None].fail(write.error or f"cannot write {file_path}")
-        return r[None].ok(None)
+            return r[bool].fail(write.error or f"cannot write {file_path}")
+        return r[bool].ok(True)
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
