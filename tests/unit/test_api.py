@@ -93,9 +93,12 @@ class TestsFlextQualityApi:
         settings model instead of passing through ``validate_configuration``.
         """
         with pytest.raises(ValidationError, match="max_function_length"):
-            FlextQualitySettings(
-                Quality={"max_function_length": 500, "max_class_length": 100}
-            )
+            FlextQualitySettings.model_validate({
+                "Quality": {
+                    "max_function_length": 500,
+                    "max_class_length": 100,
+                }
+            })
 
     # -- hook output formatting ------------------------------------------
 

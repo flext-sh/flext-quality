@@ -43,10 +43,27 @@ if TYPE_CHECKING:
     from .typings import FlextQualityTypes as FlextQualityTypes
 
     t: type[FlextQualityTypes]
+    from .hooks import FlextQualityBaseHook as FlextQualityBaseHook
+    from .hooks import FlextQualityHookManager as FlextQualityHookManager
+    from .integrations import (
+        FlextQualityClaudeContextClient as FlextQualityClaudeContextClient,
+    )
+    from .integrations import FlextQualityClaudeMemClient as FlextQualityClaudeMemClient
+    from .integrations import (
+        FlextQualityCodeExecutionBridge as FlextQualityCodeExecutionBridge,
+    )
+    from .integrations import FlextQualityMcpClient as FlextQualityMcpClient
+    from .mcp import FlextQualityMcpResources as FlextQualityMcpResources
+    from .mcp import FlextQualityMcpServer as FlextQualityMcpServer
+    from .mcp import FlextQualityMcpTools as FlextQualityMcpTools
+    from .rules import FlextQualityRulesEngine as FlextQualityRulesEngine
+    from .rules import FlextQualityRulesLoader as FlextQualityRulesLoader
+    from .rules import FlextQualityValidators as FlextQualityValidators
     from .utilities import FlextQualityUtilities as FlextQualityUtilities
 
     u: type[FlextQualityUtilities]
 
+# Why: mro-4p0t — re-export domain services imported from flext_quality subpackages.
 _LAZY_MODULES: dict[str, tuple[str, ...]] = {
     "._config": ("FlextQualityConfig", "config"),
     "._settings": ("FlextQualitySettings", "settings"),
@@ -58,6 +75,23 @@ _LAZY_MODULES: dict[str, tuple[str, ...]] = {
     ".protocols": ("FlextQualityProtocols", "p"),
     ".typings": ("FlextQualityTypes", "t"),
     ".utilities": ("FlextQualityUtilities", "u"),
+    ".hooks": ("FlextQualityBaseHook", "FlextQualityHookManager"),
+    ".integrations": (
+        "FlextQualityClaudeContextClient",
+        "FlextQualityClaudeMemClient",
+        "FlextQualityCodeExecutionBridge",
+        "FlextQualityMcpClient",
+    ),
+    ".rules": (
+        "FlextQualityRulesEngine",
+        "FlextQualityRulesLoader",
+        "FlextQualityValidators",
+    ),
+    ".mcp": (
+        "FlextQualityMcpResources",
+        "FlextQualityMcpServer",
+        "FlextQualityMcpTools",
+    ),
     "flext_infra": ("d", "e", "h", "r", "x"),
 }
 
@@ -71,15 +105,27 @@ _LAZY_IMPORTS = build_lazy_import_map(
 
 _PUBLIC_EXPORTS: tuple[str, ...] = (
     "FlextQuality",
+    "FlextQualityBaseHook",
     "FlextQualityCli",
+    "FlextQualityClaudeContextClient",
+    "FlextQualityClaudeMemClient",
+    "FlextQualityCodeExecutionBridge",
     "FlextQualityConfig",
     "FlextQualityConstants",
+    "FlextQualityHookManager",
+    "FlextQualityMcpClient",
+    "FlextQualityMcpResources",
+    "FlextQualityMcpServer",
+    "FlextQualityMcpTools",
     "FlextQualityModels",
     "FlextQualityProtocols",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
     "FlextQualityTypes",
     "FlextQualityUtilities",
+    "FlextQualityValidators",
     "__author__",
     "__author_email__",
     "__description__",
