@@ -149,7 +149,7 @@ ______________________________________________________________________
 
 - Observed schema divergence: JSON-based settings (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
 - Next: draft normalization checklist (settings schema conversion, capability gaps,
-    wrapper migration plan) and define acceptance tests per capability pillar.
+  wrapper migration plan) and define acceptance tests per capability pillar.
 
 - **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/metadata-inventory.md`) summarizing directories,
   settings formats, markdown deliverables,
