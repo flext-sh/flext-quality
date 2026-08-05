@@ -522,7 +522,7 @@ class FlextQualityScheduledMaintenance:
                 f"Invalid git command format in task: {description}"
             )
             return False
-        argv = tuple(str(part) for part in cmd_parts)
+        argv = tuple(cmd_parts)
 
         def run_git_command() -> None:
             result = u.Cli.run_raw(argv, cwd=self.project_root, timeout=timeout)
@@ -567,13 +567,15 @@ class FlextQualityScheduledMaintenance:
     ) -> bool:
         """Run a function with timeout after exception boundary setup."""
         success = False
+        task_error: Exception | None = None
 
         def run_with_result() -> None:
-            nonlocal success
+            nonlocal success, task_error
             try:
                 func()
                 success = True
-            except (OSError, RuntimeError, ValueError, KeyError, ImportError):
+            except (OSError, RuntimeError, ValueError, KeyError, ImportError) as error:
+                task_error = error
                 success = False
 
         thread = threading.Thread(target=run_with_result, daemon=False)
@@ -583,7 +585,12 @@ class FlextQualityScheduledMaintenance:
             self.results.errors.append(f"Task timeout: {description}")
             return False
         if not success:
-            self.results.errors.append(f"Task failed: {description}")
+            message = (
+                f"Task failed in {description}: {task_error!s}"
+                if task_error is not None
+                else f"Task failed: {description}"
+            )
+            self.results.errors.append(message)
             return False
         return success
 
