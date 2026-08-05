@@ -17,8 +17,6 @@ from typing import Annotated, ClassVar, override
 
 import pytest
 import schedule
-from git import InvalidGitRepositoryError, Repo
-
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
@@ -508,14 +506,9 @@ class FlextQualityScheduledMaintenance:
     def _handle_git_command(
         self, cmd_parts: t.StrSequence, timeout: int, description: str
     ) -> bool:
-        """Handle git commands using GitPython."""
+        """Handle git commands through the flext-cli process facade."""
         try:
             return self._handle_git_command_unchecked(cmd_parts, timeout, description)
-        except InvalidGitRepositoryError:
-            self.results.warnings.append(
-                f"Not a git repository for task: {description}"
-            )
-            return False
         except c.EXC_OS_RUNTIME_VALUE as e:
             self.results.errors.append(f"Git command failed in {description}: {e!s}")
             return False
@@ -524,25 +517,22 @@ class FlextQualityScheduledMaintenance:
         self, cmd_parts: t.StrSequence, timeout: int, description: str
     ) -> bool:
         """Handle git commands after exception boundary setup."""
-        repo = Repo(self.project_root)
-        git = repo.git
         if len(cmd_parts) < c.Quality.SCHEDULED_MAINTENANCE_MIN_GIT_ARGS:
             self.results.warnings.append(
                 f"Invalid git command format in task: {description}"
             )
             return False
-        subcommand = cmd_parts[1]
-        empty_args: t.StrSequence = []
-        args = (
-            cmd_parts[c.Quality.SCHEDULED_MAINTENANCE_MIN_GIT_ARGS :]
-            if len(cmd_parts) > c.Quality.SCHEDULED_MAINTENANCE_MIN_GIT_ARGS
-            else empty_args
-        )
+        argv = tuple(str(part) for part in cmd_parts)
 
         def run_git_command() -> None:
-            result = git.execute([subcommand, *args])
-            if not result:
-                msg = f"git {subcommand} returned empty result"
+            result = u.Cli.run_raw(argv, cwd=self.project_root, timeout=timeout)
+            if result.failure:
+                msg = result.error or f"git {' '.join(argv[1:])} failed"
+                raise RuntimeError(msg)
+            output = result.value
+            if output.exit_code != 0:
+                detail = (output.stderr or output.stdout).strip()
+                msg = detail or f"git exited {output.exit_code}"
                 raise RuntimeError(msg)
 
         return self._run_with_timeout(run_git_command, timeout, description)
