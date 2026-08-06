@@ -38,6 +38,8 @@ src/flext_quality/
 
 - MCP tools and hook execution are first-class orchestration paths.
 - CLI `Check` / `Validate` assemble Ruff, basedpyright, Bandit, pytest, and coverage commands.
+- Config/settings canonical pattern: ADR-012.
+- Codemod governance (ast-grep + make mod): ADR-014.
 
 ## Commands
 
