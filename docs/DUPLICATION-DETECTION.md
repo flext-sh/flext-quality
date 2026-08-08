@@ -98,9 +98,7 @@ Second Attempt (Same Edit):
   ├─ Detect hash match from previous block
   ├─ Accept operation as intentional
   ├─ Update baseline to new count
-  └─ Allow operation (exit code 0)
-```
-
+  └─ Allow operation (exit code 0)```
 **Features**:
 
 - **Hash-based retry detection**: Content hash prevents accidental re-runs
@@ -109,9 +107,7 @@ Second Attempt (Same Edit):
 - **Project-scoped analysis**: Only checks files in the modified project
 - **Timeout handling**: Blocks expire after 10 minutes
 
-**Message on Block**:
-
-```
+**Message on Block**:```
 ═══════════════════════════════════════════════════════════════
 BLOCKED: CODE DUPLICATION INCREASED
 ═══════════════════════════════════════════════════════════════
@@ -264,9 +260,7 @@ for issue in result.value.issues:
 #    Hook detects hash match and accepts
 #    Baseline automatically updated: 2 → 3 duplicate pairs
 
-# 4. No further blocks for this increase
-```
-
+# 4. No further blocks for this increase```
 ### Example 3: Updating Baseline Manually
 
 **Scenario**: Multiple duplication increases that need baseline update
@@ -284,9 +278,7 @@ for issue in result.value.issues:
 # Baseline recalculated for flext-ldif project
 
 # 4. Hooks now compare against new baseline
-#    No longer blocking known duplications
-```
-
+#    No longer blocking known duplications```
 ## Quality Gate
 
 The duplication detection is part of FLEXT quality gates:

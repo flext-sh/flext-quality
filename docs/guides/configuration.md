@@ -194,9 +194,7 @@ ldif:
 api:
   base_url: https://api.production.com
   timeout: 30
-  retry_attempts: 5
-```
-
+  retry_attempts: 5```
 ## Configuration Validation
 
 All configuration is validated using Pydantic v2 models:

@@ -271,9 +271,7 @@ make type-check
 make security
 
 # All quality checks
-make val
-```
-
+make val```
 ## Adding New Projects
 
 ### 1. Create Project Structure
@@ -284,9 +282,7 @@ cp -r flext-api flext-newlib
 cd flext-newlib
 
 # Update project metadata
-# Edit pyproject.toml, README.md, etc.
-```
-
+# Edit pyproject.toml, README.md, etc.```
 ### 2. Implement Core Patterns
 
 ```python
@@ -340,9 +336,7 @@ class FlextNewlibModels:
 mypy src/module.py --show-error-codes --show-traceback
 
 # Check specific error
-mypy src/ --show-error-codes | grep "error-code"
-```
-
+mypy src/ --show-error-codes | grep "error-code"```
 ### Test Failures
 
 ```bash
@@ -350,9 +344,7 @@ mypy src/ --show-error-codes | grep "error-code"
 pytest tests/unit/test_module.py -vv --tb=long
 
 # Debug mode
-pytest tests/unit/test_module.py --pdb
-```
-
+pytest tests/unit/test_module.py --pdb```
 ### Import Issues
 
 ```bash

@@ -222,9 +222,7 @@ Coverage thresholds and source directories are configured in each project's `pyp
 make test
 
 # HTML coverage report
-pytest --cov --cov-report=html
-```
-
+pytest --cov --cov-report=html```
 ### Parallel Test Execution
 
 ```bash
@@ -232,9 +230,7 @@ pytest --cov --cov-report=html
 pytest -n auto
 
 # Specific number of workers
-pytest -n 4
-```
-
+pytest -n 4```
 ## Test Fixtures
 
 ### Pytest Fixtures
@@ -426,9 +422,7 @@ tests/
 │   │   └── prod.yaml
 │   └── data/
 │       ├── users.json
-│       └── schema.json
-```
-
+│       └── schema.json```
 ### Loading Test Data
 
 ```python

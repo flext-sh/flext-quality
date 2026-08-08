@@ -151,9 +151,7 @@ Baseline tracking for dead code:
 │  - Refurb (modern patterns)                                  │
 │  - Complexipy (cognitive complexity)                         │
 │  - LibCST, Jedi                                              │
-└─────────────────────────────────────────────────────────────┘
-```
-
+└─────────────────────────────────────────────────────────────┘```
 ## Summary
 
 The integration follows a layered approach:

@@ -160,18 +160,14 @@ mypy src/module.py --show-error-codes --show-traceback```
 **Check specific error:**
 
 ```bash
-mypy src/ --show-error-codes | grep "error-code"
-```
-
+mypy src/ --show-error-codes | grep "error-code"```
 ### 3. Test Failures
 
 #### Problem: Tests failing
 
 ```text
 # Error
-AssertionError: Expected success but got failure
-```
-
+AssertionError: Expected success but got failure```
 #### Solutions
 
 **Run with verbose output:**
@@ -211,9 +207,7 @@ ValidationError: field required```
 **Check environment variables:**
 
 ```bash
-env | grep FLEXT_
-```
-
+env | grep FLEXT_```
 **Validate configuration:**
 
 ```python
@@ -672,7 +666,7 @@ def process_unsafe(data: dict) -> ProcessedData:
 
    ```python
 
-from **future** import annotations
+from __future__ import annotations
 from flext_core import p, r
 
 def process_data(data: dict) -> p.Result[dict]:
@@ -705,9 +699,7 @@ def process(items: t.SequenceOf[Item]) -> p.Result[Sequence[ProcessedItem]]:
 
 # ❌ BAD
 def process_untyped(items):
-    pass
-```
-
+    pass```
 1. **Test Thoroughly**
 
    ```python
@@ -727,9 +719,7 @@ def process_untyped(items):
 
        # Test failure case
        result = process_data(None)
-       assert result.failure
-```
-
+       assert result.failure```
 ## Resources
 
 - FLEXT Core Documentation

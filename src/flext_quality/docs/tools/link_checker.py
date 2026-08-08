@@ -283,9 +283,6 @@ class FlextQualityLinkChecker:
                 self.results.performance.slowest_response = max(
                     self.results.performance.slowest_response, response_time
                 )
-
-                return result
-
             except requests.exceptions.Timeout:
                 if attempt == self.settings.retry_attempts - 1:
                     return FlextQualityLinkChecker.LinkResult(
@@ -312,6 +309,8 @@ class FlextQualityLinkChecker:
                     valid=False,
                     context=context or {},
                 )
+            else:
+                return result
 
         return FlextQualityLinkChecker.LinkResult(
             url=url, error="max_retries_exceeded", valid=False, context={}

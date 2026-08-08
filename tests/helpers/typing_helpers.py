@@ -28,9 +28,6 @@ def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]
     Returns:
       TypeGuard confirming value is a dict
 
-    Raises:
-      AssertionError: If value is not a dict
-
     """
     tm.that(value, is_=dict)
     return True
@@ -44,9 +41,6 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
 
     Returns:
       TypeGuard confirming value is a list
-
-    Raises:
-      AssertionError: If value is not a list
 
     """
     tm.that(value, is_=list)
@@ -65,9 +59,6 @@ def assert_dict_structure(
     Returns:
       The validated dict
 
-    Raises:
-      AssertionError: If validation fails
-
     """
     for key in required_keys:
         tm.that(data, has=key)
@@ -83,9 +74,6 @@ def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMappi
     Returns:
       Validated results dict
 
-    Raises:
-      AssertionError: If structure is invalid
-
     """
     assert_is_dict(results)
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
@@ -100,9 +88,6 @@ def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
     Returns:
       Validated metrics dict
 
-    Raises:
-      AssertionError: If structure is invalid
-
     """
     assert_is_dict(metrics)
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
@@ -116,9 +101,6 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
 
     Returns:
       Validated issues dict
-
-    Raises:
-      AssertionError: If structure is invalid
 
     """
     assert_is_dict(issues)
