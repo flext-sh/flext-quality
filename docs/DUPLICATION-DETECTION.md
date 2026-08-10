@@ -56,7 +56,9 @@ result = plugin.check(files)
 
 if result.success:
     for dup in result.value.duplicates:
-        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")```
+        print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
+```
+
 **Key Features**:
 
 - **Line-based similarity**: Uses set intersection of source lines
@@ -84,7 +86,9 @@ if result.success:
 
 Prevents Edit/Write operations that increase code duplication.
 
-**Behavior**:```
+**Behavior**:
+
+```
 First Attempt (Edit Increases Duplication):
   ├─ Calculate duplicate pair count for project
   ├─ Compare against baseline
@@ -98,7 +102,9 @@ Second Attempt (Same Edit):
   ├─ Detect hash match from previous block
   ├─ Accept operation as intentional
   ├─ Update baseline to new count
-  └─ Allow operation (exit code 0)```
+  └─ Allow operation (exit code 0)
+```
+
 **Features**:
 
 - **Hash-based retry detection**: Content hash prevents accidental re-runs
@@ -107,7 +113,9 @@ Second Attempt (Same Edit):
 - **Project-scoped analysis**: Only checks files in the modified project
 - **Timeout handling**: Blocks expire after 10 minutes
 
-**Message on Block**:```
+**Message on Block**:
+
+```
 ═══════════════════════════════════════════════════════════════
 BLOCKED: CODE DUPLICATION INCREASED
 ═══════════════════════════════════════════════════════════════
@@ -219,7 +227,9 @@ result = analyzer.analyze_project(options=AnalysisOptions(include_duplicates=Tru
 # Duplication issues are included in results
 for issue in result.value.issues:
     if issue.rule_id == "duplication_check":
-        print(f"Duplicate code: {issue.message}")```
+        print(f"Duplicate code: {issue.message}")
+```
+
 **Architecture**:
 
 - Old code: `_DuplicationAnalyzer` inner class (508-591 lines)
@@ -243,7 +253,9 @@ for issue in result.value.issues:
 #    - Delete the duplicate copy
 #    - Edit now succeeds
 
-# 3. Duplication count stays at baseline```
+# 3. Duplication count stays at baseline
+```
+
 ### Example 2: Intentional Duplication with Retry
 
 **Scenario**: Two similar but intentionally separate implementations
@@ -260,7 +272,9 @@ for issue in result.value.issues:
 #    Hook detects hash match and accepts
 #    Baseline automatically updated: 2 → 3 duplicate pairs
 
-# 4. No further blocks for this increase```
+# 4. No further blocks for this increase
+```
+
 ### Example 3: Updating Baseline Manually
 
 **Scenario**: Multiple duplication increases that need baseline update
@@ -278,7 +292,9 @@ for issue in result.value.issues:
 # Baseline recalculated for flext-ldif project
 
 # 4. Hooks now compare against new baseline
-#    No longer blocking known duplications```
+#    No longer blocking known duplications
+```
+
 ## Quality Gate
 
 The duplication detection is part of FLEXT quality gates:
@@ -303,7 +319,9 @@ class Quality:
     class Analysis:
         SIMILARITY_THRESHOLD: float = 0.8  # 80% line overlap
         MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
-        MIN_FILES_FOR_PAIR_COMPARISON: int = 2  # Need ≥2 files```
+        MIN_FILES_FOR_PAIR_COMPARISON: int = 2  # Need ≥2 files
+```
+
 ## Hook Configuration
 
 **Pre-tool Event**: Edit/Write operations on Python files in FLEXT projects
