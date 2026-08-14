@@ -8,13 +8,10 @@ from __future__ import annotations
 
 import operator
 import sys
+from collections.abc import MutableSequence
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_quality import c, m, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import MutableSequence
 
 
 class FlextQualityStyleValidator:
@@ -222,7 +219,7 @@ class FlextQualityStyleValidator:
                 suggestions=[],
             )
         content = read.value
-        filename = (file_path.relative_to(file_path.parents[2]),)
+        filename = str(file_path.relative_to(file_path.parents[2]))
 
         violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
         issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
