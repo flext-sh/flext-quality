@@ -9,8 +9,9 @@ from __future__ import annotations
 import asyncio
 import pathlib
 import time
+from collections.abc import Mapping, MutableSequence
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -18,9 +19,6 @@ import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
 from flext_quality import c, m, p, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import Mapping, MutableSequence
 
 
 class FlextQualityLinkChecker:
@@ -283,9 +281,6 @@ class FlextQualityLinkChecker:
                 self.results.performance.slowest_response = max(
                     self.results.performance.slowest_response, response_time
                 )
-
-                return result
-
             except requests.exceptions.Timeout:
                 if attempt == self.settings.retry_attempts - 1:
                     return FlextQualityLinkChecker.LinkResult(
@@ -312,6 +307,8 @@ class FlextQualityLinkChecker:
                     valid=False,
                     context=context or {},
                 )
+            else:
+                return result
 
         return FlextQualityLinkChecker.LinkResult(
             url=url, error="max_retries_exceeded", valid=False, context={}

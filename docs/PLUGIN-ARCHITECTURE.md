@@ -101,7 +101,9 @@ class QualityPlugin(Protocol):
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
-        ...```
+        ...
+```
+
 ### 5. Baseline Management
 
 Baseline tracking for dead code:
@@ -110,7 +112,9 @@ Baseline tracking for dead code:
 - Generator: `~/flext/scripts/create-dead-code-baseline.sh`
 - Hook auto-updates on retry
 
-## Architecture Diagram```
+## Architecture Diagram
+
+```
 ┌─────────────────────────────────────────────────────────────┐
 │                     Claude Code Hooks                        │
 ├─────────────────────────────────────────────────────────────┤

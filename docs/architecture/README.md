@@ -51,35 +51,35 @@
     - [Documentation Framework](#documentation-framework)
     - [Quick Navigation](#quick-navigation)
   - [📊 System Context](#system-context)
-    - [External Systems & Integrations](#external-systems--integrations)
-    - [Key Stakeholders & User Personas](#key-stakeholders--user-personas)
+    - [External Systems & Integrations](#external-systems-integrations)
+    - [Key Stakeholders & User Personas](#key-stakeholders-user-personas)
   - [🏛️ Architecture Decisions](#architecture-decisions)
     - [Foundational Decisions](#foundational-decisions)
     - [Technology Decisions](#technology-decisions)
-  - [📋 Quality Attributes & Architectural Characteristics](#quality-attributes--architectural-characteristics)
+  - [📋 Quality Attributes & Architectural Characteristics](#quality-attributes-architectural-characteristics)
     - [Functional Requirements](#functional-requirements)
     - [Quality Attributes](#quality-attributes)
-    - [Constraints & Assumptions](#constraints--assumptions)
-  - [🔧 Development & Deployment](#-development--deployment)
+    - [Constraints & Assumptions](#constraints-assumptions)
+  - [🔧 Development & Deployment](#development-deployment)
     - [Development Environment](#development-environment)
-    - [Build & Deployment](#build--deployment)
+    - [Build & Deployment](#build-deployment)
     - [Quality Gates](#quality-gates)
-  - [📚 Documentation Structure](#-documentation-structure)
+  - [📚 Documentation Structure](#documentation-structure)
     - [Architecture Views](#architecture-views)
     - [Cross-Cutting Concerns](#cross-cutting-concerns)
     - [Operational Documentation](#operational-documentation)
-  - [🎨 Diagrams & Visualizations](#-diagrams--visualizations)
+  - [🎨 Diagrams & Visualizations](#diagrams-visualizations)
     - [Diagram Types](#diagram-types)
     - [Diagram Locations](#diagram-locations)
-  - [🔄 Evolution & Maintenance](#-evolution--maintenance)
+  - [🔄 Evolution & Maintenance](#evolution-maintenance)
     - [Architecture Evolution](#architecture-evolution)
     - [Documentation Maintenance](#documentation-maintenance)
-  - [🤝 Contributing to Architecture](#-contributing-to-architecture)
+  - [🤝 Contributing to Architecture](#contributing-to-architecture)
     - [Architecture Decision Process](#architecture-decision-process)
     - [Quality Standards](#quality-standards)
-  - [📖 Reading Guide](#-reading-guide)
+  - [📖 Reading Guide](#reading-guide)
     - [For New Team Members](#for-new-team-members)
-    - [For Architects & Technical Leads](#for-architects--technical-leads)
+    - [For Architects & Technical Leads](#for-architects-technical-leads)
     - [For Developers](#for-developers)
 
 **Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2026-04-14
@@ -107,20 +107,20 @@ enabling automated quality assessment, scoring, and reporting across enterprise 
 
 This architecture documentation follows a multi-framework approach:
 
-- **[C4 Model](c4-model/)**: System context, containers, components, and code-level views
-- **[Architecture Decision Records](adrs/)**: Documented architectural decisions and rationale
-- **[PlantUML Diagrams](diagrams/)**: Code-generated diagrams and visualizations
-- **[Arc42 Template](views/)**: Comprehensive architecture documentation template
+- **[C4 Model](c4-model/README.md)**: System context, containers, components, and code-level views
+- **Architecture Decision Records**: Documented architectural decisions and rationale
+- **PlantUML Diagrams**: Code-generated diagrams and visualizations
+- **Arc42 Template**: Comprehensive architecture documentation template
 
 ### Quick Navigation
 
 | View Type          | Purpose                         | Location              |
 | ------------------ | ------------------------------- | --------------------- |
-| **System Context** | External systems and users      | [C4 Model](c4-model/) |
-| **Container View** | High-level system components    | [C4 Model](c4-model/) |
-| **Component View** | Detailed component interactions | [C4 Model](c4-model/) |
-| **Code View**      | Implementation details          | [C4 Model](c4-model/) |
-| **ADRs**           | Architectural decisions         | [adrs/](adrs/)        |
+| **System Context** | External systems and users      | [C4 Model](c4-model/README.md) |
+| **Container View** | High-level system components    | [C4 Model](c4-model/README.md) |
+| **Component View** | Detailed component interactions | [C4 Model](c4-model/README.md) |
+| **Code View**      | Implementation details          | [C4 Model](c4-model/README.md) |
+| **ADRs**           | Architectural decisions         | adrs/        |
 
 ## 📊 System Context
 
@@ -292,10 +292,10 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Diagram Locations
 
-- **[C4 Diagrams](c4-model/)**: Complete C4 model implementation
-- **[Sequence Diagrams](diagrams/sequences/)**: Interaction flows and protocols
-- **[Deployment Diagrams](diagrams/deployment/)**: Infrastructure architecture
-- **[Data Flow Diagrams](diagrams/data-flow/)**: Data processing and storage
+- **[C4 Diagrams](c4-model/README.md)**: Complete C4 model implementation
+- **[Sequence Diagrams](diagrams/sequences/README.md)**: Interaction flows and protocols
+- **[Deployment Diagrams](diagrams/deployment/README.md)**: Infrastructure architecture
+- **[Data Flow Diagrams](diagrams/data-flow/README.md)**: Data processing and storage
 
 ## 🔄 Evolution & Maintenance
 
@@ -344,8 +344,8 @@ ______________________________________________________________________
 
 ### For Architects & Technical Leads
 
-1. Review [ADRs](adrs/) for decision history and rationale
-1. Examine [Cross-Cutting Concerns](views/) for quality attributes
+1. Review ADRs for decision history and rationale
+1. Examine Cross-Cutting Concerns for quality attributes
 1. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
 1. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
 
@@ -354,7 +354,7 @@ ______________________________________________________________________
 1. Understand **Component Architecture** for implementation guidance (_Documentation coming soon_)
 1. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
 1. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
-1. Reference [API Documentation](../api/) for interface specifications
+1. Reference [API Documentation](../api-reference/README.md) for interface specifications
 
 **FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
 and comprehensive ecosystem integration.

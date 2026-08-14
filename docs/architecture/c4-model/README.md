@@ -37,8 +37,8 @@
 
 ## Table of Contents
 
-- [C4 Model - FLEXT Quality Architecture](#c4-model---flext-quality-architecture)
-  - [🎯 C4 Model Overview](#-c4-model-overview)
+- [C4 Model - FLEXT Quality Architecture](#c4-model-flext-quality-architecture)
+  - [🎯 C4 Model Overview](#c4-model-overview)
     - [1. Context (Level 1)](#1-context-level-1)
     - [2. Containers (Level 2)](#2-containers-level-2)
     - [3. Components (Level 3)](#3-components-level-3)
@@ -51,18 +51,18 @@
   - [📊 Key Metrics](#key-metrics)
     - [System Characteristics](#system-characteristics)
     - [Quality Metrics](#quality-metrics)
-  - [🔗 Relationships & Dependencies](#relationships--dependencies)
+  - [🔗 Relationships & Dependencies](#relationships-dependencies)
     - [Internal Dependencies](#internal-dependencies)
     - [External Dependencies](#external-dependencies)
     - [Analysis Backends](#analysis-backends)
-  - [🚀 Evolution & Scaling](#evolution--scaling)
+  - [🚀 Evolution & Scaling](#evolution-scaling)
     - [Current Architecture Status](#current-architecture-status)
     - [Scaling Considerations](#scaling-considerations)
     - [Future Enhancements](#future-enhancements)
   - [📚 Navigation Guide](#navigation-guide)
     - [Understanding the Architecture](#understanding-the-architecture)
     - [For Different Audiences](#for-different-audiences)
-  - [🛠️ Tooling & Automation](#tooling--automation)
+  - [🛠️ Tooling & Automation](#tooling-automation)
     - [Diagram Generation](#diagram-generation)
     - [Documentation Automation](#documentation-automation)
     - [Maintenance Tools](#maintenance-tools)
@@ -109,7 +109,7 @@ The C4 model provides four hierarchical levels of architectural documentation:
 | **1** | [System Context](context.md)            | External systems and users      | [Context Diagram](diagrams/context.puml)      |
 | **2** | [Container Architecture](containers.md) | High-level system components    | [Container Diagram](diagrams/containers.puml) |
 | **3** | [Component Architecture](components.md) | Detailed component interactions | [Component Diagram](diagrams/components.puml) |
-| **4** | [Code Architecture](code.md)            | Implementation-level details    | [Code Diagrams](diagrams/code/)               |
+| **4** | [Code Architecture](code.md)            | Implementation-level details    | Code Diagrams               |
 
 ## 🏗️ Architecture Principles Applied
 
@@ -213,8 +213,8 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 **Architects & Tech Leads**:
 
 - Review all C4 levels for complete architectural understanding
-- Examine [ADRs](../adrs/) for decision rationale
-- Analyze cross-cutting concerns in [Views](../views/)
+- Examine ADRs for decision rationale
+- Analyze cross-cutting concerns in Views
 
 **Developers**:
 

@@ -20,6 +20,53 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:
+    """Build an empty audit metrics model."""
+    return FlextQualityModels.Quality.AuditMetrics()
+
+
+def _new_quality_thresholds_config() -> (
+    FlextQualityModels.Quality.QualityThresholdsConfig
+):
+    """Build a default quality thresholds configuration."""
+    return FlextQualityModels.Quality.QualityThresholdsConfig()
+
+
+def _new_content_checks_config() -> FlextQualityModels.Quality.ContentChecksConfig:
+    """Build a default content checks configuration."""
+    return FlextQualityModels.Quality.ContentChecksConfig()
+
+
+def _new_severity_levels_config() -> FlextQualityModels.Quality.SeverityLevelsConfig:
+    """Build a default severity levels configuration."""
+    return FlextQualityModels.Quality.SeverityLevelsConfig()
+
+
+def _new_markdown_style_config() -> FlextQualityModels.Quality.MarkdownStyleConfig:
+    """Build a default Markdown style configuration."""
+    return FlextQualityModels.Quality.MarkdownStyleConfig()
+
+
+def _new_accessibility_config() -> FlextQualityModels.Quality.AccessibilityConfig:
+    """Build a default accessibility configuration."""
+    return FlextQualityModels.Quality.AccessibilityConfig()
+
+
+def _new_formatting_config() -> FlextQualityModels.Quality.FormattingConfig:
+    """Build a default formatting configuration."""
+    return FlextQualityModels.Quality.FormattingConfig()
+
+
+def _new_link_validation_config() -> FlextQualityModels.Quality.LinkValidationConfig:
+    """Build a default link validation configuration."""
+    return FlextQualityModels.Quality.LinkValidationConfig()
+
+
+def _new_content_analysis_config() -> FlextQualityModels.Quality.ContentAnalysisConfig:
+    """Build a default content analysis configuration."""
+    return FlextQualityModels.Quality.ContentAnalysisConfig()
+
+
 class FlextQualityModels(_InfraModels, _WebModels):
     """Namespace for flext-quality models."""
 
@@ -282,7 +329,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
                 ]
             )
             metrics: FlextQualityModels.Quality.AuditMetrics = _InfraUtilities.Field(
-                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
+                default_factory=_new_audit_metrics
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
@@ -406,25 +453,13 @@ class FlextQualityModels(_InfraModels, _WebModels):
             """Configuration for audit rules and thresholds."""
 
             quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.QualityThresholdsConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_quality_thresholds_config)
             )
             content_checks: FlextQualityModels.Quality.ContentChecksConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.ContentChecksConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_content_checks_config)
             )
             severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.SeverityLevelsConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_severity_levels_config)
             )
 
         class MarkdownStyleConfig(_InfraModels.BaseModel):
@@ -468,25 +503,13 @@ class FlextQualityModels(_InfraModels, _WebModels):
             """Configuration for style guide rules."""
 
             markdown: FlextQualityModels.Quality.MarkdownStyleConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.MarkdownStyleConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_markdown_style_config)
             )
             accessibility: FlextQualityModels.Quality.AccessibilityConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.AccessibilityConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_accessibility_config)
             )
             formatting: FlextQualityModels.Quality.FormattingConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.FormattingConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_formatting_config)
             )
 
         class LinkValidationConfig(_InfraModels.BaseModel):
@@ -527,18 +550,10 @@ class FlextQualityModels(_InfraModels, _WebModels):
             """Configuration for validation settings."""
 
             link_validation: FlextQualityModels.Quality.LinkValidationConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.LinkValidationConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_link_validation_config)
             )
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
-                _InfraUtilities.Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.ContentAnalysisConfig()
-                    )
-                )
+                _InfraUtilities.Field(default_factory=_new_content_analysis_config)
             )
 
         class OptimizerResults(_InfraModels.BaseModel):

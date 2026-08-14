@@ -547,10 +547,11 @@ class FlextQualityScheduledMaintenance:
         try:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
             self.logger.info(message)
-            return True
         except c.EXC_OS_VALUE as e:
             self.results.errors.append(f"Echo command failed in {description}: {e!s}")
             return False
+        else:
+            return True
 
     def _run_with_timeout(
         self, func: Callable[[], None], timeout: int, description: str

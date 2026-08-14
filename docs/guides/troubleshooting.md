@@ -129,14 +129,18 @@ try:
 
     print(f"Success: {flext_core.__file__}")
 except ImportError as e:
-    print(f"Failed: {e}")```
+    print(f"Failed: {e}")
+```
+
 ### 2. Type Checking Errors
 
 #### Problem: MyPy errors
 
 ```text
 # Error
-error: Argument 1 to "process" has incompatible type "str"; expected "t.JsonMapping"```
+error: Argument 1 to "process" has incompatible type "str"; expected "t.JsonMapping"
+```
+
 #### Solutions
 
 **Fix type annotations:**
@@ -152,11 +156,15 @@ def process(data):
 
 # ✅ CORRECT
 def process(data: t.JsonMapping) -> p.Result[ProcessedData]:
-    return r.ok(ProcessedData(**data))```
+    return r.ok(ProcessedData(**data))
+```
+
 **Run MyPy with details:**
 
 ```bash
-mypy src/module.py --show-error-codes --show-traceback```
+mypy src/module.py --show-error-codes --show-traceback
+```
+
 **Check specific error:**
 
 ```bash
@@ -198,14 +206,18 @@ def test_with_debug():
     u.Cli.print(f"Success: {result.success}")
     if result.failure:
         u.Cli.print(f"Error: {result.failure()}")
-    assert result.success```
+    assert result.success
+```
+
 ### 4. Configuration Issues
 
 #### Problem: Configuration not loading
 
 ```text
 # Error
-ValidationError: field required```
+ValidationError: field required
+```
+
 #### Solutions
 
 **Check environment variables:**
@@ -225,7 +237,9 @@ try:
     settings = FlextSettings()
     u.Cli.info("Configuration valid")
 except c.ValidationError as e:
-    u.Cli.info(f"Configuration error: {e}")```
+    u.Cli.info(f"Configuration error: {e}")
+```
+
 **Debug configuration loading:**
 
 ```python
@@ -240,14 +254,18 @@ for key, value in os.environ.items():
 
 # Load and print configuration
 settings = FlextSettings()
-u.Cli.info(f"Config: {settings.model_dump()}")```
+u.Cli.info(f"Config: {settings.model_dump()}")
+```
+
 ### 5. LDIF Processing Issues
 
 #### Problem: LDIF parsing fails
 
 ```text
 # Error
-LdifParsingException: Invalid LDIF format```
+LdifParsingException: Invalid LDIF format
+```
+
 #### Solutions
 
 **Check LDIF content:**
@@ -262,7 +280,9 @@ objectClass: inetOrgPerson"""
 result = ldif.parse_string(content)
 if result.failure:
     print(f"Parse error: {result.error}")
-    print(f"Content: {content!r}")```
+    print(f"Content: {content!r}")
+```
+
 **Enable debug logging:**
 
 ```python
@@ -270,7 +290,9 @@ import logging
 
 logging.basicConfig(level=logging.DEBUG)
 
-# Your LDIF processing code```
+# Your LDIF processing code
+```
+
 **Validate LDIF format:**
 
 ```python
@@ -292,14 +314,18 @@ def validate_ldif_content(content: str) -> list[str]:
         if line and not line.startswith(("dn:", " ", "\t")) and ":" not in line:
             issues.append(f"Invalid line {i + 1}: {line}")
 
-    return issues```
+    return issues
+```
+
 ### 6. Migration Issues
 
 #### Problem: Migration fails
 
 ```text
 # Error
-LdifMigrationException: Server compatibility error```
+LdifMigrationException: Server compatibility error
+```
+
 #### Solutions
 
 **Check server configuration:**
@@ -315,7 +341,9 @@ settings = FlextLdifSettings(
     handle_schema_extensions=True,
 )
 
-u.Cli.info(f"Config: {settings.model_dump()}")```
+u.Cli.info(f"Config: {settings.model_dump()}")
+```
+
 **Enable server servers:**
 
 ```python
@@ -323,7 +351,9 @@ from flext_ldif import FlextLdifSettings
 
 settings = FlextLdifSettings(
     servers_enabled=True, source_server="oid", target_server="oud"
-)```
+)
+```
+
 **Test with sample data:**
 
 ```python
@@ -339,7 +369,9 @@ result = ldif.parse_string(sample_ldif)
 if result.success:
     u.Cli.info("Sample parsing successful")
 else:
-    u.Cli.info(f"Sample parsing failed: {result.error}")```
+    u.Cli.info(f"Sample parsing failed: {result.error}")
+```
+
 ### 7. Performance Issues
 
 #### Problem: Slow processing
@@ -348,7 +380,9 @@ else:
 # Symptoms
 # - High memory usage
 # - Slow response times
-# - Timeout errors```
+# - Timeout errors
+```
+
 #### Solutions
 
 **Profile memory usage:**
@@ -372,7 +406,9 @@ def profile_memory():
     u.Cli.info(f"Memory used: {memory_used / 1024 / 1024:.2f} MB")
 
 
-profile_memory()```
+profile_memory()
+```
+
 **Optimize batch size:**
 
 ```python
@@ -382,7 +418,9 @@ from flext_ldif import FlextLdifSettings
 settings = FlextLdifSettings(
     batch_size=100,  # Instead of default 1000
     parallel_processing=False,  # Disable for memory issues
-)```
+)
+```
+
 **Enable parallel processing:**
 
 ```python
@@ -391,7 +429,9 @@ from flext_ldif import FlextLdifSettings
 settings = FlextLdifSettings(
     parallel_processing=True,
     max_workers=4,  # Adjust based on CPU cores
-)```
+)
+```
+
 ## Debugging Techniques
 
 ### 1. Logging Configuration
@@ -409,7 +449,9 @@ logger = logging.getLogger(__name__)
 logger.debug("Debug message")
 logger.info("Info message")
 logger.warning("Warning message")
-logger.error("Error message")```
+logger.error("Error message")
+```
+
 ### 2. Exception Handling
 
 ```python
@@ -431,7 +473,9 @@ def safe_operation(data: dict) -> r[dict]:
         return r[dict].fail(f"Validation failed: {e}")
     except Exception as e:
         logger.error(f"Unexpected error: {e}", exc_info=True)
-        return r[dict].fail(f"Operation failed: {e}")```
+        return r[dict].fail(f"Operation failed: {e}")
+```
+
 ### 3. Debug Mode
 
 ```python
@@ -443,7 +487,9 @@ settings = FlextSettings(debug=True)
 
 # Debug information will be printed
 u.Cli.info(f"Debug mode: {settings.debug}")
-u.Cli.info(f"Log level: {settings.log_level}")```
+u.Cli.info(f"Log level: {settings.log_level}")
+```
+
 ### 4. Step-by-Step Debugging
 
 ```python
@@ -478,7 +524,9 @@ def debug_ldif_processing(content: str):
         entries = result.value.entries
         u.Cli.info(f"SUCCESS: Parsed {len(entries)} entries")
     else:
-        u.Cli.info(f"ERROR: Parse failed: {result.error}")```
+        u.Cli.info(f"ERROR: Parse failed: {result.error}")
+```
+
 ## Error Codes Reference
 
 ### FLEXT Core Errors
@@ -530,7 +578,9 @@ def monitor_memory():
         u.Cli.info("WARNING: High memory usage detected")
 
 
-monitor_memory()```
+monitor_memory()
+```
+
 ### CPU Issues
 
 ```python
@@ -553,7 +603,9 @@ def monitor_cpu():
         time.sleep(0.1)
 
 
-monitor_cpu()```
+monitor_cpu()
+```
+
 ## Getting Help
 
 ### Self-Service Resources
@@ -667,46 +719,50 @@ def process(data: dict) -> p.Result[ProcessedData]:
 
 # ❌ BAD
 def process_unsafe(data: dict) -> ProcessedData:
-    return ProcessedData(data)```
+    return ProcessedData(data)
+```
+
 1. **Validate Input Early**
 
    ```python
 
-from **future** import annotations
-from flext_core import p, r
+   from __future__ import annotations
+   from flext_core import p, r
 
-def process_data(data: dict) -> p.Result[dict]:
+   def process_data(data: dict) -> p.Result[dict]:
     if not data:
         return r[dict].fail("Data required")
 
     # Process data
     processed_data = {k: v for k, v in data.items()}
-    return r[dict].ok(processed_data)```
+    return r[dict].ok(processed_data)
+   ```
+
 1. **Use Type Hints**
 
    ```python
-from __future__ import annotations
-from collections.abc import Sequence
-from flext_quality import p, t
+   from __future__ import annotations
+   from collections.abc import Sequence
+   from flext_quality import p, t
 
 
-class Item:
+   class Item:
     pass
 
 
-class ProcessedItem:
+   class ProcessedItem:
     pass
 
 
-# ✅ GOOD
-def process(items: t.SequenceOf[Item]) -> p.Result[Sequence[ProcessedItem]]:
+   # ✅ GOOD
+   def process(items: t.SequenceOf[Item]) -> p.Result[Sequence[ProcessedItem]]:
     pass
 
 
-# ❌ BAD
-def process_untyped(items):
+   # ❌ BAD
+   def process_untyped(items):
     pass
-```
+   ```
 
 1. **Test Thoroughly**
 
@@ -728,7 +784,7 @@ def process_untyped(items):
        # Test failure case
        result = process_data(None)
        assert result.failure
-```
+   ```
 
 ## Resources
 

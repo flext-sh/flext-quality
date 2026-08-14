@@ -108,7 +108,9 @@ container = FlextContainer()
 container.bind("greeting", "ready")
 resolved = container.resolve("greeting", type_cls=str).unwrap()
 
-u.Cli.info(f"FLEXT application initialized: {resolved}")```
+u.Cli.info(f"FLEXT application initialized: {resolved}")
+```
+
 ### 2. Using flext-ldif for LDIF Processing
 
 ```python
@@ -127,7 +129,9 @@ if result.success:
     entries = result.unwrap().entries
     u.Cli.info(f"Successfully parsed {len(entries)} LDIF entries")
 else:
-    u.Cli.info(f"Failed to parse LDIF: {result.failure()}")```
+    u.Cli.info(f"Failed to parse LDIF: {result.failure()}")
+```
+
 ### 3. Railway-Oriented Error Handling
 
 ```python
@@ -165,7 +169,9 @@ result = process_ldif_data(ldif_content)
 if result.success:
     u.Cli.info(f"Success: {result.unwrap()}")
 else:
-    u.Cli.info(f"Error: {result.failure()}")```
+    u.Cli.info(f"Error: {result.failure()}")
+```
+
 ### 4. CQRS Pattern with Commands and Queries
 
 ```python
@@ -210,7 +216,9 @@ create_result = dispatcher.dispatch(
 get_result = dispatcher.dispatch(GetUserQuery(user_id="user123"))
 
 u.Cli.info(f"Created: {create_result.unwrap()}")
-u.Cli.info(f"Retrieved: {get_result.unwrap()}")```
+u.Cli.info(f"Retrieved: {get_result.unwrap()}")
+```
+
 ## Configuration
 
 ### Basic Configuration
@@ -221,7 +229,9 @@ FLEXT uses environment variables for configuration:
 # Set configuration
 export FLEXT_LOG_LEVEL=INFO
 export FLEXT_LDIF_DEFAULT_ENCODING=utf-8
-export FLEXT_LDIF_STRICT_VALIDATION=true```
+export FLEXT_LDIF_STRICT_VALIDATION=true
+```
+
 ### Programmatic Configuration
 
 ```python
@@ -232,7 +242,9 @@ from flext_ldif import FlextLdifSettings, ldif
 settings = FlextLdifSettings(default_encoding="utf-8", strict_validation=True)
 
 configured = ldif.with_settings(settings)
-assert configured.runtime_settings.Ldif.ldif_encoding == "utf-8"```
+assert configured.runtime_settings.Ldif.ldif_encoding == "utf-8"
+```
+
 ## Next Steps
 
 ### Explore the Ecosystem
