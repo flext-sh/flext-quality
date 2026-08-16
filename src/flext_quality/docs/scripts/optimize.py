@@ -28,15 +28,20 @@ _MAX_TOC_HEADING_LEVEL: Final[int] = 3
 class FlextQualityDocumentationOptimizer:
     """Documentation optimization and enhancement system."""
 
-    def __init__(self, *, backup: bool = True) -> None:
+    def __init__(
+        self, *, backup: bool = True, document_root: str | Path | None = None
+    ) -> None:
         """Initialize the documentation optimizer.
 
         Args:
             backup: Whether to create backups before making changes.
+            document_root: Root directory used for optimization report paths.
 
         """
         self.backup = backup
-        self.project_root = Path(__file__).parent.parent.parent.parent
+        self.project_root = (
+            Path(document_root).resolve() if document_root else u.Quality.project_root()
+        )
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat()
@@ -68,7 +73,7 @@ class FlextQualityDocumentationOptimizer:
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "type": "formatting_fixes",
                     "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
                 })
@@ -91,7 +96,7 @@ class FlextQualityDocumentationOptimizer:
         fixed_lines: MutableSequence[str] = []
         for i, line in enumerate(lines):
             if (
-                u.Quality.compile_pattern(r"^#{1,6}\\s").match(line)
+                u.Quality.compile_pattern(r"^#{1,6}\s").match(line)
                 and i > 0
                 and lines[i - 1].strip()
             ):
@@ -115,7 +120,7 @@ class FlextQualityDocumentationOptimizer:
             content = read.value
             original_content = content
             headings = u.Quality.compile_pattern(
-                r"^(#{1,6})\\s+(.+)$", multiline=True
+                r"^(#{1,6})\s+(.+)$", multiline=True
             ).findall(content)
             if len(headings) > c.Quality.THRESHOLD_MIN_HEADINGS_FOR_TOC:
                 content = self._add_or_update_toc(content)
@@ -126,7 +131,7 @@ class FlextQualityDocumentationOptimizer:
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "type": "toc_update",
                     "description": "Added or updated table of contents",
                 })
@@ -139,22 +144,24 @@ class FlextQualityDocumentationOptimizer:
         toc_end = -1
         for i, line in enumerate(lines):
             if u.Quality.compile_pattern(
-                r"^##+\\s+Table of Contents", ignorecase=True
+                r"^##+\s+Table of Contents", ignorecase=True
             ).match(line):
                 toc_start = i
-            elif toc_start != -1 and (
-                not line.strip() or u.Quality.compile_pattern(r"^#{1,6}\\s").match(line)
+            elif toc_start != -1 and u.Quality.compile_pattern(r"^#{1,6}\s").match(
+                line
             ):
                 toc_end = i
                 break
+        if toc_start != -1 and toc_end == -1:
+            toc_end = len(lines)
         return (toc_start, toc_end)
 
     def _extract_toc_headings(self, lines: t.StrSequence) -> MutableSequence[str]:
         """Extract headings for table of contents."""
         toc_lines: MutableSequence[str] = []
         for line in lines:
-            match = u.Quality.compile_pattern(r"^(#{1,6})\\s+(.+)$").match(line)
-            if match:
+            match = u.Quality.compile_pattern(r"^(#{1,6})\s+(.+)$").match(line)
+            if match and match.group(2).strip().casefold() != "table of contents":
                 level = len(match.group(1))
                 title = match.group(2)
                 anchor = self._heading_to_anchor(title)
@@ -171,12 +178,12 @@ class FlextQualityDocumentationOptimizer:
         """Find the best position to insert table of contents."""
         insert_pos = 0
         for i, line in enumerate(lines):
-            if u.Quality.compile_pattern(r"^##\\s").match(line):
+            if u.Quality.compile_pattern(r"^##\s").match(line):
                 return i
-            if u.Quality.compile_pattern(r"^#{1,6}\\s").match(line):
+            if u.Quality.compile_pattern(r"^#{1,6}\s").match(line):
                 continue
             if line.strip() and (
-                not u.Quality.compile_pattern(r"^#{1,6}\\s").match(line)
+                not u.Quality.compile_pattern(r"^#{1,6}\s").match(line)
             ):
                 insert_pos = i + 1
         return insert_pos
@@ -185,10 +192,17 @@ class FlextQualityDocumentationOptimizer:
         """Add or update table of contents."""
         lines = content.split("\n")
         toc_start, toc_end = self._find_existing_toc(lines)
-        toc_headings = self._extract_toc_headings(lines)
+        content_lines = (
+            [*lines[:toc_start], *lines[toc_end:]]
+            if toc_start != -1 and toc_end != -1
+            else lines
+        )
+        toc_headings = self._extract_toc_headings(content_lines)
         new_toc = self._generate_toc_content(toc_headings)
         if toc_start != -1 and toc_end != -1:
-            lines = lines[:toc_start] + list(new_toc) + lines[toc_end:]
+            lines = (
+                content_lines[:toc_start] + list(new_toc) + content_lines[toc_start:]
+            )
         else:
             insert_pos = self._find_toc_insertion_point(lines)
             lines = [*lines[:insert_pos], "", *list(new_toc), *lines[insert_pos:]]
@@ -197,8 +211,8 @@ class FlextQualityDocumentationOptimizer:
     def _heading_to_anchor(self, heading: str) -> str:
         """Convert heading to anchor link."""
         anchor = heading.lower()
-        anchor = u.Quality.compile_pattern(r"[^\\w\\s-]").sub("", anchor)
-        slug: str = u.Quality.compile_pattern(r"\\s+").sub("-", anchor)
+        anchor = u.Quality.compile_pattern(r"[^\w\s-]").sub("", anchor)
+        slug: str = u.Quality.compile_pattern(r"\s+").sub("-", anchor)
         return slug
 
     def enhance_accessibility(
@@ -227,7 +241,7 @@ class FlextQualityDocumentationOptimizer:
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "type": "accessibility_enhancement",
                     "description": "Added alt text and improved link descriptions",
                 })
@@ -241,8 +255,8 @@ class FlextQualityDocumentationOptimizer:
         for url in matches:
             filename = Path(url.split("/")[-1]).stem
             alt_text = filename.replace("-", " ").replace("_", " ").title()
-            old_pattern = f"![\\]\\({u.Quality.escape_pattern(url)}\\)"
-            new_pattern = f"![{alt_text}]\\({url}\\)"
+            old_pattern = rf"!\[\]\({u.Quality.escape_pattern(url)}\)"
+            new_pattern = f"![{alt_text}]({url})"
             content = u.Quality.compile_pattern(old_pattern).sub(new_pattern, content)
         return content
 
@@ -285,7 +299,7 @@ class FlextQualityDocumentationOptimizer:
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "type": "structure_optimization",
                     "description": "Improved paragraph breaks and section organization",
                 })
@@ -307,9 +321,9 @@ class FlextQualityDocumentationOptimizer:
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
-                u.Quality.compile_pattern(r"^##\\s").match(line)
+                u.Quality.compile_pattern(r"^##\s").match(line)
                 and i > 0
-                and (not u.Quality.compile_pattern(r"^#\\s").match(lines[i - 1]))
+                and (not u.Quality.compile_pattern(r"^#\s").match(lines[i - 1]))
                 and lines[i - 1].strip()
             ):
                 enhanced_lines.extend(("", "---", ""))
@@ -346,7 +360,7 @@ class FlextQualityDocumentationOptimizer:
                     continue
                 self.results.changes_made += 1
                 self.results.optimizations.append({
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "type": "metadata_update",
                     "description": "Updated frontmatter and added modification timestamp",
                 })
@@ -389,13 +403,18 @@ class FlextQualityDocumentationOptimizer:
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
-            self.results.backups_created.append(
-                str(backup_path.relative_to(self.project_root))
-            )
+            self.results.backups_created.append(self._display_path(backup_path))
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
             return r[bool].fail(write.error or f"cannot write {file_path}")
         return r[bool].ok(True)
+
+    def _display_path(self, file_path: Path) -> str:
+        resolved = file_path.resolve()
+        try:
+            return str(resolved.relative_to(self.project_root))
+        except ValueError:
+            return str(resolved)
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
@@ -407,7 +426,7 @@ class FlextQualityDocumentationOptimizer:
         return report_text
 
     def save_report(
-        self, output_path: str = "docs/maintenance/reports/"
+        self, output_path: str = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
     ) -> p.Result[str]:
         """Save optimization report."""
         output_dir = Path(output_path)
@@ -461,10 +480,17 @@ class FlextQualityDocumentationOptimizer:
         files: t.StrSequence = u.Field(
             (), description="Documentation files to optimize", validate_default=True
         )
+        document_root: str | None = u.Field(
+            None, description="Documentation discovery root", validate_default=True
+        )
 
         def discover_files(self) -> t.SequenceOf[Path]:
             """Discover documentation files to optimize."""
-            project_root = Path(__file__).parent.parent.parent.parent
+            project_root = (
+                Path(self.document_root).resolve()
+                if self.document_root
+                else u.Quality.project_root()
+            )
             if self.files:
                 return [project_root / f for f in self.files]
             doc_files: MutableSequence[Path] = []
@@ -483,7 +509,9 @@ class FlextQualityDocumentationOptimizer:
         @override
         def execute(self) -> p.Result[bool]:
             """Run the requested optimizations."""
-            optimizer = FlextQualityDocumentationOptimizer(backup=self.backup)
+            optimizer = FlextQualityDocumentationOptimizer(
+                backup=self.backup, document_root=self.document_root
+            )
             run_any = False
             doc_files = self.discover_files()
             if self.fix_formatting or self.comprehensive:

@@ -25,48 +25,6 @@ def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:
     return FlextQualityModels.Quality.AuditMetrics()
 
 
-def _new_quality_thresholds_config() -> (
-    FlextQualityModels.Quality.QualityThresholdsConfig
-):
-    """Build a default quality thresholds configuration."""
-    return FlextQualityModels.Quality.QualityThresholdsConfig()
-
-
-def _new_content_checks_config() -> FlextQualityModels.Quality.ContentChecksConfig:
-    """Build a default content checks configuration."""
-    return FlextQualityModels.Quality.ContentChecksConfig()
-
-
-def _new_severity_levels_config() -> FlextQualityModels.Quality.SeverityLevelsConfig:
-    """Build a default severity levels configuration."""
-    return FlextQualityModels.Quality.SeverityLevelsConfig()
-
-
-def _new_markdown_style_config() -> FlextQualityModels.Quality.MarkdownStyleConfig:
-    """Build a default Markdown style configuration."""
-    return FlextQualityModels.Quality.MarkdownStyleConfig()
-
-
-def _new_accessibility_config() -> FlextQualityModels.Quality.AccessibilityConfig:
-    """Build a default accessibility configuration."""
-    return FlextQualityModels.Quality.AccessibilityConfig()
-
-
-def _new_formatting_config() -> FlextQualityModels.Quality.FormattingConfig:
-    """Build a default formatting configuration."""
-    return FlextQualityModels.Quality.FormattingConfig()
-
-
-def _new_link_validation_config() -> FlextQualityModels.Quality.LinkValidationConfig:
-    """Build a default link validation configuration."""
-    return FlextQualityModels.Quality.LinkValidationConfig()
-
-
-def _new_content_analysis_config() -> FlextQualityModels.Quality.ContentAnalysisConfig:
-    """Build a default content analysis configuration."""
-    return FlextQualityModels.Quality.ContentAnalysisConfig()
-
-
 class FlextQualityModels(_InfraModels, _WebModels):
     """Namespace for flext-quality models."""
 
@@ -452,15 +410,9 @@ class FlextQualityModels(_InfraModels, _WebModels):
         class AuditRulesConfig(_InfraModels.BaseModel):
             """Configuration for audit rules and thresholds."""
 
-            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
-                _InfraUtilities.Field(default_factory=_new_quality_thresholds_config)
-            )
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig = (
-                _InfraUtilities.Field(default_factory=_new_content_checks_config)
-            )
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = (
-                _InfraUtilities.Field(default_factory=_new_severity_levels_config)
-            )
+            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig
 
         class MarkdownStyleConfig(_InfraModels.BaseModel):
             """Configuration for Markdown style preferences."""
@@ -475,14 +427,18 @@ class FlextQualityModels(_InfraModels, _WebModels):
             """Configuration for accessibility requirements."""
 
             require_alt_text: bool = True
-            descriptive_links: bool = True
-            heading_structure: bool = True
             descriptive_link_text: bool = True
-            proper_heading_hierarchy: bool = True
             min_alt_text_length: int = 5
             max_alt_text_length: int = 100
             check_color_contrast: bool = False
             minimum_contrast_ratio: float = 4.5
+
+        class HeadingsConfig(_InfraModels.BaseModel):
+            """Configuration for heading structure requirements."""
+
+            enforce_hierarchy: bool = True
+            max_heading_level: int = 4
+            first_heading_level: int = 1
 
         class FormattingConfig(_InfraModels.BaseModel):
             """Configuration for formatting standards."""
@@ -502,15 +458,10 @@ class FlextQualityModels(_InfraModels, _WebModels):
         class StyleGuideConfig(_InfraModels.BaseModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = (
-                _InfraUtilities.Field(default_factory=_new_markdown_style_config)
-            )
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig = (
-                _InfraUtilities.Field(default_factory=_new_accessibility_config)
-            )
-            formatting: FlextQualityModels.Quality.FormattingConfig = (
-                _InfraUtilities.Field(default_factory=_new_formatting_config)
-            )
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig
+            formatting: FlextQualityModels.Quality.FormattingConfig
+            headings: FlextQualityModels.Quality.HeadingsConfig
 
         class LinkValidationConfig(_InfraModels.BaseModel):
             """Configuration for link validation settings."""
@@ -549,12 +500,8 @@ class FlextQualityModels(_InfraModels, _WebModels):
         class ValidationConfig(_InfraModels.BaseModel):
             """Configuration for validation settings."""
 
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig = (
-                _InfraUtilities.Field(default_factory=_new_link_validation_config)
-            )
-            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
-                _InfraUtilities.Field(default_factory=_new_content_analysis_config)
-            )
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig
+            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig
 
         class OptimizerResults(_InfraModels.BaseModel):
             """Results of a documentation optimization run."""

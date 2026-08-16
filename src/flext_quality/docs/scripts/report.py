@@ -106,7 +106,9 @@ class FlextQualityDocumentationReporter:
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: t.SequenceOf[FlextQualityDocumentationReporter.Recommendation]
 
-    def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
+    def __init__(
+        self, reports_dir: str = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
+    ) -> None:
         """Initialize the documentation reporter with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.project_root = Path(__file__).parent.parent.parent.parent
@@ -702,7 +704,7 @@ class FlextQualityDocumentationReporter:
             ),
         ] = "html"
         output: str = u.Field(
-            "docs/maintenance/reports/",
+            c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
             description="Report output directory",
             validate_default=True,
         )

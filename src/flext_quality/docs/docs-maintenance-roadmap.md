@@ -31,21 +31,20 @@
 ## Guiding Principles
 
 - **Centralize capabilities** in `flext-quality`, exposing profile-based APIs so individual projects remain thin wrappers.
-- **Configuration over code**: project-specific behavior is driven entirely through metadata (`docs/maintenance/settings.*`,
-  schedules, notifications).
-- **Automation first**: every task produce machine-readable output (JSON) and human-friendly Markdown; HTML and dashboards extend the same data.
+- **Configuration over code**: packaged files under `src/flext_quality/docs/config/` own audit, style, validation, schedule, and notification behavior.
+- **Automation first**: every task produces machine-readable output and a human-readable report through the public modules.
 - **Iterative rollout**: ship in slices (pilot repos → full portfolio) with validation gates at every stage.
 
 ## Phase 1 – Foundation (Weeks 1-2)
 
 1. **Metadata Inventory**
-   - Scan all repositories for existing `docs/maintenance/` assets.
+   - Inventory documentation-tool assets consumed by each repository.
    - Normalize settings schemas (audit, style, validation, schedule).
    - Catalogue current artifacts (Markdown, HTML, JSON, dashboards) and consumers.
 1. **Shared API Enhancements**
    - Extend profile orchestrator to accept `output_formats=["markdown"]` with future-proof hooks for HTML.
    - Ensure helper functions (`run_comprehensive`, `run_audit`, etc.) return structured results.
-   - Document baseline expectations in `flext-quality/docs/README.md`.
+   - Document baseline expectations in `src/flext_quality/docs/README.md`.
 1. **Tooling Audit**
    - Evaluate candidate libraries (Typer/Rich, httpx/aiohttp, markdown-it, pandas/polars) and draft recommendations.
 
@@ -59,7 +58,7 @@
    - Implement rate limiting/backoff strategies configurable per profile.
 1. **Markdown Report Generator**
    - Create templated Markdown summaries (`jinja2` templates).
-   - Persist outputs in `docs/maintenance/reports/*.md` alongside JSON snapshots.
+   - Persist outputs under the configured reports directory.
 1. **Shared Scheduling Interface**
    - Convert schedule execution to a single `flext-quality` runner with pluggable backends (cron, systemd, GitHub Actions).
 
@@ -119,9 +118,8 @@ ______________________________________________________________________
 
   - Detected active maintenance directories in `flext-grpc`, `flext-ldap`, `flext-observability`, and `flext-quality`.
   - Collected configuration files for shared tooling:
-    - `flext-grpc/docs/maintenance/settings.json`
-    - `flext-ldap/docs/maintenance/settings.yaml`
-    - `flext-quality/docs/maintenance/settings/{audit_rules,style_guide,validation_config,schedule_config,notification_config}.yaml`
+- `flext-grpc` and `flext-ldap` consume their project-owned metadata.
+- `flext-quality/src/flext_quality/docs/config/{audit_rules,style_guide,validation_config,schedule_config,notification_config}.yaml`
   - No additional maintenance metadata discovered in other repositories within current depth scan.
   - Next: expand search depth, document artifacts (Markdown/HTML/JSON) per repo, and align schema comparisons.
 
@@ -151,12 +149,12 @@ ______________________________________________________________________
 - Next: draft normalization checklist (settings schema conversion, capability gaps,
   wrapper migration plan) and define acceptance tests per capability pillar.
 
-- **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/metadata-inventory.md`) summarizing directories,
+- **2025-10-16** – Published detailed metadata inventory (`metadata-inventory.md`) summarizing directories,
   settings formats, markdown deliverables,
   and automation scripts per repository. Established normalization checklist covering schema conversion,
   capability gap closure, report naming, and automation mapping.
 
-- **2025-10-16** – Completed initial tooling audit (`docs/maintenance/tooling-audit.md`) highlighting candidate libraries for CLI modernization (Typer,
+- **2025-10-16** – Completed initial tooling audit (`tooling-audit.md`) highlighting candidate libraries for CLI modernization (Typer,
   Rich), async validation (`httpx`), templated reporting (Jinja2), configuration validation (pydantic),
   and supporting utilities (pathspec, rapidfuzz).
 

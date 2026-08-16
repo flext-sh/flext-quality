@@ -32,25 +32,32 @@ _QUALITY_SCORE_HIGH_THRESHOLD: Final[int] = 75
 _QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
 _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
 _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
+_DOCS_CONFIG_DIR: Final[Path] = Path(__file__).resolve().parent.parent / "config"
 
 
 class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
-    def __init__(self, config_path: str = "docs/maintenance/settings/") -> None:
+    def __init__(
+        self,
+        config_path: str | Path = _DOCS_CONFIG_DIR,
+        *,
+        document_root: str | Path | None = None,
+    ) -> None:
         """Initialize documentation audit system.
 
         Args:
             config_path: Path to configuration directory for audit rules.
+            document_root: Root directory used for discovery and report paths.
 
         """
         self.config_path = Path(config_path)
-        self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: m.Quality.AuditRulesConfig = self.get_default_audit_rules()
-        self.style_guide: m.Quality.StyleGuideConfig = self.get_default_style_guide()
-        self.validation_config: m.Quality.ValidationConfig = (
-            self.get_default_validation_config()
+        self.project_root = (
+            Path(document_root).resolve() if document_root else u.Quality.project_root()
         )
+        self.audit_rules: m.Quality.AuditRulesConfig
+        self.style_guide: m.Quality.StyleGuideConfig
+        self.validation_config: m.Quality.ValidationConfig
         self.load_config()
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat()
@@ -58,80 +65,16 @@ class FlextQualityDocumentationAuditor:
 
     def load_config(self) -> None:
         """Load audit configuration files."""
-        try:
-            audit_data = u.Cli.yaml_load_mapping(self.config_path / "audit_rules.yaml")
-            if audit_data:
-                self.audit_rules = m.Quality.AuditRulesConfig.model_validate(audit_data)
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.audit_rules = self.get_default_audit_rules()
-
-        try:
-            style_data = u.Cli.yaml_load_mapping(self.config_path / "style_guide.yaml")
-            if style_data:
-                self.style_guide = m.Quality.StyleGuideConfig.model_validate(style_data)
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.style_guide = self.get_default_style_guide()
-
-        try:
-            validation_data = u.Cli.yaml_load_mapping(
-                self.config_path / "validation_config.yaml"
-            )
-            if validation_data:
-                self.validation_config = m.Quality.ValidationConfig.model_validate(
-                    validation_data
-                )
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.validation_config = self.get_default_validation_config()
-
-    def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
-        """Default audit rules if settings file not found."""
-        config: m.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
-            "quality_thresholds": {
-                "max_age_days": 90,
-                "min_word_count": 100,
-                "max_broken_links": 0,
-                "min_completeness_score": 0.8,
-            },
-            "content_checks": {
-                "check_freshness": True,
-                "check_completeness": True,
-                "check_consistency": True,
-                "check_links": True,
-            },
-            "severity_levels": {
-                "critical": ["broken_external_link", "missing_section"],
-                "high": ["outdated_content", "broken_internal_link"],
-                "medium": ["style_inconsistency", "missing_alt_text"],
-                "low": ["formatting_issue", "readability_warning"],
-            },
-        })
-        return config
-
-    def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
-        """Default style guide if settings file not found."""
-        config: m.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
-            "markdown": {
-                "heading_style": "atx",
-                "list_style": "dash",
-                "emphasis_style": "*",
-                "code_block_style": "fenced",
-            },
-            "accessibility": {
-                "require_alt_text": True,
-                "descriptive_links": True,
-                "heading_structure": True,
-            },
-            "formatting": {
-                "max_line_length": 88,
-                "consistent_indentation": True,
-                "trailing_spaces": False,
-            },
-        })
-        return config
-
-    def get_default_validation_config(self) -> m.Quality.ValidationConfig:
-        """Default validation settings if settings file not found."""
-        return m.Quality.ValidationConfig()
+        audit_data = u.Cli.yaml_load_mapping(self.config_path / "audit_rules.yaml")
+        self.audit_rules = m.Quality.AuditRulesConfig.model_validate(audit_data)
+        style_data = u.Cli.yaml_load_mapping(self.config_path / "style_guide.yaml")
+        self.style_guide = m.Quality.StyleGuideConfig.model_validate(style_data)
+        validation_data = u.Cli.yaml_load_mapping(
+            self.config_path / "validation_config.yaml"
+        )
+        self.validation_config = m.Quality.ValidationConfig.model_validate(
+            validation_data
+        )
 
     def find_documentation_files(self) -> t.SequenceOf[Path]:
         """Find all documentation files in the project."""
@@ -150,6 +93,13 @@ class FlextQualityDocumentationAuditor:
         doc_files = list(set(doc_files))
         doc_files = [f for f in doc_files if not self._is_ignored_file(f)]
         return sorted(doc_files)
+
+    def _display_path(self, file_path: Path) -> str:
+        resolved = file_path.resolve()
+        try:
+            return str(resolved.relative_to(self.project_root))
+        except ValueError:
+            return str(resolved)
 
     def _is_ignored_file(self, file_path: Path) -> bool:
         """Check if file should be ignored in audit."""
@@ -194,7 +144,7 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "file_access_error",
                     "severity": "medium",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "error": str(e),
                 })
                 continue
@@ -226,7 +176,7 @@ class FlextQualityDocumentationAuditor:
             return {
                 "type": "file_access_error",
                 "severity": "medium",
-                "file": str(file_path.relative_to(self.project_root)),
+                "file": self._display_path(file_path),
                 "error": read.error,
             }
         content = read.value
@@ -234,7 +184,7 @@ class FlextQualityDocumentationAuditor:
         return {
             "type": "outdated_content",
             "severity": "high" if age_days > _FRESHNESS_AGE_HIGH_DAYS else "medium",
-            "file": str(file_path.relative_to(self.project_root)),
+            "file": self._display_path(file_path),
             "age_days": age_days,
             "last_modified": mtime.isoformat(),
             "outdated_indicators": outdated_indicators,
@@ -275,7 +225,7 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "error": read.error,
                 })
                 continue
@@ -285,7 +235,7 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "insufficient_content",
                     "severity": "low",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "word_count": word_count,
                     "minimum_required": min_word_count,
                     "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
@@ -298,19 +248,19 @@ class FlextQualityDocumentationAuditor:
                     self.results.issues.append({
                         "type": "missing_sections",
                         "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
+                        "file": self._display_path(file_path),
                         "missing_sections": missing_sections,
                         "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
                     })
             if check_todos:
                 todos = u.Quality.compile_pattern(
-                    r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", ignorecase=True
+                    r"(?:TODO|FIXME|XXX):\s*(.+?)(?:\n|$)", ignorecase=True
                 ).findall(content)
                 if todos:
                     self.results.issues.append({
                         "type": "todo_markers",
                         "severity": "low",
-                        "file": str(file_path.relative_to(self.project_root)),
+                        "file": self._display_path(file_path),
                         "todo_count": len(todos),
                         "todos": todos[:5],
                         "recommendation": f"Address {len(todos)} TODO/FIXME items",
@@ -333,14 +283,13 @@ class FlextQualityDocumentationAuditor:
 
     def check_content_consistency(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check style consistency and formatting issues."""
-        accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
                 self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "error": read.error,
                 })
                 continue
@@ -350,7 +299,7 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "formatting_issues",
                     "severity": "low",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "issues": formatting_issues,
                     "recommendation": f"Fix {len(formatting_issues)} formatting issues",
                 })
@@ -366,17 +315,17 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "accessibility_issues",
                     "severity": severity,
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "issues": accessibility_issues,
                     "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
                 })
-            if accessibility_cfg.heading_structure:
+            if self.style_guide.headings.enforce_hierarchy:
                 heading_issues = self._check_heading_hierarchy(content)
                 if heading_issues:
                     self.results.issues.append({
                         "type": "heading_hierarchy",
                         "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
+                        "file": self._display_path(file_path),
                         "issues": heading_issues,
                         "recommendation": "Fix heading hierarchy structure",
                     })
@@ -386,7 +335,7 @@ class FlextQualityDocumentationAuditor:
         issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
         unordered_lists = u.Quality.compile_pattern(
-            r"^[\\s]*[-\\*\\+]", multiline=True
+            r"^[\s]*[-*+]", multiline=True
         ).findall(content)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
@@ -398,7 +347,7 @@ class FlextQualityDocumentationAuditor:
         ]
         if len(emphasis_usage) > 1:
             issues.append("mixed emphasis styles (* vs _)")
-        if formatting_cfg.trailing_spaces:
+        if not formatting_cfg.trailing_spaces:
             trailing_spaces = u.Quality.compile_pattern(
                 r"[ \\t]+$", multiline=True
             ).findall(content)
@@ -415,9 +364,9 @@ class FlextQualityDocumentationAuditor:
         issues: MutableSequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
-            images_without_alt = u.Quality.compile_pattern(
-                r"!\\[\\]\\([^)]+\\)"
-            ).findall(content)
+            images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
+                content
+            )
             if images_without_alt:
                 issues.extend([
                     {
@@ -426,9 +375,9 @@ class FlextQualityDocumentationAuditor:
                     }
                     for img in images_without_alt
                 ])
-        if accessibility_cfg.descriptive_links:
+        if accessibility_cfg.descriptive_link_text:
             generic_links = u.Quality.compile_pattern(
-                r"\\[here|click here|link|read more\\]\\([^)]+\\)", ignorecase=True
+                r"\[(?:here|click here|link|read more)\]\([^)]+\)", ignorecase=True
             ).findall(content)
             if generic_links:
                 issues.extend([
@@ -442,17 +391,25 @@ class FlextQualityDocumentationAuditor:
 
     def _check_heading_hierarchy(self, content: str) -> t.StrSequence:
         """Check heading hierarchy for logical structure."""
-        headings = u.Quality.compile_pattern(r"^(#+)\\s+(.+)$", multiline=True).findall(
+        headings = u.Quality.compile_pattern(r"^(#+)\s+(.+)$", multiline=True).findall(
             content
         )
         heading_levels = [len(level) for level, _ in headings]
+        heading_config = self.style_guide.headings
         issues = [
             f"Skipped heading level at line with H{heading_levels[i]}"
             for i in range(1, len(heading_levels))
             if heading_levels[i] > heading_levels[i - 1] + 1
         ]
-        if heading_levels and heading_levels[0] != 1:
-            issues.append("Document should start with H1")
+        issues.extend(
+            f"Heading H{level} exceeds maximum H{heading_config.max_heading_level}"
+            for level in heading_levels
+            if level > heading_config.max_heading_level
+        )
+        if heading_levels and heading_levels[0] != heading_config.first_heading_level:
+            issues.append(
+                f"Document should start with H{heading_config.first_heading_level}"
+            )
         return issues
 
     def check_links_and_references(self, doc_files: t.SequenceOf[Path]) -> None:
@@ -466,40 +423,42 @@ class FlextQualityDocumentationAuditor:
                 self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                     "error": read.error,
                 })
                 continue
             content = read.value
             external_links = u.Quality.compile_pattern(
-                r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)"
+                r"\[([^\]]+)\]\((https?://[^)]+)\)"
             ).findall(content)
             for text, url in external_links:
                 all_links.append({
                     "url": url,
                     "text": text,
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
+                    "source": str(file_path.resolve()),
                     "type": "external",
                 })
             internal_links = u.Quality.compile_pattern(
-                r"\\[([^\\]]+)\\]\\(([^)]+)\\)"
+                r"\[([^\]]+)\]\(([^)]+)\)"
             ).findall(content)
             for text, link in internal_links:
                 if not link.startswith(("http://", "https://", "#", "mailto:")):
                     all_links.append({
                         "url": link,
                         "text": text,
-                        "file": str(file_path.relative_to(self.project_root)),
+                        "file": self._display_path(file_path),
+                        "source": str(file_path.resolve()),
                         "type": "internal",
                     })
-            images = u.Quality.compile_pattern(
-                r"!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-            ).findall(content)
+            images = u.Quality.compile_pattern(r"!\[([^\]]*)\]\(([^)]+)\)").findall(
+                content
+            )
             for alt_text, src in images:
                 image_refs.append({
                     "src": src,
                     "alt": alt_text,
-                    "file": str(file_path.relative_to(self.project_root)),
+                    "file": self._display_path(file_path),
                 })
         if link_validation.check_external:
             self._validate_external_links(all_links)
@@ -546,16 +505,18 @@ class FlextQualityDocumentationAuditor:
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
-        doc_file_names = {str(f.relative_to(self.project_root)) for f in doc_files}
+        doc_file_names = {self._display_path(file_path) for file_path in doc_files}
         for link in internal_links:
             url_val = link["url"]
             target_file = (url_val.split("#")[0]) if isinstance(url_val, str) else ""
             if target_file and target_file not in doc_file_names:
-                file_val = link["file"]
-                link_file_dir = (
-                    Path(file_val).parent if isinstance(file_val, str) else Path()
+                source_val = link["source"]
+                source_path = (
+                    Path(source_val)
+                    if isinstance(source_val, str) and Path(source_val).is_absolute()
+                    else self.project_root / str(source_val)
                 )
-                potential_target = (link_file_dir / target_file).resolve()
+                potential_target = (source_path.parent / target_file).resolve()
                 if not potential_target.exists():
                     self.results.issues.append({
                         "type": "broken_internal_link",
@@ -769,7 +730,7 @@ class FlextQualityDocumentationAuditor:
     def save_report(
         self,
         output_format: str = "json",
-        output_path: str = "docs/maintenance/reports/",
+        output_path: str = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
     ) -> p.Result[str]:
         """Save audit report to file."""
         output_dir = Path(output_path)
@@ -832,12 +793,17 @@ class FlextQualityDocumentationAuditor:
                 description="Audit configuration directory",
                 validate_default=True,
             ),
-        ] = c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR
+        ] = str(_DOCS_CONFIG_DIR)
+        document_root: str | None = u.Field(
+            None, description="Documentation discovery root", validate_default=True
+        )
 
         @override
         def execute(self) -> p.Result[bool]:
             """Run audit checks per the parsed CLI arguments."""
-            auditor = FlextQualityDocumentationAuditor(self.config_dir)
+            auditor = FlextQualityDocumentationAuditor(
+                self.config_dir, document_root=self.document_root
+            )
             try:
                 results = self._execute_checks(auditor)
                 save_result = auditor.save_report(self.output_format, self.output)

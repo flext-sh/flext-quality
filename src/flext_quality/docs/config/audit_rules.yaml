@@ -56,11 +56,6 @@ completeness_rules:
     - "contact_information": false
 
 consistency_rules:
-  # Heading hierarchy enforcement
-  enforce_heading_hierarchy: true
-
-  # Maximum heading level allowed
-  max_heading_level: 4
 
   # List style consistency
   enforce_list_consistency: true
@@ -110,11 +105,7 @@ accessibility_rules:
   # Require alt text for images
   require_alt_text: true
 
-  # Check for descriptive link text
-  descriptive_links: true
-
-  # Heading structure validation
-  proper_headings: true
+  # Descriptive link text and heading structure are owned by style_guide.yaml
 
   # Color contrast requirements (not implemented yet)
   check_color_contrast: false

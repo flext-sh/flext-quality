@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import re
 import sys
-from typing import TYPE_CHECKING, ClassVar
+from pathlib import Path
+from typing import ClassVar
 
 from flext_cli import cli
 from flext_core.result import FlextResult as r
@@ -15,9 +16,6 @@ from flext_quality import (
     FlextQualityTypes as t,
 )
 from flext_web import FlextWebUtilities as web_u
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class FlextQualityUtilities(u, web_u):
@@ -34,6 +32,11 @@ class FlextQualityUtilities(u, web_u):
 
     class Quality:
         """Quality-specific utilities namespace."""
+
+        @staticmethod
+        def project_root() -> Path:
+            """Return the checkout root containing the package source tree."""
+            return Path(__file__).resolve().parents[2]
 
         @staticmethod
         def compile_pattern(

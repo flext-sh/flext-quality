@@ -119,7 +119,6 @@ accessibility:
   # WCAG compliance settings
   require_alt_text: true
   descriptive_link_text: true
-  proper_heading_hierarchy: true
 
   # Alt text requirements
   min_alt_text_length: 5

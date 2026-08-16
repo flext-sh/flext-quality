@@ -1,549 +1,90 @@
-"""FLEXT Quality Documentation Validation System.
-
-Specialized validation tools for links, references, and content integrity.
-Performs external link checking, internal reference validation,
-and comprehensive content verification.
-
-Usage:
-    python validate.py --external-links
-    python validate.py --internal-links --images
-    python validate.py --all --verbose
-"""
+"""FLEXT Quality documentation validation command."""
 
 from __future__ import annotations
 
-import concurrent.futures
-from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, override
 
-import requests
+import anyio
 
-from flext_api import FlextApiConstants
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
+from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
 
 if TYPE_CHECKING:
-    from collections.abc import MutableMapping, MutableSequence
+    from collections.abc import MutableSequence
 
-_MIN_LINK_TEXT_LENGTH: Final[int] = 3
 _MIN_WORD_COUNT: Final[int] = 50
 _MIN_READABILITY_SCORE: Final[int] = 60
+_VALIDATION_CONFIG = (
+    Path(__file__).resolve().parent.parent / "config" / "validation_config.yaml"
+)
+
+
+def _link_defaults() -> FlextQualityLinkChecker.LinkConfig:
+    return FlextQualityLinkChecker().settings
+
+
+def _max_workers_default() -> int:
+    loaded = u.Cli.yaml_load_mapping(_VALIDATION_CONFIG)
+    validation = t.json_mapping_adapter().validate_python(loaded["validation"])
+    return t.TypeAdapter(int).validate_python(validation["max_concurrent_requests"])
 
 
 class FlextQualityDocumentationValidator:
-    """Coordinator facade composing link + content validators with CLI surface."""
-
-    class LinkValidator:
-        """Advanced link validation and checking system."""
-
-        def __init__(
-            self, timeout: int = 10, retries: int = 3, max_workers: int = 5
-        ) -> None:
-            """Initialize the link validator with timeout and retry settings."""
-            super().__init__()
-            self.timeout = timeout
-            self.retries = retries
-            self.max_workers = max_workers
-            self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-            self.results: m.Quality.LinkValidatorResults = (
-                m.Quality.LinkValidatorResults(timestamp=u.now().isoformat())
-            )
-
-        def find_all_links(
-            self, doc_files: t.SequenceOf[Path]
-        ) -> t.SequenceOf[m.Quality.LinkRecord]:
-            """Extract all links from documentation files."""
-            all_links: MutableSequence[m.Quality.LinkRecord] = []
-            for file_path in doc_files:
-                file_rel_path = str(file_path)
-                read = u.Cli.files_read_text(file_path)
-                if read.failure:
-                    self.results.errors.append(
-                        m.Quality.LinkCheckResult(
-                            type="file_read_error", file=file_rel_path, error=read.error
-                        )
-                    )
-                    continue
-                content = read.value
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                link_pattern = "\\[([^\\]]+)\\]\\(([^)]+)\\)"
-                matches = u.Quality.compile_pattern(link_pattern).findall(content)
-                for text, url in matches:
-                    link_type = self._classify_link(url)
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=text,
-                            url=url,
-                            type=link_type,
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content, f"[{text}]({url})"
-                            ),
-                        )
-                    )
-                html_link_pattern = (
-                    "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
-                )
-                html_matches = u.Quality.compile_pattern(
-                    html_link_pattern, ignorecase=True
-                ).findall(content)
-                for url, text in html_matches:
-                    link_type = self._classify_link(url)
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=text.strip(),
-                            url=url,
-                            type=link_type,
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content, f'href="{url}"'
-                            ),
-                        )
-                    )
-                image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-                image_matches = u.Quality.compile_pattern(image_pattern).findall(
-                    content
-                )
-                for alt_text, src in image_matches:
-                    all_links.append(
-                        m.Quality.LinkRecord(
-                            text=alt_text,
-                            url=src,
-                            type="image",
-                            file=file_rel_path,
-                            line_number=self._find_line_number(
-                                content, f"![{alt_text}]({src})"
-                            ),
-                        )
-                    )
-            return all_links
-
-        def _classify_link(self, url: str) -> str:
-            """Classify link type based on URL pattern."""
-            # NOTE (multi-agent, mro-f8vk / kimi): match-with-guards was
-            # non-exhaustive by construction (reportMatchNotExhaustive); the
-            # if-chain keeps identical first-match semantics and an explicit
-            # default without a dummy `case _: pass`.
-            if url.startswith(("http://", "https://")):
-                return "external"
-            if url.startswith("mailto:"):
-                return "email"
-            if url.startswith("#"):
-                return "anchor"
-            if url.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp")):
-                return "image"
-            if url.startswith(("./", "../")) or url.endswith((".md", ".mdx")):
-                return "internal"
-            return "reference"
-
-        def _find_line_number(self, content: str, search_text: str) -> int | None:
-            """Find line number of specific text in content."""
-            lines = content.split("\n")
-            for i, line in enumerate(lines, 1):
-                if search_text in line:
-                    return i
-            return None
-
-        def validate_external_links(
-            self, links: t.SequenceOf[m.Quality.LinkRecord], *, verbose: bool = False
-        ) -> m.Quality.LinkValidatorResults:
-            """Validate external links with concurrent checking."""
-            external_links = [link for link in links if link.type == "external"]
-            if not external_links:
-                return self.results
-            with concurrent.futures.ThreadPoolExecutor(
-                max_workers=self.max_workers
-            ) as executor:
-                futures = [
-                    executor.submit(
-                        self._check_single_external_link, link, verbose=verbose
-                    )
-                    for link in external_links
-                ]
-                for future in concurrent.futures.as_completed(futures):
-                    result = future.result()
-                    self.results.links_checked += 1
-                    if result.valid:
-                        self.results.valid_links += 1
-                    else:
-                        self.results.broken_links += 1
-                        self.results.errors.append(result)
-            return self.results
-
-        def _make_http_request(
-            self,
-            url: str,
-            method: FlextApiConstants.Api.Method = FlextApiConstants.Api.Method.HEAD,
-        ) -> requests.Response:
-            """Make an HTTP request with appropriate headers."""
-            headers = {"User-Agent": self.user_agent}
-            if method == FlextApiConstants.Api.Method.HEAD:
-                headers["Accept"] = "*/*"
-            request_func = (
-                requests.head
-                if method == FlextApiConstants.Api.Method.HEAD
-                else requests.get
-            )
-            return request_func(
-                url, timeout=self.timeout, headers=headers, allow_redirects=True
-            )
-
-        def _should_retry_with_get(self, status_code: int) -> bool:
-            """Check if we should retry with GET for certain status codes."""
-            return status_code in {405, 406, 409, 410, 500, 502, 503}
-
-        def _handle_request_attempt(
-            self, link: m.Quality.LinkRecord, attempt: int
-        ) -> m.Quality.LinkCheckResult | None:
-            """Handle a single request attempt."""
-            result: m.Quality.LinkCheckResult | None = None
-            base_result = m.Quality.LinkCheckResult(
-                url=link.url, file=link.file, line=link.line_number
-            )
-            try:
-                result = self._handle_request_attempt_unchecked(link, base_result)
-            except requests.exceptions.Timeout:
-                if attempt == self.retries - 1:
-                    result = base_result.model_copy(
-                        update={
-                            "valid": False,
-                            "error": f"Timeout after {self.timeout}s",
-                        }
-                    )
-            except requests.exceptions.RequestException as e:
-                if attempt == self.retries - 1:
-                    result = base_result.model_copy(
-                        update={"valid": False, "error": str(e)}
-                    )
-            except c.EXC_OS_RUNTIME_VALUE as e:
-                result = base_result.model_copy(
-                    update={"valid": False, "error": f"Unexpected error: {e!s}"}
-                )
-            return result
-
-        def _handle_request_attempt_unchecked(
-            self, link: m.Quality.LinkRecord, base_result: m.Quality.LinkCheckResult
-        ) -> m.Quality.LinkCheckResult:
-            """Handle one request attempt while letting transport exceptions propagate."""
-            response = self._make_http_request(link.url)
-            if response.status_code < HTTPStatus.BAD_REQUEST:
-                success_result: m.Quality.LinkCheckResult = base_result.model_copy(
-                    update={"valid": True, "status_code": response.status_code}
-                )
-                return success_result
-            if self._should_retry_with_get(response.status_code):
-                response = self._make_http_request(
-                    link.url, FlextApiConstants.Api.Method.GET
-                )
-            if response.status_code < HTTPStatus.BAD_REQUEST:
-                retry_success_result: m.Quality.LinkCheckResult = (
-                    base_result.model_copy(
-                        update={"valid": True, "status_code": response.status_code}
-                    )
-                )
-                return retry_success_result
-            failure_result: m.Quality.LinkCheckResult = base_result.model_copy(
-                update={
-                    "valid": False,
-                    "status_code": response.status_code,
-                    "error": f"HTTP {response.status_code}",
-                }
-            )
-            return failure_result
-
-        def _check_single_external_link(
-            self, link: m.Quality.LinkRecord, *, verbose: bool = False
-        ) -> m.Quality.LinkCheckResult:
-            """Check a single external link."""
-            _ = verbose
-            for attempt in range(self.retries):
-                attempt_result = self._handle_request_attempt(link, attempt)
-                if attempt_result is not None:
-                    return attempt_result
-            max_retry_result: m.Quality.LinkCheckResult = (
-                m.Quality.LinkCheckResult.model_validate({
-                    "valid": False,
-                    "url": link.url,
-                    "file": link.file,
-                    "line": link.line_number,
-                    "error": "Max retries exceeded",
-                })
-            )
-            return max_retry_result
-
-        def validate_internal_links(
-            self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.LinkValidatorResults:
-            """Validate internal links and references."""
-            internal_links = [
-                link for link in links if link.type in {"internal", "reference"}
-            ]
-            doc_file_names = {str(f.relative_to(f.parents[2])) for f in doc_files}
-            for link in internal_links:
-                target = link.url.split("#", 1)[0]
-                if not target:
-                    continue
-                target_exists = target in doc_file_names
-                if not target_exists:
-                    link_file_dir = Path(link.file).parent
-                    relative_target = (
-                        link_file_dir / target[2:]
-                        if target.startswith("./")
-                        else link_file_dir.parent / target[3:]
-                        if target.startswith("../")
-                        else Path(target)
-                    )
-                    search_root = Path(link.file).parent.parent.parent
-                    potential_targets = (
-                        link_file_dir / target,
-                        Path(target),
-                        relative_target,
-                    )
-                    target_exists = any(
-                        (resolved_path := search_root / potential_target).exists()
-                        and resolved_path.suffix in {".md", ".mdx"}
-                        for potential_target in potential_targets
-                    )
-                if target_exists:
-                    self.results.valid_links += 1
-                else:
-                    self.results.errors.append(
-                        m.Quality.LinkCheckResult.model_validate({
-                            "type": "broken_internal_link",
-                            "url": link.url,
-                            "target": target,
-                            "file": link.file,
-                            "line": link.line_number,
-                            "error": "Target file not found",
-                        })
-                    )
-                    self.results.broken_links += 1
-                self.results.links_checked += 1
-            return self.results
-
-        def validate_images(
-            self, links: t.SequenceOf[m.Quality.LinkRecord], project_root: Path
-        ) -> m.Quality.LinkValidatorResults:
-            """Validate image references."""
-            images = [link for link in links if link.type == "image"]
-            for image in images:
-                src = image.url
-                if src.startswith(("http://", "https://")):
-                    self.results.valid_links += 1
-                    continue
-                image_path = Path(src)
-                if not image_path.is_absolute():
-                    file_dir = Path(image.file).parent
-                    full_path = (project_root / file_dir / image_path).resolve()
-                else:
-                    full_path = image_path
-                if full_path.exists():
-                    self.results.valid_links += 1
-                else:
-                    self.results.errors.append(
-                        m.Quality.LinkCheckResult(
-                            type="missing_image",
-                            src=src,
-                            file=image.file,
-                            line=image.line_number,
-                            error=f"Image file not found: {full_path}",
-                        )
-                    )
-                    self.results.broken_links += 1
-                self.results.links_checked += 1
-            return self.results
-
-        def validate_anchors(
-            self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.LinkValidatorResults:
-            """Validate anchor links within documents."""
-            anchor_links = [link for link in links if link.type == "anchor"]
-            file_anchors: MutableMapping[str, set[str]] = {}
-            for file_path in doc_files:
-                file_rel_path = str(file_path)
-                read = u.Cli.files_read_text(file_path)
-                if read.failure:
-                    self.results.warnings_list.append(
-                        m.Quality.LinkCheckResult(
-                            type="anchor_index_error",
-                            file=file_rel_path,
-                            warning=f"Could not build anchor index: {read.error}",
-                        )
-                    )
-                    continue
-                content = read.value
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                headings = u.Quality.compile_pattern(
-                    r"^#{1,6}\\s+(.+)$", multiline=True
-                ).findall(content)
-                anchors = [self._heading_to_anchor(heading) for heading in headings]
-                explicit_anchors = u.Quality.compile_pattern(
-                    r"<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>"
-                ).findall(content)
-                anchors.extend(explicit_anchors)
-                file_anchors[file_rel_path] = set(anchors)
-            for link in anchor_links:
-                anchor = link.url[1:]
-                link_file = link.file
-                if link_file in file_anchors and anchor in file_anchors[link_file]:
-                    self.results.valid_links += 1
-                else:
-                    self.results.errors.append(
-                        m.Quality.LinkCheckResult(
-                            type="broken_anchor",
-                            anchor=anchor,
-                            file=link_file,
-                            line=link.line_number,
-                            error=f"Anchor '{anchor}' not found in {link_file}",
-                        )
-                    )
-                    self.results.broken_links += 1
-                self.results.links_checked += 1
-            return self.results
-
-        def _heading_to_anchor(self, heading: str) -> str:
-            """Convert heading text to anchor format."""
-            anchor = heading.lower()
-            anchor = u.Quality.compile_pattern(r"[^\\w\\s-]").sub("", anchor)
-            slug: str = u.Quality.compile_pattern(r"\\s+").sub("-", anchor)
-            return slug
-
-        def check_link_text_quality(
-            self, links: t.SequenceOf[m.Quality.LinkRecord]
-        ) -> m.Quality.LinkValidatorResults:
-            """Check quality of link text for accessibility and usability."""
-            poor_link_texts = [
-                "here",
-                "click here",
-                "link",
-                "read more",
-                "this",
-                "that",
-                "page",
-                "article",
-                "post",
-                "click",
-                "tap",
-                "go",
-            ]
-            for link in links:
-                text = link.text.lower().strip()
-                if text in poor_link_texts or len(text) < _MIN_LINK_TEXT_LENGTH:
-                    self.results.warnings_list.append(
-                        m.Quality.LinkCheckResult(
-                            type="poor_link_text",
-                            text=link.text,
-                            url=link.url,
-                            file=link.file,
-                            line=link.line_number,
-                            warning="Link text is not descriptive enough for accessibility",
-                        )
-                    )
-                    self.results.warnings += 1
-            return self.results
-
-        def generate_report(self, report_format: str = "json") -> str:
-            """Generate validation report."""
-            report_text: str = (
-                self.results.model_dump_json(indent=2)
-                if report_format == "json"
-                else self.results.model_dump_json()
-            )
-            return report_text
-
-        def save_report(
-            self, output_path: str = "docs/maintenance/reports/"
-        ) -> p.Result[Path]:
-            """Save validation report."""
-            output_dir = Path(output_path)
-            timestamp = u.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"validation_report_{timestamp}.json"
-            filepath = output_dir / filename
-            report_content = self.generate_report("json")
-            report_write = u.Cli.atomic_write_text_file(filepath, report_content)
-            if report_write.failure:
-                return r[Path].fail(report_write.error or f"cannot write {filepath}")
-            latest_file = output_dir / "latest_validation.json"
-            latest_write = u.Cli.json_write(
-                latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
-            )
-            if latest_write.failure:
-                return r[Path].fail(latest_write.error or f"cannot write {latest_file}")
-            return r[Path].ok(filepath)
+    """Coordinate public link and content validators through one CLI surface."""
 
     class ContentValidator:
-        """Content validation and quality checking system."""
+        """Validate Markdown syntax and content quality."""
 
         def __init__(self) -> None:
-            """Initialize the content validator."""
-            super().__init__()
-            self.results: m.Quality.ContentValidatorResults = (
-                m.Quality.ContentValidatorResults(timestamp=u.now().isoformat())
+            """Initialize accumulated content-validation results."""
+            self.results = m.Quality.ContentValidatorResults(
+                timestamp=u.now().isoformat()
             )
 
         def validate_markdown_syntax(
             self, doc_files: t.SequenceOf[Path]
         ) -> m.Quality.ContentValidatorResults:
-            """Validate markdown syntax and formatting."""
+            """Validate Markdown syntax for the selected documents."""
             for file_path in doc_files:
-                file_rel_path = str(file_path)
                 read = u.Cli.files_read_text(file_path)
                 if read.failure:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="syntax_validation_error",
-                            file=file_rel_path,
+                            file=str(file_path),
                             error=read.error,
                         )
                     )
                     continue
-                content = read.value
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                issues = self._check_markdown_issues(content)
-                if issues:
-                    self.results.content_issues.extend([
-                        issue.model_copy(update={"file": file_rel_path})
-                        for issue in issues
-                    ])
+                issues = self._check_markdown_issues(read.value)
+                self.results.content_issues.extend(
+                    issue.model_copy(update={"file": str(file_path)})
+                    for issue in issues
+                )
                 self.results.files_checked += 1
             return self.results
 
         def _check_markdown_issues(
             self, content: str
         ) -> t.SequenceOf[m.Quality.ContentIssue]:
-            """Check for markdown syntax issues."""
             issues: MutableSequence[m.Quality.ContentIssue] = []
-            lines = content.split("\n")
-            for i, line in enumerate(lines, 1):
-                if "[" in line and "]" in line and ("(" in line) and (")" not in line):
+            for line_number, line in enumerate(content.splitlines(), 1):
+                if "[" in line and "]" in line and "(" in line and ")" not in line:
                     issues.append(
                         m.Quality.ContentIssue(
                             type="broken_link_syntax",
-                            line=i,
+                            line=line_number,
                             content=line.strip(),
                             error="Unclosed link syntax",
                         )
                     )
-                if "![" in line and "]" in line and ("(" in line) and (")" not in line):
-                    issues.append(
-                        m.Quality.ContentIssue(
-                            type="broken_image_syntax",
-                            line=i,
-                            content=line.strip(),
-                            error="Unclosed image syntax",
-                        )
-                    )
-                line.strip().startswith(("- ", "* ", "+ "))
                 if line.rstrip() != line:
                     issues.append(
                         m.Quality.ContentIssue(
                             type="trailing_spaces",
-                            line=i,
+                            line=line_number,
                             content=line,
                             error="Line has trailing spaces",
                         )
@@ -553,27 +94,24 @@ class FlextQualityDocumentationValidator:
         def check_content_quality(
             self, doc_files: t.SequenceOf[Path]
         ) -> m.Quality.ContentValidatorResults:
-            """Check content quality metrics."""
+            """Measure content quality for the selected documents."""
             for file_path in doc_files:
-                file_rel_path = str(file_path)
                 read = u.Cli.files_read_text(file_path)
                 if read.failure:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="quality_analysis_error",
-                            file=file_rel_path,
+                            file=str(file_path),
                             error=read.error,
                         )
                     )
                     continue
-                content = read.value
-                file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                metrics = self._calculate_content_metrics(content)
+                metrics = self._calculate_content_metrics(read.value)
                 if metrics.word_count < _MIN_WORD_COUNT:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="insufficient_content",
-                            file=file_rel_path,
+                            file=str(file_path),
                             word_count=metrics.word_count,
                             warning="Document appears to be too short",
                         )
@@ -582,7 +120,7 @@ class FlextQualityDocumentationValidator:
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="readability_issue",
-                            file=file_rel_path,
+                            file=str(file_path),
                             readability_score=metrics.readability_score,
                             warning="Content may be difficult to read",
                         )
@@ -591,31 +129,27 @@ class FlextQualityDocumentationValidator:
             return self.results
 
         def _calculate_content_metrics(self, content: str) -> m.Quality.ContentMetrics:
-            """Calculate basic content quality metrics."""
-            words = u.Quality.compile_pattern(r"\\b\\w+\\b").findall(content)
-            sentences = u.Quality.compile_pattern(r"[.!?]+").split(content)
-            sentences = [s.strip() for s in sentences if s.strip()]
-            avg_words_per_sentence: float = 0.0
-            if sentences:
-                avg_words_per_sentence = len(words) / len(sentences)
-                readability_score = max(
-                    0.0, min(100.0, 100.0 - (avg_words_per_sentence - 15) * 2)
-                )
-            else:
-                readability_score = 0.0
+            words = u.Quality.compile_pattern(r"\b\w+\b").findall(content)
+            sentences = [
+                sentence.strip()
+                for sentence in u.Quality.compile_pattern(r"[.!?]+").split(content)
+                if sentence.strip()
+            ]
+            average = len(words) / len(sentences) if sentences else 0.0
+            readability = max(0.0, min(100.0, 100.0 - (average - 15) * 2))
             return m.Quality.ContentMetrics(
                 word_count=len(words),
                 sentence_count=len(sentences),
-                avg_words_per_sentence=avg_words_per_sentence,
-                readability_score=readability_score,
+                avg_words_per_sentence=average,
+                readability_score=readability,
                 has_code_blocks="```" in content,
                 has_lists=bool(
-                    u.Quality.compile_pattern(
-                        r"^[\\s]*[-\\*\\+]", multiline=True
-                    ).search(content)
+                    u.Quality.compile_pattern(r"^[\s]*[-*+]", multiline=True).search(
+                        content
+                    )
                 ),
                 has_headers=bool(
-                    u.Quality.compile_pattern(r"^#{1,6}\\s", multiline=True).search(
+                    u.Quality.compile_pattern(r"^#{1,6}\s", multiline=True).search(
                         content
                     )
                 ),
@@ -623,32 +157,24 @@ class FlextQualityDocumentationValidator:
 
     @staticmethod
     def discover_validation_files() -> t.SequenceOf[Path]:
-        """Discover documentation files for validation."""
+        """Discover Markdown files under the package project root."""
         project_root = Path(__file__).parent.parent.parent.parent
-        doc_files: MutableSequence[Path] = []
-        for pattern in [
-            "**/*.md",
-            "**/*.mdx",
-            "**/README*",
-            "**/docs/**/*.md",
-            "**/docs/**/*.mdx",
-        ]:
-            doc_files.extend(project_root.glob(pattern))
-        seen: set[Path] = set()
-        unique: MutableSequence[Path] = []
-        for f in doc_files:
-            if f not in seen:
-                seen.add(f)
-                unique.append(f)
-        ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
-        return [
-            f
-            for f in unique
-            if not any(pattern in str(f) for pattern in ignored_patterns)
+        files = [
+            path
+            for pattern in ("**/*.md", "**/*.mdx", "**/README*")
+            for path in project_root.glob(pattern)
         ]
+        return sorted({
+            path
+            for path in files
+            if not any(
+                ignored in str(path)
+                for ignored in (".git", "__pycache__", "node_modules")
+            )
+        })
 
     class Run(s):
-        """CLI command for FLEXT Quality documentation validation."""
+        """CLI command for documentation validation."""
 
         external_links: bool = u.Field(
             False, description="Validate external links", validate_default=True
@@ -666,7 +192,7 @@ class FlextQualityDocumentationValidator:
             False, description="Check link text quality", validate_default=True
         )
         markdown_syntax: bool = u.Field(
-            False, description="Validate markdown syntax", validate_default=True
+            False, description="Validate Markdown syntax", validate_default=True
         )
         content_quality: bool = u.Field(
             False, description="Check content quality", validate_default=True
@@ -683,78 +209,64 @@ class FlextQualityDocumentationValidator:
             validate_default=True,
         )
         timeout: int = u.Field(
-            10, description="External request timeout", validate_default=True
+            default_factory=lambda: _link_defaults().external_timeout,
+            description="External request timeout",
         )
         retries: int = u.Field(
-            3, description="External request retries", validate_default=True
+            default_factory=lambda: _link_defaults().retry_attempts,
+            description="External request retries",
         )
         workers: int = u.Field(
-            5, description="Concurrent link workers", validate_default=True
+            default_factory=_max_workers_default, description="Concurrent link workers"
         )
-
-        def _execute_checks(
-            self,
-            link_validator: FlextQualityDocumentationValidator.LinkValidator,
-            content_validator: FlextQualityDocumentationValidator.ContentValidator,
-            all_links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
-        ) -> bool:
-            run_any = False
-            if self.external_links or self.all:
-                _ = link_validator.validate_external_links(
-                    all_links, verbose=self.verbose
-                )
-                run_any = True
-            if self.internal_links or self.all:
-                _ = link_validator.validate_internal_links(all_links, doc_files)
-                run_any = True
-            if self.images or self.all:
-                project_root = Path(__file__).parent.parent.parent.parent
-                _ = link_validator.validate_images(all_links, project_root)
-                run_any = True
-            if self.anchors or self.all:
-                _ = link_validator.validate_anchors(all_links, doc_files)
-                run_any = True
-            if self.link_text or self.all:
-                _ = link_validator.check_link_text_quality(all_links)
-                run_any = True
-            if self.markdown_syntax or self.all:
-                _ = content_validator.validate_markdown_syntax(doc_files)
-                run_any = True
-            if self.content_quality or self.all:
-                _ = content_validator.check_content_quality(doc_files)
-                run_any = True
-            return run_any
 
         @override
         def execute(self) -> p.Result[bool]:
-            """Run the requested validations."""
             doc_files = FlextQualityDocumentationValidator.discover_validation_files()
-            link_validator = FlextQualityDocumentationValidator.LinkValidator(
-                timeout=self.timeout, retries=self.retries, max_workers=self.workers
+            checker = FlextQualityLinkChecker()
+            checker.settings = checker.settings.model_copy(
+                update={
+                    "external_timeout": self.timeout,
+                    "retry_attempts": self.retries,
+                }
             )
+            links = checker.find_all_links(doc_files)
+            selected_links = [
+                link
+                for link in links
+                if self.all
+                or (self.external_links and link.type == "external")
+                or (self.internal_links and link.type == "internal")
+                or (self.images and link.type == "image")
+                or (self.anchors and link.type == "anchor")
+            ]
+            run_any = bool(selected_links) or self.link_text
+            if selected_links:
+                anyio.run(checker.validate_links, selected_links)
+            if self.link_text or self.all:
+                checker.check_link_text_quality(links)
+                run_any = True
             content_validator = FlextQualityDocumentationValidator.ContentValidator()
-            all_links = link_validator.find_all_links(doc_files)
-            if not self._execute_checks(
-                link_validator, content_validator, all_links, doc_files
-            ):
+            if self.markdown_syntax or self.all:
+                content_validator.validate_markdown_syntax(doc_files)
+                run_any = True
+            if self.content_quality or self.all:
+                content_validator.check_content_quality(doc_files)
+                run_any = True
+            if not run_any:
                 return r[bool].fail("No validation selected")
-            link_errors = link_validator.results.errors
-            content_issues = content_validator.results.content_issues
-            total_errors = len(link_errors) + len(content_issues)
-            save_result = link_validator.save_report(self.output)
-            if save_result.failure:
-                return r[bool].fail(
-                    save_result.error or "validation report write failed"
-                )
-            if total_errors > 0:
+            checker.save_report(self.output)
+            total_errors = checker.results.broken_links + len(
+                content_validator.results.content_issues
+            )
+            if total_errors:
                 return r[bool].fail(f"Validation found {total_errors} errors")
             return r[bool].ok(value=True)
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Run documentation validation via the canonical cli facade."""
-        exit_code: int = u.Quality.execute_result_command(
+        """Run documentation validation through the public CLI facade."""
+        return u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-validate",
             app_help="FLEXT Quality Documentation Validation",
@@ -765,7 +277,6 @@ class FlextQualityDocumentationValidator:
                 handler=lambda params: params.execute(),
             ),
         )
-        return exit_code
 
 
 if __name__ == "__main__":

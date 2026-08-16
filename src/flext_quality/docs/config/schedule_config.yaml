@@ -5,9 +5,9 @@
 
 # Global settings
 enabled: true
-reports_dir: "docs/maintenance/reports/"
-backup_dir: "docs/maintenance/backups/"
-logs_dir: "docs/maintenance/logs/"
+reports_dir: "reports/"
+backup_dir: "backups/"
+logs_dir: "logs/"
 
 # Maintenance schedules
 schedules:
@@ -54,80 +54,38 @@ schedules:
 tasks:
   audit_quick:
     description: "Quick daily audit for critical issues"
-    command: "python docs/maintenance/scripts/audit.py --check-freshness --check-completeness --output docs/maintenance/reports/"
+    command: "python -m flext_quality.docs.scripts.audit run --check-freshness --check-completeness --output reports/"
     timeout: 300
     critical: true
 
   audit_comprehensive:
     description: "Full comprehensive quality audit"
-    command: "python docs/maintenance/scripts/audit.py --comprehensive --output docs/maintenance/reports/"
+    command: "python -m flext_quality.docs.scripts.audit run --comprehensive --output reports/"
     timeout: 600
     critical: true
 
-  validate_links:
-    description: "Validate all links and references"
-    command: "python docs/maintenance/scripts/validate.py --external-links --internal-links --images --output docs/maintenance/reports/"
-    timeout: 300
-    critical: false
-
-  check_critical:
-    description: "Check for critical issues and send alerts"
-    command: "python docs/maintenance/notifications.py --audit-data docs/maintenance/reports/latest_audit.json"
-    timeout: 60
-    critical: false
-
   optimize_formatting:
     description: "Auto-fix formatting and style issues"
-    command: "python docs/maintenance/scripts/optimize.py --fix-formatting --backup --output docs/maintenance/reports/"
+    command: "python -m flext_quality.docs.scripts.optimize run --fix-formatting --backup --output reports/"
     timeout: 300
     critical: false
 
   optimize_full:
     description: "Full optimization suite with all enhancements"
-    command: "python docs/maintenance/scripts/optimize.py --comprehensive --backup --output docs/maintenance/reports/"
+    command: "python -m flext_quality.docs.scripts.optimize run --comprehensive --backup --output reports/"
     timeout: 600
     critical: false
 
   update_toc:
     description: "Update table of contents in documentation files"
-    command: "python docs/maintenance/scripts/optimize.py --update-toc --output docs/maintenance/reports/"
+    command: "python -m flext_quality.docs.scripts.optimize run --update-toc --output reports/"
     timeout: 180
-    critical: false
-
-  generate_report:
-    description: "Generate quality report in HTML format"
-    command: "python docs/maintenance/scripts/report.py --format html --output docs/maintenance/reports/"
-    timeout: 120
-    critical: false
-
-  generate_monthly_report:
-    description: "Generate comprehensive monthly quality trends report"
-    command: "python docs/maintenance/scripts/report.py --monthly-trends --format html --output docs/maintenance/reports/"
-    timeout: 180
-    critical: false
-
-  notify_weekly:
-    description: "Send weekly quality report notification"
-    command: "python docs/maintenance/notifications.py --weekly-report docs/maintenance/reports/latest_audit.json"
-    timeout: 60
-    critical: false
-
-  cleanup_old_reports:
-    description: "Clean up old report files older than 90 days"
-    command: 'find docs/maintenance/reports/ -name "*.json" -mtime +90 -delete 2>/dev/null || true'
-    timeout: 30
-    critical: false
-
-  backup_archive:
-    description: "Create monthly backup archive of reports"
-    command: "tar -czf docs/maintenance/backups/monthly_backup_$(date +%Y%m%d).tar.gz docs/maintenance/reports/"
-    timeout: 120
     critical: false
 
 # Error handling and recovery
 error_handling:
   max_retries: 3
-  retry_delay_seconds: 60
+  retry_delay: 60
   fail_fast: false # Continue with other tasks if one fails
   notify_on_failure: true
   notification_channels: ["console", "slack"]
@@ -135,7 +93,7 @@ error_handling:
 # Logging configuration
 logging:
   enabled: true
-  log_file: "docs/maintenance/logs/scheduled_maintenance.log"
+  log_file: "logs/scheduled_maintenance.log"
   max_log_size: "10MB"
   retention_days: 30
   log_level: "INFO"

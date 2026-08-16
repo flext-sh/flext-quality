@@ -6,7 +6,7 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 
 from __future__ import annotations
 
-import runpy
+import importlib
 import shlex
 import threading
 import time
@@ -34,7 +34,7 @@ class FlextQualityScheduledMaintenance:
     @classmethod
     def _docs_config_file(cls, filename: str) -> Path:
         """Return the absolute path for a docs settings file."""
-        return cls._docs_root() / "settings" / filename
+        return cls._docs_root() / "config" / filename
 
     @classmethod
     def _docs_reports_dir(cls) -> Path:
@@ -51,30 +51,6 @@ class FlextQualityScheduledMaintenance:
         """Return the logs directory for documentation tooling."""
         return cls._docs_root() / "logs"
 
-    @staticmethod
-    def _as_str(value: t.JsonValue | None, default: str) -> str:
-        """Normalize unknown settings values to string."""
-        return value if isinstance(value, str) else default
-
-    @staticmethod
-    def _as_bool(value: t.JsonValue | None, /, *, default: bool) -> bool:
-        """Normalize unknown settings values to bool."""
-        return value if isinstance(value, bool) else default
-
-    @staticmethod
-    def _as_int(value: t.JsonValue | None, default: int) -> int:
-        """Normalize unknown settings values to int."""
-        return value if isinstance(value, int) else default
-
-    @staticmethod
-    def _as_str_list(
-        value: t.JsonValue | None, default: t.StrSequence
-    ) -> t.StrSequence:
-        """Normalize unknown settings values to t.StrSequence."""
-        if isinstance(value, list):
-            return default
-        return default
-
     def __init__(self, config_path: str | None = None) -> None:
         """Initialize scheduled maintenance system.
 
@@ -82,11 +58,9 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        # Load (and keep) the merged maintenance config on the instance; the bare
-        # module-level `settings` refs below read from this attribute.
         self.settings: m.Quality.MaintenanceConfig = self.load_config(config_path)
-        self.project_root = Path(__file__).parent.parent.parent.parent
-        self.reports_dir = Path(self.settings.reports_dir)
+        self.project_root = u.Quality.project_root()
+        self.reports_dir = self._resolve_owned_path(self.settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
@@ -95,230 +69,19 @@ class FlextQualityScheduledMaintenance:
         )
 
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
-        """Load maintenance schedule configuration, returning the merged config."""
-        default_config = self.get_default_config()
+        """Load the complete maintenance schedule configuration."""
         resolved_config_path = (
             Path(config_path)
             if config_path is not None
             else self._docs_config_file("schedule_config.yaml")
         )
-        try:
-            loaded_untyped = u.Cli.yaml_load_mapping(resolved_config_path)
-            if u.mapping(loaded_untyped) and loaded_untyped:
-                return self._merge_config(default_config, loaded_untyped)
-        except FileNotFoundError:
-            pass
-        return default_config
-
-    def _merge_config(
-        self, base: m.Quality.MaintenanceConfig, overrides: t.JsonMapping
-    ) -> m.Quality.MaintenanceConfig:
-        """Merge external settings mapping into default typed self.settings."""
-        merged = base.model_dump()
-        merged["enabled"] = self._as_bool(
-            overrides.get("enabled"), default=base.enabled
-        )
-        merged["reports_dir"] = self._as_str(
-            overrides.get("reports_dir"), base.reports_dir
-        )
-        merged["backup_dir"] = self._as_str(
-            overrides.get("backup_dir"), base.backup_dir
+        return m.Quality.MaintenanceConfig.model_validate(
+            u.Cli.yaml_load_mapping(resolved_config_path)
         )
 
-        schedules_raw = overrides.get("schedules")
-        if u.mapping(schedules_raw):
-            schedules = {
-                key: value.model_dump() for key, value in base.schedules.items()
-            }
-            for key, value in schedules_raw.items():
-                if u.mapping(value) and key in schedules:
-                    current = schedules[key]
-                    updated = {
-                        "enabled": self._as_bool(
-                            value.get("enabled"), default=current["enabled"]
-                        ),
-                        "time": self._as_str(value.get("time"), current["time"]),
-                        "tasks": self._as_str_list(
-                            value.get("tasks"), current["tasks"]
-                        ),
-                        "day": self._as_str(value.get("day"), current.get("day") or "")
-                        or None,
-                    }
-                    schedules[key] = updated
-            merged["schedules"] = schedules
-
-        tasks_raw = overrides.get("tasks")
-        if u.mapping(tasks_raw):
-            tasks = {key: value.model_dump() for key, value in base.tasks.items()}
-            for key, value in tasks_raw.items():
-                if u.mapping(value) and key in tasks:
-                    current = tasks[key]
-                    tasks[key] = {
-                        "description": self._as_str(
-                            value.get("description"), current["description"]
-                        ),
-                        "command": self._as_str(
-                            value.get("command"), current["command"]
-                        ),
-                        "timeout": self._as_int(
-                            value.get("timeout"), current["timeout"]
-                        ),
-                    }
-            merged["tasks"] = tasks
-
-        error_handling_raw = overrides.get("error_handling")
-        if u.mapping(error_handling_raw):
-            err_cfg = base.error_handling
-            merged["error_handling"] = {
-                "max_retries": self._as_int(
-                    error_handling_raw.get("max_retries"), err_cfg.max_retries
-                ),
-                "retry_delay": self._as_int(
-                    error_handling_raw.get("retry_delay"), err_cfg.retry_delay
-                ),
-                "fail_fast": self._as_bool(
-                    error_handling_raw.get("fail_fast"), default=err_cfg.fail_fast
-                ),
-                "notify_on_failure": self._as_bool(
-                    error_handling_raw.get("notify_on_failure"),
-                    default=err_cfg.notify_on_failure,
-                ),
-            }
-
-        logging_raw = overrides.get("logging")
-        if u.mapping(logging_raw):
-            log_cfg = base.logging
-            merged["logging"] = {
-                "enabled": self._as_bool(
-                    logging_raw.get("enabled"), default=log_cfg.enabled
-                ),
-                "log_file": self._as_str(logging_raw.get("log_file"), log_cfg.log_file),
-                "max_log_size": self._as_str(
-                    logging_raw.get("max_log_size"), log_cfg.max_log_size
-                ),
-                "retention_days": self._as_int(
-                    logging_raw.get("retention_days"), log_cfg.retention_days
-                ),
-            }
-
-        config: m.Quality.MaintenanceConfig = (
-            m.Quality.MaintenanceConfig.model_validate(merged)
-        )
-        return config
-
-    def get_default_config(self) -> m.Quality.MaintenanceConfig:
-        """Default maintenance configuration."""
-        reports_dir = str(self._docs_reports_dir())
-        backup_dir = str(self._docs_backups_dir())
-        latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
-            "enabled": True,
-            "reports_dir": reports_dir,
-            "backup_dir": backup_dir,
-            "schedules": {
-                "daily_audit": {
-                    "enabled": True,
-                    "time": "09:00",
-                    "tasks": ["audit_quick", "validate_links", "check_critical"],
-                },
-                "daily_optimize": {
-                    "enabled": True,
-                    "time": "02:00",  # Early morning
-                    "tasks": ["optimize_formatting", "update_toc"],
-                },
-                "weekly_comprehensive": {
-                    "enabled": True,
-                    "day": "monday",
-                    "time": "10:00",
-                    "tasks": [
-                        "audit_comprehensive",
-                        "generate_report",
-                        "notify_weekly",
-                    ],
-                },
-                "monthly_deep_clean": {
-                    "enabled": True,
-                    "day": "1st",
-                    "time": "11:00",
-                    "tasks": [
-                        "audit_comprehensive",
-                        "optimize_full",
-                        "generate_monthly_report",
-                        "cleanup_old_reports",
-                    ],
-                },
-            },
-            "tasks": {
-                "audit_quick": {
-                    "description": "Quick daily audit for critical issues",
-                    "command": f"python -m flext_quality.docs.scripts.audit --check-freshness --check-completeness --output {reports_dir}",
-                    "timeout": 300,
-                },
-                "audit_comprehensive": {
-                    "description": "Full comprehensive audit",
-                    "command": f"python -m flext_quality.docs.scripts.audit --comprehensive --output {reports_dir}",
-                    "timeout": 600,
-                },
-                "validate_links": {
-                    "description": "Validate all links and references",
-                    "command": f"python -m flext_quality.docs.scripts.validate --external-links --internal-links --images --output {reports_dir}",
-                    "timeout": 300,
-                },
-                "check_critical": {
-                    "description": "Check for critical issues and send alerts",
-                    "command": f"python -m flext_quality.docs.notifications --audit-data {latest_audit_report}",
-                    "timeout": 60,
-                },
-                "optimize_formatting": {
-                    "description": "Auto-fix formatting issues",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --fix-formatting --backup --output {reports_dir}",
-                    "timeout": 300,
-                },
-                "optimize_full": {
-                    "description": "Full optimization suite",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --comprehensive --backup --output {reports_dir}",
-                    "timeout": 600,
-                },
-                "update_toc": {
-                    "description": "Update table of contents",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --update-toc --output {reports_dir}",
-                    "timeout": 180,
-                },
-                "generate_report": {
-                    "description": "Generate quality report",
-                    "command": f"python -m flext_quality.docs.scripts.report --format html --output {reports_dir}",
-                    "timeout": 120,
-                },
-                "generate_monthly_report": {
-                    "description": "Generate comprehensive monthly report",
-                    "command": f"python -m flext_quality.docs.scripts.report --monthly-trends --format html --output {reports_dir}",
-                    "timeout": 180,
-                },
-                "notify_weekly": {
-                    "description": "Send weekly notification",
-                    "command": f"python -m flext_quality.docs.notifications --weekly-report {latest_audit_report}",
-                    "timeout": 60,
-                },
-                "cleanup_old_reports": {
-                    "description": "Clean up old report files",
-                    "command": f'find {reports_dir} -name "*.json" -mtime +90 -delete',
-                    "timeout": 30,
-                },
-            },
-            "error_handling": {
-                "max_retries": 3,
-                "retry_delay": 60,
-                "fail_fast": False,
-                "notify_on_failure": True,
-            },
-            "logging": {
-                "enabled": True,
-                "log_file": str(self._docs_logs_dir() / "scheduled_maintenance.log"),
-                "max_log_size": "10MB",
-                "retention_days": 30,
-            },
-        })
-        return config
+    def _resolve_owned_path(self, configured_path: str) -> Path:
+        path = Path(configured_path)
+        return path if path.is_absolute() else self.project_root / path
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
         """Extract task name list from settings for a schedule key."""
@@ -441,8 +204,28 @@ class FlextQualityScheduledMaintenance:
             return self._handle_pytest_command(cmd_parts[1:], timeout, description)
         mod_name = module_name
 
+        module_args = list(cmd_parts[3:])
+        module = importlib.import_module(mod_name)
+        entrypoint = next(
+            (
+                candidate
+                for name in dir(module)
+                if name.startswith("FlextQuality")
+                and callable(candidate := getattr(getattr(module, name), "main", None))
+            ),
+            None,
+        )
+        if entrypoint is None:
+            self.results.warnings.append(
+                f"No public entrypoint exposed by {mod_name} in task: {description}"
+            )
+            return False
+
         def run_module() -> None:
-            runpy.run_module(mod_name, run_name="__main__", alter_sys=True)
+            exit_code = entrypoint(module_args)
+            if exit_code != 0:
+                message = f"{mod_name} exited with code {exit_code}"
+                raise RuntimeError(message)
 
         return self._run_with_timeout(run_module, timeout, description)
 
@@ -695,7 +478,7 @@ class FlextQualityScheduledMaintenance:
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(
-            Path(__file__).resolve().parent / "settings" / "schedule_config.yaml"
+            Path(__file__).resolve().parent / "config" / "schedule_config.yaml"
         )
 
         settings_path: Annotated[

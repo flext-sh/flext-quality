@@ -21,7 +21,9 @@ from flext_quality import c, m, p, r, s, t, u
 class FlextQualityDocumentationDashboard:
     """Documentation health monitoring dashboard."""
 
-    def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
+    def __init__(
+        self, reports_dir: str = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
+    ) -> None:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
@@ -597,7 +599,7 @@ class FlextQualityDocumentationDashboard:
             False, description="Enable dashboard debug mode", validate_default=True
         )
         reports_dir: str = u.Field(
-            "docs/maintenance/reports/",
+            c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
             description="Documentation reports directory",
             validate_default=True,
         )

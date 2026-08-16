@@ -148,10 +148,6 @@ accessibility_validation:
   # WCAG compliance checking
   enabled: true
 
-  # Heading hierarchy
-  check_heading_hierarchy: true
-  require_logical_headings: true
-
   # Link accessibility
   check_link_accessibility: true
   require_descriptive_links: true

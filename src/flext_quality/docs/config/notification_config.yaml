@@ -32,6 +32,7 @@ channels:
     channel: "#docs-quality"
     username: "FLEXT Quality Bot"
     icon_emoji: ":book:"
+    timeout: 10
 
   webhook:
     enabled: false # Set to true and add webhook URL below
@@ -143,4 +144,4 @@ debug:
   enabled: false
   log_level: "INFO"
   save_notification_history: true
-  history_file: "docs/maintenance/reports/notification_history.json"
+  history_file: "reports/notification_history.json"

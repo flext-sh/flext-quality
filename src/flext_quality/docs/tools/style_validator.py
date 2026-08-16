@@ -13,6 +13,10 @@ from pathlib import Path
 
 from flext_quality import c, m, t, u
 
+_STYLE_CONFIG_PATH = (
+    Path(__file__).resolve().parent.parent / "config" / "style_guide.yaml"
+)
+
 
 class FlextQualityStyleValidator:
     """Documentation style validation and consistency checking system."""
@@ -37,38 +41,44 @@ class FlextQualityStyleValidator:
     class MarkdownConfig(m.BaseModel):
         """Markdown formatting configuration."""
 
-        heading_style: str | None = None
-        list_style: str | None = None
-        emphasis_style: str | None = None
-        code_block_style: str | None = None
+        heading_style: str
+        list_style: str
+        emphasis_style: str
+        code_block_style: str
 
     class FormattingConfig(m.BaseModel):
         """Formatting configuration."""
 
-        max_line_length: int | None = None
-        trailing_spaces: bool | None = None
-        consistent_indentation: bool | None = None
+        max_line_length: int
+        trailing_spaces: bool
+        consistent_indentation: bool
 
     class AccessibilityConfig(m.BaseModel):
         """Accessibility configuration."""
 
-        require_alt_text: bool | None = None
-        descriptive_links: bool | None = None
-        heading_structure: bool | None = None
-        proper_headings: bool | None = None
+        require_alt_text: bool
+        descriptive_link_text: bool
 
     class HeadingsConfig(m.BaseModel):
         """Headings configuration."""
 
-        enforce_hierarchy: bool | None = None
+        enforce_hierarchy: bool
+        max_heading_level: int
+        first_heading_level: int
+
+    class CodeConfig(m.BaseModel):
+        """Code fence requirements loaded from the packaged style guide."""
+
+        require_language_specifier: bool
 
     class StyleConfig(m.BaseModel):
         """Complete style configuration."""
 
-        markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
-        formatting: FlextQualityStyleValidator.FormattingConfig | None = None
-        accessibility: FlextQualityStyleValidator.AccessibilityConfig | None = None
-        headings: FlextQualityStyleValidator.HeadingsConfig | None = None
+        markdown: FlextQualityStyleValidator.MarkdownConfig
+        formatting: FlextQualityStyleValidator.FormattingConfig
+        accessibility: FlextQualityStyleValidator.AccessibilityConfig
+        headings: FlextQualityStyleValidator.HeadingsConfig
+        code: FlextQualityStyleValidator.CodeConfig
 
     class SummaryMetrics(m.BaseModel):
         """Summary metrics for validation results."""
@@ -89,19 +99,14 @@ class FlextQualityStyleValidator:
         suggestions: MutableSequence[str]
         summary: FlextQualityStyleValidator.SummaryMetrics
 
-    def __init__(
-        self, config_path: str | None = "docs/maintenance/settings/style_guide.yaml"
-    ) -> None:
+    def __init__(self, config_path: str | None = str(_STYLE_CONFIG_PATH)) -> None:
         """Initialize style validator with configuration.
 
         Args:
             config_path: Path to style guide configuration file
 
         """
-        # Instance StyleConfig attribute restored (was dropped, leaving bare `settings` refs).
-        self.settings: FlextQualityStyleValidator.StyleConfig = (
-            FlextQualityStyleValidator.StyleConfig()
-        )
+        self.settings: FlextQualityStyleValidator.StyleConfig
         self.load_config(config_path)
         self.results: FlextQualityStyleValidator.ValidationResults = (
             FlextQualityStyleValidator.ValidationResults(
@@ -122,83 +127,17 @@ class FlextQualityStyleValidator:
 
     def load_config(self, config_path: str | None) -> None:
         """Load style guide configuration."""
-        if config_path is None:
-            self.settings = FlextQualityStyleValidator.StyleConfig(
-                markdown=FlextQualityStyleValidator.MarkdownConfig(
-                    heading_style="atx", list_style="dash", emphasis_style="*"
-                ),
-                accessibility=FlextQualityStyleValidator.AccessibilityConfig(
-                    require_alt_text=True,
-                    descriptive_links=True,
-                    heading_structure=True,
-                ),
-            )
-            return
-        try:
-            loaded_obj = u.Cli.yaml_load_mapping(Path(config_path))
-            if loaded_obj:
-                self.settings = self._normalize_config(loaded_obj)
-            else:
-                self._set_default_config()
-        except (FileNotFoundError, KeyError, OSError):
-            self._set_default_config()
+        resolved_path = Path(config_path) if config_path else _STYLE_CONFIG_PATH
+        loaded_obj = u.Cli.yaml_load_mapping(resolved_path)
+        self.settings = self._normalize_config(loaded_obj)
 
     def _normalize_config(
         self, raw: t.JsonMapping
     ) -> FlextQualityStyleValidator.StyleConfig:
-        markdown_raw = raw.get("markdown")
-        markdown = (
-            FlextQualityStyleValidator.MarkdownConfig.model_validate(markdown_raw)
-            if isinstance(markdown_raw, dict)
-            else None
+        settings: FlextQualityStyleValidator.StyleConfig = (
+            FlextQualityStyleValidator.StyleConfig.model_validate(raw)
         )
-
-        formatting_raw = raw.get("formatting")
-        formatting = (
-            FlextQualityStyleValidator.FormattingConfig.model_validate(formatting_raw)
-            if isinstance(formatting_raw, dict)
-            else None
-        )
-
-        accessibility_raw = raw.get("accessibility")
-        accessibility = (
-            FlextQualityStyleValidator.AccessibilityConfig.model_validate(
-                accessibility_raw
-            )
-            if isinstance(accessibility_raw, dict)
-            else None
-        )
-
-        headings_raw = raw.get("headings")
-        headings = (
-            FlextQualityStyleValidator.HeadingsConfig.model_validate(headings_raw)
-            if isinstance(headings_raw, dict)
-            else None
-        )
-
-        return FlextQualityStyleValidator.StyleConfig(
-            markdown=markdown,
-            formatting=formatting,
-            accessibility=accessibility,
-            headings=headings,
-        )
-
-    def _set_default_config(self) -> None:
-        """Set default configuration."""
-        self.settings = FlextQualityStyleValidator.StyleConfig(
-            markdown=FlextQualityStyleValidator.MarkdownConfig(
-                heading_style="atx",
-                list_style="dash",
-                emphasis_style="*",
-                code_block_style="fenced",
-            ),
-            formatting=FlextQualityStyleValidator.FormattingConfig(
-                max_line_length=88, trailing_spaces=False, consistent_indentation=True
-            ),
-            accessibility=FlextQualityStyleValidator.AccessibilityConfig(
-                require_alt_text=True, descriptive_links=True, proper_headings=True
-            ),
-        )
+        return settings
 
     def validate_file(self, file_path: Path) -> FlextQualityStyleValidator.FileResults:
         """Validate a single documentation file."""
@@ -219,7 +158,11 @@ class FlextQualityStyleValidator:
                 suggestions=[],
             )
         content = read.value
-        filename = str(file_path.relative_to(file_path.parents[2]))
+        resolved = file_path.resolve()
+        try:
+            filename = str(resolved.relative_to(u.Quality.project_root()))
+        except ValueError:
+            filename = str(resolved)
 
         violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
         issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -261,11 +204,7 @@ class FlextQualityStyleValidator:
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
-            emphasis_style = (
-                self.settings.markdown.emphasis_style
-                if self.settings.markdown
-                else None
-            )
+            emphasis_style = self.settings.markdown.emphasis_style
             if emphasis_style == "*" and u.Quality.compile_pattern(
                 r"(?<!\\)_[^_]+_(?!\\)"
             ).search(line):
@@ -311,12 +250,19 @@ class FlextQualityStyleValidator:
             ).finditer(content)
         ]
 
-        enforce_hierarchy = (
-            self.settings.headings.enforce_hierarchy if self.settings.headings else True
-        )
-        if enforce_hierarchy is not False:
-            expected_level = 1
+        if self.settings.headings.enforce_hierarchy:
+            expected_level = self.settings.headings.first_heading_level
             for level, text, line_num in headings:
+                if level > self.settings.headings.max_heading_level:
+                    violations.append(
+                        FlextQualityStyleValidator.StyleIssue(
+                            type="heading_level",
+                            line=line_num,
+                            content=f"{'#' * level} {text}",
+                            message=f"Heading exceeds H{self.settings.headings.max_heading_level}",
+                            severity="medium",
+                        )
+                    )
                 if level > expected_level + 1:
                     violations.append(
                         FlextQualityStyleValidator.StyleIssue(
@@ -329,13 +275,13 @@ class FlextQualityStyleValidator:
                     )
                 expected_level = level
 
-        if headings and headings[0][0] != 1:
+        if headings and headings[0][0] != self.settings.headings.first_heading_level:
             violations.append(
                 FlextQualityStyleValidator.StyleIssue(
                     type="first_heading_level",
                     line=headings[0][2],
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
-                    message="Document should start with H1 heading",
+                    message=f"Document should start with H{self.settings.headings.first_heading_level} heading",
                     severity="low",
                 )
             )
@@ -359,12 +305,8 @@ class FlextQualityStyleValidator:
             return violations
 
         markers = [item[1] for item in list_items]
-        preferred_marker = (
-            self.settings.markdown.list_style if self.settings.markdown else "dash"
-        )
-
         marker_map = {"dash": "-", "asterisk": "*", "plus": "+"}
-        preferred = marker_map.get(preferred_marker or "dash", "-")
+        preferred = marker_map[self.settings.markdown.list_style]
 
         inconsistent_markers = [m for m in markers if m != preferred]
         if inconsistent_markers:
@@ -386,28 +328,26 @@ class FlextQualityStyleValidator:
         """Check code block and inline code formatting."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        code_block_style = (
-            self.settings.markdown.code_block_style
-            if self.settings.markdown
-            else "fenced"
-        )
-        if code_block_style == "fenced":
-            code_blocks = u.Quality.compile_pattern(
-                r"```\n(.*?)\n```", dotall=True
-            ).findall(content)
-            violations.extend(
-                FlextQualityStyleValidator.StyleIssue(
-                    type="code_block_language",
-                    line=content[: content.find(block)].count("\n") + 1,
-                    content="```" + block[:50] + "...",
-                    message="Code blocks should specify language (```language)",
-                    severity="low",
-                )
-                for block in code_blocks
-                if not u.Quality.compile_pattern(r"```\w+").match(
-                    content[content.find(block) - 10 : content.find(block)]
-                )
-            )
+        if (
+            self.settings.markdown.code_block_style == "fenced"
+            and self.settings.code.require_language_specifier
+        ):
+            fence_open = False
+            for match in u.Quality.compile_pattern(
+                r"^```([^\n]*)$", multiline=True
+            ).finditer(content):
+                fence_info = match.group(1).strip()
+                if not fence_open and not fence_info:
+                    violations.append(
+                        FlextQualityStyleValidator.StyleIssue(
+                            type="code_block_language",
+                            line=content[: match.start()].count("\n") + 1,
+                            content="```",
+                            message="Code blocks should specify language (```language)",
+                            severity="low",
+                        )
+                    )
+                fence_open = not fence_open
 
         inline_code = u.Quality.compile_pattern(r"`[^`]+`").findall(content)
         if inline_code:
@@ -436,12 +376,7 @@ class FlextQualityStyleValidator:
         """Check accessibility compliance."""
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        require_alt_text = (
-            self.settings.accessibility.require_alt_text
-            if self.settings.accessibility
-            else True
-        )
-        if require_alt_text is not False:
+        if self.settings.accessibility.require_alt_text:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
                 content
             )
@@ -458,14 +393,9 @@ class FlextQualityStyleValidator:
                         )
                     )
 
-        descriptive_links = (
-            self.settings.accessibility.descriptive_links
-            if self.settings.accessibility
-            else True
-        )
-        if descriptive_links is not False:
+        if self.settings.accessibility.descriptive_link_text:
             generic_links = u.Quality.compile_pattern(
-                r"\[here|click here|link|read more\]\([^)]+\)", ignorecase=True
+                r"\[(?:here|click here|link|read more)\]\([^)]+\)", ignorecase=True
             ).findall(content)
             for link in generic_links:
                 line_num = content[: content.find(link)].count("\n") + 1
@@ -487,10 +417,7 @@ class FlextQualityStyleValidator:
         """Check line length compliance."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        max_length_val = (
-            self.settings.formatting.max_line_length if self.settings.formatting else 88
-        )
-        max_length = max_length_val or 88
+        max_length = self.settings.formatting.max_line_length
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
@@ -526,12 +453,7 @@ class FlextQualityStyleValidator:
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
-            trailing_spaces = (
-                self.settings.formatting.trailing_spaces
-                if self.settings.formatting
-                else False
-            )
-            if trailing_spaces is False and line.rstrip() != line:
+            if not self.settings.formatting.trailing_spaces and line.rstrip() != line:
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
                         type="trailing_whitespace",
@@ -578,9 +500,7 @@ class FlextQualityStyleValidator:
             suggestions.append("Fix heading hierarchy to avoid skipping levels")
 
         if violation_types.get("list_marker_consistency", 0) > 0:
-            preferred = (
-                self.settings.markdown.list_style if self.settings.markdown else "dash"
-            )
+            preferred = self.settings.markdown.list_style
             suggestions.append(f"Use consistent list markers ({preferred}) throughout")
 
         if violation_types.get("missing_alt_text", 0) > 0:
@@ -695,24 +615,19 @@ Top Issues:
         return validator.validate_files_batch(paths)
 
     @staticmethod
-    def main() -> int:
+    def main(args: t.StrSequence | None = None) -> int:
         """Run the CLI entrypoint without exporting temporary module names."""
-        if len(sys.argv) < c.Quality.STYLE_VALIDATOR_MIN_COMMAND_LINE_ARGS:
+        command_args = list(args) if args is not None else sys.argv[1:]
+        if len(command_args) < 1:
             return 1
 
-        file_path = sys.argv[1]
-        config_path = (
-            sys.argv[c.Quality.STYLE_VALIDATOR_CONFIG_ARG_INDEX]
-            if len(sys.argv) > c.Quality.STYLE_VALIDATOR_CONFIG_ARG_INDEX
-            else None
-        )
+        file_path = command_args[0]
+        config_path = command_args[1] if len(command_args) > 1 else None
 
         results = FlextQualityStyleValidator.validate_file_style(file_path, config_path)
 
-        for _violation in results.violations[:3]:
-            pass
-        return 0
+        return 1 if results.violations or results.issues else 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(FlextQualityStyleValidator.main())
+    raise SystemExit(FlextQualityStyleValidator.main(sys.argv[1:]))
