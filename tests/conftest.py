@@ -12,13 +12,10 @@ from typing import TYPE_CHECKING
 import pytest
 
 from flext_quality import FlextQualitySettings
-from flext_tests import reset_settings as _shared_reset_settings
 from tests import u
 
 if TYPE_CHECKING:
     from collections.abc import Generator
-
-reset_settings = _shared_reset_settings
 
 
 @pytest.fixture
