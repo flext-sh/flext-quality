@@ -6,18 +6,11 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
-from flext_quality import (
-    FlextQualityHookManager,
-    FlextQualityRulesLoader,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_quality import c, m, p, r, t, u
 from flext_quality._settings import FlextQualitySettings
 from flext_quality.base import FlextQualityServiceBase
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.rules import FlextQualityRulesLoader
 
 
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
@@ -48,7 +41,8 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
             r[t.JsonMapping]: Hook execution result or error
 
         """
-        return self._hooks.execute(event, input_data)
+        result: p.Result[t.JsonMapping] = self._hooks.execute(event, input_data)
+        return result
 
     def format_hook_output(
         self,
@@ -95,7 +89,10 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
             r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
-        return self._rules_loader.load(path)
+        result: p.Result[Sequence[m.Quality.RuleDefinition]] = self._rules_loader.load(
+            path
+        )
+        return result
 
     def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
@@ -113,7 +110,10 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
             return r[Sequence[m.Quality.RuleDefinition]].ok([])
-        return self._rules_loader.load_multiple(yaml_files)
+        result: p.Result[Sequence[m.Quality.RuleDefinition]] = (
+            self._rules_loader.load_multiple(yaml_files)
+        )
+        return result
 
     def process_stdin_hook(self) -> p.Result[t.JsonMapping]:
         """Process hook input from stdin (for Claude Code hooks).

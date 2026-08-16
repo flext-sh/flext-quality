@@ -5,7 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
+from flext_quality import c, m, p, r, t, u
+from flext_quality.rules.loader import FlextQualityRulesLoader
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence

@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 from flext_quality import (
-    FlextQualityClaudeContextClient,
-    FlextQualityClaudeMemClient,
-    FlextQualityHookManager,
-    FlextQualityRulesEngine,
     c,
     t,
     u,
 )
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.integrations import (
+    FlextQualityClaudeContextClient,
+    FlextQualityClaudeMemClient,
+)
 from flext_quality.mcp.server import FlextQualityMcpServer
+from flext_quality.rules import FlextQualityRulesEngine
 
 _mcp = FlextQualityMcpServer.get_server()
 

@@ -11,7 +11,8 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_quality import FlextQualityMcpClient, c, m, p, t
+from flext_quality import c, m, p, t
+from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 
 @final
@@ -32,9 +33,10 @@ class FlextQualityClaudeMemClient:
         """Build a get_observations tool call."""
         normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_MEM_SERVER_NAME, "get_observations", params
         )
+        return result
 
     def build_search_call(
         self, query: str, *, limit: int | None = None
@@ -43,9 +45,10 @@ class FlextQualityClaudeMemClient:
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         # Why: mro-4p0t — bind JsonMapping for build_tool_call params.
         params: t.MutableJsonMapping = {"query": query, "limit": search_limit}
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_MEM_SERVER_NAME, "search", params
         )
+        return result
 
     def build_timeline_call(
         self,
@@ -58,9 +61,10 @@ class FlextQualityClaudeMemClient:
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
         params = {"anchor": anchor, "depth_before": before, "depth_after": after}
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_MEM_SERVER_NAME, "timeline", params
         )
+        return result
 
     def get_observations_command(
         self, ids: t.SequenceOf[int]
@@ -95,4 +99,7 @@ class FlextQualityClaudeMemClient:
 
     def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-mem is available."""
-        return self._mcp.build_server_health_result(c.Quality.CLAUDE_MEM_SERVER_NAME)
+        result: p.Result[t.JsonMapping] = self._mcp.build_server_health_result(
+            c.Quality.CLAUDE_MEM_SERVER_NAME
+        )
+        return result

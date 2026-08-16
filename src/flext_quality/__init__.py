@@ -67,27 +67,24 @@ __all__: tuple[str, ...] = (
     "x",
 )
 
-install_lazy_exports(
-    __name__,
-    globals(),
-    MappingProxyType(
-        build_lazy_import_map(
-            MappingProxyType({
-                "._config": ("FlextQualityConfig", "config"),
-                "._settings": ("FlextQualitySettings", "settings"),
-                ".api": ("FlextQuality", "quality"),
-                ".base": ("FlextQualityServiceBase", "s"),
-                ".cli": ("FlextQualityCli", "main"),
-                ".constants": ("FlextQualityConstants", "c"),
-                ".models": ("FlextQualityModels", "m"),
-                ".protocols": ("FlextQualityProtocols", "p"),
-                ".typings": ("FlextQualityTypes", "t"),
-                ".utilities": ("FlextQualityUtilities", "u"),
-                "flext_infra": ("d", "e", "h", "r", "x"),
-            }),
-            alias_groups=MappingProxyType({}),
-            sort_keys=False,
-        )
-    ),
-    public_exports=__all__,
+_LAZY_IMPORTS = MappingProxyType(
+    build_lazy_import_map(
+        MappingProxyType({
+            "._config": ("FlextQualityConfig", "config"),
+            "._settings": ("FlextQualitySettings", "settings"),
+            ".api": ("FlextQuality", "quality"),
+            ".base": ("FlextQualityServiceBase", "s"),
+            ".cli": ("FlextQualityCli", "main"),
+            ".constants": ("FlextQualityConstants", "c"),
+            ".models": ("FlextQualityModels", "m"),
+            ".protocols": ("FlextQualityProtocols", "p"),
+            ".typings": ("FlextQualityTypes", "t"),
+            ".utilities": ("FlextQualityUtilities", "u"),
+            "flext_infra": ("d", "e", "h", "r", "x"),
+        }),
+        alias_groups=MappingProxyType({}),
+        sort_keys=False,
+    )
 )
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

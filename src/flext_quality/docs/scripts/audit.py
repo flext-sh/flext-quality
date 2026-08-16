@@ -749,7 +749,7 @@ class FlextQualityDocumentationAuditor:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(

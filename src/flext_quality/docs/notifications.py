@@ -465,7 +465,7 @@ Found {len(broken_links)} broken links that need attention:
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation notifications."""
 
         settings_path: Annotated[

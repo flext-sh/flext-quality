@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING, override
 
 from flext_quality import c, p, r, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
-    from pathlib import Path
 
 
 class FlextQualityValidators:
@@ -35,7 +35,7 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: Path | None = None
+            self, content: str, file_path: str | Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
@@ -85,14 +85,14 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: Path | None = None
+            self, content: str, file_path: str | Path | None = None
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
                 return r[t.SequenceOf[t.JsonMapping]].ok(violations)
-            file_tier = self._get_file_tier(file_path)
+            file_tier = self._get_file_tier(Path(file_path))
             if file_tier is None:
                 return r[t.SequenceOf[t.JsonMapping]].ok(violations)
             lines = content.splitlines()

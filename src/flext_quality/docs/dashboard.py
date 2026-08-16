@@ -586,7 +586,7 @@ class FlextQualityDocumentationDashboard:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(

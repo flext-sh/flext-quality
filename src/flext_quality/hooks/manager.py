@@ -5,7 +5,8 @@ from __future__ import annotations
 from collections.abc import MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING, final
 
-from flext_quality import FlextQualityBaseHook, c, p, r, t, u
+from flext_quality import c, p, r, t, u
+from flext_quality.hooks.base import FlextQualityBaseHook
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -32,7 +33,7 @@ class FlextQualityHookManager:
         for hook in hooks:
             if not hook.should_run(input_data):
                 continue
-            result = hook.execute(input_data)
+            result: p.Result[t.JsonMapping] = hook.execute(input_data)
             if result.failure:
                 return result
             output = result.value

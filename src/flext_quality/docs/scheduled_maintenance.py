@@ -474,7 +474,7 @@ class FlextQualityScheduledMaintenance:
             results_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         ).unwrap()
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(

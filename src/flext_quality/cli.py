@@ -11,18 +11,19 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, ClassVar, Self, override
 
 from flext_cli import cli
-from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
+from flext_quality import m, p, quality, r, s, t, u
+from flext_quality.integrations import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence, Sequence
 
 
-class FlextQualityCli(s):
+class FlextQualityCli(s[bool]):
     """FLEXT Quality analysis toolkit."""
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s):
+    class Status(s[t.JsonMapping]):
         """Display quality service status."""
 
         @override
@@ -30,7 +31,7 @@ class FlextQualityCli(s):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s):
+    class Check(s[t.SequenceOf[t.StrSequence]]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[

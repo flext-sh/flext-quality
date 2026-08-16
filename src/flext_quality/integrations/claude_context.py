@@ -11,7 +11,8 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_quality import FlextQualityMcpClient, c, m, p, t
+from flext_quality import c, m, p, t
+from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 
 @final
@@ -33,26 +34,29 @@ class FlextQualityClaudeContextClient:
         params: t.MutableJsonMapping = {}
         if path:
             params["path"] = path
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME, "index_codebase", params
         )
+        return result
 
     def build_search_call(
         self, query: str, *, limit: int | None = None
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
             "search_code",
             {"query": query, "limit": search_limit},
         )
+        return result
 
     def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_indexing_status tool call."""
-        return self._mcp.build_tool_call(
+        result: p.Result[m.Quality.McpToolCall] = self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME, "get_indexing_status", {}
         )
+        return result
 
     def get_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing."""
@@ -69,6 +73,7 @@ class FlextQualityClaudeContextClient:
 
     def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-context is available."""
-        return self._mcp.build_server_health_result(
+        result: p.Result[t.JsonMapping] = self._mcp.build_server_health_result(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME
         )
+        return result

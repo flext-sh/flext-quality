@@ -5,15 +5,17 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_quality import (
-    FlextQualityClaudeContextClient,
-    FlextQualityClaudeMemClient,
-    FlextQualityHookManager,
-    FlextQualityRulesEngine,
     c,
     t,
     u,
 )
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.integrations import (
+    FlextQualityClaudeContextClient,
+    FlextQualityClaudeMemClient,
+)
 from flext_quality.mcp.server import FlextQualityMcpServer
+from flext_quality.rules import FlextQualityRulesEngine
 
 _mcp = FlextQualityMcpServer.get_server()
 
@@ -77,7 +79,8 @@ class FlextQualityMcpTools:
             error_msg = result.error if result.error is not None else "Unknown error"
             output: t.JsonMapping = {"error": error_msg}
             return output
-        return result.value
+        hook_output: t.JsonMapping = result.value
+        return hook_output
 
     @_mcp.tool()
     @staticmethod

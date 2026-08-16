@@ -173,7 +173,7 @@ class FlextQualityDocumentationValidator:
             )
         })
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for documentation validation."""
 
         external_links: bool = u.Field(
