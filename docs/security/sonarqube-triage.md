@@ -46,7 +46,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       172          return self._audit_rules
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 2 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/core/config_manager.py:177` · **Effort**: 8min
@@ -65,7 +65,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       181          return self._style_guide
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 3 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/core/config_manager.py:186` · **Effort**: 8min
@@ -84,7 +84,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       190          return self._validation_config
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 4 · 🟠 CRITICAL · VULNERABILITY · `python:S4502`
 **Local**: `src/flext_quality/docs/dashboard.py:27` · **Effort**: 5min
@@ -103,7 +103,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        31      @property
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 5 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/dashboard.py:53` · **Effort**: 6min
@@ -122,7 +122,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        57  
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 6 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/notifications.py:93` · **Effort**: 47min
@@ -141,7 +141,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        97          if isinstance(channels, dict):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 7 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/notifications.py:442` · **Effort**: 9min
@@ -160,7 +160,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       446              t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 8 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/notifications.py:582` · **Effort**: 19min
@@ -179,7 +179,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       586                  notifier.send_notification(
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 9 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/audit.py:267` · **Effort**: 6min
@@ -198,7 +198,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       271          check_todos = self.validation_config.content_analysis.check_todos
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 10 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/scripts/optimize.py:94` · **Effort**: 8min
@@ -217,7 +217,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        98                  fixed_lines.append("")
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 11 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/scripts/optimize.py:252` · **Effort**: 6min
@@ -236,7 +236,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       256          }
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 12 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/optimize.py:318` · **Effort**: 6min
@@ -255,7 +255,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       322          for file_path in doc_files:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 13 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/report.py:173` · **Effort**: 24min
@@ -274,7 +274,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       177          overall_score = 0
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 14 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/report.py:236` · **Effort**: 43min
@@ -293,7 +293,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       240          recommendations: MutableSequence[
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 15 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/report.py:557` · **Effort**: 22min
@@ -312,7 +312,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       561          ],
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 16 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
 **Local**: `src/flext_quality/docs/scripts/report.py:741` · **Effort**: 6min
@@ -331,7 +331,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       745                      self.filename or f"weekly_trends_{u.now().strftime('%Y%m%d')}"
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 17 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/scripts/validate.py:275` · **Effort**: 6min
@@ -350,7 +350,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       279          ) -> m.Quality.LinkValidatorResults:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 18 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
 **Local**: `src/flext_quality/docs/tools/link_checker.py:255` · **Effort**: 7min
@@ -369,7 +369,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       259          start_time = time.time()
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 19 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8264`
 **Local**: `.github/workflows/docs.yml:18` · **Effort**: 5min
@@ -388,7 +388,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        22  concurrency:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 20 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
 **Local**: `.github/workflows/docs.yml:19` · **Effort**: 5min
@@ -407,7 +407,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        23    group: pages
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 21 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
 **Local**: `.github/workflows/docs.yml:20` · **Effort**: 5min
@@ -426,7 +426,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        24    cancel-in-progress: false
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 22 · 🟡 MAJOR · VULNERABILITY · `text:S8565`
 **Local**: `pyproject.toml:-` · **Effort**: 5min
@@ -434,7 +434,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 > Dependency versions are not predictable if the lock file (uv.lock, poetry.lock, pdm.lock or pylock.toml) is missing.
 
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 23 · 🟡 MAJOR · CODE_SMELL · `python:S108`
 **Local**: `src/flext_quality/docs/core/config_manager.py:61` · **Effort**: 5min
@@ -453,7 +453,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        65          """Configuration for style and formatting guidelines."""
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 24 · 🟡 MAJOR · CODE_SMELL · `python:S1854`
 **Local**: `src/flext_quality/docs/scripts/report.py:182` · **Effort**: 1min
@@ -472,7 +472,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       186              if isinstance(metrics, dict):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 25 · 🟡 MAJOR · CODE_SMELL · `python:S3358`
 **Local**: `src/flext_quality/docs/scripts/validate.py:295` · **Effort**: 5min
@@ -491,7 +491,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       299                      search_root = Path(link.file).parent.parent.parent
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 26 · 🟡 MAJOR · CODE_SMELL · `python:S108`
 **Local**: `src/flext_quality/docs/tools/style_validator.py:716` · **Effort**: 5min
@@ -510,7 +510,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       720  if __name__ == "__main__":
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 27 · ⚪ MINOR · CODE_SMELL · `python:S7504`
 **Local**: `conftest.py:20` · **Effort**: 5min
@@ -529,7 +529,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        24                  sys.modules.pop(module_name, None)
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 28 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/core/config_manager.py:209` · **Effort**: 1min
@@ -548,7 +548,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       213      def _get_default_config(
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 29 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/notifications.py:324` · **Effort**: 1min
@@ -567,7 +567,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       328          # Slack notification
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 30 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
@@ -586,7 +586,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       336          # Webhook notification
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 31 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
@@ -605,7 +605,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       336          # Webhook notification
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 32 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
@@ -624,7 +624,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       344          if success:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 33 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
@@ -643,7 +643,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       344          if success:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 34 · ⚪ MINOR · CODE_SMELL · `python:S7500`
 **Local**: `src/flext_quality/docs/notifications.py:362` · **Effort**: 5min
@@ -662,7 +662,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       366  FLEXT Quality Documentation Alert
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 35 · ⚪ MINOR · VULNERABILITY · `python:S5332`
 **Local**: `src/flext_quality/docs/scripts/audit.py:488` · **Effort**: 30min
@@ -681,7 +681,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       492                          "file": str(file_path.relative_to(self.project_root)),
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 36 · ⚪ MINOR · VULNERABILITY · `python:S5332`
 **Local**: `src/flext_quality/docs/scripts/audit.py:571` · **Effort**: 30min
@@ -700,7 +700,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       575                  file_dir = Path(image["file"]).parent
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 37 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/scripts/audit.py:852` · **Effort**: 1min
@@ -719,7 +719,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       856                  ValueError,
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 38 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/scripts/audit.py:853` · **Effort**: 1min
@@ -738,7 +738,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       857              ) as exc:
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 39 · ⚪ MINOR · VULNERABILITY · `python:S5332`
 **Local**: `src/flext_quality/docs/scripts/validate.py:128` · **Effort**: 30min
@@ -757,7 +757,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       132              if url.startswith("#"):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 40 · ⚪ MINOR · VULNERABILITY · `python:S5332`
 **Local**: `src/flext_quality/docs/scripts/validate.py:334` · **Effort**: 30min
@@ -776,7 +776,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       338                  if not image_path.is_absolute():
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 41 · ⚪ MINOR · VULNERABILITY · `python:S5332`
 **Local**: `src/flext_quality/docs/tools/link_checker.py:176` · **Effort**: 30min
@@ -795,7 +795,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       180          if url.startswith(("mailto:", "tel:")):
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 42 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/tools/link_checker.py:409` · **Effort**: 1min
@@ -814,7 +814,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       413  
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 43 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
@@ -833,7 +833,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       445      def validate_github_links(
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 44 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
@@ -852,7 +852,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       445      def validate_github_links(
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 45 · ⚪ MINOR · CODE_SMELL · `python:S5713`
 **Local**: `src/flext_quality/docs/tools/style_validator.py:146` · **Effort**: 1min
@@ -871,7 +871,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       150          self, raw: t.JsonMapping
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 46 · ⚪ MINOR · CODE_SMELL · `python:S7498`
 **Local**: `src/flext_quality/models.py:35` · **Effort**: 5min
@@ -890,7 +890,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        39              return []
 ```
 
-**Decisão**: 
+**Decisão**: pendente
 
 ### 47 · ⚪ MINOR · CODE_SMELL · `python:S116`
 **Local**: `src/flext_quality/rules/validators.py:17` · **Effort**: 2min
@@ -909,5 +909,4 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        21  
 ```
 
-**Decisão**: 
-
+**Decisão**: pendente
