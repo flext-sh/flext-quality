@@ -44,14 +44,14 @@
     - [**Step 3: Review Architecture**](#step-3-review-architecture)
   - [Intended Usage (Post-Transformation)](#intended-usage-post-transformation)
     - [**Basic Quality Analysis** (WORKING)](#basic-quality-analysis-working)
-    - [**CLI Usage** (PLANNED - Pure FLEXT-CLI)](#cli-usage-planned---pure-flext-cli)
-    - [**Enterprise Dashboard** (PLANNED - FLEXT-WEB)](#enterprise-dashboard-planned---flext-web)
+    - [**CLI Usage** (PLANNED - Pure FLEXT-CLI)](#cli-usage-planned-pure-flext-cli)
+    - [**Enterprise Dashboard** (PLANNED - FLEXT-WEB)](#enterprise-dashboard-planned-flext-web)
     - [**Integration with FLEXT Ecosystem** (PLANNED)](#integration-with-flext-ecosystem-planned)
   - [Enterprise Features (Post-Transformation)](#enterprise-features-post-transformation)
     - [**Workspace Integration** (Research-Based 2025 Patterns)](#workspace-integration-research-based-2025-patterns)
     - [**Modern Tool Stack** (Research-Based)](#modern-tool-stack-research-based)
     - [**Configuration Management** (Modern Standards)](#configuration-management-modern-standards)
-  - [Development Status & Roadmap](#development-status--roadmap)
+  - [Development Status & Roadmap](#development-status-roadmap)
     - [**Phase 1: Critical Integration Fixes (Immediate)**](#phase-1-critical-integration-fixes-immediate)
     - [**Phase 2: Workspace Absorption (Week 2)**](#phase-2-workspace-absorption-week-2)
     - [**Phase 3: FLEXT Ecosystem Integration (Week 3)**](#phase-3-flext-ecosystem-integration-week-3)
@@ -79,7 +79,7 @@ ______________________________________________________________________
 - ⚠️ **FLEXT Integration** - Partial flext-core usage with BaseModel compatibility issues
 - ⚠️ **Documentation** - Status indicators need synchronization across files
 
-**For developers**: See [TODO.md](../TODO.md) for accurate technical assessment and priorities.
+**For developers**: See TODO.md for accurate technical assessment and priorities.
 
 ______________________________________________________________________
 
@@ -198,7 +198,9 @@ def direct_analysis():
 
 # Run both approaches
 run(service_analysis())
-direct_analysis()```
+direct_analysis()
+```
+
 ### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
 
 ```bash
@@ -216,7 +218,9 @@ flext-quality workspace-analyze --parallel --security-scan
 flext-quality metrics --projects ./src --export json
 
 # Code fixing automation (absorbing gradual_lint_fixer.py)
-flext-quality fix --projects ./src --auto-approve --backup```
+flext-quality fix --projects ./src --auto-approve --backup
+```
+
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
 ```python
@@ -236,7 +240,9 @@ dashboard = quality_web.create_enterprise_dashboard()
 
 # - Executive reporting with quality KPIs
 
-# - Team collaboration and code review integration```
+# - Team collaboration and code review integration
+```
+
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
 ```text
@@ -253,7 +259,9 @@ from flext_quality import FlextQualityAuthenticatedService
 
 quality_service = FlextQualityAuthenticatedService(
     auth_middleware=FlextAuthMiddleware()
-)```
+)
+```
+
 ______________________________________________________________________
 
 ## Enterprise Features (Post-Transformation)
@@ -271,7 +279,9 @@ WORKSPACE_INTEGRATION = {
     "mypy_analyzer.py": "Type analysis integration with dual MyPy/PyRight",
     "pattern_audit_system.py": "FlextQualityValidator - Pattern detection",
     "flext_tools/quality_*": "Core quality bridge and gateway integration",
-}```
+}
+```
+
 ### **Modern Tool Stack** (Research-Based)
 
 ```python
@@ -293,7 +303,9 @@ ENTERPRISE_TOOLS = {
         "description": "Test coverage measurement and reporting",
         "features": "Branch coverage, HTML/XML reports, threshold enforcement",
     },
-}```
+}
+```
+
 ### **Configuration Management** (Modern Standards)
 
 ```toml
@@ -322,7 +334,9 @@ warn_return_any = true
 [tool.flext_quality.reporting]
 formats = ["html", "json", "pdf"]
 include_executive_summary = true
-include_trend_analysis = true```
+include_trend_analysis = true
+```
+
 ______________________________________________________________________
 
 ## Development Status & Roadmap
@@ -360,7 +374,7 @@ ______________________________________________________________________
 
 ### **For Developers**
 
-1. Review [TODO.md](../TODO.md) for detailed transformation plan
+1. Review TODO.md for detailed transformation plan
 1. Focus on Phase 1 critical fixes first
 1. Follow FLEXT standards (unified classes, r patterns, etc.)
 1. Contribute to fixing type errors and API implementations
@@ -390,7 +404,7 @@ ______________________________________________________________________
 
 ______________________________________________________________________
 
-**NOTE**: This quick start guide describes the intended functionality. Current implementation has significant gaps requiring the transformation outlined in [TODO.md](../TODO.md). The excellent architectural foundations suggest 2-3 weeks focused development will achieve full functionality.
+**NOTE**: This quick start guide describes the intended functionality. Current implementation has significant gaps requiring the transformation outlined in TODO.md. The excellent architectural foundations suggest 2-3 weeks focused development will achieve full functionality.
 
 **VISION**: FLEXT Quality will become the premier enterprise code quality platform,
 absorbing workspace functionality and providing unified interfaces to Python's best quality tools while maintaining zero-tolerance quality enforcement.
@@ -401,13 +415,13 @@ absorbing workspace functionality and providing unified interfaces to Python's b
 
 - [Architecture](architecture/README.md) - Architecture and design patterns
 - [API Reference](api-reference.md) - Complete API documentation
-- [Examples](../examples/) - Working code examples
+- [Examples](https://github.com/flext-sh/flext-quality/tree/0.12.0-dev/examples) - Working code examples
 
 **Across Projects**:
 
 - [flext-core Foundation](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
 - [flext-core Service Patterns](https://github.com/flext-sh/flext/tree/0.12.0-dev/flext-core/docs/guides/service-patterns.md) - Service patterns and dependency injection
-- [FLEXT Workspace Documentation](../README.md) - Ecosystem overview
+- [FLEXT Workspace Documentation](https://github.com/flext-sh/flext-quality/blob/0.12.0-dev/README.md) - Ecosystem overview
 
 **External Resources**:
 

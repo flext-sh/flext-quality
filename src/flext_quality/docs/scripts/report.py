@@ -141,9 +141,10 @@ class FlextQualityDocumentationReporter:
             loaded: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
                 t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
             )
-            return loaded
         except c.EXC_OS_VALUE:
             return None
+        else:
+            return loaded
 
     def generate_quality_report(
         self, report_format: str = "html", *, include_trends: bool = False
