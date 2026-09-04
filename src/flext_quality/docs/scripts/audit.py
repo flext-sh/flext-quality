@@ -885,9 +885,7 @@ class FlextQualityDocumentationAuditor:
             return self.ci_mode and metrics.quality_score < _QUALITY_SCORE_CI_THRESHOLD
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityDocumentationAuditor.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
         """Execute the auditor ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 

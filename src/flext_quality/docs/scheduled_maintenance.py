@@ -740,9 +740,7 @@ class FlextQualityScheduledMaintenance:
             )
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityScheduledMaintenance.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
         """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 

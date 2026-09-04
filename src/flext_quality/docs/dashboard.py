@@ -610,9 +610,7 @@ class FlextQualityDocumentationDashboard:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityDocumentationDashboard.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
         """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 

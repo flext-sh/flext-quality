@@ -752,9 +752,7 @@ class FlextQualityDocumentationValidator:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityDocumentationValidator.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityDocumentationValidator.Run) -> p.Result[bool]:
         """Execute the validator ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 

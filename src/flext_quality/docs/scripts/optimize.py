@@ -511,9 +511,7 @@ class FlextQualityDocumentationOptimizer:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityDocumentationOptimizer.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
         """Execute the optimizer ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 

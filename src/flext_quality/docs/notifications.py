@@ -641,9 +641,7 @@ Found {len(broken_links)} broken links that need attention:
             )
 
     @staticmethod
-    def _run_handler(
-        params: FlextQualityDocumentationNotifier.Run,
-    ) -> p.Result[bool]:
+    def _run_handler(params: FlextQualityDocumentationNotifier.Run) -> p.Result[bool]:
         """Execute the notifier ``Run`` route (typed, not a lambda, for pyrefly)."""
         return params.execute()
 
