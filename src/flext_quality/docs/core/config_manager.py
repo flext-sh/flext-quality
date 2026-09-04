@@ -325,3 +325,8 @@ class FlextQualityConfigManager:
                 for name in ["audit_rules", "style_guide", "validation_config"]
             },
         })
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityConfigManager"]
