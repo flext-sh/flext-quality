@@ -17,16 +17,18 @@
   Software Development :: Libraries :: Python Modules` (+1 more)
 - Project class: `platform`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
-- Main facades: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
-  `FlextQualityConstants`, `FlextQualityMcpResources`, `FlextQualityMcpServer`,
-  `FlextQualityMcpTools`, `FlextQualityModels` (+5 more)
+- Main facades: `FlextQuality`, `FlextQualityBaseHook`,
+  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`,
+  `FlextQualityCli`, `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`,
+  `FlextQualityConfigManager` (+24 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextQuality`, `FlextQualityCli`,
-  `FlextQualityConfig`, `FlextQualityConstants`, `FlextQualityMcpResources`,
-  `FlextQualityMcpServer`, `FlextQualityMcpTools`, `FlextQualityModels`,
-  `FlextQualityProtocols`, `FlextQualityServiceBase` (+7 more)
-- Exported module shortcuts: `mcp`
-- Generated module pages: `12`
+- Public symbol exports: `FlextQuality`, `FlextQualityBaseHook`,
+  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`,
+  `FlextQualityCli`, `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`,
+  `FlextQualityConfigManager`, `FlextQualityConstants`,
+  `FlextQualityDocumentationAuditor` (+26 more)
+- Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
+- Generated module pages: `35`
 
 ## Next Pages
 

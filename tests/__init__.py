@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from flext_tests import FlextTestsConstants, d, e, h, r, td, tf, tk, tm, tv, x
 
     from .base import TestsFlextQualityServiceBase, TestsFlextQualityServiceBase as s
-    from .conftest import reset_settings, set_test_environment
+    from .conftest import set_test_environment
     from .constants import TestsFlextQualityConstants, TestsFlextQualityConstants as c
     from .helpers.assertions import (
         assert_analysis_results_structure,
@@ -55,7 +55,6 @@ __all__: tuple[str, ...] = (
     "m",
     "p",
     "r",
-    "reset_settings",
     "s",
     "set_test_environment",
     "t",
@@ -73,7 +72,7 @@ _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
             ".base": ("TestsFlextQualityServiceBase", "s"),
-            ".conftest": ("reset_settings", "set_test_environment"),
+            ".conftest": ("set_test_environment",),
             ".constants": ("TestsFlextQualityConstants", "c"),
             ".helpers": ("helpers",),
             ".helpers.assertions": (
