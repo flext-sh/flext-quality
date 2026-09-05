@@ -7,7 +7,7 @@
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 - Package: `flext_quality`
-- Version: `0.12.0rc0`
+- Version: `0.12.0`
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code
   tooling
 - Doc summary: Flext Quality package.

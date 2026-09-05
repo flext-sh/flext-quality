@@ -10,7 +10,7 @@
 
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
-- Version: `0.12.0rc0`
+- Version: `0.12.0`
 - Project class: `platform`
 - Package: `flext_quality`
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code
