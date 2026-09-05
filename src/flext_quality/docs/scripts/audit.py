@@ -788,7 +788,7 @@ class FlextQualityDocumentationAuditor:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(
@@ -887,6 +887,12 @@ class FlextQualityDocumentationAuditor:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationAuditor.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-audit",
@@ -895,7 +901,7 @@ class FlextQualityDocumentationAuditor:
                 name="run",
                 help_text="Run documentation audit checks",
                 model_cls=FlextQualityDocumentationAuditor.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

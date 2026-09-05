@@ -426,7 +426,7 @@ class FlextQualityDocumentationOptimizer:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
@@ -513,6 +513,12 @@ class FlextQualityDocumentationOptimizer:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationOptimizer.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-optimize",
@@ -521,7 +527,7 @@ class FlextQualityDocumentationOptimizer:
                 name="run",
                 help_text="Run documentation optimizations",
                 model_cls=FlextQualityDocumentationOptimizer.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

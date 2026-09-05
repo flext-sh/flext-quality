@@ -691,7 +691,7 @@ class FlextQualityScheduledMaintenance:
             results_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         ).unwrap()
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(
@@ -742,6 +742,12 @@ class FlextQualityScheduledMaintenance:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityScheduledMaintenance.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-scheduled-maintenance",
@@ -752,7 +758,7 @@ class FlextQualityScheduledMaintenance:
                     "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
                 ),
                 model_cls=FlextQualityScheduledMaintenance.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

@@ -584,7 +584,7 @@ class FlextQualityDocumentationDashboard:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(
@@ -612,6 +612,12 @@ class FlextQualityDocumentationDashboard:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the dashboard via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationDashboard.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-dashboard",
@@ -620,7 +626,7 @@ class FlextQualityDocumentationDashboard:
                 name="run",
                 help_text="Start the dashboard server",
                 model_cls=FlextQualityDocumentationDashboard.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

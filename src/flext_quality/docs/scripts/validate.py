@@ -647,7 +647,7 @@ class FlextQualityDocumentationValidator:
             if not any(pattern in str(f) for pattern in ignored_patterns)
         ]
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation validation."""
 
         external_links: bool = u.Field(
@@ -754,6 +754,12 @@ class FlextQualityDocumentationValidator:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation validation via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationValidator.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-validate",
@@ -762,7 +768,7 @@ class FlextQualityDocumentationValidator:
                 name="run",
                 help_text="Run documentation validation checks",
                 model_cls=FlextQualityDocumentationValidator.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

@@ -554,7 +554,7 @@ Found {len(broken_links)} broken links that need attention:
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation notifications."""
 
         settings_path: Annotated[
@@ -643,6 +643,12 @@ Found {len(broken_links)} broken links that need attention:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the notification system via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationNotifier.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-notifications",
@@ -651,7 +657,7 @@ Found {len(broken_links)} broken links that need attention:
                 name="run",
                 help_text="Send a documentation notification",
                 model_cls=FlextQualityDocumentationNotifier.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code

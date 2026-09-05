@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     from collections.abc import MutableSequence, Sequence
 
 
-class FlextQualityCli(s):
+class FlextQualityCli(s[bool]):
     """FLEXT Quality analysis toolkit."""
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s):
+    class Status(s[t.JsonMapping]):
         """Display quality service status."""
 
         @override
@@ -30,7 +30,7 @@ class FlextQualityCli(s):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s):
+    class Check(s[t.SequenceOf[t.StrSequence]]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
@@ -76,12 +76,17 @@ class FlextQualityCli(s):
             cmds.append(["python", "-m", "coverage", "report"])
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
-    COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
+    COMMANDS: ClassVar[Sequence[type[s]]] = (Status, Check, Validate)
 
     @override
     def execute(self) -> p.Result[bool]:
         """Lifecycle entrypoint for parity with FLEXT services."""
         return r[bool].ok(value=True)
+
+
+def _invoke(params: s) -> p.Result[t.JsonDict]:
+    """Execute a registered service instance for its declarative CLI route."""
+    return params.execute()
 
 
 def main(args: t.StrSequence | None = None) -> int:
@@ -96,7 +101,7 @@ def main(args: t.StrSequence | None = None) -> int:
                 name=svc.__name__.lower(),
                 help_text=svc.__doc__ or "",
                 model_cls=svc,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             )
             for svc in FlextQualityCli.COMMANDS
         ],

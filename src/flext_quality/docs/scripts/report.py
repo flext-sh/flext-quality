@@ -11,6 +11,7 @@ Usage:
 
 from __future__ import annotations
 
+import operator
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
@@ -613,10 +614,11 @@ class FlextQualityDocumentationReporter:
                             files_processed=files_processed,
                         )
                     )
+        by_date = operator.attrgetter("date")
         return FlextQualityDocumentationReporter.TrendData(
-            audit_trends=sorted(audit_trends, key=lambda e: e.date),
-            validation_trends=sorted(validation_trends, key=lambda e: e.date),
-            optimization_trends=sorted(optimization_trends, key=lambda e: e.date),
+            audit_trends=sorted(audit_trends, key=by_date),
+            validation_trends=sorted(validation_trends, key=by_date),
+            optimization_trends=sorted(optimization_trends, key=by_date),
         )
 
     def _generate_trend_report(
@@ -690,7 +692,7 @@ class FlextQualityDocumentationReporter:
             return r[Path].fail(write.error or f"cannot write {filepath}")
         return r[Path].ok(filepath)
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation reporting."""
 
         output_format: Annotated[
@@ -766,6 +768,12 @@ class FlextQualityDocumentationReporter:
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade."""
+
+        def _invoke(
+            params: FlextQualityDocumentationReporter.Run,
+        ) -> p.Result[bool]:
+            return params.execute()
+
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-report",
@@ -774,7 +782,7 @@ class FlextQualityDocumentationReporter:
                 name="run",
                 help_text="Generate a documentation quality report",
                 model_cls=FlextQualityDocumentationReporter.Run,
-                handler=lambda params: params.execute(),
+                handler=_invoke,
             ),
         )
         return exit_code
