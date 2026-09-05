@@ -1,6 +1,0 @@
-{
-  "backend": "dolt",
-  "database": "dolt",
-  "dolt_database": "flext-quality",
-  "dolt_mode": "server"
-}

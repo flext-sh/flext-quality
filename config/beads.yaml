@@ -1,4 +1,4 @@
 version: 1
-workspace: flext-quality
-database: flext-quality
-issue_prefix: flext-quality
+workspace: flext
+database: flext
+issue_prefix: flext
