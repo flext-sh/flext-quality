@@ -111,7 +111,7 @@ def main(args: t.StrSequence | None = None) -> int:
         prog_name=FlextQualityCli.app_name,
         args=args if args is not None else sys.argv[1:],
     )
-    return 0 if result.success else 1
+    return cli.finalize_result(result)
 
 
 __all__: list[str] = ["FlextQualityCli", "main"]
