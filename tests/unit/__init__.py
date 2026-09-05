@@ -15,14 +15,43 @@ if TYPE_CHECKING:
     from .test_api import TestsFlextQualityApi
     from .test_basic import TestsFlextQualityBasic
     from .test_cli import TestsFlextQualityCli
+    from .test_code_execution import TestsFlextQualityCodeExecutionBridge
+    from .test_docs_config_manager import TestsFlextQualityConfigManager
+    from .test_docs_dashboard import TestsFlextQualityDocumentationDashboard
+    from .test_docs_notifications import TestsFlextQualityDocumentationNotifier
+    from .test_hooks import TestsFlextQualityBaseHook, TestsFlextQualityHookManager
+    from .test_integrations import TestsFlextQualityIntegrations
+    from .test_mcp_layer import (
+        TestsFlextQualityMcpResources,
+        TestsFlextQualityMcpServer,
+        TestsFlextQualityMcpTools,
+    )
+    from .test_rules_engine_validators import (
+        TestsFlextQualityRulesEngine,
+        TestsFlextQualityRulesLoader,
+        TestsFlextQualityValidators,
+    )
     from .test_scheduled_maintenance_timeout import (
         TestsFlextQualityScheduledMaintenanceTimeout,
     )
 __all__: tuple[str, ...] = (
     "TestsFlextQualityApi",
+    "TestsFlextQualityBaseHook",
     "TestsFlextQualityBasic",
     "TestsFlextQualityCli",
+    "TestsFlextQualityCodeExecutionBridge",
+    "TestsFlextQualityConfigManager",
+    "TestsFlextQualityDocumentationDashboard",
+    "TestsFlextQualityDocumentationNotifier",
+    "TestsFlextQualityHookManager",
+    "TestsFlextQualityIntegrations",
+    "TestsFlextQualityMcpResources",
+    "TestsFlextQualityMcpServer",
+    "TestsFlextQualityMcpTools",
+    "TestsFlextQualityRulesEngine",
+    "TestsFlextQualityRulesLoader",
     "TestsFlextQualityScheduledMaintenanceTimeout",
+    "TestsFlextQualityValidators",
     "c",
     "d",
     "e",
@@ -47,6 +76,25 @@ _LAZY_IMPORTS = MappingProxyType(
             ".test_api": ("TestsFlextQualityApi",),
             ".test_basic": ("TestsFlextQualityBasic",),
             ".test_cli": ("TestsFlextQualityCli",),
+            ".test_code_execution": ("TestsFlextQualityCodeExecutionBridge",),
+            ".test_docs_config_manager": ("TestsFlextQualityConfigManager",),
+            ".test_docs_dashboard": ("TestsFlextQualityDocumentationDashboard",),
+            ".test_docs_notifications": ("TestsFlextQualityDocumentationNotifier",),
+            ".test_hooks": (
+                "TestsFlextQualityBaseHook",
+                "TestsFlextQualityHookManager",
+            ),
+            ".test_integrations": ("TestsFlextQualityIntegrations",),
+            ".test_mcp_layer": (
+                "TestsFlextQualityMcpResources",
+                "TestsFlextQualityMcpServer",
+                "TestsFlextQualityMcpTools",
+            ),
+            ".test_rules_engine_validators": (
+                "TestsFlextQualityRulesEngine",
+                "TestsFlextQualityRulesLoader",
+                "TestsFlextQualityValidators",
+            ),
             ".test_scheduled_maintenance_timeout": (
                 "TestsFlextQualityScheduledMaintenanceTimeout",
             ),
