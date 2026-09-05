@@ -73,3 +73,8 @@ class FlextQualityHookManager:
             self._hooks[event] = list[FlextQualityBaseHook]()
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityHookManager"]

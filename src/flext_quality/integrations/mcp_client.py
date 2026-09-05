@@ -166,3 +166,8 @@ class FlextQualityMcpClient:
             return self._build_object_result(parsed)
         except ValueError:
             return self._build_list_result(output)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityMcpClient"]

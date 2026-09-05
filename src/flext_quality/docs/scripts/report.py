@@ -613,10 +613,17 @@ class FlextQualityDocumentationReporter:
                             files_processed=files_processed,
                         )
                     )
+
+        def _trend_entry_date(
+            entry: FlextQualityDocumentationReporter.TrendEntry,
+        ) -> datetime:
+            """Sort key for trend entries (typed, not a lambda, for pyrefly)."""
+            return entry.date
+
         return FlextQualityDocumentationReporter.TrendData(
-            audit_trends=sorted(audit_trends, key=lambda e: e.date),
-            validation_trends=sorted(validation_trends, key=lambda e: e.date),
-            optimization_trends=sorted(optimization_trends, key=lambda e: e.date),
+            audit_trends=sorted(audit_trends, key=_trend_entry_date),
+            validation_trends=sorted(validation_trends, key=_trend_entry_date),
+            optimization_trends=sorted(optimization_trends, key=_trend_entry_date),
         )
 
     def _generate_trend_report(
@@ -690,7 +697,7 @@ class FlextQualityDocumentationReporter:
             return r[Path].fail(write.error or f"cannot write {filepath}")
         return r[Path].ok(filepath)
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation reporting."""
 
         output_format: Annotated[
@@ -764,6 +771,11 @@ class FlextQualityDocumentationReporter:
             return r[bool].ok(value=True)
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
+        """Execute the reporter ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade."""
         exit_code: int = u.Quality.execute_result_command(
@@ -774,10 +786,15 @@ class FlextQualityDocumentationReporter:
                 name="run",
                 help_text="Generate a documentation quality report",
                 model_cls=FlextQualityDocumentationReporter.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationReporter._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationReporter"]
 
 
 if __name__ == "__main__":

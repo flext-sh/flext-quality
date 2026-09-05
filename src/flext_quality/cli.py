@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     from collections.abc import MutableSequence, Sequence
 
 
-class FlextQualityCli(s):
+class FlextQualityCli(s[bool]):
     """FLEXT Quality analysis toolkit."""
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s):
+    class Status(s[t.JsonMapping]):
         """Display quality service status."""
 
         @override
@@ -30,7 +30,7 @@ class FlextQualityCli(s):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s):
+    class Check(s[t.SequenceOf[t.StrSequence]]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
@@ -84,6 +84,11 @@ class FlextQualityCli(s):
         return r[bool].ok(value=True)
 
 
+def _execute_command(params: s) -> p.Result[t.JsonDict]:
+    """Execute a registered flext-quality CLI subcommand (typed, not a lambda, for pyrefly)."""
+    return params.execute()
+
+
 def main(args: t.StrSequence | None = None) -> int:
     """flext-quality CLI entry point."""
     app = cli.create_app_with_common_params(
@@ -96,7 +101,7 @@ def main(args: t.StrSequence | None = None) -> int:
                 name=svc.__name__.lower(),
                 help_text=svc.__doc__ or "",
                 model_cls=svc,
-                handler=lambda params: params.execute(),
+                handler=_execute_command,
             )
             for svc in FlextQualityCli.COMMANDS
         ],

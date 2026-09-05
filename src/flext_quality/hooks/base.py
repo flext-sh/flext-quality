@@ -29,3 +29,8 @@ class FlextQualityBaseHook:
     def _match_pattern(self, pattern: str, value: str) -> bool:
         """Match pattern against value (supports wildcards)."""
         return fnmatch.fnmatch(value, pattern)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityBaseHook"]

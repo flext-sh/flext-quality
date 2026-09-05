@@ -101,3 +101,8 @@ class FlextQualityRulesLoader:
             enabled=bool(enabled),
         )
         return r[m.Quality.RuleDefinition].ok(rule)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityRulesLoader"]
