@@ -512,9 +512,7 @@ class FlextQualityDocumentationOptimizer:
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityDocumentationOptimizer.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(

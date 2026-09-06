@@ -131,7 +131,9 @@ class FlextQualityUtilities(u, web_u):
                     yaml_result.value
                 )
             except c.EXC_BROAD_IO_TYPE as e:
-                return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to load rules: {e}", exception=e)
+                return r[t.SequenceOf[t.JsonMapping]].fail(
+                    f"Failed to load rules: {e}", exception=e
+                )
 
         @staticmethod
         def parse_hook_input(raw: str) -> p.Result[t.JsonMapping]:

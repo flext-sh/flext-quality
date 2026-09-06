@@ -743,9 +743,7 @@ class FlextQualityScheduledMaintenance:
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityScheduledMaintenance.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(

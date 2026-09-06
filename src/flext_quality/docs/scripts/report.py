@@ -769,9 +769,7 @@ class FlextQualityDocumentationReporter:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityDocumentationReporter.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(

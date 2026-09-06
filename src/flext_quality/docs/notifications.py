@@ -638,9 +638,7 @@ Found {len(broken_links)} broken links that need attention:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the notification system via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityDocumentationNotifier.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityDocumentationNotifier.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(

@@ -886,9 +886,7 @@ class FlextQualityDocumentationAuditor:
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityDocumentationAuditor.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(

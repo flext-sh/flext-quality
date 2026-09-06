@@ -613,9 +613,7 @@ class FlextQualityDocumentationDashboard:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the dashboard via the canonical cli facade."""
 
-        def _invoke(
-            params: FlextQualityDocumentationDashboard.Run,
-        ) -> p.Result[bool]:
+        def _invoke(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
             return params.execute()
 
         exit_code: int = u.Quality.execute_result_command(
