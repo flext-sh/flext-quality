@@ -1,9 +1,8 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Flext Quality.mcp package."""
+"""Flext Quality.hooks package."""
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from types import MappingProxyType
@@ -11,21 +10,15 @@ from types import MappingProxyType
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from .resources import FlextQualityMcpResources
-    from .server import FlextQualityMcpServer
-    from .tools import FlextQualityMcpTools
-__all__: tuple[str, ...] = (
-    "FlextQualityMcpResources",
-    "FlextQualityMcpServer",
-    "FlextQualityMcpTools",
-)
+    from .base import FlextQualityBaseHook
+    from .manager import FlextQualityHookManager
+__all__: tuple[str, ...] = ("FlextQualityBaseHook", "FlextQualityHookManager")
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
-            ".resources": ("FlextQualityMcpResources",),
-            ".server": ("FlextQualityMcpServer",),
-            ".tools": ("FlextQualityMcpTools",),
+            ".base": ("FlextQualityBaseHook",),
+            ".manager": ("FlextQualityHookManager",),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

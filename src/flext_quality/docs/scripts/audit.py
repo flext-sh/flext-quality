@@ -883,12 +883,13 @@ class FlextQualityDocumentationAuditor:
             return self.ci_mode and metrics.quality_score < _QUALITY_SCORE_CI_THRESHOLD
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
+        """Execute the auditor ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade."""
-
-        def _invoke(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
-            return params.execute()
-
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-audit",
@@ -897,10 +898,15 @@ class FlextQualityDocumentationAuditor:
                 name="run",
                 help_text="Run documentation audit checks",
                 model_cls=FlextQualityDocumentationAuditor.Run,
-                handler=_invoke,
+                handler=FlextQualityDocumentationAuditor._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationAuditor"]
 
 
 if __name__ == "__main__":

@@ -509,12 +509,13 @@ class FlextQualityDocumentationOptimizer:
             return r[bool].ok(value=True)
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
+        """Execute the optimizer ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade."""
-
-        def _invoke(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
-            return params.execute()
-
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-optimize",
@@ -523,10 +524,15 @@ class FlextQualityDocumentationOptimizer:
                 name="run",
                 help_text="Run documentation optimizations",
                 model_cls=FlextQualityDocumentationOptimizer.Run,
-                handler=_invoke,
+                handler=FlextQualityDocumentationOptimizer._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationOptimizer"]
 
 
 if __name__ == "__main__":

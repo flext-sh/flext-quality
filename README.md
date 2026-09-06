@@ -12,7 +12,7 @@
 
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
-**Version**: `0.12.0rc0` | **Python**: 3.13+ | **Project class**: `platform`
+**Version**: `0.12.0` | **Python**: 3.13+ | **Project class**: `platform`
 
 > **Alpha (0.12.0).** This package is alpha quality. Every package in the
 > workspace must be re-checked and re-validated at 0.12.0 before any promotion
@@ -53,17 +53,19 @@ slot registry verification).
 - Parent FLEXT chain: read this project's `pyproject.toml` `dependencies` array
   filtered by `flext-*`. The FLEXT cascade is encoded in the inheritance lists
   of the facade classes listed under Module Map above.
-- Public extensions exposed by this project: `FlextQuality`, `FlextQualityCli`,
-  `FlextQualityConfig`, `FlextQualityConstants`, `FlextQualityMcpResources`,
-  `FlextQualityMcpServer` (+7 more).
+- Public extensions exposed by this project: `FlextQuality`,
+  `FlextQualityBaseHook`, `FlextQualityClaudeContextClient`,
+  `FlextQualityClaudeMemClient`, `FlextQualityCli`,
+  `FlextQualityCodeExecutionBridge` (+26 more).
 - Library abstraction boundaries: see AGENTS.md §2.7.
 
 ## Quality Gates
 
-Canonical selector-free `make` verbs (`check`, `test`, `fmt`, `conform`, `docs`)
-use `APPLY=Y` — see
+Canonical `make` verbs (`check`, `test`, `fmt WHAT=apply APPLY=Y`, `val`,
+`docs`) — see
 [`/flext/AGENTS.md`](https://github.com/flext-sh/flext/blob/0.12.0-dev/AGENTS.md)
-`Build & Test` and `Required Python quality gates`.
+`Build & Test` and `Required Python quality gates`; selector routing is owned
+universally by `config.AiHub.paths.agents_home`/`skills/make-check/SKILL.md`.
 
 ## Governance Pointer
 

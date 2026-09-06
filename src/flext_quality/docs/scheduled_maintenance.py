@@ -740,12 +740,13 @@ class FlextQualityScheduledMaintenance:
             )
 
     @staticmethod
+    def _run_handler(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
+        """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade."""
-
-        def _invoke(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
-            return params.execute()
-
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-scheduled-maintenance",
@@ -756,10 +757,15 @@ class FlextQualityScheduledMaintenance:
                     "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
                 ),
                 model_cls=FlextQualityScheduledMaintenance.Run,
-                handler=_invoke,
+                handler=FlextQualityScheduledMaintenance._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityScheduledMaintenance"]
 
 
 if __name__ == "__main__":

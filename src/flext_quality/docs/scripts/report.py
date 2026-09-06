@@ -11,7 +11,6 @@ Usage:
 
 from __future__ import annotations
 
-import operator
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
@@ -614,11 +613,17 @@ class FlextQualityDocumentationReporter:
                             files_processed=files_processed,
                         )
                     )
-        by_date = operator.attrgetter("date")
+
+        def _trend_entry_date(
+            entry: FlextQualityDocumentationReporter.TrendEntry,
+        ) -> datetime:
+            """Sort key for trend entries (typed, not a lambda, for pyrefly)."""
+            return entry.date
+
         return FlextQualityDocumentationReporter.TrendData(
-            audit_trends=sorted(audit_trends, key=by_date),
-            validation_trends=sorted(validation_trends, key=by_date),
-            optimization_trends=sorted(optimization_trends, key=by_date),
+            audit_trends=sorted(audit_trends, key=_trend_entry_date),
+            validation_trends=sorted(validation_trends, key=_trend_entry_date),
+            optimization_trends=sorted(optimization_trends, key=_trend_entry_date),
         )
 
     def _generate_trend_report(
@@ -766,12 +771,13 @@ class FlextQualityDocumentationReporter:
             return r[bool].ok(value=True)
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
+        """Execute the reporter ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade."""
-
-        def _invoke(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
-            return params.execute()
-
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-docs-report",
@@ -780,10 +786,15 @@ class FlextQualityDocumentationReporter:
                 name="run",
                 help_text="Generate a documentation quality report",
                 model_cls=FlextQualityDocumentationReporter.Run,
-                handler=_invoke,
+                handler=FlextQualityDocumentationReporter._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationReporter"]
 
 
 if __name__ == "__main__":

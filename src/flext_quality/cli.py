@@ -84,6 +84,8 @@ class FlextQualityCli(s[bool]):
         return r[bool].ok(value=True)
 
 
+# Why: both lanes replaced the lambda handler with a named typed function so
+# pyrefly can infer the route handler signature; the lane name `_invoke` is kept.
 def _invoke(params: s) -> p.Result[t.JsonDict]:
     """Execute a registered service instance for its declarative CLI route."""
     return params.execute()
