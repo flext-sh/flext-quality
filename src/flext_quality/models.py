@@ -7,7 +7,13 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import MutableMapping, MutableSequence
-from typing import TYPE_CHECKING, Annotated, Self
+
+# Why: mro-fix-27vfb — `Path` backs a real Pydantic model field
+# (ExecutionRequest.script_path) and must resolve at runtime; a
+# TYPE_CHECKING-only import leaves that field unresolved and the model
+# unbuildable at first instantiation (model_rebuild() is prohibited).
+from pathlib import Path
+from typing import Annotated, Self
 
 from flext_infra import (
     FlextInfraModels as _InfraModels,
@@ -15,9 +21,6 @@ from flext_infra import (
 )
 from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 from flext_web import FlextWebModels as _WebModels
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:

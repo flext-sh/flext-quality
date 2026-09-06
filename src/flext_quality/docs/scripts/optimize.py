@@ -426,7 +426,7 @@ class FlextQualityDocumentationOptimizer:
             return r[str].fail(latest_write.error or f"cannot write {latest_file}")
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
@@ -511,6 +511,11 @@ class FlextQualityDocumentationOptimizer:
             return r[bool].ok(value=True)
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
+        """Execute the optimizer ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade."""
         exit_code: int = u.Quality.execute_result_command(
@@ -521,10 +526,15 @@ class FlextQualityDocumentationOptimizer:
                 name="run",
                 help_text="Run documentation optimizations",
                 model_cls=FlextQualityDocumentationOptimizer.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationOptimizer._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationOptimizer"]
 
 
 if __name__ == "__main__":
