@@ -72,3 +72,8 @@ class FlextQualityClaudeContextClient:
         return self._mcp.build_server_health_result(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME
         )
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityClaudeContextClient"]

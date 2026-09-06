@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import pytest
 
-from flext_quality import FlextQuality, c, quality
+from flext_quality import FlextQuality, FlextQualityConfig, c, config, quality
 from flext_tests import tm
 
 
@@ -54,3 +54,13 @@ class TestsFlextQualityBasic:
         count = FlextQuality().execute().value["hooks_registered"]
         tm.that(count, is_=int)
         tm.that(isinstance(count, int) and count >= 0, eq=True)
+
+    def test_config_singleton_is_a_frozen_quality_config(self) -> None:
+        """The module-level ``config`` singleton is a frozen ``FlextQualityConfig``."""
+        tm.that(config, is_=FlextQualityConfig)
+        tm.that(config.model_config.get("frozen"), eq=True)
+
+    def test_config_quality_namespace_allows_open_extra_fields(self) -> None:
+        """``config.Quality`` is an open namespace exposing config/*.yaml data."""
+        tm.that(config.Quality, is_=object)
+        tm.that(type(config.Quality).model_config.get("extra"), eq="allow")
