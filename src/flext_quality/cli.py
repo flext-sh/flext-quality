@@ -14,7 +14,7 @@ from flext_cli import cli
 from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence, Sequence
+    from collections.abc import MutableSequence
 
 
 class FlextQualityCli(s[bool]):
@@ -76,7 +76,9 @@ class FlextQualityCli(s[bool]):
             cmds.append(["python", "-m", "coverage", "report"])
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
-    COMMANDS: ClassVar[Sequence[type[s]]] = (Status, Check, Validate)
+    COMMANDS: ClassVar[
+        t.SequenceOf[type[s[t.JsonMapping] | s[t.SequenceOf[t.StrSequence]]]]
+    ] = (Status, Check, Validate)
 
     @override
     def execute(self) -> p.Result[bool]:

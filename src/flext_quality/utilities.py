@@ -162,7 +162,7 @@ class FlextQualityUtilities(u, web_u):
             if cmd_result.failure:
                 return r[str].fail(str(cmd_result.error))
             out = cmd_result.value
-            if out.exit_code != 0:
+            if out.outcome.raw_return_code != 0:
                 return r[str].fail_op("Command", out.stderr)
             return r[str].ok(out.stdout)
 
