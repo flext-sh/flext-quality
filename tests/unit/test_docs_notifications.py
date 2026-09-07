@@ -24,9 +24,7 @@ if TYPE_CHECKING:
 class TestsFlextQualityDocumentationNotifier:
     """Contract tests for the documentation notification system."""
 
-    def test_default_config_enables_only_console_channel(
-        self, tmp_path: Path
-    ) -> None:
+    def test_default_config_enables_only_console_channel(self, tmp_path: Path) -> None:
         """A missing config file yields defaults with only console enabled."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         tm.that(notifier.config.enabled, eq=True)
@@ -148,9 +146,7 @@ class TestsFlextQualityDocumentationNotifier:
         notifier = FlextQualityDocumentationNotifier(str(config_path))
         tm.that(notifier.notify_quality_drop(50.0, 90.0), eq=True)
 
-    def test_notify_quality_drop_below_threshold_is_noop(
-        self, tmp_path: Path
-    ) -> None:
+    def test_notify_quality_drop_below_threshold_is_noop(self, tmp_path: Path) -> None:
         """A drop smaller than the configured threshold sends nothing."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         tm.that(notifier.notify_quality_drop(85.0, 90.0), eq=True)
@@ -176,9 +172,7 @@ class TestsFlextQualityDocumentationNotifier:
         notifier = FlextQualityDocumentationNotifier(str(config_path))
         tm.that(notifier.notify_broken_links([{"url": "x"}]), eq=True)
 
-    def test_notify_broken_links_below_threshold_is_noop(
-        self, tmp_path: Path
-    ) -> None:
+    def test_notify_broken_links_below_threshold_is_noop(self, tmp_path: Path) -> None:
         """Fewer broken links than the threshold sends nothing."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         tm.that(notifier.notify_broken_links([]), eq=True)
@@ -250,9 +244,7 @@ class TestsFlextQualityDocumentationNotifier:
         tm.that(notifier.notify_monthly_report({}), eq=True)
         tm.that(notifier.results.notifications_sent, eq=1)
 
-    def test_send_notification_slack_failure_is_recorded(
-        self, tmp_path: Path
-    ) -> None:
+    def test_send_notification_slack_failure_is_recorded(self, tmp_path: Path) -> None:
         """A real (schemeless) slack webhook URL fails and is recorded as an error."""
         config_path = tmp_path / "notify.yaml"
         config_path.write_text(
