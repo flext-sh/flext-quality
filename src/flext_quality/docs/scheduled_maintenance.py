@@ -17,6 +17,7 @@ from typing import Annotated, ClassVar, override
 
 import pytest
 import schedule
+
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
@@ -530,9 +531,9 @@ class FlextQualityScheduledMaintenance:
                 msg = result.error or f"git {' '.join(argv[1:])} failed"
                 raise RuntimeError(msg)
             output = result.value
-            if output.exit_code != 0:
+            if output.outcome.raw_return_code != 0:
                 detail = (output.stderr or output.stdout).strip()
-                msg = detail or f"git exited {output.exit_code}"
+                msg = detail or f"git exited {output.outcome.raw_return_code}"
                 raise RuntimeError(msg)
 
         return self._run_with_timeout(run_git_command, timeout, description)

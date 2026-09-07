@@ -131,7 +131,9 @@ class FlextQualityUtilities(u, web_u):
                     yaml_result.value
                 )
             except c.EXC_BROAD_IO_TYPE as e:
-                return r[t.SequenceOf[t.JsonMapping]].fail(f"Failed to load rules: {e}")
+                return r[t.SequenceOf[t.JsonMapping]].fail(
+                    f"Failed to load rules: {e}", exception=e
+                )
 
         @staticmethod
         def parse_hook_input(raw: str) -> p.Result[t.JsonMapping]:
@@ -141,7 +143,7 @@ class FlextQualityUtilities(u, web_u):
                 coerced_input: t.JsonMapping = parsed
                 return r[t.JsonMapping].ok(coerced_input)
             except ValueError as e:
-                return r[t.JsonMapping].fail(f"Invalid JSON: {e}")
+                return r[t.JsonMapping].fail(f"Invalid JSON: {e}", exception=e)
 
         @staticmethod
         def read_stdin() -> p.Result[str]:
@@ -160,7 +162,7 @@ class FlextQualityUtilities(u, web_u):
             if cmd_result.failure:
                 return r[str].fail(str(cmd_result.error))
             out = cmd_result.value
-            if out.exit_code != 0:
+            if out.outcome.raw_return_code != 0:
                 return r[str].fail_op("Command", out.stderr)
             return r[str].ok(out.stdout)
 

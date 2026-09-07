@@ -394,7 +394,7 @@ class FlextQualityDocumentationOptimizer:
             )
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
-            return r[bool].fail(write.error or f"cannot write {file_path}")
+            return r[bool].from_failure(write)
         return r[bool].ok(True)
 
     def generate_report(self, report_format: str = "json") -> str:
@@ -417,13 +417,13 @@ class FlextQualityDocumentationOptimizer:
         report_content = self.generate_report("json")
         report_write = u.Cli.atomic_write_text_file(filepath, report_content)
         if report_write.failure:
-            return r[str].fail(report_write.error or f"cannot write {filepath}")
+            return r[str].from_failure(report_write)
         latest_file = output_dir / "latest_optimization.json"
         latest_write = u.Cli.json_write(
             latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
-            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+            return r[str].from_failure(latest_write)
         return r[str].ok(str(filepath))
 
     class Run(s[bool]):
@@ -505,9 +505,7 @@ class FlextQualityDocumentationOptimizer:
                 return r[bool].fail("No optimization selected")
             save_result = optimizer.save_report(self.output)
             if save_result.failure:
-                return r[bool].fail(
-                    save_result.error or "optimization report write failed"
-                )
+                return r[bool].from_failure(save_result)
             return r[bool].ok(value=True)
 
     @staticmethod

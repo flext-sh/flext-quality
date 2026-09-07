@@ -183,7 +183,4 @@ class TestsFlextQualityHookManager:
         tm.that(len(entries), eq=2)
 
 
-__all__: list[str] = [
-    "TestsFlextQualityBaseHook",
-    "TestsFlextQualityHookManager",
-]
+__all__: list[str] = ["TestsFlextQualityBaseHook", "TestsFlextQualityHookManager"]
