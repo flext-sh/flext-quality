@@ -41,10 +41,7 @@ class TestsFlextQualityDocumentationDashboard:
             },
         })
         tm.ok(audit_dump)
-        (tmp_path / "latest_audit.json").write_text(
-            audit_dump.value,
-            encoding="utf-8",
-        )
+        (tmp_path / "latest_audit.json").write_text(audit_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         metrics = dashboard.get_current_metrics()
         tm.that(metrics.get("quality_score"), eq=87)
