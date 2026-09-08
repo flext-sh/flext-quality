@@ -7,11 +7,11 @@ mocks, no patched collaborators.
 
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING
 
 from flext_quality import FlextQualityDocumentationDashboard
 from flext_tests import tm
+from tests import u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -31,16 +31,18 @@ class TestsFlextQualityDocumentationDashboard:
         self, tmp_path: Path
     ) -> None:
         """A real ``latest_audit.json`` file is parsed into the metrics payload."""
+        audit_dump = u.Cli.json_dumps({
+            "files_analyzed": 12,
+            "timestamp": "2026-01-01T00:00:00",
+            "metrics": {
+                "quality_score": 87,
+                "total_issues": 4,
+                "severity_breakdown": {"critical": 1, "high": 3},
+            },
+        })
+        tm.ok(audit_dump)
         (tmp_path / "latest_audit.json").write_text(
-            json.dumps({
-                "files_analyzed": 12,
-                "timestamp": "2026-01-01T00:00:00",
-                "metrics": {
-                    "quality_score": 87,
-                    "total_issues": 4,
-                    "severity_breakdown": {"critical": 1, "high": 3},
-                },
-            }),
+            audit_dump.value,
             encoding="utf-8",
         )
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
@@ -76,7 +78,9 @@ class TestsFlextQualityDocumentationDashboard:
             }
         }
         report_file = tmp_path / "audit_report_20260101_120000.json"
-        report_file.write_text(json.dumps(report), encoding="utf-8")
+        report_dump = u.Cli.json_dumps(report)
+        tm.ok(report_dump)
+        report_file.write_text(report_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         trends = dashboard.get_quality_trends(days=3650)
         tm.that(trends.get("data_points"), eq=1)
@@ -103,13 +107,12 @@ class TestsFlextQualityDocumentationDashboard:
             ("20260102_000000", 60),
         ):
             report_file = tmp_path / f"audit_report_{stamp}.json"
-            report_file.write_text(
-                json.dumps({
-                    "metrics": {"quality_score": score, "total_issues": 1},
-                    "files_analyzed": 5,
-                }),
-                encoding="utf-8",
-            )
+            report_dump = u.Cli.json_dumps({
+                "metrics": {"quality_score": score, "total_issues": 1},
+                "files_analyzed": 5,
+            })
+            tm.ok(report_dump)
+            report_file.write_text(report_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         reports = dashboard.get_recent_reports(limit=2)
         tm.that(len(reports), eq=2)
@@ -136,7 +139,9 @@ class TestsFlextQualityDocumentationDashboard:
         client = dashboard.app.test_client()
         response = client.get("/api/metrics")
         tm.that(response.status_code, eq=200)
-        payload = json.loads(response.get_data(as_text=True))
+        payload_result = u.Cli.json_loads(response.get_data(as_text=True))
+        tm.ok(payload_result)
+        payload = payload_result.value
         tm.that(payload.get("status"), eq="No audit data available")
 
     def test_api_trends_route_honors_days_query_param(self, tmp_path: Path) -> None:
@@ -145,7 +150,9 @@ class TestsFlextQualityDocumentationDashboard:
         client = dashboard.app.test_client()
         response = client.get("/api/trends?days=5")
         tm.that(response.status_code, eq=200)
-        payload = json.loads(response.get_data(as_text=True))
+        payload_result = u.Cli.json_loads(response.get_data(as_text=True))
+        tm.ok(payload_result)
+        payload = payload_result.value
         tm.that(payload.get("period_days"), eq=5)
 
     def test_api_reports_route_honors_limit_query_param(self, tmp_path: Path) -> None:
@@ -154,7 +161,9 @@ class TestsFlextQualityDocumentationDashboard:
         client = dashboard.app.test_client()
         response = client.get("/api/reports?limit=1")
         tm.that(response.status_code, eq=200)
-        payload = json.loads(response.get_data(as_text=True))
+        payload_result = u.Cli.json_loads(response.get_data(as_text=True))
+        tm.ok(payload_result)
+        payload = payload_result.value
         tm.that(payload, eq=[])
 
     def test_logger_property_returns_module_logger(self, tmp_path: Path) -> None:

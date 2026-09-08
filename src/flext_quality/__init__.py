@@ -23,13 +23,7 @@ if TYPE_CHECKING:
     from flext_infra import d, e, h, r, x
     from flext_web import c as web_c
 
-    from . import (
-        docs as docs,
-        hooks as hooks,
-        integrations as integrations,
-        mcp as mcp,
-        rules as rules,
-    )
+    from . import docs, hooks, integrations, mcp, rules
     from ._config import FlextQualityConfig, config
     from ._settings import FlextQualitySettings, settings
     from .api import FlextQuality, quality
