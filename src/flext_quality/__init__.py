@@ -20,9 +20,6 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from enum import StrEnum, auto, unique
-    from typing import TYPE_CHECKING, ClassVar, Final
-
     from flext_infra import d, e, h, r, x
     from flext_web import c as web_c
 
@@ -66,9 +63,6 @@ if TYPE_CHECKING:
     from .typings import FlextQualityTypes, FlextQualityTypes as t
     from .utilities import FlextQualityUtilities, FlextQualityUtilities as u
 __all__: tuple[str, ...] = (
-    "TYPE_CHECKING",
-    "ClassVar",
-    "Final",
     "FlextQuality",
     "FlextQualityBaseHook",
     "FlextQualityClaudeContextClient",
@@ -101,8 +95,6 @@ __all__: tuple[str, ...] = (
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
-    "MappingProxyType",
-    "StrEnum",
     "__author__",
     "__author_email__",
     "__description__",
@@ -111,7 +103,6 @@ __all__: tuple[str, ...] = (
     "__url__",
     "__version__",
     "__version_info__",
-    "auto",
     "c",
     "config",
     "d",
@@ -131,7 +122,6 @@ __all__: tuple[str, ...] = (
     "settings",
     "t",
     "u",
-    "unique",
     "web_c",
     "x",
 )
@@ -176,10 +166,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "enum": ("StrEnum", "auto", "unique"),
             "flext_infra": ("d", "e", "h", "r", "x"),
-            "types": ("MappingProxyType",),
-            "typing": ("ClassVar", "Final", "TYPE_CHECKING"),
         }),
         alias_groups=MappingProxyType({"flext_web": (("web_c", "c"),)}),
         sort_keys=False,

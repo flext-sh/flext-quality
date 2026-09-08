@@ -11,7 +11,6 @@ Usage:
 
 from __future__ import annotations
 
-import logging
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, override
@@ -37,7 +36,7 @@ class FlextQualityDocumentationOptimizer:
         """
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = u.fetch_logger(self.__class__.__name__)
         self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat()
         )

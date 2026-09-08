@@ -561,21 +561,21 @@ Broken Links:
         """Run the example validation without leaking module-level test data."""
         test_links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo] = [
             FlextQualityLinkChecker.LinkInfo(
-                url="https://github.com/microsoft/vscode",
+                url=c.Quality.LinkCheckerDemo.VSCODE_URL,
                 text="VSCode",
                 type="external",
                 file="README.md",
                 context={"file": "README.md"},
             ),
             FlextQualityLinkChecker.LinkInfo(
-                url="https://httpbin.org/status/200",
+                url=c.Quality.LinkCheckerDemo.HTTPBIN_OK_URL,
                 text="httpbin",
                 type="external",
                 file="docs/setup.md",
                 context={"file": "docs/setup.md"},
             ),
             FlextQualityLinkChecker.LinkInfo(
-                url="https://httpbin.org/status/404",
+                url=c.Quality.LinkCheckerDemo.HTTPBIN_BROKEN_URL,
                 text="broken",
                 type="external",
                 file="docs/broken.md",
