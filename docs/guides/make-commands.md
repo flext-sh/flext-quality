@@ -3,6 +3,8 @@
 
 # flext-quality - FLEXT Make Commands
 
+> Project profile: `flext-quality`
+
 <!-- TOC START -->
 - [Discover commands](#discover-commands)
 - [Canonical workflow](#canonical-workflow)
@@ -12,15 +14,13 @@
 - [Related guides](#related-guides)
 <!-- TOC END -->
 
-> Project profile: `flext-quality`
-
 `make help` at the workspace root is the executable authority for command
 grammar. This guide records the invariants that every declared verb must keep.
 
 ## Discover commands
 
 ```bash
-make setup APPLY=Y
+make setup
 make help
 ```
 
