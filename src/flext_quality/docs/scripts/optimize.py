@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final, override
 
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:

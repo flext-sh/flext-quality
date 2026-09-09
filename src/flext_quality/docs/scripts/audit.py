@@ -19,8 +19,8 @@ from string import Template
 from typing import TYPE_CHECKING, Annotated, Final, override
 
 import requests
-
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:

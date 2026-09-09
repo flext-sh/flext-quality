@@ -13,8 +13,8 @@ from pathlib import Path
 from typing import override
 
 from flask import Flask, Response, render_template_string, request
-
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 

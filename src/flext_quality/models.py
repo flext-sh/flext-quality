@@ -19,8 +19,9 @@ from flext_infra import (
     FlextInfraModels as _InfraModels,
     FlextInfraUtilities as _InfraUtilities,
 )
-from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 from flext_web import FlextWebModels as _WebModels
+
+from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 
 
 def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:

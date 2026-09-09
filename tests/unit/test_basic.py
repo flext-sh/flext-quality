@@ -8,9 +8,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
+from flext_tests import tm
 
 from flext_quality import FlextQuality, FlextQualityConfig, c, config, quality
-from flext_tests import tm
 
 
 class TestsFlextQualityBasic:

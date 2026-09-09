@@ -9,8 +9,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_quality import FlextQualityCodeExecutionBridge
 from flext_tests import tm
+
+from flext_quality import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
     from pathlib import Path

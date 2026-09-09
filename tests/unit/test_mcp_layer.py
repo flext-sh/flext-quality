@@ -11,12 +11,13 @@ from __future__ import annotations
 import shutil
 from typing import TYPE_CHECKING
 
+from flext_tests import tm
+
 from flext_quality import (
     FlextQualityMcpResources,
     FlextQualityMcpServer,
     FlextQualityMcpTools,
 )
-from flext_tests import tm
 
 if TYPE_CHECKING:
     from pathlib import Path
