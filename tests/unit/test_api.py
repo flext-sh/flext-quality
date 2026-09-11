@@ -15,10 +15,10 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
+from flext_tests import tm
 from pydantic import ValidationError
 
 from flext_quality import FlextQuality, FlextQualitySettings, p, quality, t
-from flext_tests import tm
 
 
 class TestsFlextQualityApi:

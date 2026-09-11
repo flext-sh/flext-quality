@@ -3,32 +3,27 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-from .__version__ import __author__ as __author__
-from .__version__ import __author_email__ as __author_email__
-from .__version__ import __description__ as __description__
-from .__version__ import __license__ as __license__
-from .__version__ import __title__ as __title__
-from .__version__ import __url__ as __url__
-from .__version__ import __version__ as __version__
-from .__version__ import __version_info__ as __version_info__
+from .__version__ import (
+    __author__ as __author__,
+    __author_email__ as __author_email__,
+    __description__ as __description__,
+    __license__ as __license__,
+    __title__ as __title__,
+    __url__ as __url__,
+    __version__ as __version__,
+    __version_info__ as __version_info__,
+)
 
 if TYPE_CHECKING:
-    from . import docs as docs
-    from . import hooks as hooks
-    from . import integrations as integrations
-    from . import mcp as mcp
-    from . import rules as rules
-    from enum import StrEnum, auto, unique
     from flext_infra import d, e, h, r, x
     from flext_web import c as web_c
-    from typing import ClassVar, Final, TYPE_CHECKING
 
+    from . import docs, hooks, integrations, mcp, rules
     from ._config import FlextQualityConfig, config
     from ._settings import FlextQualitySettings, settings
     from .api import FlextQuality, quality
@@ -62,9 +57,6 @@ if TYPE_CHECKING:
     from .typings import FlextQualityTypes, FlextQualityTypes as t
     from .utilities import FlextQualityUtilities, FlextQualityUtilities as u
 __all__: tuple[str, ...] = (
-    "TYPE_CHECKING",
-    "ClassVar",
-    "Final",
     "FlextQuality",
     "FlextQualityBaseHook",
     "FlextQualityClaudeContextClient",
@@ -97,8 +89,6 @@ __all__: tuple[str, ...] = (
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
-    "MappingProxyType",
-    "StrEnum",
     "__author__",
     "__author_email__",
     "__description__",
@@ -107,7 +97,6 @@ __all__: tuple[str, ...] = (
     "__url__",
     "__version__",
     "__version_info__",
-    "auto",
     "c",
     "config",
     "d",
@@ -127,7 +116,6 @@ __all__: tuple[str, ...] = (
     "settings",
     "t",
     "u",
-    "unique",
     "web_c",
     "x",
 )
@@ -172,10 +160,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "enum": ("StrEnum", "auto", "unique"),
             "flext_infra": ("d", "e", "h", "r", "x"),
-            "types": ("MappingProxyType",),
-            "typing": ("ClassVar", "Final", "TYPE_CHECKING"),
         }),
         alias_groups=MappingProxyType({"flext_web": (("web_c", "c"),)}),
         sort_keys=False,

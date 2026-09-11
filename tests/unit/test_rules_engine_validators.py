@@ -8,12 +8,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from flext_tests import tm
+
 from flext_quality import (
     FlextQualityRulesEngine,
     FlextQualityRulesLoader,
     FlextQualityValidators,
 )
-from flext_tests import tm
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -312,8 +313,7 @@ class TestsFlextQualityRulesLoader:
         """A rule entry without a ``name`` is rejected with its index."""
         rules_path = tmp_path / "rules.yaml"
         rules_path.write_text(
-            "rules:\n  - type: warning\n    description: no name\n",
-            encoding="utf-8",
+            "rules:\n  - type: warning\n    description: no name\n", encoding="utf-8"
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
@@ -324,8 +324,7 @@ class TestsFlextQualityRulesLoader:
         """A rule declaring an unknown ``type`` is rejected."""
         rules_path = tmp_path / "rules.yaml"
         rules_path.write_text(
-            "rules:\n  - name: bad-type\n    type: not-a-real-type\n",
-            encoding="utf-8",
+            "rules:\n  - name: bad-type\n    type: not-a-real-type\n", encoding="utf-8"
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
@@ -347,14 +346,10 @@ class TestsFlextQualityRulesLoader:
         tm.that(rule.pattern, eq=None)
         tm.that(rule.enabled, eq=True)
 
-    def test_load_multiple_aggregates_rules_across_files(
-        self, tmp_path: Path
-    ) -> None:
+    def test_load_multiple_aggregates_rules_across_files(self, tmp_path: Path) -> None:
         """``load_multiple`` concatenates rules loaded from every given file."""
         first = tmp_path / "first.yaml"
-        first.write_text(
-            "rules:\n  - name: one\n    type: info\n", encoding="utf-8"
-        )
+        first.write_text("rules:\n  - name: one\n    type: info\n", encoding="utf-8")
         second = tmp_path / "second.yaml"
         second.write_text(
             "rules:\n  - name: two\n    type: warning\n", encoding="utf-8"

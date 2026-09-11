@@ -9,8 +9,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_quality import FlextQualityCodeExecutionBridge
 from flext_tests import tm
+
+from flext_quality import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -61,7 +62,9 @@ class TestsFlextQualityCodeExecutionBridge:
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_ruff_command(tmp_path)
         tm.that(result.success, eq=True)
-        tm.that(result.value, eq=["ruff", "check", str(tmp_path), "--output-format=json"])
+        tm.that(
+            result.value, eq=["ruff", "check", str(tmp_path), "--output-format=json"]
+        )
 
     def test_build_ruff_command_honors_fix_and_output_format(
         self, tmp_path: Path

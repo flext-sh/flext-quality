@@ -3,29 +3,19 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from types import MappingProxyType
+from typing import TYPE_CHECKING
 
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from . import helpers as helpers
-    from . import unit as unit
-    from flext_quality import FlextQualityConstants
     from flext_tests import FlextTestsConstants, d, e, h, r, td, tf, tk, tm, tv, x
 
+    from flext_quality import FlextQualityConstants
+
+    from . import helpers, unit
     from .base import TestsFlextQualityServiceBase, TestsFlextQualityServiceBase as s
-    from .conftest import set_test_environment
     from .constants import TestsFlextQualityConstants, TestsFlextQualityConstants as c
-    from .helpers.assertions import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-    )
     from .models import TestsFlextQualityModels, TestsFlextQualityModels as m
     from .protocols import TestsFlextQualityProtocols, TestsFlextQualityProtocols as p
     from .settings import TestsFlextQualitySettings
@@ -41,12 +31,6 @@ __all__: tuple[str, ...] = (
     "TestsFlextQualitySettings",
     "TestsFlextQualityTypes",
     "TestsFlextQualityUtilities",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
     "c",
     "d",
     "e",
@@ -56,7 +40,6 @@ __all__: tuple[str, ...] = (
     "p",
     "r",
     "s",
-    "set_test_environment",
     "t",
     "td",
     "tf",
@@ -72,17 +55,8 @@ _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
             ".base": ("TestsFlextQualityServiceBase", "s"),
-            ".conftest": ("set_test_environment",),
             ".constants": ("TestsFlextQualityConstants", "c"),
             ".helpers": ("helpers",),
-            ".helpers.assertions": (
-                "assert_analysis_results_structure",
-                "assert_dict_structure",
-                "assert_is_dict",
-                "assert_is_list",
-                "assert_issues_structure",
-                "assert_metrics_structure",
-            ),
             ".models": ("TestsFlextQualityModels", "m"),
             ".protocols": ("TestsFlextQualityProtocols", "p"),
             ".settings": ("TestsFlextQualitySettings",),

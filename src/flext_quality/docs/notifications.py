@@ -15,8 +15,8 @@ from pathlib import Path
 from typing import Annotated, override
 
 import requests
-
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 
@@ -596,9 +596,7 @@ Found {len(broken_links)} broken links that need attention:
             if self.audit_data:
                 audit_read = u.Cli.files_read_text(Path(self.audit_data))
                 if audit_read.failure:
-                    return r[bool].fail(
-                        audit_read.error or f"cannot read {self.audit_data}"
-                    )
+                    return r[bool].from_failure(audit_read)
                 audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     audit_read.value
                 )
@@ -617,9 +615,7 @@ Found {len(broken_links)} broken links that need attention:
             if self.weekly_report:
                 weekly_read = u.Cli.files_read_text(Path(self.weekly_report))
                 if weekly_read.failure:
-                    return r[bool].fail(
-                        weekly_read.error or f"cannot read {self.weekly_report}"
-                    )
+                    return r[bool].from_failure(weekly_read)
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     weekly_read.value
                 )
@@ -628,9 +624,7 @@ Found {len(broken_links)} broken links that need attention:
             if self.monthly_report:
                 monthly_read = u.Cli.files_read_text(Path(self.monthly_report))
                 if monthly_read.failure:
-                    return r[bool].fail(
-                        monthly_read.error or f"cannot read {self.monthly_report}"
-                    )
+                    return r[bool].from_failure(monthly_read)
                 report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     monthly_read.value
                 )

@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
+from flext_cli import cli
 from jinja2 import Template
 
-from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -694,7 +694,7 @@ class FlextQualityDocumentationReporter:
         filepath = self.reports_dir / f"{filename}.{report_format}"
         write = u.Cli.atomic_write_text_file(filepath, content)
         if write.failure:
-            return r[Path].fail(write.error or f"cannot write {filepath}")
+            return r[Path].from_failure(write)
         return r[Path].ok(filepath)
 
     class Run(s[bool]):
@@ -746,7 +746,7 @@ class FlextQualityDocumentationReporter:
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             elif self.weekly_trends:
                 trend_report = reporter.generate_trend_report(days=7)
                 filename = (
@@ -754,7 +754,7 @@ class FlextQualityDocumentationReporter:
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             else:
                 report_content = reporter.generate_quality_report(
                     self.output_format, include_trends=self.include_trends
@@ -767,7 +767,7 @@ class FlextQualityDocumentationReporter:
                     report_content, filename, self.output_format
                 )
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             return r[bool].ok(value=True)
 
     @staticmethod

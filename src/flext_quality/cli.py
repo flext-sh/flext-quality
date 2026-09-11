@@ -11,10 +11,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, ClassVar, Self, override
 
 from flext_cli import cli
+
 from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence, Sequence
+    from collections.abc import MutableSequence
 
 
 class FlextQualityCli(s[bool]):
@@ -76,7 +77,9 @@ class FlextQualityCli(s[bool]):
             cmds.append(["python", "-m", "coverage", "report"])
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
-    COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
+    COMMANDS: ClassVar[
+        t.SequenceOf[type[s[t.JsonMapping] | s[t.SequenceOf[t.StrSequence]]]]
+    ] = (Status, Check, Validate)
 
     @override
     def execute(self) -> p.Result[bool]:
@@ -84,8 +87,10 @@ class FlextQualityCli(s[bool]):
         return r[bool].ok(value=True)
 
 
-def _execute_command(params: s) -> p.Result[t.JsonDict]:
-    """Execute a registered flext-quality CLI subcommand (typed, not a lambda, for pyrefly)."""
+# Why: both lanes replaced the lambda handler with a named typed function so
+# pyrefly can infer the route handler signature; the lane name `_invoke` is kept.
+def _invoke(params: s) -> p.Result[t.JsonDict]:
+    """Execute a registered service instance for its declarative CLI route."""
     return params.execute()
 
 
@@ -101,7 +106,7 @@ def main(args: t.StrSequence | None = None) -> int:
                 name=svc.__name__.lower(),
                 help_text=svc.__doc__ or "",
                 model_cls=svc,
-                handler=_execute_command,
+                handler=_invoke,
             )
             for svc in FlextQualityCli.COMMANDS
         ],
@@ -111,7 +116,7 @@ def main(args: t.StrSequence | None = None) -> int:
         prog_name=FlextQualityCli.app_name,
         args=args if args is not None else sys.argv[1:],
     )
-    return 0 if result.success else 1
+    return cli.finalize_result(result)
 
 
 __all__: list[str] = ["FlextQualityCli", "main"]

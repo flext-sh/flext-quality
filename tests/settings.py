@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from flext_quality import FlextQualitySettings
 from flext_tests import FlextTestsSettings
+
+from flext_quality import FlextQualitySettings
 
 
 class TestsFlextQualitySettings(FlextQualitySettings, FlextTestsSettings):

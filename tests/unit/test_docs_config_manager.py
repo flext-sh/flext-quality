@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_quality import FlextQualityConfigManager
 from flext_tests import tm
+
+from flext_quality import FlextQualityConfigManager
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -41,9 +42,7 @@ class TestsFlextQualityConfigManager:
         tm.that(guide.markdown.heading_style, eq="atx")
         tm.that(guide.accessibility.require_alt_text, eq=True)
 
-    def test_get_validation_config_falls_back_to_defaults(
-        self, tmp_path: Path
-    ) -> None:
+    def test_get_validation_config_falls_back_to_defaults(self, tmp_path: Path) -> None:
         """An empty config directory yields the built-in validation defaults."""
         manager = FlextQualityConfigManager(tmp_path)
         validation = manager.get_validation_config()
@@ -67,8 +66,7 @@ class TestsFlextQualityConfigManager:
     def test_get_config_caches_raw_mapping_by_name(self, tmp_path: Path) -> None:
         """``get_config`` loads and caches the raw section mapping by name."""
         (tmp_path / "custom.yaml").write_text(
-            "section:\n  flag: true\n  items:\n    - a\n    - b\n",
-            encoding="utf-8",
+            "section:\n  flag: true\n  items:\n    - a\n    - b\n", encoding="utf-8"
         )
         manager = FlextQualityConfigManager(tmp_path)
         data = manager.get_config("custom")
@@ -110,8 +108,7 @@ class TestsFlextQualityConfigManager:
         manager = FlextQualityConfigManager(tmp_path)
         issues = manager.validate_configs()
         tm.that(
-            any("Missing required settings file" in issue for issue in issues),
-            eq=False,
+            any("Missing required settings file" in issue for issue in issues), eq=False
         )
 
     def test_get_all_configs_returns_composite_mapping(self, tmp_path: Path) -> None:
@@ -201,13 +198,14 @@ class TestsFlextQualityConfigManager:
         """``get_content_setting`` reads from the raw content-validation mapping."""
         manager = FlextQualityConfigManager(tmp_path)
         validation = manager.get_validation_config()
-        tm.that(validation.get_content_setting("missing", default="fallback"), eq="fallback")
+        tm.that(
+            validation.get_content_setting("missing", default="fallback"), eq="fallback"
+        )
 
     def test_as_section_coerces_list_items_to_strings(self, tmp_path: Path) -> None:
         """A YAML list value is normalized into a list of strings."""
         (tmp_path / "custom.yaml").write_text(
-            "section:\n  items:\n    - 1\n    - true\n    - text\n",
-            encoding="utf-8",
+            "section:\n  items:\n    - 1\n    - true\n    - text\n", encoding="utf-8"
         )
         manager = FlextQualityConfigManager(tmp_path)
         data = manager.get_config("custom")

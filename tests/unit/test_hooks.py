@@ -8,8 +8,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, override
 
-from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r
 from flext_tests import tm
+
+from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r
 
 if TYPE_CHECKING:
     from flext_quality import p, t
@@ -183,7 +184,4 @@ class TestsFlextQualityHookManager:
         tm.that(len(entries), eq=2)
 
 
-__all__: list[str] = [
-    "TestsFlextQualityBaseHook",
-    "TestsFlextQualityHookManager",
-]
+__all__: list[str] = ["TestsFlextQualityBaseHook", "TestsFlextQualityHookManager"]

@@ -19,8 +19,8 @@ from string import Template
 from typing import TYPE_CHECKING, Annotated, Final, override
 
 import requests
-
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -779,13 +779,13 @@ class FlextQualityDocumentationAuditor:
         report_content = self.generate_report(output_format)
         report_write = u.Cli.atomic_write_text_file(filepath, report_content)
         if report_write.failure:
-            return r[str].fail(report_write.error or f"cannot write {filepath}")
+            return r[str].from_failure(report_write)
         latest_file = output_dir / "latest_audit.json"
         latest_write = u.Cli.json_write(
             latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
-            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+            return r[str].from_failure(latest_write)
         return r[str].ok(str(filepath))
 
     class Run(s[bool]):
@@ -842,9 +842,7 @@ class FlextQualityDocumentationAuditor:
                 results = self._execute_checks(auditor)
                 save_result = auditor.save_report(self.output_format, self.output)
                 if save_result.failure:
-                    return r[bool].fail(
-                        save_result.error or "audit report write failed"
-                    )
+                    return r[bool].from_failure(save_result)
                 metrics = results.metrics
                 if self._should_fail(metrics):
                     return r[bool].fail("Audit failed quality threshold")

@@ -8,12 +8,13 @@ and real JSON/model serialization — no mocks or patched collaborators.
 
 from __future__ import annotations
 
+from flext_tests import tm
+
 from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
     FlextQualityMcpClient,
 )
-from flext_tests import tm
 
 
 class TestsFlextQualityIntegrations:
