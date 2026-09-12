@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 # Built as a concatenation so this fixture literal is never mistaken by
 # static scanners for a real suppression directive in this test module.
-_IGNORE_MARKER_CONTENT = "value = 1
+_IGNORE_MARKER_CONTENT = "value = 1"
 
 
 class TestsFlextQualityRulesEngine:

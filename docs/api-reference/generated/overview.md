@@ -15,7 +15,7 @@
   Developers`, `Operating System :: OS Independent`, `Programming Language ::
   Python :: 3 :: Only`, `Programming Language :: Python :: 3.13`, `Topic ::
   Software Development :: Libraries :: Python Modules` (+1 more)
-- Project class: `platform`
+- Project class: `domain`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`,
