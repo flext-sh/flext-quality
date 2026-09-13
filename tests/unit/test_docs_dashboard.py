@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 from flext_tests import tm
 
 from flext_quality import FlextQualityDocumentationDashboard
-from tests import u
+from tests import t, u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -68,15 +68,14 @@ class TestsFlextQualityDocumentationDashboard:
 
     def test_get_quality_trends_reads_real_report_files(self, tmp_path: Path) -> None:
         """A recent, well-formed report file contributes one trend entry."""
-        report = {
+        report_file = tmp_path / "audit_report_20260101_120000.json"
+        report_dump = u.Cli.json_dumps({
             "metrics": {
                 "quality_score": 91,
                 "total_issues": 2,
                 "severity_breakdown": {"critical": 0, "high": 2},
             }
-        }
-        report_file = tmp_path / "audit_report_20260101_120000.json"
-        report_dump = u.Cli.json_dumps(report)
+        })
         tm.ok(report_dump)
         report_file.write_text(report_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
@@ -139,7 +138,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(response.status_code, eq=200)
         payload_result = u.Cli.json_loads(response.get_data(as_text=True))
         tm.ok(payload_result)
-        payload = payload_result.value
+        payload = t.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("status"), eq="No audit data available")
 
     def test_api_trends_route_honors_days_query_param(self, tmp_path: Path) -> None:
@@ -150,7 +149,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(response.status_code, eq=200)
         payload_result = u.Cli.json_loads(response.get_data(as_text=True))
         tm.ok(payload_result)
-        payload = payload_result.value
+        payload = t.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("period_days"), eq=5)
 
     def test_api_reports_route_honors_limit_query_param(self, tmp_path: Path) -> None:
