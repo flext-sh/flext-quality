@@ -18,9 +18,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Final, override
 
 import requests
-
 from flext_api import FlextApiConstants
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -467,13 +467,13 @@ class FlextQualityDocumentationValidator:
             report_content = self.generate_report("json")
             report_write = u.Cli.atomic_write_text_file(filepath, report_content)
             if report_write.failure:
-                return r[Path].fail(report_write.error or f"cannot write {filepath}")
+                return r[Path].from_failure(report_write)
             latest_file = output_dir / "latest_validation.json"
             latest_write = u.Cli.json_write(
                 latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
             )
             if latest_write.failure:
-                return r[Path].fail(latest_write.error or f"cannot write {latest_file}")
+                return r[Path].from_failure(latest_write)
             return r[Path].ok(filepath)
 
     class ContentValidator:
@@ -647,7 +647,7 @@ class FlextQualityDocumentationValidator:
             if not any(pattern in str(f) for pattern in ignored_patterns)
         ]
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation validation."""
 
         external_links: bool = u.Field(
@@ -744,12 +744,15 @@ class FlextQualityDocumentationValidator:
             total_errors = len(link_errors) + len(content_issues)
             save_result = link_validator.save_report(self.output)
             if save_result.failure:
-                return r[bool].fail(
-                    save_result.error or "validation report write failed"
-                )
+                return r[bool].from_failure(save_result)
             if total_errors > 0:
                 return r[bool].fail(f"Validation found {total_errors} errors")
             return r[bool].ok(value=True)
+
+    @staticmethod
+    def _run_handler(params: FlextQualityDocumentationValidator.Run) -> p.Result[bool]:
+        """Execute the validator ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
@@ -762,10 +765,15 @@ class FlextQualityDocumentationValidator:
                 name="run",
                 help_text="Run documentation validation checks",
                 model_cls=FlextQualityDocumentationValidator.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationValidator._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationValidator"]
 
 
 if __name__ == "__main__":

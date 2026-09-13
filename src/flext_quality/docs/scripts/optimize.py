@@ -11,12 +11,12 @@ Usage:
 
 from __future__ import annotations
 
-import logging
 import shutil
 from pathlib import Path
 from typing import TYPE_CHECKING, Final, override
 
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -37,7 +37,7 @@ class FlextQualityDocumentationOptimizer:
         """
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger = u.fetch_logger(self.__class__.__name__)
         self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat()
         )
@@ -394,7 +394,7 @@ class FlextQualityDocumentationOptimizer:
             )
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
-            return r[bool].fail(write.error or f"cannot write {file_path}")
+            return r[bool].from_failure(write)
         return r[bool].ok(True)
 
     def generate_report(self, report_format: str = "json") -> str:
@@ -417,16 +417,16 @@ class FlextQualityDocumentationOptimizer:
         report_content = self.generate_report("json")
         report_write = u.Cli.atomic_write_text_file(filepath, report_content)
         if report_write.failure:
-            return r[str].fail(report_write.error or f"cannot write {filepath}")
+            return r[str].from_failure(report_write)
         latest_file = output_dir / "latest_optimization.json"
         latest_write = u.Cli.json_write(
             latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
-            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+            return r[str].from_failure(latest_write)
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
@@ -505,10 +505,13 @@ class FlextQualityDocumentationOptimizer:
                 return r[bool].fail("No optimization selected")
             save_result = optimizer.save_report(self.output)
             if save_result.failure:
-                return r[bool].fail(
-                    save_result.error or "optimization report write failed"
-                )
+                return r[bool].from_failure(save_result)
             return r[bool].ok(value=True)
+
+    @staticmethod
+    def _run_handler(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
+        """Execute the optimizer ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
@@ -521,10 +524,15 @@ class FlextQualityDocumentationOptimizer:
                 name="run",
                 help_text="Run documentation optimizations",
                 model_cls=FlextQualityDocumentationOptimizer.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationOptimizer._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationOptimizer"]
 
 
 if __name__ == "__main__":

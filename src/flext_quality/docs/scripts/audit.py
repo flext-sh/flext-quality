@@ -19,8 +19,8 @@ from string import Template
 from typing import TYPE_CHECKING, Annotated, Final, override
 
 import requests
-
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -779,16 +779,16 @@ class FlextQualityDocumentationAuditor:
         report_content = self.generate_report(output_format)
         report_write = u.Cli.atomic_write_text_file(filepath, report_content)
         if report_write.failure:
-            return r[str].fail(report_write.error or f"cannot write {filepath}")
+            return r[str].from_failure(report_write)
         latest_file = output_dir / "latest_audit.json"
         latest_write = u.Cli.json_write(
             latest_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         )
         if latest_write.failure:
-            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+            return r[str].from_failure(latest_write)
         return r[str].ok(str(filepath))
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(
@@ -842,9 +842,7 @@ class FlextQualityDocumentationAuditor:
                 results = self._execute_checks(auditor)
                 save_result = auditor.save_report(self.output_format, self.output)
                 if save_result.failure:
-                    return r[bool].fail(
-                        save_result.error or "audit report write failed"
-                    )
+                    return r[bool].from_failure(save_result)
                 metrics = results.metrics
                 if self._should_fail(metrics):
                     return r[bool].fail("Audit failed quality threshold")
@@ -885,6 +883,11 @@ class FlextQualityDocumentationAuditor:
             return self.ci_mode and metrics.quality_score < _QUALITY_SCORE_CI_THRESHOLD
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
+        """Execute the auditor ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade."""
         exit_code: int = u.Quality.execute_result_command(
@@ -895,10 +898,15 @@ class FlextQualityDocumentationAuditor:
                 name="run",
                 help_text="Run documentation audit checks",
                 model_cls=FlextQualityDocumentationAuditor.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationAuditor._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationAuditor"]
 
 
 if __name__ == "__main__":

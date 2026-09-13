@@ -561,21 +561,21 @@ Broken Links:
         """Run the example validation without leaking module-level test data."""
         test_links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo] = [
             FlextQualityLinkChecker.LinkInfo(
-                url="https://github.com/microsoft/vscode",
+                url=c.Quality.LinkCheckerDemo.VSCODE_URL,
                 text="VSCode",
                 type="external",
                 file="README.md",
                 context={"file": "README.md"},
             ),
             FlextQualityLinkChecker.LinkInfo(
-                url="https://httpbin.org/status/200",
+                url=c.Quality.LinkCheckerDemo.HTTPBIN_OK_URL,
                 text="httpbin",
                 type="external",
                 file="docs/setup.md",
                 context={"file": "docs/setup.md"},
             ),
             FlextQualityLinkChecker.LinkInfo(
-                url="https://httpbin.org/status/404",
+                url=c.Quality.LinkCheckerDemo.HTTPBIN_BROKEN_URL,
                 text="broken",
                 type="external",
                 file="docs/broken.md",
@@ -591,6 +591,11 @@ Broken Links:
         """Run the example CLI entrypoint."""
         asyncio.run(FlextQualityLinkChecker.run_demo())
         return 0
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityLinkChecker"]
 
 
 if __name__ == "__main__":

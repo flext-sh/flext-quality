@@ -18,6 +18,7 @@ from typing import Annotated, ClassVar, override
 import pytest
 import schedule
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 
@@ -530,9 +531,9 @@ class FlextQualityScheduledMaintenance:
                 msg = result.error or f"git {' '.join(argv[1:])} failed"
                 raise RuntimeError(msg)
             output = result.value
-            if output.exit_code != 0:
+            if output.outcome.raw_return_code != 0:
                 detail = (output.stderr or output.stdout).strip()
-                msg = detail or f"git exited {output.exit_code}"
+                msg = detail or f"git exited {output.outcome.raw_return_code}"
                 raise RuntimeError(msg)
 
         return self._run_with_timeout(run_git_command, timeout, description)
@@ -691,7 +692,7 @@ class FlextQualityScheduledMaintenance:
             results_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
         ).unwrap()
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(
@@ -740,6 +741,11 @@ class FlextQualityScheduledMaintenance:
             )
 
     @staticmethod
+    def _run_handler(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
+        """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade."""
         exit_code: int = u.Quality.execute_result_command(
@@ -752,10 +758,15 @@ class FlextQualityScheduledMaintenance:
                     "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
                 ),
                 model_cls=FlextQualityScheduledMaintenance.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityScheduledMaintenance._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityScheduledMaintenance"]
 
 
 if __name__ == "__main__":

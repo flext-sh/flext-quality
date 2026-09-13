@@ -16,8 +16,9 @@ from flext_quality import (
     t,
     u,
 )
-from flext_quality._settings import FlextQualitySettings
 from flext_quality.base import FlextQualityServiceBase
+
+from ._settings import FlextQualitySettings
 
 
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
@@ -124,10 +125,10 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         """
         stdin_result = u.Quality.read_stdin()
         if stdin_result.failure:
-            return r[t.JsonMapping].fail(stdin_result.error or "Failed to read stdin")
+            return r[t.JsonMapping].from_failure(stdin_result)
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.failure:
-            return r[t.JsonMapping].fail(parse_result.error or "Failed to parse input")
+            return r[t.JsonMapping].from_failure(parse_result)
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:

@@ -40,6 +40,13 @@ class FlextQualityConstants(c, web_c):
     class Quality:
         """Quality-specific constants namespace."""
 
+        class LinkCheckerDemo:
+            """Demo link fixtures for the documentation link checker."""
+
+            VSCODE_URL: Final[str] = "https://github.com/microsoft/vscode"
+            HTTPBIN_OK_URL: Final[str] = "https://httpbin.org/status/200"
+            HTTPBIN_BROKEN_URL: Final[str] = "https://httpbin.org/status/404"
+
         @unique
         class HookEvent(StrEnum):
             """Claude Code hook events."""

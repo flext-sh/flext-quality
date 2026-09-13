@@ -15,9 +15,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
+from flext_cli import cli
 from jinja2 import Template
 
-from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
@@ -613,10 +613,17 @@ class FlextQualityDocumentationReporter:
                             files_processed=files_processed,
                         )
                     )
+
+        def _trend_entry_date(
+            entry: FlextQualityDocumentationReporter.TrendEntry,
+        ) -> datetime:
+            """Sort key for trend entries (typed, not a lambda, for pyrefly)."""
+            return entry.date
+
         return FlextQualityDocumentationReporter.TrendData(
-            audit_trends=sorted(audit_trends, key=lambda e: e.date),
-            validation_trends=sorted(validation_trends, key=lambda e: e.date),
-            optimization_trends=sorted(optimization_trends, key=lambda e: e.date),
+            audit_trends=sorted(audit_trends, key=_trend_entry_date),
+            validation_trends=sorted(validation_trends, key=_trend_entry_date),
+            optimization_trends=sorted(optimization_trends, key=_trend_entry_date),
         )
 
     def _generate_trend_report(
@@ -687,10 +694,10 @@ class FlextQualityDocumentationReporter:
         filepath = self.reports_dir / f"{filename}.{report_format}"
         write = u.Cli.atomic_write_text_file(filepath, content)
         if write.failure:
-            return r[Path].fail(write.error or f"cannot write {filepath}")
+            return r[Path].from_failure(write)
         return r[Path].ok(filepath)
 
-    class Run(s):
+    class Run(s[bool]):
         """CLI command for FLEXT Quality documentation reporting."""
 
         output_format: Annotated[
@@ -739,7 +746,7 @@ class FlextQualityDocumentationReporter:
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             elif self.weekly_trends:
                 trend_report = reporter.generate_trend_report(days=7)
                 filename = (
@@ -747,7 +754,7 @@ class FlextQualityDocumentationReporter:
                 )
                 save_result = reporter.save_report(trend_report, filename, "md")
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             else:
                 report_content = reporter.generate_quality_report(
                     self.output_format, include_trends=self.include_trends
@@ -760,8 +767,13 @@ class FlextQualityDocumentationReporter:
                     report_content, filename, self.output_format
                 )
                 if save_result.failure:
-                    return r[bool].fail(save_result.error or "report write failed")
+                    return r[bool].from_failure(save_result)
             return r[bool].ok(value=True)
+
+    @staticmethod
+    def _run_handler(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
+        """Execute the reporter ``Run`` route (typed, not a lambda, for pyrefly)."""
+        return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
@@ -774,10 +786,15 @@ class FlextQualityDocumentationReporter:
                 name="run",
                 help_text="Generate a documentation quality report",
                 model_cls=FlextQualityDocumentationReporter.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationReporter._run_handler,
             ),
         )
         return exit_code
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityDocumentationReporter"]
 
 
 if __name__ == "__main__":

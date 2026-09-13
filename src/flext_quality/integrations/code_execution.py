@@ -99,3 +99,8 @@ class FlextQualityCodeExecutionBridge:
             "timeout_ms": self._timeout_ms,
             "supported_runtimes": ["python", "typescript", "ruff", "basedpyright"],
         })
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityCodeExecutionBridge"]

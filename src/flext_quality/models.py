@@ -7,17 +7,21 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import MutableMapping, MutableSequence
-from typing import TYPE_CHECKING, Annotated, Self
+
+# Why: mro-fix-27vfb — `Path` backs a real Pydantic model field
+# (ExecutionRequest.script_path) and must resolve at runtime; a
+# TYPE_CHECKING-only import leaves that field unresolved and the model
+# unbuildable at first instantiation (model_rebuild() is prohibited).
+from pathlib import Path
+from typing import Annotated, Self
 
 from flext_infra import (
     FlextInfraModels as _InfraModels,
     FlextInfraUtilities as _InfraUtilities,
 )
-from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 from flext_web import FlextWebModels as _WebModels
 
-if TYPE_CHECKING:
-    from pathlib import Path
+from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 
 
 def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:
@@ -165,7 +169,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
 
             @property
             def success_rate(self) -> float:
-                """Calculate success rate as a percentage."""
+                """Success rate as a percentage."""
                 if self.total_items == 0:
                     return 100.0
                 return (self.valid_items / self.total_items) * 100.0

@@ -6,9 +6,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_tests import tm
+
 from flext_quality import m
 from flext_quality.docs.scheduled_maintenance import FlextQualityScheduledMaintenance
-from flext_tests import tm
 
 
 class TestsFlextQualityScheduledMaintenanceTimeout:
