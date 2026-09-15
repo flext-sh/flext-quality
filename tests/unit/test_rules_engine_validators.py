@@ -19,9 +19,8 @@ from flext_quality import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-# Built as a concatenation so this fixture literal is never mistaken by
-# static scanners for a real suppression directive in this test module.
-_IGNORE_MARKER_CONTENT = "value = 1"
+# Source text passed to the validator, not a suppression on this test module.
+_IGNORE_MARKER_CONTENT = "value = 1  # type: ignore"
 
 
 class TestsFlextQualityRulesEngine:
@@ -270,11 +269,22 @@ class TestsFlextQualityValidators:
         tm.that(len(registry.all()), eq=3)
 
     def test_registry_validate_all_aggregates_every_validator(self) -> None:
-        """``validate_all`` merges violations from every registered validator."""
+        """``validate_all`` preserves both violations from a registered validator."""
         registry = FlextQualityValidators.Registry()
-        result = registry.validate_all(_IGNORE_MARKER_CONTENT)
+        content = "first-marker\nsecond-marker"
+        registry.register(
+            FlextQualityValidators.Pattern({
+                "first": "first-marker",
+                "second": "second-marker",
+            })
+        )
+        result = registry.validate_all(content)
         tm.that(result.success, eq=True)
-        tm.that(len(result.value) >= 1, eq=True)
+        tm.that(
+            {"pattern-first", "pattern-second"}
+            <= {violation["rule"] for violation in result.value},
+            eq=True,
+        )
 
 
 class TestsFlextQualityRulesLoader:
