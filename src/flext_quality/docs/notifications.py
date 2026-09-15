@@ -604,7 +604,8 @@ Found {len(broken_links)} broken links that need attention:
                 issues_raw = audit_data.get("issues")
                 broken_links: MutableSequence[t.JsonValue] = []
                 if isinstance(issues_raw, t.SEQUENCE_PAIR_TYPES):
-                    for i_raw in issues_raw:
+                    issues_seq: t.SequenceOf[t.JsonValue] = issues_raw  # type: ignore[assignment]
+                    for i_raw in issues_seq:
                         if isinstance(i_raw, Mapping):
                             type_val = i_raw.get("type", "")
                             if "broken" in str(type_val).lower():
