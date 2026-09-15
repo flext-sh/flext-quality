@@ -89,6 +89,7 @@ dev = [
   "pytest-cov",
   "pytest-markdown-docs",
   "pytest-randomly>=4.1.0",
+  "pytest-reportlog",
   "pytest-testmon>=2.2.0",
   "pytest-timeout",
   "pytest-xdist",
@@ -415,6 +416,7 @@ markers = [
   "smoke: public-interface smoke tests",
   "unit: unit tests",
   "integration: integration tests",
+  "functional: functional behavior tests",
   "performance: performance and benchmark tests",
   "slow: slow-running tests",
   "docker: tests requiring Docker",
@@ -424,6 +426,8 @@ markers = [
   "edge_cases: edge case tests",
   "stress: stress tests",
   "resilience: resilience tests",
+  "discovery: catalog and stream discovery tests",
+  "singer: Singer protocol contract tests",
 ]
 minversion = "8.0"
 python_classes = ["Test*"]
