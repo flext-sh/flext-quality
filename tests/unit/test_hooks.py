@@ -10,10 +10,10 @@ from typing import TYPE_CHECKING, ClassVar, override
 
 from flext_tests import tm
 
-from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r
+from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r, t
 
 if TYPE_CHECKING:
-    from flext_quality import p, t
+    from flext_quality import p
 
 
 class _AlwaysRunHook(FlextQualityBaseHook):
@@ -23,7 +23,10 @@ class _AlwaysRunHook(FlextQualityBaseHook):
 
     @override
     def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r.ok({"continue": True, "seen": input_data.get("tool_name")})
+        return r[t.JsonMapping].ok({
+            "continue": True,
+            "seen": input_data.get("tool_name"),
+        })
 
 
 class _MatcherHook(FlextQualityBaseHook):
@@ -34,7 +37,7 @@ class _MatcherHook(FlextQualityBaseHook):
 
     @override
     def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r.ok({"continue": True})
+        return r[t.JsonMapping].ok({"continue": True})
 
 
 class _BlockingHook(FlextQualityBaseHook):
@@ -44,7 +47,7 @@ class _BlockingHook(FlextQualityBaseHook):
 
     @override
     def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r.ok({"continue": False, "reason": "blocked"})
+        return r[t.JsonMapping].ok({"continue": False, "reason": "blocked"})
 
 
 class _FailingHook(FlextQualityBaseHook):
@@ -54,7 +57,7 @@ class _FailingHook(FlextQualityBaseHook):
 
     @override
     def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r.fail("boom")
+        return r[t.JsonMapping].fail("boom")
 
 
 class TestsFlextQualityBaseHook:

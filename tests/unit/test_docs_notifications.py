@@ -3,7 +3,7 @@
 Exercises real config loading/overriding, real threshold/formatting logic,
 and the real ``requests`` library against invalid-scheme URLs (a fast,
 deterministic, non-networked failure) — no mocks, no patched collaborators.
-Email delivery is intentionally left untested: the production code opens a
+Email credential preflight is tested without delivery: production opens a
 real blocking SMTP socket with no timeout, which is unsafe to exercise in a
 sandboxed, possibly network-restricted test run.
 """
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+import pytest
 from flext_tests import tm
 
 from flext_quality import FlextQualityDocumentationNotifier
@@ -24,6 +25,17 @@ if TYPE_CHECKING:
 
 class TestsFlextQualityDocumentationNotifier:
     """Contract tests for the documentation notification system."""
+
+    @pytest.mark.parametrize("password", [None, ""])
+    def test_email_requires_password_before_delivery(
+        self, tmp_path: Path, password: str | None
+    ) -> None:
+        """Selecting email with absent credentials fails before opening SMTP."""
+        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier.config.channels.email.enabled = True
+        notifier.config.email.password = password
+        with pytest.raises(ValueError, match="non-empty SMTP password"):
+            notifier.send_notification("title", "message")
 
     def test_default_config_enables_only_console_channel(self, tmp_path: Path) -> None:
         """A missing config file yields defaults with only console enabled."""

@@ -44,7 +44,7 @@ class FlextQualityDocumentationNotifier:
         smtp_server: str
         smtp_port: int
         username: str
-        password: str
+        password: str | None
         from_address: str
         to_addresses: t.StrSequence = u.Field(default_factory=tuple)
 
@@ -195,7 +195,7 @@ class FlextQualityDocumentationNotifier:
                 smtp_server="smtp.gmail.com",
                 smtp_port=587,
                 username="",
-                password="",
+                password=None,
                 from_address="",
                 to_addresses=[],
             ),
@@ -356,6 +356,10 @@ Please review recent changes and address any identified issues.
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
         email_config = self.config.email
+        password = email_config.password
+        if not password:
+            error_message = "Email notification requires a non-empty SMTP password"
+            raise ValueError(error_message)
 
         msg = MIMEMultipart()
         msg["From"] = email_config.from_address
@@ -378,7 +382,7 @@ Timestamp: {u.now().isoformat()}
 
         server = smtplib.SMTP(email_config.smtp_server, email_config.smtp_port)
         server.starttls()
-        server.login(email_config.username, email_config.password)
+        server.login(email_config.username, password)
         text = msg.as_string()
         server.sendmail(
             email_config.from_address, list(email_config.to_addresses or []), text
@@ -603,7 +607,7 @@ Found {len(broken_links)} broken links that need attention:
                 _ = notifier.notify_critical_issues(audit_data)
                 issues_raw = audit_data.get("issues")
                 broken_links: MutableSequence[t.JsonValue] = []
-                if isinstance(issues_raw, t.SEQUENCE_PAIR_TYPES):
+                if isinstance(issues_raw, (list, tuple)):
                     for i_raw in issues_raw:
                         if isinstance(i_raw, Mapping):
                             type_val = i_raw.get("type", "")
