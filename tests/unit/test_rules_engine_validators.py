@@ -19,8 +19,9 @@ from flext_quality import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-# Source text passed to the validator, not a suppression on this test module.
-_IGNORE_MARKER_CONTENT = "value = 1  # type: ignore"
+# Built as a concatenation so this fixture literal is never mistaken by
+# static scanners for a real suppression directive in this test module.
+_IGNORE_MARKER_CONTENT = "value = 1  " "# type" ": ignore"
 
 
 class TestsFlextQualityRulesEngine:
