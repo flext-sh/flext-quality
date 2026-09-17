@@ -45,8 +45,9 @@ This system prevents code duplication from accumulating while allowing intention
 A `s[int]` that detects code clones using line-based similarity:
 
 ```python
-from flext_quality import FlextDuplicationPlugin
 from pathlib import Path
+
+from flext_quality import FlextDuplicationPlugin
 
 plugin = FlextDuplicationPlugin()
 
@@ -58,7 +59,6 @@ if result.success:
     for dup in result.value.duplicates:
         print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
 ```
-
 **Key Features**:
 
 - **Line-based similarity**: Uses set intersection of source lines
@@ -124,7 +124,7 @@ BLOCKED: CODE DUPLICATION INCREASED
    Project:      flext-ldif
    Baseline:     2 duplicate pairs
    Current:      3 duplicate pairs (+1)
-   File:         /home/user/flext/flext-ldif/src/flext_ldif/...
+   File:         <workspace-root>/flext-ldif/src/flext_ldif/...
 
 WHY THIS MATTERS:
   Code duplication causes:

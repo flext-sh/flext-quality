@@ -225,7 +225,7 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 **DevOps Engineers**:
 
 - Focus on [Container Architecture](containers.md)
-- Review **Deployment Architecture** (_Documentation coming soon_)
+- Review [deployment diagrams](../diagrams/deployment/README.md)
 - Examine infrastructure requirements and dependencies
 
 ## 🛠️ Tooling & Automation

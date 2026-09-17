@@ -245,7 +245,7 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Build & Deployment
 
-- **Poetry Build**: Standard Python packaging via poetry-core
+- **Build**: Standard Python packaging via hatchling
 - **Container Ready**: Docker support for containerized deployment
 - **CI/CD Integration**: GitHub Actions and GitLab CI support
 - **Artifact Management**: PyPI distribution with semantic versioning
@@ -262,23 +262,16 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Architecture Views
 
-- **System Context**: External system relationships (_Documentation coming soon_)
-- **Container Architecture**: High-level system components (_Documentation coming soon_)
-- **Component Architecture**: Detailed component interactions (_Documentation coming soon_)
-- **Code Architecture**: Implementation-level details (_Documentation coming soon_)
+- [System Context](c4-model/context.md): External system relationships
+- [Container Architecture](c4-model/containers.md): High-level system components
+- [Component Architecture](c4-model/components.md): Detailed component interactions
+- [Code Architecture](c4-model/code.md): Implementation-level details
 
 ### Cross-Cutting Concerns
 
-- **Security Architecture**: Security controls and threat modeling (_Documentation coming soon_)
-- **Deployment Architecture**: Infrastructure and deployment patterns (_Documentation coming soon_)
-- **Data Architecture**: Data models and persistence strategies (_Documentation coming soon_)
-- **Integration Architecture**: External system integrations (_Documentation coming soon_)
-
-### Operational Documentation
-
-- **Monitoring & Observability**: System monitoring and alerting (_Documentation coming soon_)
-- **Disaster Recovery**: Backup and recovery procedures (_Documentation coming soon_)
-- **Performance Characteristics**: Performance benchmarks and optimization (_Documentation coming soon_)
+- [Deployment diagrams](diagrams/deployment/README.md)
+- [Data-flow diagrams](diagrams/data-flow/README.md)
+- [Sequence diagrams](diagrams/sequences/README.md)
 
 ## 🎨 Diagrams & Visualizations
 
@@ -337,23 +330,23 @@ ______________________________________________________________________
 
 ### For New Team Members
 
-1. Start with System Context to understand the big picture (_Documentation coming soon_)
-1. Review Container Architecture for high-level components (_Documentation coming soon_)
-1. Read key Architecture Decisions to understand foundational choices (_Documentation coming soon_)
+1. Start with [System Context](c4-model/context.md) to understand the big picture.
+1. Review [Container Architecture](c4-model/containers.md) for high-level components.
+1. Read the C4 pages in this directory before implementation-specific guides.
 1. Explore [Component Architecture](c4-model/components.md) for detailed interactions
 
 ### For Architects & Technical Leads
 
 1. Review ADRs for decision history and rationale
 1. Examine Cross-Cutting Concerns for quality attributes
-1. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
-1. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
+1. Analyze the [deployment diagrams](diagrams/deployment/README.md).
+1. Review [data-flow diagrams](diagrams/data-flow/README.md).
 
 ### For Developers
 
-1. Understand **Component Architecture** for implementation guidance (_Documentation coming soon_)
-1. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
-1. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
+1. Understand [Component Architecture](c4-model/components.md) for implementation guidance.
+1. Review [Code Architecture](c4-model/code.md) for implementation patterns.
+1. Check [System Context](c4-model/context.md) for external dependencies.
 1. Reference [API Documentation](../api-reference/README.md) for interface specifications
 
 **FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,

@@ -9,7 +9,7 @@
   - [3. MCP Server Access (Available)](#3-mcp-server-access-available)
   - [4. Future: Plugin Interface](#4-future-plugin-interface)
   - [5. Baseline Management](#5-baseline-management)
-- [Architecture Diagram```](#architecture-diagram)
+- [Architecture Diagram](#architecture-diagram)
 - [Summary](#summary)
 <!-- TOC END -->
 
@@ -70,10 +70,11 @@ Planned plugin interface for flext-quality:
 
 ```python
 from __future__ import annotations
-from flext_quality import m
+
 from pathlib import Path
-from flext_core import p
-from flext_core import t
+
+from flext_core import p, t
+from flext_quality import m
 
 
 class QualityPlugin(Protocol):
@@ -82,28 +83,22 @@ class QualityPlugin(Protocol):
     @property
     def name(self) -> str:
         """Plugin name."""
-        ...
 
     @property
     def description(self) -> str:
         """Plugin description."""
-        ...
 
     def analyze(
         self, path: Path, settings: m.Quality.PluginConfigModel | None = None
     ) -> p.Result[AnalysisResult]:
         """Run analysis on path."""
-        ...
 
     def supports_fix(self) -> bool:
         """Whether plugin can auto-fix issues."""
-        ...
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
-        ...
 ```
-
 ### 5. Baseline Management
 
 Baseline tracking for dead code:
