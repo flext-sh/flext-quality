@@ -101,7 +101,7 @@ git clone <repository-url>
 cd flext-quality
 
 # Install dependencies
-poetry install
+uv sync
 
 # Activate environment
 poetry shell

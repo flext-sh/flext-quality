@@ -412,7 +412,7 @@ make clean-test-env
 make reset-test-db
 
 # Update test dependencies
-poetry install --group test
+uv sync --group test
 ```
 
 ## Related Documentation
