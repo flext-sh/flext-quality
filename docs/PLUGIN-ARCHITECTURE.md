@@ -12,6 +12,7 @@
   - [5. Baseline Management](#5-baseline-management)
 - [Architecture Diagram```](#architecture-diagram)
 - [Summary](#summary)
+
 <!-- TOC END -->
 
 ## Current State

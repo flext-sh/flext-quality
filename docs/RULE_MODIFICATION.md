@@ -29,6 +29,7 @@
   - [❌ Mistake 3: Breaking YAML structure](#mistake-3-breaking-yaml-structure)
 - [📋 Rule Modification Checklist](#rule-modification-checklist)
 - [🔗 Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 **How to customize validation rules during testing and development**
@@ -385,7 +386,7 @@ python3 -c "import yaml; yaml.safe_load(open('file.yaml'))"
 
 ```yaml
 # WRONG - Unescaped regex metacharacters
-pattern: 'rm -rf +'  # + is metacharacter, needs \\+
+pattern: "rm -rf +" # + is metacharacter, needs \\+
 
 # RIGHT - Properly escaped
 pattern: 'rm\s+-rf\s+'
