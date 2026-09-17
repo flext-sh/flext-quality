@@ -1,6 +1,7 @@
 # Rule Modification Quick Reference
 
 <!-- TOC START -->
+
 - [🚀 Quick Start](#quick-start)
   - [Find Rule Files](#find-rule-files)
   - [Reload Rules Automatically](#reload-rules-automatically)
@@ -32,7 +33,7 @@
 
 **How to customize validation rules during testing and development**
 
-______________________________________________________________________
+---
 
 ## 🚀 Quick Start
 
@@ -75,7 +76,7 @@ After editing YAML files, rules reload on next hook execution:
 # Just save your YAML changes and the system will use them immediately
 ```
 
-______________________________________________________________________
+---
 
 ## 📝 Common Modifications
 
@@ -105,7 +106,7 @@ ______________________________________________________________________
     Use 'mv file file.bak' instead of rm...
 ```
 
-______________________________________________________________________
+---
 
 ### 2. Disable Rule Temporarily
 
@@ -134,7 +135,7 @@ ______________________________________________________________________
   severity: low             # Low priority warning
 ```
 
-______________________________________________________________________
+---
 
 ### 3. Modify Guidance Message
 
@@ -162,7 +163,7 @@ Update guidance for clarity:
           return r.ok(user)
 ```
 
-______________________________________________________________________
+---
 
 ### 4. Add Custom Rule
 
@@ -192,7 +193,7 @@ Create new rule in appropriate YAML file:
     - "!**/tests/**" # Except tests
 ```
 
-______________________________________________________________________
+---
 
 ### 5. Change Pattern (Regex)
 
@@ -208,7 +209,7 @@ Update what triggers the rule:
   pattern: 'cast\s*\(\s*(int|str|dict|list)'
 ```
 
-______________________________________________________________________
+---
 
 ## 🔍 Rule Structure Reference
 
@@ -240,7 +241,7 @@ ______________________________________________________________________
     - "FLEXT_PROJECT"
 ```
 
-______________________________________________________________________
+---
 
 ## 🔄 Workflow: Test → Adjust → Verify
 
@@ -293,7 +294,7 @@ nano flext-quality/src/flext_quality/rules/data/security.yaml
 # blocking: false
 ```
 
-______________________________________________________________________
+---
 
 ## 🎯 Finding Your Rule
 
@@ -326,7 +327,7 @@ cat flext-quality/src/flext_quality/rules/data/code_quality.yaml
 cat flext-quality/src/flext_quality/rules/data/git_operations.yaml
 ```
 
-______________________________________________________________________
+---
 
 ## ✅ Validation After Changes
 
@@ -358,7 +359,7 @@ echo 'rm -rf /tmp/test' > /tmp/test_rule.sh
 # 3. Exception works (if added) ✅
 ```
 
-______________________________________________________________________
+---
 
 ## 🚨 Common Mistakes
 
@@ -408,7 +409,7 @@ name: test  # Not indented under code
   name: test
 ```
 
-______________________________________________________________________
+---
 
 ## 📋 Rule Modification Checklist
 
@@ -424,7 +425,7 @@ When modifying a rule:
 - [ ] Updated guidance if needed
 - [ ] Checked for side effects (other rules)
 
-______________________________________________________________________
+---
 
 ## 🔗 Related Documentation
 
@@ -432,7 +433,7 @@ ______________________________________________________________________
 - **Architecture Rules**: Search for architectural patterns in YAML files
 - **Testing Rules**: See `flextresult.yaml` and `code_quality.yaml`
 
-______________________________________________________________________
+---
 
 **Quick Reference**: All rules in `flext-quality/src/flext_quality/rules/data/`
 

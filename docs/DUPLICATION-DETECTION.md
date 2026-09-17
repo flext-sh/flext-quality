@@ -1,6 +1,7 @@
 # Code Duplication Detection System
 
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [Components](#components)
   - [1. FlextDuplicationPlugin](#1-flextduplicationplugin)
@@ -415,7 +416,7 @@ A: Currently line-based only. Semantic detection is a future improvement.
 
 A: They're included in the analysis. Test duplication is often intentional, so use the retry mechanism.
 
-______________________________________________________________________
+---
 
 **Last Updated**: 2025-12-29
 **Status**: Current

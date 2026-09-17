@@ -1,6 +1,7 @@
 # C4 Model - FLEXT Quality Architecture
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [🎯 C4 Model Overview](#c4-model-overview)
   - [1. Context (Level 1)](#1-context-level-1)
@@ -33,7 +34,7 @@
 - [📋 Quality Assurance](#quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 ## Table of Contents
 
@@ -109,7 +110,7 @@ The C4 model provides four hierarchical levels of architectural documentation:
 | **1** | [System Context](context.md)            | External systems and users      | [Context Diagram](diagrams/context.puml)      |
 | **2** | [Container Architecture](containers.md) | High-level system components    | [Container Diagram](diagrams/containers.puml) |
 | **3** | [Component Architecture](components.md) | Detailed component interactions | [Component Diagram](diagrams/components.puml) |
-| **4** | [Code Architecture](code.md)            | Implementation-level details    | Code Diagrams               |
+| **4** | [Code Architecture](code.md)            | Implementation-level details    | Code Diagrams                                 |
 
 ## 🏗️ Architecture Principles Applied
 
@@ -268,6 +269,6 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 - **Accuracy**: Diagrams and documentation reflect actual implementation
 - **Maintenance**: Regular review and update process established
 
-______________________________________________________________________
+---
 
 **C4 Model Documentation** - Structured architectural understanding from system context to implementation details.

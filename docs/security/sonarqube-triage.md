@@ -9,18 +9,18 @@ Bead: `mro-2wjm.16`
 **47 issues** — BLOCKER 0, CRITICAL 18, MAJOR 8, MINOR 21
 Tipos: VULNERABILITY 10, BUG 0, CODE_SMELL 37 · **Debt total: 459min**
 
-| regra | issues |
-|---|---|
-| `python:S5713` | 12 |
-| `python:S3776` | 10 |
-| `python:S1192` | 7 |
-| `python:S5332` | 5 |
-| `githubactions:S8233` | 2 |
-| `python:S108` | 2 |
-| `python:S4502` | 1 |
-| `githubactions:S8264` | 1 |
-| `text:S8565` | 1 |
-| `python:S1854` | 1 |
+| regra                 | issues |
+| --------------------- | ------ |
+| `python:S5713`        | 12     |
+| `python:S3776`        | 10     |
+| `python:S1192`        | 7      |
+| `python:S5332`        | 5      |
+| `githubactions:S8233` | 2      |
+| `python:S108`         | 2      |
+| `python:S4502`        | 1      |
+| `githubactions:S8264` | 1      |
+| `text:S8565`          | 1      |
+| `python:S1854`        | 1      |
 
 ## Como usar
 
@@ -30,12 +30,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ## Issues
 
 ### 1 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/core/config_manager.py:168` · **Effort**: 8min
 
 > Define a constant instead of duplicating this literal "audit_rules.yaml" 4 times.
 
 ```python
-      164  
+      164
       165      def get_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
       166          """Get audit rules configuration."""
       167          if self._audit_rules is None:
@@ -49,12 +50,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 2 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/core/config_manager.py:177` · **Effort**: 8min
 
 > Define a constant instead of duplicating this literal "style_guide.yaml" 4 times.
 
 ```python
-      173  
+      173
       174      def get_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
       175          """Get style guide configuration."""
       176          if self._style_guide is None:
@@ -68,12 +70,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 3 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/core/config_manager.py:186` · **Effort**: 8min
 
 > Define a constant instead of duplicating this literal "validation_config.yaml" 4 times.
 
 ```python
-      182  
+      182
       183      def get_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
       184          """Get validation configuration."""
       185          if self._validation_config is None:
@@ -87,25 +90,27 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 4 · 🟠 CRITICAL · VULNERABILITY · `python:S4502`
+
 **Local**: `src/flext_quality/docs/dashboard.py:27` · **Effort**: 5min
 
 > Make sure disabling CSRF protection is safe here.
 
 ```python
-       23  
+       23
        24      def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
        25          """Initialize documentation dashboard with reports directory."""
        26          self.reports_dir = Path(reports_dir)
 >>>    27          self.app = Flask(__name__)
        28          self._logger_instance: p.Logger = u.fetch_logger(__name__)
        29          self.setup_routes()
-       30  
+       30
        31      @property
 ```
 
 **Decisão**: pendente
 
 ### 5 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/dashboard.py:53` · **Effort**: 6min
 
 > Define a constant instead of duplicating this literal "application/json" 3 times.
@@ -117,14 +122,15 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        52                  ).decode(),
 >>>    53                  mimetype="application/json",
        54              )
-       55  
+       55
        56          _ = api_metrics
-       57  
+       57
 ```
 
 **Decisão**: pendente
 
 ### 6 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/notifications.py:93` · **Effort**: 47min
 
 > Refactor this function to reduce its Cognitive Complexity from 57 to the 15 allowed.
@@ -133,10 +139,10 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        89          self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
        90              timestamp=u.now().isoformat()
        91          )
-       92  
+       92
 >>>    93      def _load_user_config(self, loaded: t.JsonMapping) -> _NotifierConfig:
        94          cfg = self.get_default_config()
-       95  
+       95
        96          channels = loaded.get("channels")
        97          if isinstance(channels, dict):
 ```
@@ -144,6 +150,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 7 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/notifications.py:442` · **Effort**: 9min
 
 > Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.
@@ -152,7 +159,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       438              webhook_config.url, json=payload, headers=headers, timeout=timeout
       439          )
       440          response.raise_for_status()
-      441  
+      441
 >>>   442      def _format_critical_issues_message(self, audit_data: t.JsonMapping) -> str:
       443          """Format message for critical issues notification."""
       444          metrics_val = audit_data.get("metrics")
@@ -163,6 +170,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 8 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/notifications.py:582` · **Effort**: 19min
 
 > Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed.
@@ -170,7 +178,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ```python
       578              None, description="Monthly report JSON file", validate_default=True
       579          )
-      580  
+      580
       581          @override
 >>>   582          def execute(self) -> p.Result[bool]:
       583              """Dispatch to the appropriate notification action."""
@@ -182,6 +190,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 9 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/audit.py:267` · **Effort**: 6min
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
@@ -190,7 +199,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       263          ).search(content):
       264              indicators.append("potentially inconsistent status")
       265          return indicators
-      266  
+      266
 >>>   267      def check_content_completeness(self, doc_files: t.SequenceOf[Path]) -> None:
       268          """Check documentation completeness and identify missing sections."""
       269          min_word_count = self.audit_rules.quality_thresholds.min_word_count
@@ -201,6 +210,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 10 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/scripts/optimize.py:94` · **Effort**: 8min
 
 > Define a constant instead of duplicating this literal r"^#{1,6}\\s" 4 times.
@@ -220,12 +230,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 11 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/scripts/optimize.py:252` · **Effort**: 6min
 
-> Define a constant instead of duplicating this literal "[learn more](\\1)" 3 times.
+> Define a constant instead of duplicating this literal "[learn more](\1)" 3 times.
 
 ```python
-      248  
+      248
       249      def _improve_link_text(self, content: str) -> str:
       250          """Improve generic link text for better accessibility."""
       251          improvements = {
@@ -239,6 +250,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 12 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/optimize.py:318` · **Effort**: 6min
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
@@ -247,7 +259,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       314              ):
       315                  enhanced_lines.extend(("", "---", ""))
       316          return "\n".join(enhanced_lines)
-      317  
+      317
 >>>   318      def update_metadata(
       319          self, doc_files: t.SequenceOf[Path]
       320      ) -> m.Quality.OptimizerResults:
@@ -258,6 +270,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 13 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/report.py:173` · **Effort**: 24min
 
 > Refactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed.
@@ -266,7 +279,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       169              return self._generate_markdown_report(report_data)
       170          msg = f"Unsupported format: {report_format}"
       171          raise ValueError(msg)
-      172  
+      172
 >>>   173      def _calculate_summary_metrics(
       174          self,
       175      ) -> FlextQualityDocumentationReporter.SummaryMetrics:
@@ -277,6 +290,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 14 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/report.py:236` · **Effort**: 43min
 
 > Refactor this function to reduce its Cognitive Complexity from 53 to the 15 allowed.
@@ -285,7 +299,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
       233          """Analyze quality trends over time."""
       234          return None
-      235  
+      235
 >>>   236      def _generate_recommendations(
       237          self,
       238      ) -> MutableSequence[FlextQualityDocumentationReporter.Recommendation]:
@@ -296,6 +310,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 15 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/report.py:557` · **Effort**: 22min
 
 > Refactor this function to reduce its Cognitive Complexity from 32 to the 15 allowed.
@@ -304,7 +319,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       553              str, t.Quality.DocumentationReportValue | datetime
       554          ] = {**report_data_raw, "date": report_date}
       555          return report_data_dict
-      556  
+      556
 >>>   557      def _analyze_trend_data(
       558          self,
       559          reports: t.SequenceOf[
@@ -315,6 +330,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 16 · 🟠 CRITICAL · CODE_SMELL · `python:S1192`
+
 **Local**: `src/flext_quality/docs/scripts/report.py:741` · **Effort**: 6min
 
 > Define a constant instead of duplicating this literal "report write failed" 3 times.
@@ -334,6 +350,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 17 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/scripts/validate.py:275` · **Effort**: 6min
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
@@ -342,7 +359,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       271                  })
       272              )
       273              return max_retry_result
-      274  
+      274
 >>>   275          def validate_internal_links(
       276              self,
       277              links: t.SequenceOf[m.Quality.LinkRecord],
@@ -353,6 +370,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 18 · 🟠 CRITICAL · CODE_SMELL · `python:S3776`
+
 **Local**: `src/flext_quality/docs/tools/link_checker.py:255` · **Effort**: 7min
 
 > Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.
@@ -361,7 +379,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       251                  self.results.performance.slowest_response, response_time
       252              )
       253              return result
-      254  
+      254
 >>>   255      def check_link_sync(
       256          self, url: str, context: t.JsonMapping | None = None
       257      ) -> FlextQualityLinkChecker.LinkResult:
@@ -372,6 +390,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 19 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8264`
+
 **Local**: `.github/workflows/docs.yml:18` · **Effort**: 5min
 
 > Move this read permission from workflow level to job level.
@@ -379,30 +398,31 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ```yaml
        14        - ".github/workflows/docs.yml"
        15    workflow_dispatch:
-       16  
+       16
        17  permissions:
 >>>    18    contents: read
        19    pages: write
        20    id-token: write
-       21  
+       21
        22  concurrency:
 ```
 
 **Decisão**: pendente
 
 ### 20 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
+
 **Local**: `.github/workflows/docs.yml:19` · **Effort**: 5min
 
 > Move this write permission from workflow level to job level.
 
 ```yaml
        15    workflow_dispatch:
-       16  
+       16
        17  permissions:
        18    contents: read
 >>>    19    pages: write
        20    id-token: write
-       21  
+       21
        22  concurrency:
        23    group: pages
 ```
@@ -410,17 +430,18 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 21 · 🟡 MAJOR · VULNERABILITY · `githubactions:S8233`
+
 **Local**: `.github/workflows/docs.yml:20` · **Effort**: 5min
 
 > Move this write permission from workflow level to job level.
 
 ```yaml
-       16  
+       16
        17  permissions:
        18    contents: read
        19    pages: write
 >>>    20    id-token: write
-       21  
+       21
        22  concurrency:
        23    group: pages
        24    cancel-in-progress: false
@@ -429,6 +450,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 22 · 🟡 MAJOR · VULNERABILITY · `text:S8565`
+
 **Local**: `pyproject.toml:-` · **Effort**: 5min
 
 > Dependency versions are not predictable if the lock file (uv.lock, poetry.lock, pdm.lock or pylock.toml) is missing.
@@ -436,6 +458,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 23 · 🟡 MAJOR · CODE_SMELL · `python:S108`
+
 **Local**: `src/flext_quality/docs/core/config_manager.py:61` · **Effort**: 5min
 
 > Either remove or fill this block of code.
@@ -447,7 +470,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
        60                  case _:
 >>>    61                      pass
        62              return check_value
-       63  
+       63
        64      class StyleGuide(FlextQualityModels.Quality.StyleGuideConfig):
        65          """Configuration for style and formatting guidelines."""
 ```
@@ -455,6 +478,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 24 · 🟡 MAJOR · CODE_SMELL · `python:S1854`
+
 **Local**: `src/flext_quality/docs/scripts/report.py:182` · **Effort**: 1min
 
 > Remove this assignment to local variable 'quality_trend'; the value is never used.
@@ -465,7 +489,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       180          links_checked = 0
       181          optimizations_applied = 0
 >>>   182          quality_trend = "unknown"
-      183  
+      183
       184          if self.audit_data and isinstance(self.audit_data, dict):
       185              metrics = self.audit_data.get("metrics")
       186              if isinstance(metrics, dict):
@@ -474,6 +498,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 25 · 🟡 MAJOR · CODE_SMELL · `python:S3358`
+
 **Local**: `src/flext_quality/docs/scripts/validate.py:295` · **Effort**: 5min
 
 > Extract this nested conditional expression into an independent statement.
@@ -493,25 +518,27 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 26 · 🟡 MAJOR · CODE_SMELL · `python:S108`
+
 **Local**: `src/flext_quality/docs/tools/style_validator.py:716` · **Effort**: 5min
 
 > Either remove or fill this block of code.
 
 ```python
-      712  
+      712
       713          results = FlextQualityStyleValidator.validate_file_style(file_path, config_path)
-      714  
+      714
       715          for _violation in results.violations[:3]:
 >>>   716              pass
       717          return 0
-      718  
-      719  
+      718
+      719
       720  if __name__ == "__main__":
 ```
 
 **Decisão**: pendente
 
 ### 27 · ⚪ MINOR · CODE_SMELL · `python:S7504`
+
 **Local**: `conftest.py:20` · **Effort**: 5min
 
 > Remove this unnecessary `list()` call on an already iterable object.
@@ -531,6 +558,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 28 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/core/config_manager.py:209` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -543,13 +571,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   209          except (OSError, PermissionError, UnicodeDecodeError) as exc:
       210              _ = exc
       211              return self._get_default_config(filename)
-      212  
+      212
       213      def _get_default_config(
 ```
 
 **Decisão**: pendente
 
 ### 29 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/notifications.py:324` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -562,13 +591,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   324              except (smtplib.SMTPException, ConnectionError, OSError) as e:
       325                  self.results.errors.append(f"Email notification failed: {e}")
       326                  success = False
-      327  
+      327
       328          # Slack notification
 ```
 
 **Decisão**: pendente
 
 ### 30 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -581,13 +611,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   332              except (requests.RequestException, ConnectionError, OSError) as e:
       333                  self.results.errors.append(f"Slack notification failed: {e}")
       334                  success = False
-      335  
+      335
       336          # Webhook notification
 ```
 
 **Decisão**: pendente
 
 ### 31 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -600,13 +631,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   332              except (requests.RequestException, ConnectionError, OSError) as e:
       333                  self.results.errors.append(f"Slack notification failed: {e}")
       334                  success = False
-      335  
+      335
       336          # Webhook notification
 ```
 
 **Decisão**: pendente
 
 ### 32 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -619,13 +651,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   340              except (requests.RequestException, ConnectionError, OSError) as e:
       341                  self.results.errors.append(f"Webhook notification failed: {e}")
       342                  success = False
-      343  
+      343
       344          if success:
 ```
 
 **Decisão**: pendente
 
 ### 33 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -638,25 +671,26 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 >>>   340              except (requests.RequestException, ConnectionError, OSError) as e:
       341                  self.results.errors.append(f"Webhook notification failed: {e}")
       342                  success = False
-      343  
+      343
       344          if success:
 ```
 
 **Decisão**: pendente
 
 ### 34 · ⚪ MINOR · CODE_SMELL · `python:S7500`
+
 **Local**: `src/flext_quality/docs/notifications.py:362` · **Effort**: 5min
 
 > Replace this comprehension with passing the iterable to the collection constructor call
 
 ```python
       358          email_config = self.config.email
-      359  
+      359
       360          msg = MIMEMultipart()
       361          msg["From"] = email_config.from_address
 >>>   362          msg["To"] = ", ".join(x for x in (email_config.to_addresses or []))
       363          msg["Subject"] = f"[{priority.upper()}] {title}"
-      364  
+      364
       365          body = f"""
       366  FLEXT Quality Documentation Alert
 ```
@@ -664,6 +698,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 35 · ⚪ MINOR · VULNERABILITY · `python:S5332`
+
 **Local**: `src/flext_quality/docs/scripts/audit.py:488` · **Effort**: 30min
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
@@ -683,12 +718,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 36 · ⚪ MINOR · VULNERABILITY · `python:S5332`
+
 **Local**: `src/flext_quality/docs/scripts/audit.py:571` · **Effort**: 30min
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
 ```python
-      567  
+      567
       568      def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
       569          """Validate image references."""
       570          for image in images:
@@ -702,6 +738,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 37 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/scripts/audit.py:852` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -721,6 +758,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 38 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/scripts/audit.py:853` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -740,6 +778,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 39 · ⚪ MINOR · VULNERABILITY · `python:S5332`
+
 **Local**: `src/flext_quality/docs/scripts/validate.py:128` · **Effort**: 30min
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
@@ -759,6 +798,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 40 · ⚪ MINOR · VULNERABILITY · `python:S5332`
+
 **Local**: `src/flext_quality/docs/scripts/validate.py:334` · **Effort**: 30min
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
@@ -778,13 +818,14 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 41 · ⚪ MINOR · VULNERABILITY · `python:S5332`
+
 **Local**: `src/flext_quality/docs/tools/link_checker.py:176` · **Effort**: 30min
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
 ```python
       172          return all_links
-      173  
+      173
       174      def _classify_link(self, url: str) -> str:
       175          """Classify link type based on URL."""
 >>>   176          if url.startswith(("http://", "https://")):
@@ -797,6 +838,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 42 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/tools/link_checker.py:409` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -810,12 +852,13 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       410                  results = self.check_links_batch_sync(links)
       411          else:
       412              results = self.check_links_batch_sync(links)
-      413  
+      413
 ```
 
 **Decisão**: pendente
 
 ### 43 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -823,18 +866,19 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ```python
       437              rp.set_url(f"https://{domain}/robots.txt")
       438              rp.read()
-      439  
+      439
       440              return rp.can_fetch(self.settings.user_agent, "/")
 >>>   441          except (OSError, ConnectionError, TimeoutError, UnicodeDecodeError):
       442              # If robots.txt can't be read, assume crawling is allowed
       443              return True
-      444  
+      444
       445      def validate_github_links(
 ```
 
 **Decisão**: pendente
 
 ### 44 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -842,18 +886,19 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 ```python
       437              rp.set_url(f"https://{domain}/robots.txt")
       438              rp.read()
-      439  
+      439
       440              return rp.can_fetch(self.settings.user_agent, "/")
 >>>   441          except (OSError, ConnectionError, TimeoutError, UnicodeDecodeError):
       442              # If robots.txt can't be read, assume crawling is allowed
       443              return True
-      444  
+      444
       445      def validate_github_links(
 ```
 
 **Decisão**: pendente
 
 ### 45 · ⚪ MINOR · CODE_SMELL · `python:S5713`
+
 **Local**: `src/flext_quality/docs/tools/style_validator.py:146` · **Effort**: 1min
 
 > Remove this redundant Exception class; it derives from another which is already caught.
@@ -865,7 +910,7 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
       145                  self._set_default_config()
 >>>   146          except (FileNotFoundError, KeyError, OSError):
       147              self._set_default_config()
-      148  
+      148
       149      def _normalize_config(
       150          self, raw: t.JsonMapping
 ```
@@ -873,17 +918,18 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 46 · ⚪ MINOR · CODE_SMELL · `python:S7498`
+
 **Local**: `src/flext_quality/models.py:35` · **Effort**: 5min
 
 > Replace this constructor call with a literal.
 
 ```python
        31              return []
-       32  
+       32
        33          @staticmethod
        34          def _empty_dict_str_str() -> t.StrMapping:
 >>>    35              return dict[str, str]()
-       36  
+       36
        37          @staticmethod
        38          def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:
        39              return []
@@ -892,20 +938,21 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 **Decisão**: pendente
 
 ### 47 · ⚪ MINOR · CODE_SMELL · `python:S116`
+
 **Local**: `src/flext_quality/rules/validators.py:17` · **Effort**: 2min
 
-> Rename this field "Base" to match the regular expression ^[_a-z][_a-z0-9]*$.
+> Rename this field "Base" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
 ```python
-       13  
+       13
        14  class FlextQualityValidators:
        15      """Namespace for flext-quality validators (one class per module pattern)."""
-       16  
+       16
 >>>    17      Base = p.Quality.ValidatorBase
-       18  
+       18
        19      class Pattern(p.Quality.ValidatorBase):
        20          """Validates content against regex patterns."""
-       21  
+       21
 ```
 
 **Decisão**: pendente

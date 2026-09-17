@@ -1,6 +1,7 @@
 # Hook Warning Reference Guide
 
 <!-- TOC START -->
+
 - [⚠️ How Warning-Only Mode Works](#how-warning-only-mode-works)
 - [📂 Warning Categories](#warning-categories)
   - [1. Security Warnings (16 rules)](#1-security-warnings-16-rules)
@@ -20,7 +21,7 @@
 
 This guide explains the 197 validation rules that hooks monitor, organized into 5 warning categories.
 
-______________________________________________________________________
+---
 
 ## ⚠️ How Warning-Only Mode Works
 
@@ -39,7 +40,7 @@ Tool execution → Hook validates → Violations found? →
 - 📖 **Guidance provided** (how to fix violations)
 - 🔄 **Iterative validation** (fix and try again)
 
-______________________________________________________________________
+---
 
 ## 📂 Warning Categories
 
@@ -136,7 +137,7 @@ ______________________________________________________________________
   - Problem: Inconsistent with FLEXT Poetry approach
   - Fix: Use Poetry for FLEXT projects
 
-______________________________________________________________________
+---
 
 ### 2. Git Operations Warnings (29 rules)
 
@@ -278,7 +279,7 @@ ______________________________________________________________________
   - Problem: Automated git operations need explicit review
   - Fix: Execute git directly or ask user to run command
 
-______________________________________________________________________
+---
 
 ### 3. Code Quality Warnings (14 rules)
 
@@ -309,7 +310,7 @@ ______________________________________________________________________
 - **CQ005**: Complex `Callable` (3+ parameters)
 
   - Problem: Unclear function signatures
-  - Fix: Use `` with `__call__` method for clarity
+  - Fix: Use ``with`**call**` method for clarity
 
 #### Data Structures (CQ006-007)
 
@@ -347,7 +348,7 @@ ______________________________________________________________________
   - Problem: Mocks hide implementation details, create brittle tests
   - Fix: Use real objects, fixtures, factories instead
 
-______________________________________________________________________
+---
 
 ### 4. File Operations Warnings (19 rules)
 
@@ -460,7 +461,7 @@ ______________________________________________________________________
   - Problem: Generated output clogs project
   - Fix: `/tmp/output_*.txt` for temporary
 
-______________________________________________________________________
+---
 
 ### 5. Project Files Warnings (14 rules)
 
@@ -545,7 +546,7 @@ ______________________________________________________________________
   - Problem: HEAD points to current branch
   - Fix: Use `git checkout`, `git switch` commands
 
-______________________________________________________________________
+---
 
 ## 🔄 How to Respond to Warnings
 
@@ -594,7 +595,7 @@ Edit the YAML file to adjust severity:
     - "**/scripts/**" # Skip in scripts
 ```
 
-______________________________________________________________________
+---
 
 ## 📖 Documentation References
 
@@ -602,7 +603,7 @@ ______________________________________________________________________
 - **Dependencies**: See `../README.md` section on dependency rules
 - **Testing**: See `../AGENTS.md` section on quality gates
 
-______________________________________________________________________
+---
 
 ## 🎯 Summary
 
@@ -617,7 +618,7 @@ ______________________________________________________________________
 
 **All warnings are informational and allow execution to proceed.**
 
-______________________________________________________________________
+---
 
 **Last Updated**: 2025-12-30
 **Status**: ⚠️ WARNING-ONLY MODE - All operations proceed after warning
