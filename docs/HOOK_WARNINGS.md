@@ -124,14 +124,14 @@ ______________________________________________________________________
 - **SEC014**: `pip install` (direct pip usage)
 
   - Problem: Bypasses Poetry dependency management
-  - Fix: Use `poetry add package-name`
+  - Fix: Use `make deps package-name`
 
 - **SEC015**: `pip install --upgrade`
 
   - Problem: Can break compatibility
-  - Fix: Use `poetry update` for safe upgrades
+  - Fix: Use `make deps` for safe upgrades
 
-- **SEC016**: `uv pip` (uv package installer)
+- **SEC016**: `make deps` (uv package installer)
 
   - Problem: Inconsistent with FLEXT Poetry approach
   - Fix: Use Poetry for FLEXT projects
@@ -472,15 +472,15 @@ ______________________________________________________________________
 
   - Problem: Manual edits cause inconsistencies
   - Fix: Use Poetry commands:
-    - `poetry add <pkg>`
-    - `poetry remove <pkg>`
+    - `make deps <pkg>`
+    - `make deps <pkg>`
     - `poetry version <version>`
 
-- **PF002**: `poetry.lock` manual edit
+- **PF002**: `uv.lock` manual edit
 
   - ⛔ CRITICAL: Lock file is generated
   - Problem: Manual edits corrupt dependency resolution
-  - Fix: Use `poetry lock` or `poetry update` only
+  - Fix: Use `make deps` or `make deps` only
 
 #### Git Configuration (PF003-014)
 

@@ -304,7 +304,7 @@ The duplication detection is part of FLEXT quality gates:
 make check
 
 # Full validation (includes all quality checks)
-make val
+make check
 ```
 
 ## Constants and Configuration

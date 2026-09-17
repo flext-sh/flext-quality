@@ -132,7 +132,7 @@ Baseline tracking for dead code:
 │                    ~/flext/base.mk                           │
 ├─────────────────────────────────────────────────────────────┤
 │  make dead-code    make modernize    make cognitive-complexity│
-│  make val-full                                          │
+│  make check                                          │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼

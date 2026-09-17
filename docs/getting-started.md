@@ -104,7 +104,7 @@ cd flext-quality
 make setup
 
 # Activate environment
-poetry shell
+make setup
 ```
 
 ### **Step 2: Verify Current State**
