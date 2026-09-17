@@ -412,7 +412,7 @@ make clean-test-env
 make reset-test-db
 
 # Update test dependencies
-uv sync --group test
+make setup
 ```
 
 ## Related Documentation
