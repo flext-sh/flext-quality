@@ -131,7 +131,7 @@ print(
 
 ### FLEXT Ecosystem Integration
 
-```python
+````python
 from __future__ import annotations
 
 from flext_cli import u
@@ -198,7 +198,7 @@ jobs:
         with:
           name: quality-report
           path: quality-report.json
-```
+````
 
 ## Example Structure
 

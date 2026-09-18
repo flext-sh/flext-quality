@@ -93,20 +93,15 @@ Prevents Edit/Write operations that increase code duplication.
 **Behavior**:
 
 ```
-First Attempt (Edit Increases Duplication):
-  ├─ Calculate duplicate pair count for project
-  ├─ Compare against baseline
-  ├─ If count increased:
-  │   ├─ Block operation (exit code 2)
-  │   ├─ Show educational message
-  │   └─ Save hash to /tmp/.flext-duplicate-code-blocked
-  └─ If count same/decreased: Allow operation
 
-Second Attempt (Same Edit):
-  ├─ Detect hash match from previous block
-  ├─ Accept operation as intentional
-  ├─ Update baseline to new count
-  └─ Allow operation (exit code 0)
+First Attempt (Edit Increases Duplication): ├─ Calculate duplicate pair count for
+project ├─ Compare against baseline ├─ If count increased: │ ├─ Block operation (exit
+code 2) │ ├─ Show educational message │ └─ Save hash to
+/tmp/.flext-duplicate-code-blocked └─ If count same/decreased: Allow operation
+
+Second Attempt (Same Edit): ├─ Detect hash match from previous block ├─ Accept operation
+as intentional ├─ Update baseline to new count └─ Allow operation (exit code 0)
+
 ```
 
 **Features**:
@@ -121,45 +116,35 @@ Second Attempt (Same Edit):
 **Message on Block**:
 
 ```
-═══════════════════════════════════════════════════════════════
-BLOCKED: CODE DUPLICATION INCREASED
-═══════════════════════════════════════════════════════════════
 
-❌ VIOLATION: Duplicate code count increased
-   Project:      flext-ldif
-   Baseline:     2 duplicate pairs
-   Current:      3 duplicate pairs (+1)
-   File:         /home/user/flext/flext-ldif/src/flext_ldif/...
+═══════════════════════════════════════════════════════════════ BLOCKED: CODE
+DUPLICATION INCREASED ═══════════════════════════════════════════════════════════════
 
-WHY THIS MATTERS:
-  Code duplication causes:
-  • Maintenance burden (fix bugs in multiple places)
-  • Inconsistency risk (divergent copies)
-  • Code bloat (larger codebase)
-  • DRY principle violation
+❌ VIOLATION: Duplicate code count increased Project: flext-ldif Baseline: 2 duplicate
+pairs Current: 3 duplicate pairs (+1) File:
+/home/user/flext/flext-ldif/src/flext_ldif/...
 
-RULE (from FLEXT Quality Gates):
-  'Duplication detection must BLOCK edits that increase duplication'
-  'Compare against workspace baseline'
+WHY THIS MATTERS: Code duplication causes: • Maintenance burden (fix bugs in multiple
+places) • Inconsistency risk (divergent copies) • Code bloat (larger codebase) • DRY
+principle violation
+
+RULE (from FLEXT Quality Gates): 'Duplication detection must BLOCK edits that increase
+duplication' 'Compare against workspace baseline'
 
 ACTIONS TO RESOLVE:
 
-  Option A: REFACTOR to eliminate duplication (Recommended)
-    - Extract common code to shared utility
-    - Use inheritance or composition
-    - Then retry your edit
+Option A: REFACTOR to eliminate duplication (Recommended) - Extract common code to
+shared utility - Use inheritance or composition - Then retry your edit
 
-  Option B: RETRY same edit to ACCEPT increase
-    - If the duplication is intentional, retry the EXACT same edit
-    - Baseline will be updated automatically
-    - Edit will proceed on second attempt
+Option B: RETRY same edit to ACCEPT increase - If the duplication is intentional, retry
+the EXACT same edit - Baseline will be updated automatically - Edit will proceed on
+second attempt
 
-  Option C: UPDATE baseline manually
-    - Run: ~/flext/scripts/create-duplicate-baseline.sh --update flext-ldif
-    - Document why duplication is kept
-    - Then retry your edit
+Option C: UPDATE baseline manually - Run: ~/flext/scripts/create-duplicate-baseline.sh
+--update flext-ldif - Document why duplication is kept - Then retry your edit
 ═══════════════════════════════════════════════════════════════
-```
+
+````
 
 ### 3. Baseline Generation Script
 
@@ -178,7 +163,7 @@ Generates and manages duplicate code baselines for all FLEXT projects.
 
 # Show help
 ./scripts/create-duplicate-baseline.sh --help
-```
+````
 
 **Baseline Format**:
 

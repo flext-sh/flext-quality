@@ -118,46 +118,26 @@ Baseline tracking for dead code:
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     Claude Code Hooks                        │
-├─────────────────────────────────────────────────────────────┤
-│  05-dead-code-detector.sh    06-modernization-advisor.sh   │
-│         (blocking)                  (advisory)              │
-└────────────────┬──────────────────────────┬─────────────────┘
-                 │                          │
-                 ▼                          ▼
-┌────────────────────────┐    ┌───────────────────────────────┐
-│   Vulture (dead code)  │    │    Refurb (modern patterns)   │
-└────────────────────────┘    └───────────────────────────────┘
-                 │                          │
-                 ▼                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    ~/flext/base.mk                           │
-├─────────────────────────────────────────────────────────────┤
-│  make dead-code    make modernize    make cognitive-complexity│
-│  make val-full                                          │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    flext-quality                             │
-├─────────────────────────────────────────────────────────────┤
-│  FlextQualityPythonTools    FlextQualityAnalyzer            │
-│  - Vulture                  - Orchestrates all tools        │
-│  - Mypy                     - Generates reports             │
-│  - Bandit                   - Calculates scores             │
-│  - Radon                                                     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│                MCP Python Refactoring Server                 │
-├─────────────────────────────────────────────────────────────┤
-│  ~/mcp-python-refactoring                                    │
-│  - Rope (AST refactoring)                                    │
-│  - Refurb (modern patterns)                                  │
-│  - Complexipy (cognitive complexity)                         │
-│  - LibCST, Jedi                                              │
+
+┌─────────────────────────────────────────────────────────────┐ │ Claude Code Hooks │
+├─────────────────────────────────────────────────────────────┤ │
+05-dead-code-detector.sh 06-modernization-advisor.sh │ │ (blocking) (advisory) │
+└────────────────┬──────────────────────────┬─────────────────┘ │ │ ▼ ▼
+┌────────────────────────┐ ┌───────────────────────────────┐ │ Vulture (dead code) │ │
+Refurb (modern patterns) │ └────────────────────────┘ └───────────────────────────────┘
+│ │ ▼ ▼ ┌─────────────────────────────────────────────────────────────┐ │
+~/flext/base.mk │ ├─────────────────────────────────────────────────────────────┤ │ make
+dead-code make modernize make cognitive-complexity│ │ make val-full │
+└─────────────────────────────────────────────────────────────┘ │ ▼
+┌─────────────────────────────────────────────────────────────┐ │ flext-quality │
+├─────────────────────────────────────────────────────────────┤ │
+FlextQualityPythonTools FlextQualityAnalyzer │ │ - Vulture - Orchestrates all tools │
+│ - Mypy - Generates reports │ │ - Bandit - Calculates scores │ │ - Radon │
+└─────────────────────────────────────────────────────────────┘ │ ▼
+┌─────────────────────────────────────────────────────────────┐ │ MCP Python Refactoring
+Server │ ├─────────────────────────────────────────────────────────────┤ │
+~/mcp-python-refactoring │ │ - Rope (AST refactoring) │ │ - Refurb (modern patterns) │
+│ - Complexipy (cognitive complexity) │ │ - LibCST, Jedi │
 └─────────────────────────────────────────────────────────────┘
 
 ## Summary
