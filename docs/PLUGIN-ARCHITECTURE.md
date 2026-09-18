@@ -1,6 +1,7 @@
 # FLEXT Quality Plugin Architecture Plan
 
 <!-- TOC START -->
+
 - [Current State](#current-state)
 - [MCP Python Refactoring Integration](#mcp-python-refactoring-integration)
 - [Integration Points](#integration-points)
@@ -11,6 +12,7 @@
   - [5. Baseline Management](#5-baseline-management)
 - [Architecture Diagram](#architecture-diagram)
 - [Summary](#summary)
+
 <!-- TOC END -->
 
 ## Current State

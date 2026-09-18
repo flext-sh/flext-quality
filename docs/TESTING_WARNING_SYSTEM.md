@@ -1,6 +1,7 @@
 # Testing Hook Warning System
 
 <!-- TOC START -->
+
 - [✅ System Status: WARNING-ONLY MODE ACTIVE](#system-status-warning-only-mode-active)
 - [🧪 Test Verification Results](#test-verification-results)
   - [Configuration Checks](#configuration-checks)
@@ -37,11 +38,11 @@
   - [For Daily Development](#for-daily-development)
   - [For Validation & Testing](#for-validation-testing)
   - [For Integration](#for-integration)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 **Comprehensive guide to verify the warning-only hook system is working correctly**
 
-______________________________________________________________________
+---
 
 ## ✅ System Status: WARNING-ONLY MODE ACTIVE
 
@@ -53,7 +54,7 @@ The hook system is **fully operational in warning-only mode** with:
 - ✅ **Automatic iterative tracking** (multiple edit attempts)
 - ✅ **Enhanced warning messages** with actionable guidance
 
-______________________________________________________________________
+---
 
 ## 🧪 Test Verification Results
 
@@ -100,7 +101,7 @@ type_system.yaml         → 16 rules
 TOTAL: 197 validation rules
 ```
 
-______________________________________________________________________
+---
 
 ## 🎯 Category Coverage
 
@@ -151,7 +152,7 @@ ______________________________________________________________________
 
 **Testing**: Try to edit pyproject.toml → Warning → Edit allowed
 
-______________________________________________________________________
+---
 
 ## 🚀 Quick Test Scenarios
 
@@ -229,7 +230,7 @@ touch fix_script.sh
 # 4. ✅ Edit would be allowed by hook (rejected by validators)
 ```
 
-______________________________________________________________________
+---
 
 ## 📊 Verification Checklist
 
@@ -263,7 +264,7 @@ ______________________________________________________________________
 - [x] Multiple attempts allowed until clean
 - [x] Automatic rollback available on validation failure
 
-______________________________________________________________________
+---
 
 ## 📖 Documentation
 
@@ -284,7 +285,7 @@ ______________________________________________________________________
 - Format: YAML with Pydantic validation
 - Reload: Automatic (no restart needed)
 
-______________________________________________________________________
+---
 
 ## 🔄 Typical Testing Workflow
 
@@ -324,7 +325,7 @@ echo 'def test(): pass
 # Execution clean, no warnings
 ```
 
-______________________________________________________________________
+---
 
 ## ✅ Success Criteria (All Met)
 
@@ -337,7 +338,7 @@ ______________________________________________________________________
 - [x] User can easily modify rules
 - [x] System is production-ready for testing
 
-______________________________________________________________________
+---
 
 ## 🎯 Next Steps for User
 
@@ -362,13 +363,13 @@ ______________________________________________________________________
 1. No risk of blocked operations
 1. Automatic backup/restore available
 
-______________________________________________________________________
+---
 
 **System Status**: ✅ READY FOR PRODUCTION
 
 All 197 rules active, warning-only mode enabled, documentation complete.
 
-______________________________________________________________________
+---
 
 **Last Verified**: 2025-12-30
 **Hook Version**: pre_tool_use.py with enhanced warnings

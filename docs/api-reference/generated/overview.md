@@ -1,7 +1,9 @@
 # flext-quality API Overview
 
 <!-- TOC START -->
+
 - [Next Pages](#next-pages)
+
 <!-- TOC END -->
 
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
@@ -12,9 +14,9 @@
   tooling
 - Doc summary: Flext Quality package.
 - Classifiers: `Development Status :: 3 - Alpha`, `Intended Audience ::
-  Developers`, `Operating System :: OS Independent`, `Programming Language ::
-  Python :: 3 :: Only`, `Programming Language :: Python :: 3.13`, `Topic ::
-  Software Development :: Libraries :: Python Modules` (+1 more)
+Developers`, `Operating System :: OS Independent`, `Programming Language ::
+Python :: 3 :: Only`, `Programming Language :: Python :: 3.13`, `Topic ::
+Software Development :: Libraries :: Python Modules` (+1 more)
 - Project class: `domain`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: `FlextQuality`, `FlextQualityBaseHook`,

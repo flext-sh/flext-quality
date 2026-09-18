@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
 
-from flask import Flask, Response, render_template_string, request
+from flask import Flask, Response, request
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
@@ -39,7 +39,7 @@ class FlextQualityDocumentationDashboard:
         @self.app.route("/")
         def index() -> str:
             """Serve the main dashboard page."""
-            return render_template_string(self.get_dashboard_html())
+            return self.get_dashboard_html()
 
         _ = index
 

@@ -1,6 +1,7 @@
 # FLEXT Quality Architecture Documentation
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [🎯 Architecture Overview](#architecture-overview)
   - [System Purpose](#system-purpose)
@@ -39,7 +40,7 @@
   - [For New Team Members](#for-new-team-members)
   - [For Architects & Technical Leads](#for-architects-technical-leads)
   - [For Developers](#for-developers)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 ## Table of Contents
 
@@ -114,13 +115,13 @@ This architecture documentation follows a multi-framework approach:
 
 ### Quick Navigation
 
-| View Type          | Purpose                         | Location              |
-| ------------------ | ------------------------------- | --------------------- |
+| View Type          | Purpose                         | Location                       |
+| ------------------ | ------------------------------- | ------------------------------ |
 | **System Context** | External systems and users      | [C4 Model](c4-model/README.md) |
 | **Container View** | High-level system components    | [C4 Model](c4-model/README.md) |
 | **Component View** | Detailed component interactions | [C4 Model](c4-model/README.md) |
 | **Code View**      | Implementation details          | [C4 Model](c4-model/README.md) |
-| **ADRs**           | Architectural decisions         | adrs/        |
+| **ADRs**           | Architectural decisions         | adrs/                          |
 
 ## 📊 System Context
 
@@ -324,7 +325,7 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 - **Review**: Architectural changes require peer review and approval
 - **Testing**: Architecture changes include appropriate testing coverage
 
-______________________________________________________________________
+---
 
 ## 📖 Reading Guide
 

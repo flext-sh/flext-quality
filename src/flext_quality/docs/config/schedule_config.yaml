@@ -157,7 +157,16 @@ notifications:
 # Maintenance windows (when automated tasks can run)
 maintenance_windows:
   enabled: true
-  allowed_days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+  allowed_days:
+    [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ]
   allowed_hours_start: "01:00" # 1 AM
   allowed_hours_end: "06:00" # 6 AM
   skip_if_high_load: true # Skip if system load is high
