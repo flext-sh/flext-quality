@@ -85,22 +85,26 @@
 
 **Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2026-04-14
 
-Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code quality analysis library with Clean Architecture,
-Domain-Driven Design, and FLEXT ecosystem integration.
+Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code
+quality analysis library with Clean Architecture, Domain-Driven Design, and FLEXT
+ecosystem integration.
 
 ## 🎯 Architecture Overview
 
 ### System Purpose
 
-FLEXT Quality provides comprehensive code quality analysis and metrics collection for Python projects within the FLEXT ecosystem,
-enabling automated quality assessment, scoring, and reporting across enterprise Python codebases.
+FLEXT Quality provides comprehensive code quality analysis and metrics collection for
+Python projects within the FLEXT ecosystem, enabling automated quality assessment,
+scoring, and reporting across enterprise Python codebases.
 
 ### Key Architectural Principles
 
 - **Clean Architecture**: Clear separation of concerns with domain-first design
-- **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and domain services
+- **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and
+  domain services
 - **Railway-Oriented Programming**: Functional error handling with `r[T]` patterns
-- **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli, flext-web, and flext-observability
+- **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli,
+  flext-web, and flext-observability
 
 ## 🏗️ Architecture Documentation Structure
 
@@ -108,7 +112,8 @@ enabling automated quality assessment, scoring, and reporting across enterprise 
 
 This architecture documentation follows a multi-framework approach:
 
-- **[C4 Model](c4-model/README.md)**: System context, containers, components, and code-level views
+- **[C4 Model](c4-model/README.md)**: System context, containers, components, and
+  code-level views
 - **Architecture Decision Records**: Documented architectural decisions and rationale
 - **PlantUML Diagrams**: Code-generated diagrams and visualizations
 - **Arc42 Template**: Comprehensive architecture documentation template
@@ -231,7 +236,8 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 - **Python 3.13+**: Exclusive support for latest Python features
 - **FLEXT Ecosystem**: Native integration with FLEXT foundation libraries
-- **External Tools**: Optional dependencies (ruff, mypy, bandit) with graceful degradation
+- **External Tools**: Optional dependencies (ruff, mypy, bandit) with graceful
+  degradation
 - **Enterprise Focus**: Designed for large-scale enterprise Python projects
 
 ## 🔧 Development & Deployment
@@ -265,21 +271,28 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 - **System Context**: External system relationships (_Documentation coming soon_)
 - **Container Architecture**: High-level system components (_Documentation coming soon_)
-- **Component Architecture**: Detailed component interactions (_Documentation coming soon_)
+- **Component Architecture**: Detailed component interactions (_Documentation coming
+  soon_)
 - **Code Architecture**: Implementation-level details (_Documentation coming soon_)
 
 ### Cross-Cutting Concerns
 
-- **Security Architecture**: Security controls and threat modeling (_Documentation coming soon_)
-- **Deployment Architecture**: Infrastructure and deployment patterns (_Documentation coming soon_)
-- **Data Architecture**: Data models and persistence strategies (_Documentation coming soon_)
-- **Integration Architecture**: External system integrations (_Documentation coming soon_)
+- **Security Architecture**: Security controls and threat modeling (_Documentation
+  coming soon_)
+- **Deployment Architecture**: Infrastructure and deployment patterns (_Documentation
+  coming soon_)
+- **Data Architecture**: Data models and persistence strategies (_Documentation coming
+  soon_)
+- **Integration Architecture**: External system integrations (_Documentation coming
+  soon_)
 
 ### Operational Documentation
 
-- **Monitoring & Observability**: System monitoring and alerting (_Documentation coming soon_)
+- **Monitoring & Observability**: System monitoring and alerting (_Documentation coming
+  soon_)
 - **Disaster Recovery**: Backup and recovery procedures (_Documentation coming soon_)
-- **Performance Characteristics**: Performance benchmarks and optimization (_Documentation coming soon_)
+- **Performance Characteristics**: Performance benchmarks and optimization
+  (_Documentation coming soon_)
 
 ## 🎨 Diagrams & Visualizations
 
@@ -340,22 +353,29 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 1. Start with System Context to understand the big picture (_Documentation coming soon_)
 1. Review Container Architecture for high-level components (_Documentation coming soon_)
-1. Read key Architecture Decisions to understand foundational choices (_Documentation coming soon_)
+1. Read key Architecture Decisions to understand foundational choices (_Documentation
+   coming soon_)
 1. Explore [Component Architecture](c4-model/components.md) for detailed interactions
 
 ### For Architects & Technical Leads
 
 1. Review ADRs for decision history and rationale
 1. Examine Cross-Cutting Concerns for quality attributes
-1. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
-1. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
+1. Analyze **Security Architecture** for security considerations (_Documentation coming
+   soon_)
+1. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming
+   soon_)
 
 ### For Developers
 
-1. Understand **Component Architecture** for implementation guidance (_Documentation coming soon_)
-1. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
-1. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
-1. Reference [API Documentation](../api-reference/README.md) for interface specifications
+1. Understand **Component Architecture** for implementation guidance (_Documentation
+   coming soon_)
+1. Review **Code Architecture** for implementation patterns (_Documentation coming
+   soon_)
+1. Check **Integration Architecture** for external dependencies (_Documentation coming
+   soon_)
+1. Reference [API Documentation](../api-reference/README.md) for interface
+   specifications
 
-**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
-and comprehensive ecosystem integration.
+**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean
+architecture, domain-driven design, and comprehensive ecosystem integration.

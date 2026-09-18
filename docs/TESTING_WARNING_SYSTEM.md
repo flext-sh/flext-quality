@@ -292,7 +292,7 @@ touch fix_script.sh
 ### 1. Enable Hooks (Already Enabled)
 
 ```bash
-ls ~/.claude/hooks/pre_tool_use.py  # Should exist and be executable
+ls ~/.claude/hooks/pre_tool_use.py # Should exist and be executable
 ```
 
 ### 2. Make Intentional Violations
@@ -371,7 +371,5 @@ All 197 rules active, warning-only mode enabled, documentation complete.
 
 ---
 
-**Last Verified**: 2025-12-30
-**Hook Version**: pre_tool_use.py with enhanced warnings
-**Rule Count**: 197 across 16 YAML files
-**Mode**: ⚠️ WARNING-ONLY (non-blocking)
+**Last Verified**: 2025-12-30 **Hook Version**: pre_tool_use.py with enhanced warnings
+**Rule Count**: 197 across 16 YAML files **Mode**: ⚠️ WARNING-ONLY (non-blocking)

@@ -37,7 +37,8 @@
 
 <!-- TOC END -->
 
-Comprehensive test suite for FLEXT Quality ensuring robust validation of code quality analysis functionality, domain business rules, and ecosystem integration.
+Comprehensive test suite for FLEXT Quality ensuring robust validation of code quality
+analysis functionality, domain business rules, and ecosystem integration.
 
 ## Test Architecture
 
@@ -157,7 +158,6 @@ Complete user journey testing with full system integration:
 #### Complete Test Suite
 
 ```bash
-
 # Run all tests with coverage (thresholds configured in pyproject.toml)
 make test
 
@@ -168,7 +168,6 @@ pytest -v --cov --cov-report=html --cov-report=term-missing
 #### Test Categories
 
 ```bash
-
 # Unit tests only
 make test-unit
 pytest tests/unit/ -v
@@ -188,16 +187,15 @@ pytest tests/test_domain_entities.py -v
 #### Test Filtering
 
 ```bash
-
 # Run tests matching pattern
-pytest -k "analyzer" -v                    # All analyzer-related tests
-pytest -k "domain and not integration" -v  # Domain tests excluding integration
+pytest -k "analyzer" -v                   # All analyzer-related tests
+pytest -k "domain and not integration" -v # Domain tests excluding integration
 
 # Run by markers
-pytest -m "unit" -v                        # Unit tests only
-pytest -m "integration" -v                 # Integration tests only
-pytest -m "slow" -v                        # Long-running tests only
-pytest -m "not slow" -v                    # Fast tests only
+pytest -m "unit" -v        # Unit tests only
+pytest -m "integration" -v # Integration tests only
+pytest -m "slow" -v        # Long-running tests only
+pytest -m "not slow" -v    # Fast tests only
 ```
 
 ### Test Configuration
@@ -214,15 +212,15 @@ python_functions = ["test_*"]
 addopts = "--strict-markers --disable-warnings --cov --cov-report=term-missing"
 
 [tool.coverage.report]
-fail_under = 90  # Coverage threshold — single source of truth
+fail_under = 90 # Coverage threshold — single source of truth
 
 markers = [
-    "unit: Unit tests with mocking and isolation",
-    "integration: Integration tests with real dependencies",
-    "e2e: End-to-end tests with full system",
-    "slow: Long-running tests (>5 seconds)",
-    "security: Security-related testing",
-    "performance: Performance and benchmarking tests",
+  "unit: Unit tests with mocking and isolation",
+  "integration: Integration tests with real dependencies",
+  "e2e: End-to-end tests with full system",
+  "slow: Long-running tests (>5 seconds)",
+  "security: Security-related testing",
+  "performance: Performance and benchmarking tests",
 ]
 ```
 
@@ -376,7 +374,6 @@ def test_memory_usage_within_limits():
 #### **Test Failures**
 
 ```bash
-
 # Run specific failing test with detailed output
 pytest tests/test_analyzer.py::test_specific_function -vvv --tb=long
 
@@ -390,7 +387,6 @@ pytest --cov=src --cov-report=term-missing --cov-debug=trace
 #### **Performance Issues**
 
 ```bash
-
 # Profile test execution
 pytest --profile
 
@@ -398,13 +394,12 @@ pytest --profile
 pytest -m "not slow"
 
 # Parallel test execution
-pytest -n auto  # Requires pytest-xdist
+pytest -n auto # Requires pytest-xdist
 ```
 
 #### **Environment Issues**
 
 ```bash
-
 # Clean test environment
 make clean-test-env
 
@@ -419,5 +414,7 @@ poetry install --group test
 
 - **Source Code Documentation** - Implementation details (_Documentation coming soon_)
 - **Development Guide** - Development setup and workflows (_Documentation coming soon_)
-- **[Architecture Documentation](../docs/architecture/README.md)** - System design and patterns
-- **Quality Standards** - Quality requirements and validation (_Documentation coming soon_)
+- **[Architecture Documentation](../docs/architecture/README.md)** - System design and
+  patterns
+- **Quality Standards** - Quality requirements and validation (_Documentation coming
+  soon_)

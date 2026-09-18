@@ -36,7 +36,8 @@ The FLEXT ecosystem now includes comprehensive code duplication detection via:
 1. **create-duplicate-baseline.sh** - Baseline generation and management script
 1. **~/.duplicate-code-baseline** - Project baseline tracking file
 
-This system prevents code duplication from accumulating while allowing intentional duplicates through a smart retry mechanism.
+This system prevents code duplication from accumulating while allowing intentional
+duplicates through a smart retry mechanism.
 
 ## Components
 
@@ -111,7 +112,8 @@ Second Attempt (Same Edit):
 
 - **Hash-based retry detection**: Content hash prevents accidental re-runs
 - **Educational messages**: Shows why duplication matters
-- **Automatic baseline update**: No manual intervention needed for intentional duplicates
+- **Automatic baseline update**: No manual intervention needed for intentional
+  duplicates
 - **Project-scoped analysis**: Only checks files in the modified project
 - **Timeout handling**: Blocks expire after 10 minutes
 
@@ -201,7 +203,8 @@ flext-ldap:0
 
 **Location**: `~/.duplicate-code-baseline`
 
-Tracks duplicate pair counts for each project. Updated automatically by the hook on retry acceptance.
+Tracks duplicate pair counts for each project. Updated automatically by the hook on
+retry acceptance.
 
 **Example**:
 
@@ -397,17 +400,22 @@ class Quality:
 
 ## FAQ
 
-**Q: What if I'm working on a complex refactoring that temporarily increases duplication?**
+**Q: What if I'm working on a complex refactoring that temporarily increases
+duplication?**
 
-A: Use the retry mechanism. Make your edits, let the hook block, then retry. The duplication spike will be captured in baseline tracking, and you can refactor it down later.
+A: Use the retry mechanism. Make your edits, let the hook block, then retry. The
+duplication spike will be captured in baseline tracking, and you can refactor it down
+later.
 
 **Q: Can I disable duplication checking?**
 
-A: Yes - pass `include_duplicates=False` to analysis options. Or update the baseline if duplicates are intentional and documented.
+A: Yes - pass `include_duplicates=False` to analysis options. Or update the baseline if
+duplicates are intentional and documented.
 
 **Q: How often should I regenerate the baseline?**
 
-A: Only when making coordinated changes across projects. The hook maintains it automatically on retry acceptance.
+A: Only when making coordinated changes across projects. The hook maintains it
+automatically on retry acceptance.
 
 **Q: Does this detect semantic similarity or only line-based?**
 
@@ -415,10 +423,9 @@ A: Currently line-based only. Semantic detection is a future improvement.
 
 **Q: What about duplicates in test files?**
 
-A: They're included in the analysis. Test duplication is often intentional, so use the retry mechanism.
+A: They're included in the analysis. Test duplication is often intentional, so use the
+retry mechanism.
 
 ---
 
-**Last Updated**: 2025-12-29
-**Status**: Current
-**Version**: 1.0.0
+**Last Updated**: 2025-12-29 **Status**: Current **Version**: 1.0.0

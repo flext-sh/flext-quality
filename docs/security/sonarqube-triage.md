@@ -6,8 +6,8 @@ Bead: `mro-2wjm.16`
 
 ## Resumo
 
-**47 issues** — BLOCKER 0, CRITICAL 18, MAJOR 8, MINOR 21
-Tipos: VULNERABILITY 10, BUG 0, CODE_SMELL 37 · **Debt total: 459min**
+**47 issues** — BLOCKER 0, CRITICAL 18, MAJOR 8, MINOR 21 Tipos: VULNERABILITY 10, BUG
+0, CODE_SMELL 37 · **Debt total: 459min**
 
 | regra                 | issues |
 | --------------------- | ------ |
@@ -24,8 +24,11 @@ Tipos: VULNERABILITY 10, BUG 0, CODE_SMELL 37 · **Debt total: 459min**
 
 ## Como usar
 
-Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o **código real** (linha `>>>`), o tipo e o effort estimado.
-**Decisão**: `corrigir` / `falso-positivo` (marcar na plataforma com justificativa) / `risco-aceito`. Ordem: BLOCKER → CRITICAL → VULNERABILITY → MAJOR. CODE_SMELL em volume pede correção de padrão.
+Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
+**código real** (linha `>>>`), o tipo e o effort estimado. **Decisão**: `corrigir` /
+`falso-positivo` (marcar na plataforma com justificativa) / `risco-aceito`. Ordem:
+BLOCKER → CRITICAL → VULNERABILITY → MAJOR. CODE_SMELL em volume pede correção de
+padrão.
 
 ## Issues
 
@@ -73,7 +76,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/core/config_manager.py:186` · **Effort**: 8min
 
-> Define a constant instead of duplicating this literal "validation_config.yaml" 4 times.
+> Define a constant instead of duplicating this literal "validation_config.yaml" 4
+> times.
 
 ```python
       182
@@ -453,7 +457,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `pyproject.toml:-` · **Effort**: 5min
 
-> Dependency versions are not predictable if the lock file (uv.lock, poetry.lock, pdm.lock or pylock.toml) is missing.
+> Dependency versions are not predictable if the lock file (uv.lock, poetry.lock,
+> pdm.lock or pylock.toml) is missing.
 
 **Decisão**: pendente
 
@@ -561,7 +566,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/core/config_manager.py:209` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       205                  self._as_config_data(raw) if raw else self._get_default_config(filename)
@@ -581,7 +587,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:324` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       320          # Email notification
@@ -601,7 +608,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       328          # Slack notification
@@ -621,7 +629,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:332` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       328          # Slack notification
@@ -641,7 +650,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       336          # Webhook notification
@@ -661,7 +671,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:340` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       336          # Webhook notification
@@ -681,7 +692,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/notifications.py:362` · **Effort**: 5min
 
-> Replace this comprehension with passing the iterable to the collection constructor call
+> Replace this comprehension with passing the iterable to the collection constructor
+> call
 
 ```python
       358          email_config = self.config.email
@@ -741,7 +753,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/scripts/audit.py:852` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       848                  metrics = results.metrics
@@ -761,7 +774,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/scripts/audit.py:853` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       849                  if self._should_fail(metrics):
@@ -841,7 +855,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/tools/link_checker.py:409` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       405              try:
@@ -861,7 +876,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       437              rp.set_url(f"https://{domain}/robots.txt")
@@ -881,7 +897,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/tools/link_checker.py:441` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       437              rp.set_url(f"https://{domain}/robots.txt")
@@ -901,7 +918,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 **Local**: `src/flext_quality/docs/tools/style_validator.py:146` · **Effort**: 1min
 
-> Remove this redundant Exception class; it derives from another which is already caught.
+> Remove this redundant Exception class; it derives from another which is already
+> caught.
 
 ```python
       142              if loaded_obj:
