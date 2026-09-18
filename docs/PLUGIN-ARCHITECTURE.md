@@ -159,7 +159,6 @@ Baseline tracking for dead code:
 │  - Complexipy (cognitive complexity)                         │
 │  - LibCST, Jedi                                              │
 └─────────────────────────────────────────────────────────────┘
-```
 
 ## Summary
 
