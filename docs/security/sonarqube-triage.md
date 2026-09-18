@@ -88,13 +88,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Define a constant instead of duplicating this literal "audit_rules.yaml" 4 times.
 
-<<<<<<< HEAD
-```text
-      164  
-=======
 ```python
       164
->>>>>>> origin/0.12.0-dev
       165      def get_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
       166          """Get audit rules configuration."""
       167          if self._audit_rules is None:
@@ -113,13 +108,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Define a constant instead of duplicating this literal "style_guide.yaml" 4 times.
 
-<<<<<<< HEAD
-```text
-      173  
-=======
 ```python
       173
->>>>>>> origin/0.12.0-dev
       174      def get_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
       175          """Get style guide configuration."""
       176          if self._style_guide is None:
@@ -138,13 +128,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Define a constant instead of duplicating this literal "validation_config.yaml" 4 times.
 
-<<<<<<< HEAD
-```text
-      182  
-=======
 ```python
       182
->>>>>>> origin/0.12.0-dev
       183      def get_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
       184          """Get validation configuration."""
       185          if self._validation_config is None:
@@ -163,13 +148,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Make sure disabling CSRF protection is safe here.
 
-<<<<<<< HEAD
-```text
-       23  
-=======
 ```python
        23
->>>>>>> origin/0.12.0-dev
        24      def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
        25          """Initialize documentation dashboard with reports directory."""
        26          self.reports_dir = Path(reports_dir)
@@ -308,13 +288,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Define a constant instead of duplicating this literal "[learn more](\1)" 3 times.
 
-<<<<<<< HEAD
-```text
-      248  
-=======
 ```python
       248
->>>>>>> origin/0.12.0-dev
       249      def _improve_link_text(self, content: str) -> str:
       250          """Improve generic link text for better accessibility."""
       251          improvements = {
@@ -601,13 +576,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Either remove or fill this block of code.
 
-<<<<<<< HEAD
-```text
-      712  
-=======
 ```python
       712
->>>>>>> origin/0.12.0-dev
       713          results = FlextQualityStyleValidator.validate_file_style(file_path, config_path)
       714
       715          for _violation in results.violations[:3]:
@@ -806,13 +776,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
-<<<<<<< HEAD
-```text
-      567  
-=======
 ```python
       567
->>>>>>> origin/0.12.0-dev
       568      def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
       569          """Validate image references."""
       570          for image in images:
@@ -1031,13 +996,8 @@ Cada issue traz a **mensagem do SonarQube** (descreve o problema e o impacto), o
 
 > Rename this field "Base" to match the regular expression ^[\_a-z][_a-z0-9]\*$.
 
-<<<<<<< HEAD
-```text
-       13  
-=======
 ```python
        13
->>>>>>> origin/0.12.0-dev
        14  class FlextQualityValidators:
        15      """Namespace for flext-quality validators (one class per module pattern)."""
        16
