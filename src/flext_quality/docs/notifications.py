@@ -7,17 +7,42 @@ including email, Slack, webhooks, and project management tools.
 
 from __future__ import annotations
 
+import ipaddress
 import smtplib
+import socket
 from collections.abc import Mapping, MutableSequence
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Annotated, override
+from typing import Annotated, Final, override
+from urllib.parse import urlparse
 
 import requests
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
+
+_WEBHOOK_SECURE_SCHEMES: Final[frozenset[str]] = frozenset({"https"})
+_SLACK_WEBHOOK_HOSTS: Final[frozenset[str]] = frozenset({"hooks.slack.com"})
+
+
+def _validate_outbound_webhook(url: str, allowed_hosts: frozenset[str]) -> None:
+    """Fail closed unless the webhook is an allowlisted public HTTPS host.
+
+    Resolves the host and rejects any non-global address so a forged target
+    cannot redirect a server-side request at internal, loopback, or
+    link-local services.
+    """
+    parsed = urlparse(url)
+    host = parsed.hostname or ""
+    if parsed.scheme not in _WEBHOOK_SECURE_SCHEMES or host not in allowed_hosts:
+        msg = f"webhook target is not allowlisted: {url}"
+        raise ValueError(msg)
+    for *_, sockaddr in socket.getaddrinfo(host, 443):
+        address = ipaddress.ip_address(sockaddr[0])
+        if not address.is_global:
+            msg = f"webhook host resolves to a non-public address: {host}"
+            raise ValueError(msg)
 
 
 class FlextQualityDocumentationNotifier:
@@ -413,7 +438,13 @@ Timestamp: {u.now().isoformat()}
             ],
         }
 
-        response = requests.post(slack_config.webhook_url, json=payload, timeout=10)
+        _validate_outbound_webhook(slack_config.webhook_url, _SLACK_WEBHOOK_HOSTS)
+        response = requests.post(
+            slack_config.webhook_url,
+            json=payload,
+            timeout=10,
+            allow_redirects=False,
+        )
         response.raise_for_status()
 
     def _send_webhook_notification(

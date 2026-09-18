@@ -15,7 +15,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from http import HTTPStatus
 from pathlib import Path
-from string import Template
 from typing import TYPE_CHECKING, Annotated, Final, override
 
 import requests
@@ -32,6 +31,10 @@ _QUALITY_SCORE_HIGH_THRESHOLD: Final[int] = 75
 _QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
 _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
 _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
+
+_AUDIT_REPORT_TEMPLATE: Final[str] = (
+    """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: $files_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
+)
 
 
 class FlextQualityDocumentationAuditor:
@@ -727,20 +730,20 @@ class FlextQualityDocumentationAuditor:
         files_analyzed = metrics.files_analyzed
         generated_at = self.results.timestamp
         score_color = self._get_score_color(quality_score)
-        html = Template(
-            """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: $files_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
-        ).substitute(
-            generated_at=generated_at,
-            files_analyzed=files_analyzed,
-            score_color=score_color,
-            quality_score=quality_score,
-            total_issues=total_issues,
-            issues_per_file=f"{issues_per_file:.1f}",
-            critical_count=critical_count,
-            high_count=high_count,
-            medium_count=medium_count,
-            low_count=low_count,
-        )
+        html = _AUDIT_REPORT_TEMPLATE
+        for name, value in {
+            "generated_at": generated_at,
+            "files_analyzed": files_analyzed,
+            "score_color": score_color,
+            "quality_score": quality_score,
+            "total_issues": total_issues,
+            "issues_per_file": f"{issues_per_file:.1f}",
+            "critical_count": critical_count,
+            "high_count": high_count,
+            "medium_count": medium_count,
+            "low_count": low_count,
+        }.items():
+            html = html.replace(f"${name}", str(value))
         for issue in self.results.issues:
             severity_class = f"severity-{issue.get('severity', 'info')}"
             type_str = str(issue.get("type", ""))
