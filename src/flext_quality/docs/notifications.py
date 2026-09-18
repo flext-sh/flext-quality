@@ -440,10 +440,7 @@ Timestamp: {u.now().isoformat()}
 
         _validate_outbound_webhook(slack_config.webhook_url, _SLACK_WEBHOOK_HOSTS)
         response = requests.post(
-            slack_config.webhook_url,
-            json=payload,
-            timeout=10,
-            allow_redirects=False,
+            slack_config.webhook_url, json=payload, timeout=10, allow_redirects=False
         )
         response.raise_for_status()
 

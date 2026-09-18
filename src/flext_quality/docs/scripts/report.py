@@ -15,13 +15,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
-from flext_cli import cli
-from flext_cli import u as cli_u
+from flext_cli import cli, u as cli_u
 
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, MutableSequence
+    from collections.abc import Mapping, MutableSequence
 
 _QUALITY_SCORE_EXCELLENT: Final[int] = 80
 _QUALITY_SCORE_GOOD: Final[int] = 60
