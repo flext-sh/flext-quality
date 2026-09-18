@@ -300,7 +300,7 @@ padrão.
 > Refactor this function to reduce its Cognitive Complexity from 53 to the 15 allowed.
 
 ```python
-      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
+      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendD ...
       233          """Analyze quality trends over time."""
       234          return None
       235
@@ -471,7 +471,7 @@ padrão.
 ```python
        57                      check_value = bool(self.style_checks.get(check_name, False))
        58                  case "accessibility":
-       59                      check_value = bool(self.accessibility_checks.get(check_name, False))
+       59                      check_value = bool(self.accessibility_checks.get(chec ...
        60                  case _:
 >>>    61                      pass
        62              return check_value

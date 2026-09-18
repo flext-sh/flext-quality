@@ -72,10 +72,11 @@ Planned plugin interface for flext-quality:
 
 ```python
 from __future__ import annotations
-from flext_quality import m
+
 from pathlib import Path
-from flext_core import p
-from flext_core import t
+
+from flext_core import p, t
+from flext_quality import m
 
 
 class QualityPlugin(Protocol):
@@ -104,7 +105,7 @@ class QualityPlugin(Protocol):
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
         ...
-```
+
 
 ### 5. Baseline Management
 

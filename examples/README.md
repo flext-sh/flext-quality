@@ -134,11 +134,11 @@ print(
 ```python
 from __future__ import annotations
 
+from flext_cli import u
+from flext_observability import create_metric
+
 # examples/integration/flext_ecosystem.py
 from flext_quality import QualityAPI
-from flext_cli import u
-from flext_core import FlextSettings
-from flext_observability import create_metric
 
 # Initialize with dependency injection
 container = FlextContainer()
@@ -162,7 +162,7 @@ def analyze_with_monitoring(project_path: str):
     else:
         u.Cli.info(f"Analysis failed: {result.error}")
         return None
-```
+
 
 ### CI/CD Quality Gate
 

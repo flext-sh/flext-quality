@@ -126,7 +126,8 @@ mypy src/flext_quality/ --strict # Cannot run until imports work
 pytest tests/ -v # AttributeError expected
 
 # Direct analyzer import works (bypasses model issues)
-python -c "from flext_quality import FlextQualityCodeAnalyzer; u.Cli.print('Direct import successful')"
+python -c "from flext_quality import FlextQualityCodeAnalyzer; u.Cli.print('Direct \
+    import successful')"
 ```
 
 ### **Step 3: Review Architecture**
@@ -154,8 +155,8 @@ ls -la src/flext_quality/
 
 ```python
 from __future__ import annotations
-from flext_quality import FlextQualityService
-from flext_quality import FlextQualityCodeAnalyzer
+
+from flext_quality import FlextQualityCodeAnalyzer, FlextQualityService
 
 
 # Option 1: Service Layer Approach
@@ -203,7 +204,7 @@ def direct_analysis():
 # Run both approaches
 run(service_analysis())
 direct_analysis()
-```
+
 
 ### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
 

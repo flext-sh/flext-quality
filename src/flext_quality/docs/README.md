@@ -448,7 +448,7 @@ jobs:
 - High: ${report.metrics?.severity_breakdown?.high || 0}
 - Medium: ${report.metrics?.severity_breakdown?.medium || 0}
 
-[📄 View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+[📄 View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/ ...
               });
             }
 
@@ -520,13 +520,16 @@ repos:
 # Add to crontab for regular maintenance
 
 # Daily quality checks
-0 9 * * * cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py --daily --output docs/maintenance/reports/
+0 9 * * * cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py \
+    --daily --output docs/maintenance/reports/
 
 # Weekly comprehensive audit
-0 10 * * 1 cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py --comprehensive --output docs/maintenance/reports/
+0 10 * * 1 cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py \
+    --comprehensive --output docs/maintenance/reports/
 
 # Monthly trend analysis and reporting
-0 11 1 * * cd /path/to/flext-quality && python docs/maintenance/scripts/report.py --monthly-trends --notify
+0 11 1 * * cd /path/to/flext-quality && python docs/maintenance/scripts/report.py \
+    --monthly-trends --notify
 ```
 
 ## 📊 Quality Metrics

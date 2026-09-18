@@ -140,7 +140,7 @@ title FLEXT Quality - System Context
 
 Person(developer, "Python Developer", "Develops Python applications requiring quality analysis")
 Person(devops, "DevOps Engineer", "Manages CI/CD pipelines and quality gates")
-Person(architect, "Software Architect", "Makes architectural decisions and reviews quality metrics")
+Person(architect, "Software Architect", "Makes architectural decisions and reviews q ...
 
 System(flext_quality, "FLEXT Quality", "Code quality analysis and metrics collection library")
 

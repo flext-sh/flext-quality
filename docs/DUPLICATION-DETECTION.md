@@ -48,8 +48,9 @@ duplicates through a smart retry mechanism.
 A `s[int]` that detects code clones using line-based similarity:
 
 ```python
-from flext_quality import FlextDuplicationPlugin
 from pathlib import Path
+
+from flext_quality import FlextDuplicationPlugin
 
 plugin = FlextDuplicationPlugin()
 
@@ -60,7 +61,7 @@ result = plugin.check(files)
 if result.success:
     for dup in result.value.duplicates:
         print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
-```
+
 
 **Key Features**:
 
