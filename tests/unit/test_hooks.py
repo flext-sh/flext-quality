@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, override
 
+import pytest
 from flext_tests import tm
 
 from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r, t
@@ -69,12 +70,8 @@ class TestsFlextQualityBaseHook:
         class _BareHook(FlextQualityBaseHook):
             event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
 
-        try:
+        with pytest.raises(NotImplementedError):
             _BareHook().execute({})
-        except NotImplementedError:
-            return
-        message = "expected NotImplementedError"
-        raise AssertionError(message)
 
     def test_should_run_defaults_true_without_a_matcher(self) -> None:
         """A hook without a matcher runs for every input."""

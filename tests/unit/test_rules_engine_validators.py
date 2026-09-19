@@ -283,7 +283,7 @@ class TestsFlextQualityValidators:
         tm.that(result.success, eq=True)
         tm.that(
             {"pattern-first", "pattern-second"}
-            <= {violation["rule"] for violation in result.value},
+            <= {str(violation["rule"]) for violation in result.value},
             eq=True,
         )
 
