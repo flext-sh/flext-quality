@@ -13,9 +13,7 @@ if TYPE_CHECKING:
     from .server import FlextQualityMcpServer
     from .tools import FlextQualityMcpTools
 __all__: tuple[str, ...] = (
-    "FlextQualityMcpResources",
-    "FlextQualityMcpServer",
-    "FlextQualityMcpTools",
+    "FlextQualityMcpResources", "FlextQualityMcpServer", "FlextQualityMcpTools",
 )
 
 _LAZY_IMPORTS = MappingProxyType(

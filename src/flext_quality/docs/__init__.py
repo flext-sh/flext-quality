@@ -21,18 +21,9 @@ if TYPE_CHECKING:
     from .tools.link_checker import FlextQualityLinkChecker
     from .tools.style_validator import FlextQualityStyleValidator
 __all__: tuple[str, ...] = (
-    "FlextQualityConfigManager",
-    "FlextQualityDocumentationAuditor",
-    "FlextQualityDocumentationDashboard",
-    "FlextQualityDocumentationNotifier",
-    "FlextQualityDocumentationOptimizer",
-    "FlextQualityDocumentationReporter",
-    "FlextQualityDocumentationValidator",
-    "FlextQualityLinkChecker",
-    "FlextQualityScheduledMaintenance",
-    "FlextQualityStyleValidator",
-    "core",
-    "scripts",
+    "FlextQualityConfigManager", "FlextQualityDocumentationAuditor", "FlextQualityDocumentationDashboard", "FlextQualityDocumentationNotifier",
+    "FlextQualityDocumentationOptimizer", "FlextQualityDocumentationReporter", "FlextQualityDocumentationValidator", "FlextQualityLinkChecker",
+    "FlextQualityScheduledMaintenance", "FlextQualityStyleValidator", "core", "scripts",
     "tools",
 )
 

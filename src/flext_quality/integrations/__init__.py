@@ -14,10 +14,7 @@ if TYPE_CHECKING:
     from .code_execution import FlextQualityCodeExecutionBridge
     from .mcp_client import FlextQualityMcpClient
 __all__: tuple[str, ...] = (
-    "FlextQualityClaudeContextClient",
-    "FlextQualityClaudeMemClient",
-    "FlextQualityCodeExecutionBridge",
-    "FlextQualityMcpClient",
+    "FlextQualityClaudeContextClient", "FlextQualityClaudeMemClient", "FlextQualityCodeExecutionBridge", "FlextQualityMcpClient",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
