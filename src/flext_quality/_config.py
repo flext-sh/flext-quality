@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Self
+from typing import Annotated, Self
 
 from flext_cli import FlextCliConfig, m
 
@@ -47,7 +47,10 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
 
     __hash__ = object.__hash__
 
-    Quality: _QualityNamespace = _QualityNamespace()
+    Quality: Annotated[
+        _QualityNamespace,
+        m.Field(description="Open namespace exposing ``config/*.yaml`` under ``Quality``."),
+    ] = _QualityNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()
