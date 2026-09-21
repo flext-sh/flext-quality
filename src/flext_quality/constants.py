@@ -20,7 +20,6 @@ from typing import TYPE_CHECKING, ClassVar, Final
 from flext_infra import c
 from flext_web import c as web_c
 
-from ._constants.base import FlextQualityConstantsBase
 from ._constants.values import FlextQualityConstantsValues
 
 if TYPE_CHECKING:
