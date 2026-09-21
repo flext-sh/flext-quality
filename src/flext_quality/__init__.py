@@ -20,8 +20,9 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_core import d, e, h, r, x
     from flext_web import c as web_c
+
+    from flext_core import d, e, h, r, x
 
     from . import docs, hooks, integrations, mcp, rules
     from .__version__ import FlextQualityVersion
