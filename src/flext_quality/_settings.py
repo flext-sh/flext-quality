@@ -12,8 +12,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import FlextSettings
 from flext_quality import m, u
 
@@ -21,7 +19,7 @@ from flext_quality import m, u
 class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality; fields under ``settings.Quality.*``."""
 
-    model_config = SettingsConfigDict(
+    model_config = m.SettingsConfigDict(
         env_prefix="FLEXT_QUALITY_", env_nested_delimiter="__", extra="ignore"
     )
 
