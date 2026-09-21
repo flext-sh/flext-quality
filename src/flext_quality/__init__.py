@@ -20,7 +20,7 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_core import d, e, h, r, x
+    from flext_infra import d, e, h, r, x
     from flext_web import c as web_c
 
     from . import docs, hooks, integrations, mcp, rules
@@ -163,7 +163,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "flext_core": ("d", "e", "h", "r", "x"),
+            "flext_infra": ("d", "e", "h", "r", "x"),
         }),
         alias_groups=MappingProxyType({"flext_web": (("web_c", "c"),)}),
         sort_keys=False,
