@@ -126,18 +126,18 @@ Tool execution → Hook validates → Violations found? →
 
 - **SEC014**: `pip install` (direct pip usage)
 
-  - Problem: Bypasses Poetry dependency management
-  - Fix: Use `poetry add package-name`
+  - Problem: Bypasses the typed dependency owner and workspace lifecycle
+  - Fix: Update the canonical dependency config, then run `make deps` and `make gen`
 
 - **SEC015**: `pip install --upgrade`
 
-  - Problem: Can break compatibility
-  - Fix: Use `poetry update` for safe upgrades
+  - Problem: Bypasses dependency floors, cooldown policy, and generated consumers
+  - Fix: Update the canonical dependency config, then run `make deps` and `make gen`
 
-- **SEC016**: `uv pip` (uv package installer)
+- **SEC016**: bare `uv` package management
 
-  - Problem: Inconsistent with FLEXT Poetry approach
-  - Fix: Use Poetry for FLEXT projects
+  - Problem: Bypasses the root Make dispatcher and typed dependency owner
+  - Fix: Use `make setup` for provisioning or `make deps` followed by `make gen` for owner changes
 
 ---
 
@@ -474,16 +474,13 @@ Tool execution → Hook validates → Violations found? →
 - **PF001**: `pyproject.toml` direct edit
 
   - Problem: Manual edits cause inconsistencies
-  - Fix: Use Poetry commands:
-    - `poetry add <pkg>`
-    - `poetry remove <pkg>`
-    - `poetry version <version>`
+  - Fix: Edit the flext-infra config/template owner, then run `make deps` and `make gen`
 
-- **PF002**: `poetry.lock` manual edit
+- **PF002**: `uv.lock` manual edit
 
-  - ⛔ CRITICAL: Lock file is generated
-  - Problem: Manual edits corrupt dependency resolution
-  - Fix: Use `poetry lock` or `poetry update` only
+  - ⛔ CRITICAL: `uv.lock` is prohibited in FLEXT repositories
+  - Problem: Its presence creates a competing dependency authority
+  - Fix: Correct the config/generator owner and rerun `make setup`, `make deps`, and `make gen`
 
 #### Git Configuration (PF003-014)
 

@@ -145,7 +145,7 @@ TOTAL: 197 validation rules
 
 ### 5. Project Files Warnings (14 rules) ✅
 
-- **PF001-002**: Configuration (pyproject.toml, poetry.lock)
+- **PF001-002**: Configuration (pyproject.toml, uv.lock)
 - **PF003-005**: Git & build files
 - **PF006-011**: Secrets & credentials
 - **PF012-014**: Git internals
@@ -226,7 +226,7 @@ touch fix_script.sh
 # Expected behavior:
 # 1. Hook detects: Direct pyproject.toml edit
 # 2. Shows warning about direct edit
-# 3. Suggests: Use 'poetry add', 'poetry remove', etc.
+# 3. Suggests: update the typed owner, then run 'make deps' and 'make gen'.
 # 4. ✅ Edit would be allowed by hook (rejected by validators)
 ```
 

@@ -1,5 +1,58 @@
 # Triagem SonarCloud — flext-sh/flext-quality
 
+<!-- TOC START -->
+- [Resumo](#resumo)
+- [Como usar](#como-usar)
+- [Issues](#issues)
+  - [1 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#1-critical-code_smell-pythons1192)
+  - [2 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#2-critical-code_smell-pythons1192)
+  - [3 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#3-critical-code_smell-pythons1192)
+  - [4 · 🟠 CRITICAL · VULNERABILITY · python:S4502](#4-critical-vulnerability-pythons4502)
+  - [5 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#5-critical-code_smell-pythons1192)
+  - [6 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#6-critical-code_smell-pythons3776)
+  - [7 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#7-critical-code_smell-pythons3776)
+  - [8 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#8-critical-code_smell-pythons3776)
+  - [9 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#9-critical-code_smell-pythons3776)
+  - [10 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#10-critical-code_smell-pythons1192)
+  - [11 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#11-critical-code_smell-pythons1192)
+  - [12 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#12-critical-code_smell-pythons3776)
+  - [13 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#13-critical-code_smell-pythons3776)
+  - [14 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#14-critical-code_smell-pythons3776)
+  - [15 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#15-critical-code_smell-pythons3776)
+  - [16 · 🟠 CRITICAL · CODE_SMELL · python:S1192](#16-critical-code_smell-pythons1192)
+  - [17 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#17-critical-code_smell-pythons3776)
+  - [18 · 🟠 CRITICAL · CODE_SMELL · python:S3776](#18-critical-code_smell-pythons3776)
+  - [19 · 🟡 MAJOR · VULNERABILITY · githubactions:S8264](#19-major-vulnerability-githubactionss8264)
+  - [20 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#20-major-vulnerability-githubactionss8233)
+  - [21 · 🟡 MAJOR · VULNERABILITY · githubactions:S8233](#21-major-vulnerability-githubactionss8233)
+  - [22 · 🟡 MAJOR · VULNERABILITY · text:S8565](#22-major-vulnerability-texts8565)
+  - [23 · 🟡 MAJOR · CODE_SMELL · python:S108](#23-major-code_smell-pythons108)
+  - [24 · 🟡 MAJOR · CODE_SMELL · python:S1854](#24-major-code_smell-pythons1854)
+  - [25 · 🟡 MAJOR · CODE_SMELL · python:S3358](#25-major-code_smell-pythons3358)
+  - [26 · 🟡 MAJOR · CODE_SMELL · python:S108](#26-major-code_smell-pythons108)
+  - [27 · ⚪ MINOR · CODE_SMELL · python:S7504](#27-minor-code_smell-pythons7504)
+  - [28 · ⚪ MINOR · CODE_SMELL · python:S5713](#28-minor-code_smell-pythons5713)
+  - [29 · ⚪ MINOR · CODE_SMELL · python:S5713](#29-minor-code_smell-pythons5713)
+  - [30 · ⚪ MINOR · CODE_SMELL · python:S5713](#30-minor-code_smell-pythons5713)
+  - [31 · ⚪ MINOR · CODE_SMELL · python:S5713](#31-minor-code_smell-pythons5713)
+  - [32 · ⚪ MINOR · CODE_SMELL · python:S5713](#32-minor-code_smell-pythons5713)
+  - [33 · ⚪ MINOR · CODE_SMELL · python:S5713](#33-minor-code_smell-pythons5713)
+  - [34 · ⚪ MINOR · CODE_SMELL · python:S7500](#34-minor-code_smell-pythons7500)
+  - [35 · ⚪ MINOR · VULNERABILITY · python:S5332](#35-minor-vulnerability-pythons5332)
+  - [36 · ⚪ MINOR · VULNERABILITY · python:S5332](#36-minor-vulnerability-pythons5332)
+  - [37 · ⚪ MINOR · CODE_SMELL · python:S5713](#37-minor-code_smell-pythons5713)
+  - [38 · ⚪ MINOR · CODE_SMELL · python:S5713](#38-minor-code_smell-pythons5713)
+  - [39 · ⚪ MINOR · VULNERABILITY · python:S5332](#39-minor-vulnerability-pythons5332)
+  - [40 · ⚪ MINOR · VULNERABILITY · python:S5332](#40-minor-vulnerability-pythons5332)
+  - [41 · ⚪ MINOR · VULNERABILITY · python:S5332](#41-minor-vulnerability-pythons5332)
+  - [42 · ⚪ MINOR · CODE_SMELL · python:S5713](#42-minor-code_smell-pythons5713)
+  - [43 · ⚪ MINOR · CODE_SMELL · python:S5713](#43-minor-code_smell-pythons5713)
+  - [44 · ⚪ MINOR · CODE_SMELL · python:S5713](#44-minor-code_smell-pythons5713)
+  - [45 · ⚪ MINOR · CODE_SMELL · python:S5713](#45-minor-code_smell-pythons5713)
+  - [46 · ⚪ MINOR · CODE_SMELL · python:S7498](#46-minor-code_smell-pythons7498)
+  - [47 · ⚪ MINOR · CODE_SMELL · python:S116](#47-minor-code_smell-pythons116)
+<!-- TOC END -->
+
 Gerado do dump da plataforma SonarCloud (2026-08-06).
 
 Bead: `mro-2wjm.16`
@@ -119,7 +172,7 @@ padrão.
 
 > Define a constant instead of duplicating this literal "application/json" 3 times.
 
-```python
+```text
        49              return Response(
        50                  t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
        51                      self.get_current_metrics()
@@ -139,7 +192,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 57 to the 15 allowed.
 
-```python
+```text
        89          self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
        90              timestamp=u.now().isoformat()
        91          )
@@ -159,7 +212,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 19 to the 15 allowed.
 
-```python
+```text
       438              webhook_config.url, json=payload, headers=headers, timeout=timeout
       439          )
       440          response.raise_for_status()
@@ -179,7 +232,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 29 to the 15 allowed.
 
-```python
+```text
       578              None, description="Monthly report JSON file", validate_default=True
       579          )
       580
@@ -199,7 +252,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
-```python
+```text
       263          ).search(content):
       264              indicators.append("potentially inconsistent status")
       265          return indicators
@@ -219,7 +272,7 @@ padrão.
 
 > Define a constant instead of duplicating this literal r"^#{1,6}\\s" 4 times.
 
-```python
+```text
        90          lines = content.split("\n")
        91          fixed_lines: MutableSequence[str] = []
        92          for i, line in enumerate(lines):
@@ -259,7 +312,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
-```python
+```text
       314              ):
       315                  enhanced_lines.extend(("", "---", ""))
       316          return "\n".join(enhanced_lines)
@@ -279,7 +332,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 34 to the 15 allowed.
 
-```python
+```text
       169              return self._generate_markdown_report(report_data)
       170          msg = f"Unsupported format: {report_format}"
       171          raise ValueError(msg)
@@ -299,8 +352,8 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 53 to the 15 allowed.
 
-```python
-      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendD ...
+```text
+      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
       233          """Analyze quality trends over time."""
       234          return None
       235
@@ -319,7 +372,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 32 to the 15 allowed.
 
-```python
+```text
       553              str, t.Quality.DocumentationReportValue | datetime
       554          ] = {**report_data_raw, "date": report_date}
       555          return report_data_dict
@@ -339,7 +392,7 @@ padrão.
 
 > Define a constant instead of duplicating this literal "report write failed" 3 times.
 
-```python
+```text
       737                      self.filename or f"monthly_trends_{u.now().strftime('%Y%m%d')}"
       738                  )
       739                  save_result = reporter.save_report(trend_report, filename, "md")
@@ -359,7 +412,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.
 
-```python
+```text
       271                  })
       272              )
       273              return max_retry_result
@@ -379,7 +432,7 @@ padrão.
 
 > Refactor this function to reduce its Cognitive Complexity from 17 to the 15 allowed.
 
-```python
+```text
       251                  self.results.performance.slowest_response, response_time
       252              )
       253              return result
@@ -468,7 +521,7 @@ padrão.
 
 > Either remove or fill this block of code.
 
-```python
+```text
        57                      check_value = bool(self.style_checks.get(check_name, False))
        58                  case "accessibility":
        59                      check_value = bool(self.accessibility_checks.get(chec ...
@@ -488,7 +541,7 @@ padrão.
 
 > Remove this assignment to local variable 'quality_trend'; the value is never used.
 
-```python
+```text
       178          total_issues = 0
       179          files_analyzed = 0
       180          links_checked = 0
@@ -508,7 +561,7 @@ padrão.
 
 > Extract this nested conditional expression into an independent statement.
 
-```python
+```text
       291                      link_file_dir = Path(link.file).parent
       292                      relative_target = (
       293                          link_file_dir / target[2:]
@@ -548,7 +601,7 @@ padrão.
 
 > Remove this unnecessary `list()` call on an already iterable object.
 
-```python
+```text
        16      if (
        17          existing_package is None
        18          or Path(getattr(existing_package, "__file__", "")).resolve() != init_file
@@ -569,7 +622,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       205                  self._as_config_data(raw) if raw else self._get_default_config(filename)
       206              )
       207          except FileNotFoundError:
@@ -590,7 +643,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       320          # Email notification
       321          if self.config.channels.email.enabled:
       322              try:
@@ -611,7 +664,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       328          # Slack notification
       329          if self.config.channels.slack.enabled:
       330              try:
@@ -632,7 +685,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       328          # Slack notification
       329          if self.config.channels.slack.enabled:
       330              try:
@@ -653,7 +706,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       336          # Webhook notification
       337          if self.config.channels.webhook.enabled:
       338              try:
@@ -674,7 +727,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       336          # Webhook notification
       337          if self.config.channels.webhook.enabled:
       338              try:
@@ -695,7 +748,7 @@ padrão.
 > Replace this comprehension with passing the iterable to the collection constructor
 > call
 
-```python
+```text
       358          email_config = self.config.email
       359
       360          msg = MIMEMultipart()
@@ -715,7 +768,7 @@ padrão.
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
-```python
+```text
       484              internal_links = u.Quality.compile_pattern(
       485                  r"\\[([^\\]]+)\\]\\(([^)]+)\\)"
       486              ).findall(content)
@@ -756,7 +809,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       848                  metrics = results.metrics
       849                  if self._should_fail(metrics):
       850                      return r[bool].fail("Audit failed quality threshold")
@@ -777,7 +830,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       849                  if self._should_fail(metrics):
       850                      return r[bool].fail("Audit failed quality threshold")
       851              except (
@@ -797,7 +850,7 @@ padrão.
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
-```python
+```text
       124              # NOTE (multi-agent, mro-f8vk / kimi): match-with-guards was
       125              # non-exhaustive by construction (reportMatchNotExhaustive); the
       126              # if-chain keeps identical first-match semantics and an explicit
@@ -817,7 +870,7 @@ padrão.
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
-```python
+```text
       330              """Validate image references."""
       331              images = [link for link in links if link.type == "image"]
       332              for image in images:
@@ -837,7 +890,7 @@ padrão.
 
 > Using HTTP protocol is insecure. Use HTTPS instead.
 
-```python
+```text
       172          return all_links
       173
       174      def _classify_link(self, url: str) -> str:
@@ -858,7 +911,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       405              try:
       406                  async with ClientSession() as session:
       407                      self.session = session
@@ -879,7 +932,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       437              rp.set_url(f"https://{domain}/robots.txt")
       438              rp.read()
       439
@@ -900,7 +953,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       437              rp.set_url(f"https://{domain}/robots.txt")
       438              rp.read()
       439
@@ -921,7 +974,7 @@ padrão.
 > Remove this redundant Exception class; it derives from another which is already
 > caught.
 
-```python
+```text
       142              if loaded_obj:
       143                  self.settings = self._normalize_config(loaded_obj)
       144              else:
@@ -941,7 +994,7 @@ padrão.
 
 > Replace this constructor call with a literal.
 
-```python
+```text
        31              return []
        32
        33          @staticmethod

@@ -10,7 +10,7 @@
   - [3. MCP Server Access (Available)](#3-mcp-server-access-available)
   - [4. Future: Plugin Interface](#4-future-plugin-interface)
   - [5. Baseline Management](#5-baseline-management)
-- [Architecture Diagram```](#architecture-diagram)
+- [Architecture Diagram](#architecture-diagram)
 - [Summary](#summary)
 
 <!-- TOC END -->
@@ -49,14 +49,16 @@ Hooks in `~/.claude/hooks/` use CLI tools directly:
 
 ### 2. Makefile Targets (Implemented)
 
-Added to `~/flext/base.mk`:
+Run from the active workspace root. The dispatcher owns tool selection:
 
-```makefile
-dead-code: ## Dead code detection (Vulture)
-modernize: ## Modern patterns suggestions (Refurb)
-cognitive-complexity: ## Cognitive complexity (Complexipy)
-validate-full: ## Full validation including dead code
+```bash
+make mod
+make fix
+make fmt
+make check
 ```
+
+See [Make commands](guides/make-commands.md) for the complete lifecycle.
 
 ### 3. MCP Server Access (Available)
 
@@ -85,27 +87,23 @@ class QualityPlugin(Protocol):
     @property
     def name(self) -> str:
         """Plugin name."""
-        ...
 
     @property
     def description(self) -> str:
         """Plugin description."""
-        ...
 
     def analyze(
         self, path: Path, settings: m.Quality.PluginConfigModel | None = None
     ) -> p.Result[AnalysisResult]:
         """Run analysis on path."""
-        ...
 
     def supports_fix(self) -> bool:
         """Whether plugin can auto-fix issues."""
-        ...
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
         ...
-
+```
 
 ### 5. Baseline Management
 
@@ -117,28 +115,52 @@ Baseline tracking for dead code:
 
 ## Architecture Diagram
 
-```
+The legacy integration proposal below preserves its intended layers; it is not proof
+that the external MCP server or historical hooks are installed. Current execution uses
+the workspace-root Make contract above.
 
-┌─────────────────────────────────────────────────────────────┐ │ Claude Code Hooks │
-├─────────────────────────────────────────────────────────────┤ │
-05-dead-code-detector.sh 06-modernization-advisor.sh │ │ (blocking) (advisory) │
-└────────────────┬──────────────────────────┬─────────────────┘ │ │ ▼ ▼
-┌────────────────────────┐ ┌───────────────────────────────┐ │ Vulture (dead code) │ │
-Refurb (modern patterns) │ └────────────────────────┘ └───────────────────────────────┘
-│ │ ▼ ▼ ┌─────────────────────────────────────────────────────────────┐ │
-~/flext/base.mk │ ├─────────────────────────────────────────────────────────────┤ │ make
-dead-code make modernize make cognitive-complexity│ │ make val-full │
-└─────────────────────────────────────────────────────────────┘ │ ▼
-┌─────────────────────────────────────────────────────────────┐ │ flext-quality │
-├─────────────────────────────────────────────────────────────┤ │
-FlextQualityPythonTools FlextQualityAnalyzer │ │ - Vulture - Orchestrates all tools │
-│ - Mypy - Generates reports │ │ - Bandit - Calculates scores │ │ - Radon │
-└─────────────────────────────────────────────────────────────┘ │ ▼
-┌─────────────────────────────────────────────────────────────┐ │ MCP Python Refactoring
-Server │ ├─────────────────────────────────────────────────────────────┤ │
-~/mcp-python-refactoring │ │ - Rope (AST refactoring) │ │ - Refurb (modern patterns) │
-│ - Complexipy (cognitive complexity) │ │ - LibCST, Jedi │
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Claude Code Hooks                        │
+├─────────────────────────────────────────────────────────────┤
+│  05-dead-code-detector.sh    06-modernization-advisor.sh   │
+│         (blocking)                  (advisory)              │
+└────────────────┬──────────────────────────┬─────────────────┘
+                 │                          │
+                 ▼                          ▼
+┌────────────────────────┐    ┌───────────────────────────────┐
+│   Vulture (dead code)  │    │    Refurb (modern patterns)   │
+└────────────────────────┘    └───────────────────────────────┘
+                 │                          │
+                 ▼                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                Workspace root Make dispatcher                │
+├─────────────────────────────────────────────────────────────┤
+│  make mod    make fix    make fmt    make check               │
 └─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    flext-quality                             │
+├─────────────────────────────────────────────────────────────┤
+│  FlextQualityPythonTools    FlextQualityAnalyzer            │
+│  - Vulture                  - Orchestrates all tools        │
+│  - Mypy                     - Generates reports             │
+│  - Bandit                   - Calculates scores             │
+│  - Radon                                                     │
+└─────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────┐
+│                MCP Python Refactoring Server                 │
+├─────────────────────────────────────────────────────────────┤
+│  ~/mcp-python-refactoring                                    │
+│  - Rope (AST refactoring)                                    │
+│  - Refurb (modern patterns)                                  │
+│  - Complexipy (cognitive complexity)                         │
+│  - LibCST, Jedi                                              │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ## Summary
 
