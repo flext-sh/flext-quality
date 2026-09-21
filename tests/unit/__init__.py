@@ -11,8 +11,6 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 if TYPE_CHECKING:
     from flext_tests import c, d, e, h, m, p, r, s, t, td, tf, tk, tm, tv, u, x
 
-    from .test_api import TestsFlextQualityApi
-    from .test_basic import TestsFlextQualityBasic
     from .test_cli import TestsFlextQualityCli
     from .test_code_execution import TestsFlextQualityCodeExecutionBridge
     from .test_docs_config_manager import TestsFlextQualityConfigManager
@@ -30,13 +28,8 @@ if TYPE_CHECKING:
         TestsFlextQualityRulesLoader,
         TestsFlextQualityValidators,
     )
-    from .test_scheduled_maintenance_timeout import (
-        TestsFlextQualityScheduledMaintenanceTimeout,
-    )
 __all__: tuple[str, ...] = (
-    "TestsFlextQualityApi",
     "TestsFlextQualityBaseHook",
-    "TestsFlextQualityBasic",
     "TestsFlextQualityCli",
     "TestsFlextQualityCodeExecutionBridge",
     "TestsFlextQualityConfigManager",
@@ -49,7 +42,6 @@ __all__: tuple[str, ...] = (
     "TestsFlextQualityMcpTools",
     "TestsFlextQualityRulesEngine",
     "TestsFlextQualityRulesLoader",
-    "TestsFlextQualityScheduledMaintenanceTimeout",
     "TestsFlextQualityValidators",
     "c",
     "d",
@@ -72,8 +64,6 @@ __all__: tuple[str, ...] = (
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
-            ".test_api": ("TestsFlextQualityApi",),
-            ".test_basic": ("TestsFlextQualityBasic",),
             ".test_cli": ("TestsFlextQualityCli",),
             ".test_code_execution": ("TestsFlextQualityCodeExecutionBridge",),
             ".test_docs_config_manager": ("TestsFlextQualityConfigManager",),
@@ -93,9 +83,6 @@ _LAZY_IMPORTS = MappingProxyType(
                 "TestsFlextQualityRulesEngine",
                 "TestsFlextQualityRulesLoader",
                 "TestsFlextQualityValidators",
-            ),
-            ".test_scheduled_maintenance_timeout": (
-                "TestsFlextQualityScheduledMaintenanceTimeout",
             ),
             "flext_tests": (
                 "c",
