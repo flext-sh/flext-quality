@@ -13,7 +13,9 @@ if TYPE_CHECKING:
     from .loader import FlextQualityRulesLoader
     from .validators import FlextQualityValidators
 __all__: tuple[str, ...] = (
-    "FlextQualityRulesEngine", "FlextQualityRulesLoader", "FlextQualityValidators",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
+    "FlextQualityValidators",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
