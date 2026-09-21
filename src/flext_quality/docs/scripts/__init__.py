@@ -14,10 +14,7 @@ if TYPE_CHECKING:
     from .report import FlextQualityDocumentationReporter
     from .validate import FlextQualityDocumentationValidator
 __all__: tuple[str, ...] = (
-    "FlextQualityDocumentationAuditor",
-    "FlextQualityDocumentationOptimizer",
-    "FlextQualityDocumentationReporter",
-    "FlextQualityDocumentationValidator",
+    "FlextQualityDocumentationAuditor", "FlextQualityDocumentationOptimizer", "FlextQualityDocumentationReporter", "FlextQualityDocumentationValidator",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
