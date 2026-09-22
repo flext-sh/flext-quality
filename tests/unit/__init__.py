@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_tests import c, d, e, h, m, p, r, s, t, td, tf, tk, tm, tv, u, x
-
     from .test_cli import TestsFlextQualityCli
     from .test_code_execution import TestsFlextQualityCodeExecutionBridge
     from .test_docs_config_manager import TestsFlextQualityConfigManager
@@ -43,22 +41,6 @@ __all__: tuple[str, ...] = (
     "TestsFlextQualityRulesEngine",
     "TestsFlextQualityRulesLoader",
     "TestsFlextQualityValidators",
-    "c",
-    "d",
-    "e",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "td",
-    "tf",
-    "tk",
-    "tm",
-    "tv",
-    "u",
-    "x",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
@@ -83,24 +65,6 @@ _LAZY_IMPORTS = MappingProxyType(
                 "TestsFlextQualityRulesEngine",
                 "TestsFlextQualityRulesLoader",
                 "TestsFlextQualityValidators",
-            ),
-            "flext_tests": (
-                "c",
-                "d",
-                "e",
-                "h",
-                "m",
-                "p",
-                "r",
-                "s",
-                "t",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "u",
-                "x",
             ),
         }),
         alias_groups=MappingProxyType({}),

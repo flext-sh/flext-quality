@@ -20,17 +20,20 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_infra import d, e, h, r, x
-    from flext_web import c as web_c
+    from flext_cli import cli
+    from flext_infra import docs_main, infra
+    from flext_web import web
+    from pydantic_core import from_json, to_json, to_jsonable_python
+
+    from flext_core import core, d, e, h, lazy_attribute, r, x
 
     from . import docs, hooks, integrations, mcp, rules
-    from .__version__ import FlextQualityVersion
     from ._config import FlextQualityConfig, config
     from ._settings import FlextQualitySettings, settings
     from .api import FlextQuality, quality
-    from .base import FlextQualityServiceBase, FlextQualityServiceBase as s
+    from .base import FlextQualityServiceBase, s
     from .cli import FlextQualityCli, main
-    from .constants import FlextQualityConstants, FlextQualityConstants as c
+    from .constants import FlextQualityConstants, c
     from .docs.core.config_manager import FlextQualityConfigManager
     from .docs.dashboard import FlextQualityDocumentationDashboard
     from .docs.notifications import FlextQualityDocumentationNotifier
@@ -51,12 +54,12 @@ if TYPE_CHECKING:
     from .mcp.server import FlextQualityMcpServer
     from .mcp.tools import FlextQualityMcpTools
     from .models import FlextQualityModels, FlextQualityModels as m
-    from .protocols import FlextQualityProtocols, FlextQualityProtocols as p
+    from .protocols import FlextQualityProtocols, p
     from .rules.engine import FlextQualityRulesEngine
     from .rules.loader import FlextQualityRulesLoader
     from .rules.validators import FlextQualityValidators
-    from .typings import FlextQualityTypes, FlextQualityTypes as t
-    from .utilities import FlextQualityUtilities, FlextQualityUtilities as u
+    from .typings import FlextQualityTypes, t
+    from .utilities import FlextQualityUtilities, u
 __all__: tuple[str, ...] = (
     "FlextQuality",
     "FlextQualityBaseHook",
@@ -90,7 +93,6 @@ __all__: tuple[str, ...] = (
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
-    "FlextQualityVersion",
     "__author__",
     "__author_email__",
     "__description__",
@@ -100,13 +102,19 @@ __all__: tuple[str, ...] = (
     "__version__",
     "__version_info__",
     "c",
+    "cli",
     "config",
+    "core",
     "d",
     "docs",
+    "docs_main",
     "e",
+    "from_json",
     "h",
     "hooks",
+    "infra",
     "integrations",
+    "lazy_attribute",
     "m",
     "main",
     "mcp",
@@ -117,15 +125,16 @@ __all__: tuple[str, ...] = (
     "s",
     "settings",
     "t",
+    "to_json",
+    "to_jsonable_python",
     "u",
-    "web_c",
+    "web",
     "x",
 )
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
-            ".__version__": ("FlextQualityVersion",),
             "._config": ("FlextQualityConfig", "config"),
             "._settings": ("FlextQualitySettings", "settings"),
             ".api": ("FlextQuality", "quality"),
@@ -163,9 +172,13 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "flext_infra": ("d", "e", "h", "r", "x"),
+            "flext_cli": ("cli",),
+            "flext_core": ("core", "d", "e", "h", "lazy_attribute", "r", "x"),
+            "flext_infra": ("docs_main", "infra"),
+            "flext_web": ("web",),
+            "pydantic_core": ("from_json", "to_json", "to_jsonable_python"),
         }),
-        alias_groups=MappingProxyType({"flext_web": (("web_c", "c"),)}),
+        alias_groups=MappingProxyType({}),
         sort_keys=False,
     )
 )
