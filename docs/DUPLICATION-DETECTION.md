@@ -62,6 +62,7 @@ if result.success:
     for dup in result.value.duplicates:
         print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
 ```
+
 **Key Features**:
 
 - **Line-based similarity**: Uses set intersection of source lines
@@ -142,7 +143,7 @@ Option C: UPDATE baseline manually - Run: ~/flext/scripts/create-duplicate-basel
 --update flext-ldif - Document why duplication is kept - Then retry your edit
 ═══════════════════════════════════════════════════════════════
 
-````
+```
 
 ### 3. Baseline Generation Script
 
@@ -161,7 +162,7 @@ Generates and manages duplicate code baselines for all FLEXT projects.
 
 # Show help
 ./scripts/create-duplicate-baseline.sh --help
-````
+```
 
 **Baseline Format**:
 

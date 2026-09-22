@@ -49,14 +49,16 @@ Hooks in `~/.claude/hooks/` use CLI tools directly:
 
 ### 2. Makefile Targets (Implemented)
 
-Added to `~/flext/base.mk`:
+Run from the active workspace root. The dispatcher owns tool selection:
 
-```makefile
-dead-code: ## Dead code detection (Vulture)
-modernize: ## Modern patterns suggestions (Refurb)
-cognitive-complexity: ## Cognitive complexity (Complexipy)
-validate-full: ## Full validation including dead code
+```bash
+make mod
+make fix
+make fmt
+make check
 ```
+
+See [Make commands](guides/make-commands.md) for the complete lifecycle.
 
 ### 3. MCP Server Access (Available)
 
@@ -100,7 +102,9 @@ class QualityPlugin(Protocol):
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
+        ...
 ```
+
 ### 5. Baseline Management
 
 Baseline tracking for dead code:
@@ -110,6 +114,10 @@ Baseline tracking for dead code:
 - Hook auto-updates on retry
 
 ## Architecture Diagram
+
+The legacy integration proposal below preserves its intended layers; it is not proof
+that the external MCP server or historical hooks are installed. Current execution uses
+the workspace-root Make contract above.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -126,10 +134,9 @@ Baseline tracking for dead code:
                  │                          │
                  ▼                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                    ~/flext/base.mk                           │
+│                Workspace root Make dispatcher                │
 ├─────────────────────────────────────────────────────────────┤
-│  make dead-code    make modernize    make cognitive-complexity│
-│  make check                                          │
+│  make mod    make fix    make fmt    make check               │
 └─────────────────────────────────────────────────────────────┘
                               │
                               ▼
@@ -153,6 +160,7 @@ Baseline tracking for dead code:
 │  - Complexipy (cognitive complexity)                         │
 │  - LibCST, Jedi                                              │
 └─────────────────────────────────────────────────────────────┘
+```
 
 ## Summary
 

@@ -153,7 +153,7 @@ ls -la src/flext_quality/
 
 ### **Basic Quality Analysis** (WORKING)
 
-````python
+```python
 from __future__ import annotations
 
 from flext_quality import FlextQualityCodeAnalyzer, FlextQualityService
@@ -205,6 +205,7 @@ def direct_analysis():
 run(service_analysis())
 direct_analysis()
 ```
+
 ### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
 
 ```bash
@@ -222,7 +223,7 @@ flext-quality metrics --projects ./src --export json
 
 # Code fixing automation (absorbing gradual_lint_fixer.py)
 flext-quality fix --projects ./src --auto-approve --backup
-````
+```
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
