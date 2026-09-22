@@ -52,7 +52,7 @@ email = "team@flext.sh"
 name = "FLEXT Team"
 
 [project.scripts]
-flext-quality = "flext_quality.services.cli:main"
+flext-quality = "flext_quality.cli:main"
 
 [project.urls]
 Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
