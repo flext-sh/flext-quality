@@ -38,7 +38,8 @@
   - [For Daily Development](#for-daily-development)
   - [For Validation & Testing](#for-validation-testing)
   - [For Integration](#for-integration)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 **Comprehensive guide to verify the warning-only hook system is working correctly**
 
