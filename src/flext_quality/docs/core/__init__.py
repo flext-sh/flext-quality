@@ -10,6 +10,8 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
     from .config_manager import FlextQualityConfigManager
+
+
 __all__: tuple[str, ...] = ("FlextQualityConfigManager",)
 
 _LAZY_IMPORTS = MappingProxyType(
