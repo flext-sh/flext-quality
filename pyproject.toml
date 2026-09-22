@@ -160,11 +160,8 @@ allow-direct-references = true
 [tool.hatch.build.targets.wheel]
 packages = ["src/flext_quality"]
 
-[tool.hatch.build.targets.wheel.force-include]
-config = "flext_quality/config"
-
 [tool.hatch.build.targets.sdist]
-only-include = ["src/flext_quality", "config"]
+only-include = ["src/flext_quality"]
 
 [tool.mypy]
 disable_error_code = [
