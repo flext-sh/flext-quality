@@ -15,13 +15,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
-from flext_cli import cli
-from flext_cli import u as cli_u
+from flext_cli import cli, u as cli_u
 
 from flext_quality import c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Mapping, MutableSequence
+    from collections.abc import Mapping, MutableSequence
 
 _QUALITY_SCORE_EXCELLENT: Final[int] = 80
 _QUALITY_SCORE_GOOD: Final[int] = 60
@@ -32,6 +31,8 @@ _HTML_REPORT_TEMPLATE_NAME: Final[str] = "report.html.j2"
 
 class FlextQualityDocumentationReporter:
     """Documentation quality reporting and analytics system."""
+
+    logger = u.fetch_logger(__name__)
 
     class AuditSummary(m.BaseModel):
         """Audit data summary structure."""
@@ -137,16 +138,16 @@ class FlextQualityDocumentationReporter:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         read = u.Cli.files_read_text(filepath)
-        if read.failure:
-            return None
-        try:
-            loaded: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
-                t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
-            )
-        except c.EXC_OS_VALUE:
-            return None
-        else:
-            return loaded
+        loaded: t.MappingKV[str, t.Quality.DocumentationReportValue] | None = None
+        if read.success:
+            try:
+                loaded = t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                    read.value
+                )
+            except c.EXC_OS_VALUE as exc:
+                self.logger.warning("Failed to parse report %s: %s", filename, exc)
+                loaded = None
+        return loaded
 
     def generate_quality_report(
         self, report_format: str = "html", *, include_trends: bool = False
@@ -542,7 +543,8 @@ class FlextQualityDocumentationReporter:
             return None
         read = u.Cli.files_read_text(report_file)
         if read.failure:
-            return None
+            msg = f"unreadable report {report_file}: {read.error}"
+            raise ValueError(msg)
         report_data_raw: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
             t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
         )

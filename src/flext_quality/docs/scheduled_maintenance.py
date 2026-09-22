@@ -103,12 +103,10 @@ class FlextQualityScheduledMaintenance:
             if config_path is not None
             else self._docs_config_file("schedule_config.yaml")
         )
-        try:
+        if resolved_config_path.is_file():
             loaded_untyped = u.Cli.yaml_load_mapping(resolved_config_path)
             if u.mapping(loaded_untyped) and loaded_untyped:
                 return self._merge_config(default_config, loaded_untyped)
-        except FileNotFoundError:
-            pass
         return default_config
 
     def _merge_config(
@@ -361,13 +359,17 @@ class FlextQualityScheduledMaintenance:
 
         return success
 
+    def fail_step(self, message: str) -> bool:
+        """Record a step failure message and report the step as failed."""
+        self.results.errors.append(message)
+        return False
+
     def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             return self._run_single_task_unchecked(task_config)
         except (OSError, RuntimeError, ValueError, KeyError) as e:
-            self.results.errors.append(f"Task error: {task_config.description} - {e!s}")
-            return False
+            return self.fail_step(f"Task error: {task_config.description} - {e!s}")
 
     def _run_single_task_unchecked(
         self, task_config: m.Quality.ScheduleTaskConfig
@@ -415,8 +417,7 @@ class FlextQualityScheduledMaintenance:
                 cmd_parts, timeout, description
             )
         except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
-            self.results.errors.append(f"Python command failed in {description}: {e!s}")
-            return False
+            return self.fail_step(f"Python command failed in {description}: {e!s}")
 
     def _handle_python_command_unchecked(
         self, cmd_parts: t.StrSequence, timeout: int, description: str
@@ -456,8 +457,7 @@ class FlextQualityScheduledMaintenance:
                 cmd_parts, timeout, description
             )
         except (RuntimeError, OSError, ImportError) as e:
-            self.results.errors.append(f"pytest command failed in {description}: {e!s}")
-            return False
+            return self.fail_step(f"pytest command failed in {description}: {e!s}")
 
     def _handle_pytest_command_unchecked(
         self, cmd_parts: t.StrSequence, timeout: int, description: str
@@ -483,8 +483,7 @@ class FlextQualityScheduledMaintenance:
         try:
             return self._handle_make_command_unchecked(cmd_parts, description)
         except (FileNotFoundError, OSError, RuntimeError) as e:
-            self.results.errors.append(f"Make command failed in {description}: {e!s}")
-            return False
+            return self.fail_step(f"Make command failed in {description}: {e!s}")
 
     def _handle_make_command_unchecked(
         self, cmd_parts: t.StrSequence, description: str
@@ -511,8 +510,7 @@ class FlextQualityScheduledMaintenance:
         try:
             return self._handle_git_command_unchecked(cmd_parts, timeout, description)
         except c.EXC_OS_RUNTIME_VALUE as e:
-            self.results.errors.append(f"Git command failed in {description}: {e!s}")
-            return False
+            return self.fail_step(f"Git command failed in {description}: {e!s}")
 
     def _handle_git_command_unchecked(
         self, cmd_parts: t.StrSequence, timeout: int, description: str
@@ -549,8 +547,7 @@ class FlextQualityScheduledMaintenance:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
             self.logger.info(message)
         except c.EXC_OS_VALUE as e:
-            self.results.errors.append(f"Echo command failed in {description}: {e!s}")
-            return False
+            return self.fail_step(f"Echo command failed in {description}: {e!s}")
         else:
             return True
 
@@ -561,8 +558,7 @@ class FlextQualityScheduledMaintenance:
         try:
             return self._run_with_timeout_unchecked(func, timeout, description)
         except c.EXC_OS_RUNTIME_VALUE as e:
-            self.results.errors.append(f"Task execution error in {description}: {e!s}")
-            return False
+            return self.fail_step(f"Task execution error in {description}: {e!s}")
 
     def _run_with_timeout_unchecked(
         self, func: Callable[[], None], timeout: int, description: str
@@ -702,8 +698,10 @@ class FlextQualityScheduledMaintenance:
         settings_path: Annotated[
             str,
             u.Field(
-                default_factory=lambda: (
-                    FlextQualityScheduledMaintenance.Run.DEFAULT_CONFIG
+                default=str(
+                    Path(__file__).resolve().parent
+                    / "settings"
+                    / "schedule_config.yaml"
                 ),
                 alias="settings",
                 description="Scheduled maintenance settings file",

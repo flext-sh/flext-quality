@@ -85,22 +85,26 @@
 
 **Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2026-04-14
 
-Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code quality analysis library with Clean Architecture,
-Domain-Driven Design, and FLEXT ecosystem integration.
+Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code
+quality analysis library with Clean Architecture, Domain-Driven Design, and FLEXT
+ecosystem integration.
 
 ## 🎯 Architecture Overview
 
 ### System Purpose
 
-FLEXT Quality provides comprehensive code quality analysis and metrics collection for Python projects within the FLEXT ecosystem,
-enabling automated quality assessment, scoring, and reporting across enterprise Python codebases.
+FLEXT Quality provides comprehensive code quality analysis and metrics collection for
+Python projects within the FLEXT ecosystem, enabling automated quality assessment,
+scoring, and reporting across enterprise Python codebases.
 
 ### Key Architectural Principles
 
 - **Clean Architecture**: Clear separation of concerns with domain-first design
-- **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and domain services
+- **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and
+  domain services
 - **Railway-Oriented Programming**: Functional error handling with `r[T]` patterns
-- **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli, flext-web, and flext-observability
+- **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli,
+  flext-web, and flext-observability
 
 ## 🏗️ Architecture Documentation Structure
 
@@ -108,7 +112,8 @@ enabling automated quality assessment, scoring, and reporting across enterprise 
 
 This architecture documentation follows a multi-framework approach:
 
-- **[C4 Model](c4-model/README.md)**: System context, containers, components, and code-level views
+- **[C4 Model](c4-model/README.md)**: System context, containers, components, and
+  code-level views
 - **Architecture Decision Records**: Documented architectural decisions and rationale
 - **PlantUML Diagrams**: Code-generated diagrams and visualizations
 - **Arc42 Template**: Comprehensive architecture documentation template
@@ -135,7 +140,7 @@ title FLEXT Quality - System Context
 
 Person(developer, "Python Developer", "Develops Python applications requiring quality analysis")
 Person(devops, "DevOps Engineer", "Manages CI/CD pipelines and quality gates")
-Person(architect, "Software Architect", "Makes architectural decisions and reviews quality metrics")
+Person(architect, "Software Architect", "Makes architectural decisions and reviews q ...
 
 System(flext_quality, "FLEXT Quality", "Code quality analysis and metrics collection library")
 
@@ -231,7 +236,8 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 - **Python 3.13+**: Exclusive support for latest Python features
 - **FLEXT Ecosystem**: Native integration with FLEXT foundation libraries
-- **External Tools**: Optional dependencies (ruff, mypy, bandit) with graceful degradation
+- **External Tools**: Optional dependencies (ruff, mypy, bandit) with graceful
+  degradation
 - **Enterprise Focus**: Designed for large-scale enterprise Python projects
 
 ## 🔧 Development & Deployment

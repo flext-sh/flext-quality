@@ -24,6 +24,7 @@ if TYPE_CHECKING:
     from flext_web import c as web_c
 
     from . import docs, hooks, integrations, mcp, rules
+    from .__version__ import FlextQualityVersion
     from ._config import FlextQualityConfig, config
     from ._settings import FlextQualitySettings, settings
     from .api import FlextQuality, quality
@@ -89,6 +90,7 @@ __all__: tuple[str, ...] = (
     "FlextQualityTypes",
     "FlextQualityUtilities",
     "FlextQualityValidators",
+    "FlextQualityVersion",
     "__author__",
     "__author_email__",
     "__description__",
@@ -123,6 +125,7 @@ __all__: tuple[str, ...] = (
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
         MappingProxyType({
+            ".__version__": ("FlextQualityVersion",),
             "._config": ("FlextQualityConfig", "config"),
             "._settings": ("FlextQualitySettings", "settings"),
             ".api": ("FlextQuality", "quality"),

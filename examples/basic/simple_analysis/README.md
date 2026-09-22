@@ -31,7 +31,9 @@
 
 <!-- TOC END -->
 
-This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python project and generating quality reports. It showcases the core functionality and basic integration patterns that form the foundation of quality analysis workflows.
+This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python
+project and generating quality reports. It showcases the core functionality and basic
+integration patterns that form the foundation of quality analysis workflows.
 
 ## Overview
 
@@ -64,7 +66,6 @@ The simple analysis example covers:
 ### Basic Execution
 
 ```bash
-
 # Analyze current directory
 python example.py
 
@@ -297,7 +298,7 @@ pdf_report = report.generate_pdf_report()
 **No Python Files Found:**
 
 ```bash
-⚠️  Warning: No Python files found in: /path/to/project
+⚠️ Warning: No Python files found in: /path/to/project
 ```
 
 - Verify the path contains `.py` files
@@ -343,7 +344,9 @@ After mastering this basic example:
 
 ## Related Resources
 
-- **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system documentation
+- **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system
+  documentation
 - **CodeAnalyzer API** - Detailed API reference (_Documentation coming soon_)
-- **Quality Metrics Guide** - Understanding quality scoring (_Documentation coming soon_)
+- **Quality Metrics Guide** - Understanding quality scoring (_Documentation coming
+  soon_)
 - **Integration Patterns** - FLEXT ecosystem integration (_Documentation coming soon_)

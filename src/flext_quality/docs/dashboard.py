@@ -189,10 +189,8 @@ class FlextQualityDocumentationDashboard:
             return None
         read = u.Cli.files_read_text(report_file)
         if read.failure:
-            self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
-            )
-            return None
+            msg = f"Skipping unreadable report {report_file}: {read.error}"
+            raise ValueError(msg)
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_v = data.get("metrics")
         metrics_m: t.JsonMapping = (
@@ -236,10 +234,8 @@ class FlextQualityDocumentationDashboard:
         )
         read = u.Cli.files_read_text(report_file)
         if read.failure:
-            self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
-            )
-            return None
+            msg = f"Skipping unreadable report {report_file}: {read.error}"
+            raise ValueError(msg)
         data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_rv = data.get("metrics")
         metrics_rm: t.JsonMapping = (

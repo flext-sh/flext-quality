@@ -36,7 +36,8 @@ The FLEXT ecosystem now includes comprehensive code duplication detection via:
 1. **create-duplicate-baseline.sh** - Baseline generation and management script
 1. **~/.duplicate-code-baseline** - Project baseline tracking file
 
-This system prevents code duplication from accumulating while allowing intentional duplicates through a smart retry mechanism.
+This system prevents code duplication from accumulating while allowing intentional
+duplicates through a smart retry mechanism.
 
 ## Components
 
@@ -91,36 +92,29 @@ Prevents Edit/Write operations that increase code duplication.
 **Behavior**:
 
 ```
-First Attempt (Edit Increases Duplication):
-  ├─ Calculate duplicate pair count for project
-  ├─ Compare against baseline
-  ├─ If count increased:
-  │   ├─ Block operation (exit code 2)
-  │   ├─ Show educational message
-  │   └─ Save hash to /tmp/.flext-duplicate-code-blocked
-  └─ If count same/decreased: Allow operation
 
-Second Attempt (Same Edit):
-  ├─ Detect hash match from previous block
-  ├─ Accept operation as intentional
-  ├─ Update baseline to new count
-  └─ Allow operation (exit code 0)
+First Attempt (Edit Increases Duplication): ├─ Calculate duplicate pair count for
+project ├─ Compare against baseline ├─ If count increased: │ ├─ Block operation (exit
+code 2) │ ├─ Show educational message │ └─ Save hash to
+/tmp/.flext-duplicate-code-blocked └─ If count same/decreased: Allow operation
+
+Second Attempt (Same Edit): ├─ Detect hash match from previous block ├─ Accept operation
+as intentional ├─ Update baseline to new count └─ Allow operation (exit code 0)
+
 ```
 
 **Features**:
 
 - **Hash-based retry detection**: Content hash prevents accidental re-runs
 - **Educational messages**: Shows why duplication matters
-- **Automatic baseline update**: No manual intervention needed for intentional duplicates
+- **Automatic baseline update**: No manual intervention needed for intentional
+  duplicates
 - **Project-scoped analysis**: Only checks files in the modified project
 - **Timeout handling**: Blocks expire after 10 minutes
 
 **Message on Block**:
 
 ```
-═══════════════════════════════════════════════════════════════
-BLOCKED: CODE DUPLICATION INCREASED
-═══════════════════════════════════════════════════════════════
 
 ❌ VIOLATION: Duplicate code count increased
    Project:      flext-ldif
@@ -128,35 +122,27 @@ BLOCKED: CODE DUPLICATION INCREASED
    Current:      3 duplicate pairs (+1)
    File:         <workspace-root>/flext-ldif/src/flext_ldif/...
 
-WHY THIS MATTERS:
-  Code duplication causes:
-  • Maintenance burden (fix bugs in multiple places)
-  • Inconsistency risk (divergent copies)
-  • Code bloat (larger codebase)
-  • DRY principle violation
+WHY THIS MATTERS: Code duplication causes: • Maintenance burden (fix bugs in multiple
+places) • Inconsistency risk (divergent copies) • Code bloat (larger codebase) • DRY
+principle violation
 
-RULE (from FLEXT Quality Gates):
-  'Duplication detection must BLOCK edits that increase duplication'
-  'Compare against workspace baseline'
+RULE (from FLEXT Quality Gates): 'Duplication detection must BLOCK edits that increase
+duplication' 'Compare against workspace baseline'
 
 ACTIONS TO RESOLVE:
 
-  Option A: REFACTOR to eliminate duplication (Recommended)
-    - Extract common code to shared utility
-    - Use inheritance or composition
-    - Then retry your edit
+Option A: REFACTOR to eliminate duplication (Recommended) - Extract common code to
+shared utility - Use inheritance or composition - Then retry your edit
 
-  Option B: RETRY same edit to ACCEPT increase
-    - If the duplication is intentional, retry the EXACT same edit
-    - Baseline will be updated automatically
-    - Edit will proceed on second attempt
+Option B: RETRY same edit to ACCEPT increase - If the duplication is intentional, retry
+the EXACT same edit - Baseline will be updated automatically - Edit will proceed on
+second attempt
 
-  Option C: UPDATE baseline manually
-    - Run: ~/flext/scripts/create-duplicate-baseline.sh --update flext-ldif
-    - Document why duplication is kept
-    - Then retry your edit
+Option C: UPDATE baseline manually - Run: ~/flext/scripts/create-duplicate-baseline.sh
+--update flext-ldif - Document why duplication is kept - Then retry your edit
 ═══════════════════════════════════════════════════════════════
-```
+
+````
 
 ### 3. Baseline Generation Script
 
@@ -175,7 +161,7 @@ Generates and manages duplicate code baselines for all FLEXT projects.
 
 # Show help
 ./scripts/create-duplicate-baseline.sh --help
-```
+````
 
 **Baseline Format**:
 
@@ -201,7 +187,8 @@ flext-ldap:0
 
 **Location**: `~/.duplicate-code-baseline`
 
-Tracks duplicate pair counts for each project. Updated automatically by the hook on retry acceptance.
+Tracks duplicate pair counts for each project. Updated automatically by the hook on
+retry acceptance.
 
 **Example**:
 
@@ -397,17 +384,22 @@ class Quality:
 
 ## FAQ
 
-**Q: What if I'm working on a complex refactoring that temporarily increases duplication?**
+**Q: What if I'm working on a complex refactoring that temporarily increases
+duplication?**
 
-A: Use the retry mechanism. Make your edits, let the hook block, then retry. The duplication spike will be captured in baseline tracking, and you can refactor it down later.
+A: Use the retry mechanism. Make your edits, let the hook block, then retry. The
+duplication spike will be captured in baseline tracking, and you can refactor it down
+later.
 
 **Q: Can I disable duplication checking?**
 
-A: Yes - pass `include_duplicates=False` to analysis options. Or update the baseline if duplicates are intentional and documented.
+A: Yes - pass `include_duplicates=False` to analysis options. Or update the baseline if
+duplicates are intentional and documented.
 
 **Q: How often should I regenerate the baseline?**
 
-A: Only when making coordinated changes across projects. The hook maintains it automatically on retry acceptance.
+A: Only when making coordinated changes across projects. The hook maintains it
+automatically on retry acceptance.
 
 **Q: Does this detect semantic similarity or only line-based?**
 
@@ -415,10 +407,9 @@ A: Currently line-based only. Semantic detection is a future improvement.
 
 **Q: What about duplicates in test files?**
 
-A: They're included in the analysis. Test duplication is often intentional, so use the retry mechanism.
+A: They're included in the analysis. Test duplication is often intentional, so use the
+retry mechanism.
 
 ---
 
-**Last Updated**: 2025-12-29
-**Status**: Current
-**Version**: 1.0.0
+**Last Updated**: 2025-12-29 **Status**: Current **Version**: 1.0.0

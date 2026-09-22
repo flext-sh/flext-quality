@@ -440,10 +440,7 @@ Timestamp: {u.now().isoformat()}
 
         _validate_outbound_webhook(slack_config.webhook_url, _SLACK_WEBHOOK_HOSTS)
         response = requests.post(
-            slack_config.webhook_url,
-            json=payload,
-            timeout=10,
-            allow_redirects=False,
+            slack_config.webhook_url, json=payload, timeout=10, allow_redirects=False
         )
         response.raise_for_status()
 
@@ -638,7 +635,7 @@ Found {len(broken_links)} broken links that need attention:
                 _ = notifier.notify_critical_issues(audit_data)
                 issues_raw = audit_data.get("issues")
                 broken_links: MutableSequence[t.JsonValue] = []
-                if isinstance(issues_raw, t.SEQUENCE_PAIR_TYPES):
+                if isinstance(issues_raw, (list, tuple)):
                     issues_seq: t.SequenceOf[t.JsonValue] = issues_raw
                     for i_raw in issues_seq:
                         if isinstance(i_raw, Mapping):

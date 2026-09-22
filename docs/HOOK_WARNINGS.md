@@ -20,7 +20,8 @@
 
 **Status**: ⚠️ **WARNING-ONLY MODE** - All warnings allow execution to proceed
 
-This guide explains the 197 validation rules that hooks monitor, organized into 5 warning categories.
+This guide explains the 197 validation rules that hooks monitor, organized into 5
+warning categories.
 
 ---
 
@@ -558,7 +559,7 @@ Use the guidance provided to correct the code:
 #    Use: mv file file.bak instead
 
 # Fix it:
-mv old_directory old_directory.bak  # Instead of rm -rf
+mv old_directory old_directory.bak # Instead of rm -rf
 ```
 
 ### Option 2: Acknowledge and Proceed (If Intentional)
@@ -618,5 +619,5 @@ Edit the YAML file to adjust severity:
 
 ---
 
-**Last Updated**: 2025-12-30
-**Status**: ⚠️ WARNING-ONLY MODE - All operations proceed after warning
+**Last Updated**: 2025-12-30 **Status**: ⚠️ WARNING-ONLY MODE - All operations proceed
+after warning

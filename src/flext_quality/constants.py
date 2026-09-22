@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING, ClassVar, Final
 from flext_infra import c
 from flext_web import c as web_c
 
+from ._constants.values import FlextQualityConstantsValues
+
 if TYPE_CHECKING:
     from flext_quality import t
 
@@ -37,15 +39,11 @@ class FlextQualityConstants(c, web_c):
         threshold = c.Quality.THRESHOLD_DEFAULT_LINES
     """
 
-    class Quality:
+    class Quality(FlextQualityConstantsValues.Quality):
         """Quality-specific constants namespace."""
 
-        class LinkCheckerDemo:
+        class LinkCheckerDemo(FlextQualityConstantsValues.LinkCheckerDemo):
             """Demo link fixtures for the documentation link checker."""
-
-            VSCODE_URL: Final[str] = "https://github.com/microsoft/vscode"
-            HTTPBIN_OK_URL: Final[str] = "https://httpbin.org/status/200"
-            HTTPBIN_BROKEN_URL: Final[str] = "https://httpbin.org/status/404"
 
         @unique
         class HookEvent(StrEnum):
@@ -109,8 +107,6 @@ class FlextQualityConstants(c, web_c):
             INTEGER = "int"
 
         # ===== Quality Thresholds =====
-        THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
-        "Maximum broken links to show."
         THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
         "Minimum headings for table of contents."
 
