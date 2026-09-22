@@ -139,7 +139,7 @@
   - Collected configuration files for shared tooling:
     - `flext-grpc/docs/maintenance/settings.json`
     - `flext-ldap/docs/maintenance/settings.yaml`
-    - `flext-quality/docs/maintenance/settings/{audit_rules,style_guide,validation_config,schedule_config,notification_config}.yaml`
+    - runtime_bootstrap_options
   - No additional maintenance metadata discovered in other repositories within current
     depth scan.
   - Next: expand search depth, document artifacts (Markdown/HTML/JSON) per repo, and

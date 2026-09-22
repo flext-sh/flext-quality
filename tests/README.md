@@ -90,7 +90,7 @@ Complete user journey testing with full system integration:
 
 - **`test_analyzer.py`**: Multi-backend analysis engine testing
 - **`test_analyzer_comprehensive.py`**: Complete analysis workflow validation
-- **`test_analyzer_edge_cases.py`**: Error handling and edge case testing
+- runtime_bootstrap_options
 
 ### Domain Layer Testing
 
@@ -102,7 +102,7 @@ Complete user journey testing with full system integration:
 
 - **`test_application_services.py`**: Service orchestration and workflow testing
 - **`test_services_comprehensive.py`**: Complete service integration testing
-- **`test_services_error_scenarios.py`**: Error handling and resilience testing
+- runtime_bootstrap_options
 
 ### Infrastructure Layer Testing
 
@@ -120,7 +120,7 @@ Complete user journey testing with full system integration:
 
 - **`test_metrics.py`**: Quality metrics calculation and validation
 - **`test_reports.py`**: Report generation and formatting testing
-- **`test_check_detected_issues.py`**: Issue detection accuracy testing
+- runtime_bootstrap_options
 
 ### Configuration and Setup Testing
 
@@ -263,9 +263,9 @@ def test_should_do_something_when_condition():
 ### Naming Conventions
 
 - **Test Files**: `test_<component>.py` (e.g., `test_analyzer.py`)
-- **Test Functions**: `test_should_<expected_behavior>_when_<condition>()`
+- runtime_bootstrap_options
 - **Test Classes**: `Test<ComponentName>` (e.g., `TestQualityAnalyzer`)
-- **Fixtures**: `<resource_type>_fixture` (e.g., `quality_project_fixture`)
+- runtime_bootstrap_options
 
 ### Test Data Management
 
