@@ -23,6 +23,9 @@ class FlextQualityConstantsValues:
             / "schedule_config.yaml"
         )
 
+        THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
+        "Maximum broken links to show."
+
     class LinkCheckerDemo:
         """Demo link fixtures for the documentation link checker."""
 

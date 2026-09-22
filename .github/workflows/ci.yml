@@ -97,6 +97,9 @@ jobs:
           input="$(printf %s "$header" | b64url).$(printf %s "$payload" | b64url)"
           signature=$(printf %s "$input" | openssl dgst -sha256 -sign "$key_path" | b64url)
           jwt="$input.$signature"
+          # nosemgrep: gha-curl-pipe-shell — JSON parse of the authenticated
+          # GitHub API response, never script execution; the minted token is
+          # add-masked immediately below.
           installation_id=$(curl -sfS -X GET \
             -H "Authorization: Bearer $jwt" \
             -H "Accept: application/vnd.github+json" \
@@ -106,6 +109,8 @@ jobs:
           if len(entries) != 1:
               sys.exit(f"expected exactly one app installation, got {len(entries)}")
           print(entries[0]["id"])')
+          # nosemgrep: gha-curl-pipe-shell — same JSON-parse contract; the
+          # response token never reaches a shell interpreter unmasked.
           access_token=$(curl -sfS -X POST \
             -H "Authorization: Bearer $jwt" \
             -H "Accept: application/vnd.github+json" \
@@ -278,6 +283,9 @@ jobs:
           input="$(printf %s "$header" | b64url).$(printf %s "$payload" | b64url)"
           signature=$(printf %s "$input" | openssl dgst -sha256 -sign "$key_path" | b64url)
           jwt="$input.$signature"
+          # nosemgrep: gha-curl-pipe-shell — JSON parse of the authenticated
+          # GitHub API response, never script execution; the minted token is
+          # add-masked immediately below.
           installation_id=$(curl -sfS -X GET \
             -H "Authorization: Bearer $jwt" \
             -H "Accept: application/vnd.github+json" \
@@ -287,6 +295,8 @@ jobs:
           if len(entries) != 1:
               sys.exit(f"expected exactly one app installation, got {len(entries)}")
           print(entries[0]["id"])')
+          # nosemgrep: gha-curl-pipe-shell — same JSON-parse contract; the
+          # response token never reaches a shell interpreter unmasked.
           access_token=$(curl -sfS -X POST \
             -H "Authorization: Bearer $jwt" \
             -H "Accept: application/vnd.github+json" \

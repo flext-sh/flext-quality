@@ -12,21 +12,21 @@
 - Version: `0.12.0`
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code tooling
 - Doc summary: Flext Quality package.
-- Classifiers: `Development Status :: 3 - Alpha`, `Intended Audience :: Developers`,
-  `Operating System :: OS Independent`, `Programming Language :: Python :: 3 :: Only`,
-  `Programming Language :: Python :: 3.13`,
-  `Topic :: Software Development :: Libraries :: Python Modules` (+1 more)
+- Classifiers: Development Status :: 3 - Alpha, Intended Audience :: Developers,
+  Operating System :: OS Independent, Programming Language :: Python :: 3 :: Only,
+  Programming Language :: Python :: 3.13, Topic :: Software Development :: Libraries ::
+  Python Modules, Typing :: Typed
 - Project class: `domain`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
   `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`
-  (+24 more)
+  (+25 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
 - Public symbol exports: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
   `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`,
-  `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+26 more)
+  `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+27 more)
 - Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
 - Generated module pages: `35`
 
