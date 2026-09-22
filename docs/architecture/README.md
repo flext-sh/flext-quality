@@ -354,5 +354,5 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 1. Check [System Context](c4-model/context.md) for external dependencies.
 1. Reference [API Documentation](../api-reference/README.md) for interface specifications
 
-**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean
-architecture, domain-driven design, and comprehensive ecosystem integration.
+**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
+and comprehensive ecosystem integration.
