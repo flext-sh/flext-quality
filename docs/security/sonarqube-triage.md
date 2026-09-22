@@ -354,7 +354,8 @@ padrão.
 > Refactor this function to reduce its Cognitive Complexity from 53 to the 15 allowed.
 
 ```text
-      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
+      232      def _analyze_trends(self) \
+          -> FlextQualityDocumentationReporter.TrendData | None:
       233          """Analyze quality trends over time."""
       234          return None
       235
