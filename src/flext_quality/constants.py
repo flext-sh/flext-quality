@@ -107,8 +107,6 @@ class FlextQualityConstants(c, web_c):
             INTEGER = "int"
 
         # ===== Quality Thresholds =====
-        THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
-        "Maximum broken links to show."
         THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
         "Minimum headings for table of contents."
 
