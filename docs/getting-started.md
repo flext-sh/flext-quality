@@ -422,7 +422,8 @@ quality tools while maintaining zero-tolerance quality enforcement.
 
 - [Architecture](architecture/README.md) - Architecture and design patterns
 - [API Reference](api-reference/README.md) - Generated API documentation
-- [Examples](https://github.com/flext-sh/flext-quality/tree/0.12.0-dev/examples) - Working code examples
+- [Examples](https://github.com/flext-sh/flext-quality/tree/0.12.0-dev/examples) -
+  Working code examples
 
 **Across Projects**:
 

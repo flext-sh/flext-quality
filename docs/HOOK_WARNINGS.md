@@ -137,7 +137,8 @@ Tool execution → Hook validates → Violations found? →
 - **SEC016**: bare `uv` package management
 
   - Problem: Bypasses the root Make dispatcher and typed dependency owner
-  - Fix: Use `make setup` for provisioning or `make deps` followed by `make gen` for owner changes
+  - Fix: Use `make setup` for provisioning or `make deps` followed by `make gen` for
+    owner changes
 
 ---
 
@@ -480,7 +481,8 @@ Tool execution → Hook validates → Violations found? →
 
   - ⛔ CRITICAL: `uv.lock` is prohibited in FLEXT repositories
   - Problem: Its presence creates a competing dependency authority
-  - Fix: Correct the config/generator owner and rerun `make setup`, `make deps`, and `make gen`
+  - Fix: Correct the config/generator owner and rerun `make setup`, `make deps`, and
+    `make gen`
 
 #### Git Configuration (PF003-014)
 
