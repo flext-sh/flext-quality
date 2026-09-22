@@ -61,8 +61,7 @@ result = plugin.check(files)
 if result.success:
     for dup in result.value.duplicates:
         print(f"{dup.file1} <-> {dup.file2}: {dup.similarity:.1%}")
-
-
+```
 **Key Features**:
 
 - **Line-based similarity**: Uses set intersection of source lines
@@ -117,12 +116,11 @@ as intentional ├─ Update baseline to new count └─ Allow operation (exit 
 
 ```
 
-═══════════════════════════════════════════════════════════════ BLOCKED: CODE
-DUPLICATION INCREASED ═══════════════════════════════════════════════════════════════
-
-❌ VIOLATION: Duplicate code count increased Project: flext-ldif Baseline: 2 duplicate
-pairs Current: 3 duplicate pairs (+1) File:
-/home/user/flext/flext-ldif/src/flext_ldif/...
+❌ VIOLATION: Duplicate code count increased
+   Project:      flext-ldif
+   Baseline:     2 duplicate pairs
+   Current:      3 duplicate pairs (+1)
+   File:         <workspace-root>/flext-ldif/src/flext_ldif/...
 
 WHY THIS MATTERS: Code duplication causes: • Maintenance burden (fix bugs in multiple
 places) • Inconsistency risk (divergent copies) • Code bloat (larger codebase) • DRY
@@ -295,7 +293,7 @@ The duplication detection is part of FLEXT quality gates:
 make check
 
 # Full validation (includes all quality checks)
-make val
+make check
 ```
 
 ## Constants and Configuration
