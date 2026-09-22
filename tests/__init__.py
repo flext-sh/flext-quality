@@ -27,7 +27,6 @@ if TYPE_CHECKING:
         tv,
     )
     from flext_web import web
-    from pydantic_core import from_json, to_json, to_jsonable_python
 
     from flext_core import core, d, e, h, lazy_attribute, r, x
     from flext_quality import main, quality
@@ -58,7 +57,6 @@ __all__: tuple[str, ...] = (
     "discover_repository_root",
     "docs_main",
     "e",
-    "from_json",
     "h",
     "helpers",
     "infra",
@@ -78,8 +76,6 @@ __all__: tuple[str, ...] = (
     "tf",
     "tk",
     "tm",
-    "to_json",
-    "to_jsonable_python",
     "tv",
     "u",
     "unit",
@@ -119,7 +115,6 @@ _LAZY_IMPORTS = MappingProxyType(
                 "tv",
             ),
             "flext_web": ("web",),
-            "pydantic_core": ("from_json", "to_json", "to_jsonable_python"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

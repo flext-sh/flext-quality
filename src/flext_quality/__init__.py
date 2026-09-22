@@ -23,7 +23,6 @@ if TYPE_CHECKING:
     from flext_cli import cli
     from flext_infra import docs_main, infra
     from flext_web import web
-    from pydantic_core import from_json, to_json, to_jsonable_python
 
     from flext_core import core, d, e, h, lazy_attribute, r, x
 
@@ -109,7 +108,6 @@ __all__: tuple[str, ...] = (
     "docs",
     "docs_main",
     "e",
-    "from_json",
     "h",
     "hooks",
     "infra",
@@ -125,8 +123,6 @@ __all__: tuple[str, ...] = (
     "s",
     "settings",
     "t",
-    "to_json",
-    "to_jsonable_python",
     "u",
     "web",
     "x",
@@ -176,7 +172,6 @@ _LAZY_IMPORTS = MappingProxyType(
             "flext_core": ("core", "d", "e", "h", "lazy_attribute", "r", "x"),
             "flext_infra": ("docs_main", "infra"),
             "flext_web": ("web",),
-            "pydantic_core": ("from_json", "to_json", "to_jsonable_python"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
