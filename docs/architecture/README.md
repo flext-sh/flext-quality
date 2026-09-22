@@ -349,10 +349,12 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### For Developers
 
-1. Understand [Component Architecture](c4-model/components.md) for implementation guidance.
+1. Understand [Component Architecture](c4-model/components.md) for implementation
+   guidance.
 1. Review [Code Architecture](c4-model/code.md) for implementation patterns.
 1. Check [System Context](c4-model/context.md) for external dependencies.
-1. Reference [API Documentation](../api-reference/README.md) for interface specifications
+1. Reference [API Documentation](../api-reference/README.md) for interface
+   specifications
 
-**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
-and comprehensive ecosystem integration.
+**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean
+architecture, domain-driven design, and comprehensive ecosystem integration.

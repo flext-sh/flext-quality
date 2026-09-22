@@ -1,6 +1,7 @@
 # Triagem SonarCloud — flext-sh/flext-quality
 
 <!-- TOC START -->
+
 - [Resumo](#resumo)
 - [Como usar](#como-usar)
 - [Issues](#issues)
@@ -51,7 +52,7 @@
   - [45 · ⚪ MINOR · CODE_SMELL · python:S5713](#45-minor-code_smell-pythons5713)
   - [46 · ⚪ MINOR · CODE_SMELL · python:S7498](#46-minor-code_smell-pythons7498)
   - [47 · ⚪ MINOR · CODE_SMELL · python:S116](#47-minor-code_smell-pythons116)
-<!-- TOC END -->
+  <!-- TOC END -->
 
 Gerado do dump da plataforma SonarCloud (2026-08-06).
 
@@ -353,7 +354,8 @@ padrão.
 > Refactor this function to reduce its Cognitive Complexity from 53 to the 15 allowed.
 
 ```text
-      232      def _analyze_trends(self) -> FlextQualityDocumentationReporter.TrendData | None:
+      232      def _analyze_trends(self) \
+          -> FlextQualityDocumentationReporter.TrendData | None:
       233          """Analyze quality trends over time."""
       234          return None
       235
@@ -510,7 +512,8 @@ padrão.
 
 **Local**: `pyproject.toml:-` · **Effort**: 5min
 
-> Dependency versions are not predictable if the lock file (uv.lock, uv.lock, pdm.lock or pylock.toml) is missing.
+> Dependency versions are not predictable if the lock file (uv.lock, uv.lock, pdm.lock
+> or pylock.toml) is missing.
 
 **Decisão**: pendente
 
