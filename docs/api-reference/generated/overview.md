@@ -21,12 +21,12 @@
 - Main facades: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
   `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`
-  (+25 more)
+  (+24 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
 - Public symbol exports: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
   `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`,
-  `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+27 more)
+  `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+26 more)
 - Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
 - Generated module pages: `35`
 

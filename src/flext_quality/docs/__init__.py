@@ -20,6 +20,8 @@ if TYPE_CHECKING:
     from .scripts.validate import FlextQualityDocumentationValidator
     from .tools.link_checker import FlextQualityLinkChecker
     from .tools.style_validator import FlextQualityStyleValidator
+
+
 __all__: tuple[str, ...] = (
     "FlextQualityConfigManager",
     "FlextQualityDocumentationAuditor",

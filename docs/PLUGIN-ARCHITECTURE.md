@@ -102,7 +102,6 @@ class QualityPlugin(Protocol):
 
     def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
-        ...
 ```
 
 ### 5. Baseline Management

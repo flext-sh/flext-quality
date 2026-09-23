@@ -34,7 +34,8 @@
 - [📋 Quality Assurance](#quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 ## Table of Contents
 

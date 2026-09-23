@@ -26,6 +26,8 @@ if TYPE_CHECKING:
         TestsFlextQualityRulesLoader,
         TestsFlextQualityValidators,
     )
+
+
 __all__: tuple[str, ...] = (
     "TestsFlextQualityBaseHook",
     "TestsFlextQualityCli",

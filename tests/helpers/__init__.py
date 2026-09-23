@@ -17,6 +17,8 @@ if TYPE_CHECKING:
         assert_issues_structure,
         assert_metrics_structure,
     )
+
+
 __all__: tuple[str, ...] = (
     "assert_analysis_results_structure",
     "assert_dict_structure",

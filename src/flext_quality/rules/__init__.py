@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from .engine import FlextQualityRulesEngine
     from .loader import FlextQualityRulesLoader
     from .validators import FlextQualityValidators
+
+
 __all__: tuple[str, ...] = (
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",

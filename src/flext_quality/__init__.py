@@ -59,6 +59,8 @@ if TYPE_CHECKING:
     from .rules.validators import FlextQualityValidators
     from .typings import FlextQualityTypes, t
     from .utilities import FlextQualityUtilities, u
+
+
 __all__: tuple[str, ...] = (
     "FlextQuality",
     "FlextQualityBaseHook",

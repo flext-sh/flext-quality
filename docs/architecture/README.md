@@ -39,7 +39,8 @@
   - [For New Team Members](#for-new-team-members)
   - [For Architects & Technical Leads](#for-architects-technical-leads)
   - [For Developers](#for-developers)
-  <!-- TOC END -->
+
+<!-- TOC END -->
 
 ## Table of Contents
 

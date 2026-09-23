@@ -108,7 +108,7 @@
 - README.md demo.py scripts/ settings/ tools/ reports/
   - Configuration Validation
 - Verify configuration files exist
-- audit_rules.YAML style_guide.YAML validation_config.YAML
+- runtime_bootstrap_options
 - Test configuration loading
   - 🚀 Quick Start
     - Interactive Demo
