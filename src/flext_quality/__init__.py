@@ -49,7 +49,7 @@ if TYPE_CHECKING:
     from .mcp.server import FlextQualityMcpServer
     from .mcp.tools import FlextQualityMcpTools
     from .models import FlextQualityModels, FlextQualityModels as m
-    from .protocols import FlextQualityProtocols, p
+    from .protocols import FlextQualityProtocols, FlextQualityProtocols as p
     from .rules.engine import FlextQualityRulesEngine
     from .rules.loader import FlextQualityRulesLoader
     from .rules.validators import FlextQualityValidators

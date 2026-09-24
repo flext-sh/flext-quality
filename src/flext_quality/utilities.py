@@ -10,7 +10,7 @@ from flext_cli import cli
 from flext_infra import FlextInfraUtilities as u
 from flext_web import FlextWebUtilities as web_u
 
-from flext_core.result import FlextResult as r
+from flext_core import FlextResult as r
 from flext_quality import (
     FlextQualityConstants as c,
     FlextQualityProtocols as p,
