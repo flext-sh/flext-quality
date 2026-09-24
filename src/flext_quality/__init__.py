@@ -20,11 +20,7 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_cli import cli
-    from flext_infra import docs_main, infra
-    from flext_web import web
-
-    from flext_core import core, d, e, h, lazy_attribute, r, x
+    from flext_infra import d, e, h, r, x
 
     from . import docs, hooks, integrations, mcp, rules
     from ._config import FlextQualityConfig, config
@@ -103,18 +99,13 @@ __all__: tuple[str, ...] = (
     "__version__",
     "__version_info__",
     "c",
-    "cli",
     "config",
-    "core",
     "d",
     "docs",
-    "docs_main",
     "e",
     "h",
     "hooks",
-    "infra",
     "integrations",
-    "lazy_attribute",
     "m",
     "main",
     "mcp",
@@ -126,7 +117,6 @@ __all__: tuple[str, ...] = (
     "settings",
     "t",
     "u",
-    "web",
     "x",
 )
 
@@ -170,10 +160,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "flext_cli": ("cli",),
-            "flext_core": ("core", "d", "e", "h", "lazy_attribute", "r", "x"),
-            "flext_infra": ("docs_main", "infra"),
-            "flext_web": ("web",),
+            "flext_infra": ("d", "e", "h", "r", "x"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
