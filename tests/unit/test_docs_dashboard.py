@@ -166,9 +166,7 @@ class TestsFlextQualityDocumentationDashboard:
     def test_logger_property_returns_module_logger(self, tmp_path: Path) -> None:
         """The dashboard exposes its module logger through a public property."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        tm.that(
-            dashboard.logger.name, eq=FlextQualityDocumentationDashboard.__module__
-        )
+        tm.that(dashboard.logger.name, eq=FlextQualityDocumentationDashboard.__module__)
 
     def test_run_command_model_carries_declared_defaults(self) -> None:
         """The ``Run`` command model exposes its documented default fields."""
