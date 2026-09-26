@@ -13,7 +13,7 @@ from collections.abc import MutableMapping, MutableSequence
 # TYPE_CHECKING-only import leaves that field unresolved and the model
 # unbuildable at first instantiation (model_rebuild() is prohibited).
 from pathlib import Path
-from typing import Annotated, Self
+from typing import Annotated
 
 from flext_infra import (
     FlextInfraModels as _InfraModels,
@@ -22,53 +22,7 @@ from flext_infra import (
 from flext_web import FlextWebModels as _WebModels
 
 from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
-
-
-def _new_audit_metrics() -> FlextQualityModels.Quality.AuditMetrics:
-    """Build an empty audit metrics model."""
-    return FlextQualityModels.Quality.AuditMetrics()
-
-
-def _new_quality_thresholds_config() -> (
-    FlextQualityModels.Quality.QualityThresholdsConfig
-):
-    """Build a default quality thresholds configuration."""
-    return FlextQualityModels.Quality.QualityThresholdsConfig()
-
-
-def _new_content_checks_config() -> FlextQualityModels.Quality.ContentChecksConfig:
-    """Build a default content checks configuration."""
-    return FlextQualityModels.Quality.ContentChecksConfig()
-
-
-def _new_severity_levels_config() -> FlextQualityModels.Quality.SeverityLevelsConfig:
-    """Build a default severity levels configuration."""
-    return FlextQualityModels.Quality.SeverityLevelsConfig()
-
-
-def _new_markdown_style_config() -> FlextQualityModels.Quality.MarkdownStyleConfig:
-    """Build a default Markdown style configuration."""
-    return FlextQualityModels.Quality.MarkdownStyleConfig()
-
-
-def _new_accessibility_config() -> FlextQualityModels.Quality.AccessibilityConfig:
-    """Build a default accessibility configuration."""
-    return FlextQualityModels.Quality.AccessibilityConfig()
-
-
-def _new_formatting_config() -> FlextQualityModels.Quality.FormattingConfig:
-    """Build a default formatting configuration."""
-    return FlextQualityModels.Quality.FormattingConfig()
-
-
-def _new_link_validation_config() -> FlextQualityModels.Quality.LinkValidationConfig:
-    """Build a default link validation configuration."""
-    return FlextQualityModels.Quality.LinkValidationConfig()
-
-
-def _new_content_analysis_config() -> FlextQualityModels.Quality.ContentAnalysisConfig:
-    """Build a default content analysis configuration."""
-    return FlextQualityModels.Quality.ContentAnalysisConfig()
+from flext_quality._model_defaults import FlextQualityModelDefaults
 
 
 class FlextQualityModels(_InfraModels, _WebModels):
@@ -76,6 +30,16 @@ class FlextQualityModels(_InfraModels, _WebModels):
 
     class Quality:
         """Quality-specific models namespace."""
+
+        AuditMetrics = FlextQualityModelDefaults.AuditMetrics
+        QualityThresholdsConfig = FlextQualityModelDefaults.QualityThresholdsConfig
+        ContentChecksConfig = FlextQualityModelDefaults.ContentChecksConfig
+        SeverityLevelsConfig = FlextQualityModelDefaults.SeverityLevelsConfig
+        MarkdownStyleConfig = FlextQualityModelDefaults.MarkdownStyleConfig
+        AccessibilityConfig = FlextQualityModelDefaults.AccessibilityConfig
+        FormattingConfig = FlextQualityModelDefaults.FormattingConfig
+        LinkValidationConfig = FlextQualityModelDefaults.LinkValidationConfig
+        ContentAnalysisConfig = FlextQualityModelDefaults.ContentAnalysisConfig
 
         @staticmethod
         def _empty_list_str() -> MutableSequence[str]:
@@ -193,31 +157,6 @@ class FlextQualityModels(_InfraModels, _WebModels):
             lines: int = 0
             words: int = 0
 
-            @classmethod
-            def from_path(cls, path: Path) -> Self:
-                """Build metadata from a filesystem path."""
-                size = path.stat().st_size if path.exists() else 0
-                modified_time = path.stat().st_mtime if path.exists() else 0.0
-                extension = path.suffix.lower()
-                is_markdown = extension in {".md", ".mdx"}
-                lines = 0
-                words = 0
-                if path.exists():
-                    read = _InfraUtilities.Cli.files_read_text(path)
-                    if read.success:
-                        content = read.value
-                        lines = content.count("\n") + 1
-                        words = len(content.split())
-                return cls(
-                    path=str(path),
-                    size=size,
-                    modified_time=modified_time,
-                    extension=extension,
-                    is_markdown=is_markdown,
-                    lines=lines,
-                    words=words,
-                )
-
         class ScheduleTaskConfig(_InfraModels.BaseModel):
             """Task configuration for scheduled documentation maintenance."""
 
@@ -292,17 +231,6 @@ class FlextQualityModels(_InfraModels, _WebModels):
             description: str
             options: t.SequenceOf[FlextQualityModels.Quality.ArgumentOptionSpec]
 
-        class AuditMetrics(_InfraModels.BaseModel):
-            """Typed metrics for documentation audit results."""
-
-            total_issues: int = 0
-            severity_breakdown: t.MutableIntMapping = _InfraUtilities.Field(
-                default_factory=dict
-            )
-            quality_score: int = 0
-            files_analyzed: int = 0
-            issues_per_file: float = 0.0
-
         class AuditRecommendation(_InfraModels.BaseModel):
             """Typed recommendation from documentation audit."""
 
@@ -333,7 +261,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
                 ]
             )
             metrics: FlextQualityModels.Quality.AuditMetrics = _InfraUtilities.Field(
-                default_factory=_new_audit_metrics
+                default_factory=FlextQualityModelDefaults.AuditMetrics
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
@@ -426,138 +354,56 @@ class FlextQualityModels(_InfraModels, _WebModels):
             errors: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
             timestamp: str
 
-        class QualityThresholdsConfig(_InfraModels.BaseModel):
-            """Configuration for quality threshold limits."""
-
-            max_age_days: int = 90
-            min_word_count: int = 100
-            max_broken_links: int = 0
-            min_completeness_score: float = 0.8
-            max_file_size_mb: int = 10
-
-        class ContentChecksConfig(_InfraModels.BaseModel):
-            """Configuration for content validation checks."""
-
-            check_freshness: bool = True
-            check_completeness: bool = True
-            check_consistency: bool = True
-            check_links: bool = True
-            check_structure: bool = True
-            check_accessibility: bool = True
-
-        class SeverityLevelsConfig(_InfraModels.BaseModel):
-            """Configuration for severity level categorization."""
-
-            critical: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-            high: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-            medium: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-            low: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-
         class AuditRulesConfig(_InfraModels.BaseModel):
             """Configuration for audit rules and thresholds."""
 
             quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
-                _InfraUtilities.Field(default_factory=_new_quality_thresholds_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.QualityThresholdsConfig
+                )
             )
             content_checks: FlextQualityModels.Quality.ContentChecksConfig = (
-                _InfraUtilities.Field(default_factory=_new_content_checks_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.ContentChecksConfig
+                )
             )
             severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = (
-                _InfraUtilities.Field(default_factory=_new_severity_levels_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.SeverityLevelsConfig
+                )
             )
-
-        class MarkdownStyleConfig(_InfraModels.BaseModel):
-            """Configuration for Markdown style preferences."""
-
-            heading_style: str = "atx"
-            list_style: str = "dash"
-            emphasis_style: str = "*"
-            code_block_style: str = "fenced"
-            link_style: str = "inline"
-
-        class AccessibilityConfig(_InfraModels.BaseModel):
-            """Configuration for accessibility requirements."""
-
-            require_alt_text: bool = True
-            descriptive_links: bool = True
-            heading_structure: bool = True
-            descriptive_link_text: bool = True
-            proper_heading_hierarchy: bool = True
-            min_alt_text_length: int = 5
-            max_alt_text_length: int = 100
-            check_color_contrast: bool = False
-            minimum_contrast_ratio: float = 4.5
-
-        class FormattingConfig(_InfraModels.BaseModel):
-            """Configuration for formatting standards."""
-
-            max_line_length: int = 88
-            soft_line_limit: int = 80
-            consistent_indentation: bool = True
-            trailing_spaces: bool = False
-            trailing_newlines: bool = True
-            indentation_type: str = "spaces"
-            indentation_size: int = 4
-            blank_lines_before_headings: bool = True
-            blank_lines_after_headings: bool = False
-            blank_lines_around_lists: bool = True
-            blank_lines_around_code_blocks: bool = True
 
         class StyleGuideConfig(_InfraModels.BaseModel):
             """Configuration for style guide rules."""
 
             markdown: FlextQualityModels.Quality.MarkdownStyleConfig = (
-                _InfraUtilities.Field(default_factory=_new_markdown_style_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.MarkdownStyleConfig
+                )
             )
             accessibility: FlextQualityModels.Quality.AccessibilityConfig = (
-                _InfraUtilities.Field(default_factory=_new_accessibility_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.AccessibilityConfig
+                )
             )
             formatting: FlextQualityModels.Quality.FormattingConfig = (
-                _InfraUtilities.Field(default_factory=_new_formatting_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.FormattingConfig
+                )
             )
-
-        class LinkValidationConfig(_InfraModels.BaseModel):
-            """Configuration for link validation settings."""
-
-            timeout: int = 10
-            retry_attempts: int = 3
-            user_agent: str = "FLEXT-Quality-Doc-Auditor/1.0"
-            check_external: bool = True
-            check_internal: bool = True
-            check_images: bool = True
-            follow_redirects: bool = True
-            max_redirects: int = 5
-            acceptable_status_codes: t.SequenceOf[int] = _InfraUtilities.Field(
-                default_factory=lambda: [200, 201, 202, 206, 301, 302, 303, 307, 308]
-            )
-            validate_content_type: bool = False
-            expected_content_types: t.StrSequence = _InfraUtilities.Field(
-                default_factory=lambda: ["text/html", "text/plain", "application/json"]
-            )
-            allowed_domains: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-            blocked_domains: t.StrSequence = _InfraUtilities.Field(default_factory=list)
-
-        class ContentAnalysisConfig(_InfraModels.BaseModel):
-            """Configuration for content analysis parameters."""
-
-            min_section_depth: int = 2
-            required_sections: t.StrSequence = _InfraUtilities.Field(
-                default_factory=lambda: ["Overview", "Installation", "Usage"]
-            )
-            min_word_count: int = 100
-            check_readability: bool = False
-            readability_target_score: int = 60
-            check_todos: bool = True
-            check_fixmes: bool = True
 
         class ValidationConfig(_InfraModels.BaseModel):
             """Configuration for validation settings."""
 
             link_validation: FlextQualityModels.Quality.LinkValidationConfig = (
-                _InfraUtilities.Field(default_factory=_new_link_validation_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.LinkValidationConfig
+                )
             )
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
-                _InfraUtilities.Field(default_factory=_new_content_analysis_config)
+                _InfraUtilities.Field(
+                    default_factory=FlextQualityModelDefaults.ContentAnalysisConfig
+                )
             )
 
         class OptimizerResults(_InfraModels.BaseModel):
