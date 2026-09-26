@@ -257,8 +257,10 @@ class TestsFlextQualityDocumentationNotifier:
         tm.that(notifier.notify_monthly_report({}), eq=True)
         tm.that(notifier.results.notifications_sent, eq=1)
 
-    def test_send_notification_slack_failure_is_recorded(self, tmp_path: Path) -> None:
-        """A real (schemeless) slack webhook URL fails and is recorded as an error."""
+    def test_send_notification_slack_rejects_non_allowlisted_target(
+        self, tmp_path: Path
+    ) -> None:
+        """A non-allowlisted slack webhook target fails closed before any request."""
         config_path = tmp_path / "notify.yaml"
         config_path.write_text(
             "channels:\n  slack:\n    enabled: true\n"
@@ -266,10 +268,9 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        success = notifier.send_notification("title", "message")
-        tm.that(success, eq=False)
-        tm.that(len(notifier.results.errors), eq=1)
-        tm.that(notifier.results.errors[0], has="Slack notification failed")
+        with pytest.raises(ValueError, match="webhook target is not allowlisted"):
+            notifier.send_notification("title", "message")
+        tm.that(notifier.results.notifications_sent, eq=0)
 
     def test_send_notification_webhook_failure_is_recorded(
         self, tmp_path: Path
