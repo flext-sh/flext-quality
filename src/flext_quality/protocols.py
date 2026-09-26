@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, ClassVar, Protocol, runtime_checkable
 
-from flext_infra import p
-from flext_web import p as web_p
+from flext_infra import FlextInfraProtocols
+from flext_web import FlextWebProtocols
 
 if TYPE_CHECKING:
     from flext_quality import c, t
 
 
-class FlextQualityProtocols(p, web_p):
+class FlextQualityProtocols(FlextInfraProtocols, FlextWebProtocols):
     """Namespace for flext-quality protocols."""
 
     @runtime_checkable

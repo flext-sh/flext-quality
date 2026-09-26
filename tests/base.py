@@ -4,13 +4,13 @@ from __future__ import annotations
 
 from typing import override
 
-from flext_tests import s as tests_s
+from flext_tests import FlextTestsServiceBase
 
 from flext_quality import m
 from tests.settings import TestsFlextQualitySettings
 
 
-class TestsFlextQualityServiceBase(tests_s):
+class TestsFlextQualityServiceBase(FlextTestsServiceBase):
     """Quality test service base with source and test settings namespaces."""
 
     @classmethod
