@@ -893,20 +893,24 @@ broken_links = validator.get_broken_links()
 
 ### Adding Custom Rules
 
-```python
-from __future__ import annotations
+```yaml
 # Extend audit_rules.yaml with custom checks
 custom_checks:
   - name: "company_branding"
     pattern: "\\bincorrect\\b|\\bwrong\\b"
     severity: "medium"
     message: "Use approved company terminology"
+```
 
+```python
 # Create custom validator
-from docs import  BaseValidator
+from __future__ import annotations
+
+from docs import BaseValidator
+
 
 class CustomValidator(BaseValidator):
-    def validate(self, content: str, file_path: Path) -> List[Dict]:
+    def validate(self, content: str, file_path: Path) -> list[dict]:
         # Your custom validation logic
         return issues
 ```
