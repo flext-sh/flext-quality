@@ -381,9 +381,7 @@ class FlextQualityModels(_WebModels):
                     ]
                 ]
             )
-            metrics: FlextQualityModels.Quality.AuditMetrics = _WebModels.Field(
-                default_factory=AuditMetrics
-            )
+            metrics: FlextQualityModels.Quality.AuditMetrics
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
             ] = _WebModels.Field(default_factory=list)
@@ -453,9 +451,7 @@ class FlextQualityModels(_WebModels):
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
             ] = _WebModels.Field(default_factory=list)
-            performance: FlextQualityModels.Quality.LinkPerformanceMetrics = (
-                _WebModels.Field(default_factory=LinkPerformanceMetrics)
-            )
+            performance: FlextQualityModels.Quality.LinkPerformanceMetrics
 
         class ContentValidatorResults(_WebModels.ManagedModel):
             """Results for documentation content validation."""

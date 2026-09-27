@@ -35,7 +35,10 @@ class FlextQualityLinkChecker:
         )
         self.session: ClientSession | None = None
         self.results: m.Quality.LinkValidatorResults = (
-            m.Quality.LinkValidatorResults(timestamp=u.now().isoformat())
+            m.Quality.LinkValidatorResults(
+                timestamp=u.now().isoformat(),
+                performance=m.Quality.LinkPerformanceMetrics(),
+            )
         )
 
     def find_all_links(

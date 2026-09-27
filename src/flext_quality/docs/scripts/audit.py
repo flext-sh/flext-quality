@@ -54,7 +54,7 @@ class FlextQualityDocumentationAuditor:
             self.config_manager.get_validation_config()
         )
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
-            timestamp=u.now().isoformat()
+            timestamp=u.now().isoformat(), metrics=m.Quality.AuditMetrics()
         )
 
     def find_documentation_files(self) -> t.SequenceOf[Path]:
