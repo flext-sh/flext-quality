@@ -6,7 +6,6 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping
 from pathlib import Path
 
 from flext_quality import m, t, u
@@ -28,7 +27,6 @@ class FlextQualityConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: MutableMapping[str, t.JsonMapping] = {}
         self._audit_rules: m.Quality.AuditRulesConfig | None = None
         self._style_guide: m.Quality.StyleGuideConfig | None = None
         self._validation_config: m.Quality.ValidationConfig | None = None
@@ -54,12 +52,6 @@ class FlextQualityConfigManager:
             self._validation_config = m.Quality.ValidationConfig.model_validate(data)
         return self._validation_config
 
-    def get_config(self, name: str) -> t.JsonMapping:
-        """Get a configuration file by name."""
-        if name not in self._cache:
-            self._cache[name] = self._load_config_file(f"{name}.yaml")
-        return self._cache[name]
-
     def _load_config_file(self, filename: str) -> t.JsonMapping:
         """Load a YAML configuration file."""
         config_path = self.config_dir / filename
@@ -67,7 +59,6 @@ class FlextQualityConfigManager:
 
     def reload_configs(self) -> None:
         """Reload all configurations from disk."""
-        self._cache.clear()
         self._audit_rules = None
         self._style_guide = None
         self._validation_config = None
@@ -78,18 +69,6 @@ class FlextQualityConfigManager:
         self.get_style_guide()
         self.get_validation_config()
         return []
-
-    def get_all_configs(self) -> t.JsonMapping:
-        """Get all configurations as a single dictionary."""
-        return t.json_mapping_adapter().validate_python({
-            "audit_rules": self.get_audit_rules().model_dump(mode="json"),
-            "style_guide": self.get_style_guide().model_dump(mode="json"),
-            "validation_config": self.get_validation_config().model_dump(mode="json"),
-            "raw_configs": {
-                name: self.get_config(name)
-                for name in ["audit_rules", "style_guide", "validation_config"]
-            },
-        })
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
