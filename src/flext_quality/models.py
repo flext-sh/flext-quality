@@ -97,6 +97,54 @@ class FlextQualityModels(_WebModels):
             blank_lines_around_lists: bool
             blank_lines_around_code_blocks: bool
 
+        class HeadingsConfig(_WebModels.ManagedModel):
+            """Documentation heading hierarchy policy."""
+
+            enforce_hierarchy: bool
+            require_space_after_hash: bool
+            first_heading_level: int
+
+        class CodeStyleConfig(_WebModels.ManagedModel):
+            """Documentation code block policy."""
+
+            require_language_specifier: bool
+
+        class StyleIssue(_WebModels.ManagedModel):
+            """A documentation style violation."""
+
+            type: str
+            line: int
+            content: str
+            message: str
+            severity: str
+
+        class StyleFileResults(_WebModels.ManagedModel):
+            """Style findings for one file."""
+
+            file: str
+            violations: MutableSequence[FlextQualityModels.Quality.StyleIssue]
+            issues: MutableSequence[FlextQualityModels.Quality.StyleIssue]
+            suggestions: MutableSequence[str]
+
+        class StyleSummaryMetrics(_WebModels.ManagedModel):
+            """Counts for a style validation run."""
+
+            total_violations: int
+            critical_issues: int
+            warnings: int
+            suggestions_count: int
+            accessibility_issues: int
+
+        class StyleValidationResults(_WebModels.ManagedModel):
+            """Aggregated style findings."""
+
+            files_checked: int
+            style_violations: MutableSequence[FlextQualityModels.Quality.StyleIssue]
+            accessibility_issues: MutableSequence[FlextQualityModels.Quality.StyleIssue]
+            formatting_errors: MutableSequence[FlextQualityModels.Quality.StyleIssue]
+            suggestions: MutableSequence[str]
+            summary: FlextQualityModels.Quality.StyleSummaryMetrics
+
         class LinkValidationConfig(_WebModels.ManagedModel):
             """Configuration for link validation settings."""
 
@@ -428,6 +476,8 @@ class FlextQualityModels(_WebModels):
             markdown: FlextQualityModels.Quality.MarkdownStyleConfig
             accessibility: FlextQualityModels.Quality.AccessibilityConfig
             formatting: FlextQualityModels.Quality.FormattingConfig
+            headings: FlextQualityModels.Quality.HeadingsConfig
+            code: FlextQualityModels.Quality.CodeStyleConfig
 
         class ValidationConfig(_WebModels.FlexibleInternalModel):
             """Configuration for validation settings."""
