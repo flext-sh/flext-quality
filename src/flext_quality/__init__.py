@@ -20,7 +20,7 @@ from .__version__ import (
 )
 
 if TYPE_CHECKING:
-    from flext_infra import d, e, h, r, x
+    from flext_web import d, e, h, r, x
 
     from . import docs, hooks, integrations, mcp, rules
     from ._config import FlextQualityConfig, config
@@ -160,7 +160,7 @@ _LAZY_IMPORTS = MappingProxyType(
             ".rules.validators": ("FlextQualityValidators",),
             ".typings": ("FlextQualityTypes", "t"),
             ".utilities": ("FlextQualityUtilities", "u"),
-            "flext_infra": ("d", "e", "h", "r", "x"),
+            "flext_web": ("d", "e", "h", "r", "x"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,

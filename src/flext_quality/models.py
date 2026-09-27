@@ -13,6 +13,7 @@ from collections.abc import MutableMapping, MutableSequence
 # TYPE_CHECKING-only import leaves that field unresolved and the model
 # unbuildable at first instantiation (model_rebuild() is prohibited).
 from pathlib import Path
+from types import MappingProxyType
 from typing import Annotated
 
 from flext_web import FlextWebModels as _WebModels
@@ -29,192 +30,410 @@ class FlextQualityModels(_WebModels):
         class AuditMetrics(_WebModels.ManagedModel):
             """Typed metrics for documentation audit results."""
 
-            total_issues: int = 0
-            severity_breakdown: t.MutableIntMapping = _WebModels.Field(default_factory=dict)
-            quality_score: int = 0
-            files_analyzed: int = 0
-            issues_per_file: float = 0.0
+            total_issues: int = _WebModels.Field(
+                default=0, description="Total number of documentation issues found by the audit."
+            )
+            severity_breakdown: t.MutableIntMapping = _WebModels.Field(
+                default_factory=dict,
+                description="Count of issues found for each severity level (e.g. critical, high, medium, low).",
+            )
+            quality_score: int = _WebModels.Field(
+                default=0,
+                description="Overall documentation quality score from 0 to 100, higher is better.",
+            )
+            files_analyzed: int = _WebModels.Field(
+                default=0, description="Number of documentation files the audit inspected."
+            )
+            issues_per_file: float = _WebModels.Field(
+                default=0.0,
+                description="Average number of issues found per analyzed file.",
+            )
 
         class QualityThresholdsConfig(_WebModels.ManagedModel):
             """Configuration for quality threshold limits."""
 
-            max_age_days: int
-            min_word_count: int
-            max_broken_links: int
-            min_completeness_score: float
-            max_file_size_mb: int
+            max_age_days: int = _WebModels.Field(
+                description="Maximum age in days before a documentation file is flagged as stale."
+            )
+            min_word_count: int = _WebModels.Field(
+                description="Minimum number of words a documentation file must contain to pass."
+            )
+            max_broken_links: int = _WebModels.Field(
+                description="Maximum number of broken links tolerated before a file fails the audit."
+            )
+            min_completeness_score: float = _WebModels.Field(
+                description="Minimum acceptable completeness score, from 0.0 to 1.0, for a document."
+            )
+            max_file_size_mb: int = _WebModels.Field(
+                description="Maximum documentation file size, in megabytes, before it is flagged."
+            )
 
         class ContentChecksConfig(_WebModels.ManagedModel):
             """Configuration for content validation checks."""
 
-            check_freshness: bool
-            check_completeness: bool
-            check_consistency: bool
-            check_links: bool
-            check_structure: bool
-            check_accessibility: bool
+            check_freshness: bool = _WebModels.Field(
+                description="Whether to check that documentation content is not stale."
+            )
+            check_completeness: bool = _WebModels.Field(
+                description="Whether to check that documentation content meets completeness requirements."
+            )
+            check_consistency: bool = _WebModels.Field(
+                description="Whether to check documentation content for internal consistency."
+            )
+            check_links: bool = _WebModels.Field(
+                description="Whether to check documentation content for broken or invalid links."
+            )
+            check_structure: bool = _WebModels.Field(
+                description="Whether to check documentation content for correct structural organization."
+            )
+            check_accessibility: bool = _WebModels.Field(
+                description="Whether to check documentation content against accessibility requirements."
+            )
 
         class SeverityLevelsConfig(_WebModels.ManagedModel):
             """Configuration for severity level categorization."""
 
-            critical: t.StrSequence
-            high: t.StrSequence
-            medium: t.StrSequence
-            low: t.StrSequence
+            critical: t.StrSequence = _WebModels.Field(
+                description="Issue type identifiers classified as critical severity."
+            )
+            high: t.StrSequence = _WebModels.Field(
+                description="Issue type identifiers classified as high severity."
+            )
+            medium: t.StrSequence = _WebModels.Field(
+                description="Issue type identifiers classified as medium severity."
+            )
+            low: t.StrSequence = _WebModels.Field(
+                description="Issue type identifiers classified as low severity."
+            )
 
         class MarkdownStyleConfig(_WebModels.ManagedModel):
             """Configuration for Markdown style preferences."""
 
-            heading_style: str
-            list_style: str
-            emphasis_style: str
-            code_block_style: str
-            link_style: str
+            heading_style: str = _WebModels.Field(
+                description="Preferred Markdown heading style (e.g. ATX '#' or Setext underline)."
+            )
+            list_style: str = _WebModels.Field(
+                description="Preferred Markdown list marker style (e.g. '-', '*', or '+')."
+            )
+            emphasis_style: str = _WebModels.Field(
+                description="Preferred Markdown emphasis marker style (e.g. asterisk or underscore)."
+            )
+            code_block_style: str = _WebModels.Field(
+                description="Preferred Markdown code block style (e.g. fenced or indented)."
+            )
+            link_style: str = _WebModels.Field(
+                description="Preferred Markdown link style (e.g. inline or reference-style)."
+            )
 
         class AccessibilityConfig(_WebModels.ManagedModel):
             """Configuration for accessibility requirements."""
 
-            require_alt_text: bool
-            descriptive_link_text: bool
-            proper_heading_hierarchy: bool
-            min_alt_text_length: int
-            max_alt_text_length: int
-            check_color_contrast: bool
-            minimum_contrast_ratio: float
+            require_alt_text: bool = _WebModels.Field(
+                description="Whether every image must carry descriptive alt text."
+            )
+            descriptive_link_text: bool = _WebModels.Field(
+                description="Whether link text must be descriptive rather than generic (e.g. not 'click here')."
+            )
+            proper_heading_hierarchy: bool = _WebModels.Field(
+                description="Whether heading levels must form a proper, non-skipping hierarchy."
+            )
+            min_alt_text_length: int = _WebModels.Field(
+                description="Minimum character length required for image alt text."
+            )
+            max_alt_text_length: int = _WebModels.Field(
+                description="Maximum character length allowed for image alt text."
+            )
+            check_color_contrast: bool = _WebModels.Field(
+                description="Whether to check that documented color combinations meet contrast requirements."
+            )
+            minimum_contrast_ratio: float = _WebModels.Field(
+                description="Minimum acceptable color contrast ratio for documented color combinations."
+            )
 
         class FormattingConfig(_WebModels.ManagedModel):
             """Configuration for formatting standards."""
 
-            max_line_length: int
-            soft_line_limit: int
-            consistent_indentation: bool
-            trailing_spaces: bool
-            trailing_newlines: bool
-            indentation_type: str
-            indentation_size: int
-            blank_lines_before_headings: bool
-            blank_lines_after_headings: bool
-            blank_lines_around_lists: bool
-            blank_lines_around_code_blocks: bool
+            max_line_length: int = _WebModels.Field(
+                description="Maximum allowed line length, in characters, before a hard violation."
+            )
+            soft_line_limit: int = _WebModels.Field(
+                description="Preferred line length, in characters, used as a soft warning threshold below the hard maximum."
+            )
+            consistent_indentation: bool = _WebModels.Field(
+                description="Whether indentation must be consistent throughout the document."
+            )
+            trailing_spaces: bool = _WebModels.Field(
+                description="Whether trailing whitespace at the end of lines is flagged."
+            )
+            trailing_newlines: bool = _WebModels.Field(
+                description="Whether trailing blank lines at the end of the file are flagged."
+            )
+            indentation_type: str = _WebModels.Field(
+                description="Preferred indentation character type (e.g. 'spaces' or 'tabs')."
+            )
+            indentation_size: int = _WebModels.Field(
+                description="Preferred number of indentation characters per nesting level."
+            )
+            blank_lines_before_headings: bool = _WebModels.Field(
+                description="Whether a blank line is required immediately before a heading."
+            )
+            blank_lines_after_headings: bool = _WebModels.Field(
+                description="Whether a blank line is required immediately after a heading."
+            )
+            blank_lines_around_lists: bool = _WebModels.Field(
+                description="Whether blank lines are required around list blocks."
+            )
+            blank_lines_around_code_blocks: bool = _WebModels.Field(
+                description="Whether blank lines are required around fenced code blocks."
+            )
 
         class HeadingsConfig(_WebModels.ManagedModel):
             """Documentation heading hierarchy policy."""
 
-            enforce_hierarchy: bool
-            max_heading_level: int
-            require_space_after_hash: bool
-            allow_closing_hashes: bool
-            first_heading_level: int
-            toc_heading_level: int
+            enforce_hierarchy: bool = _WebModels.Field(
+                description="Whether heading levels must strictly follow hierarchical order without skipping."
+            )
+            max_heading_level: int = _WebModels.Field(
+                description="Deepest heading level (e.g. 6 for H6) permitted in a document."
+            )
+            require_space_after_hash: bool = _WebModels.Field(
+                description="Whether ATX heading markers ('#') must be followed by a space."
+            )
+            allow_closing_hashes: bool = _WebModels.Field(
+                description="Whether trailing '#' closing markers on ATX headings are permitted."
+            )
+            first_heading_level: int = _WebModels.Field(
+                description="Heading level a document must start with (e.g. 1 for H1)."
+            )
+            toc_heading_level: int = _WebModels.Field(
+                description="Deepest heading level included when generating a table of contents."
+            )
 
         class CodeStyleConfig(_WebModels.ManagedModel):
             """Documentation code block policy."""
 
-            require_language_specifier: bool
-            preferred_languages: t.StrSequence
-            inline_code_style: str
-            consistent_fencing: bool
-            fence_style: str
+            require_language_specifier: bool = _WebModels.Field(
+                description="Whether fenced code blocks must declare a language specifier."
+            )
+            preferred_languages: t.StrSequence = _WebModels.Field(
+                description="Language specifiers accepted for fenced code blocks."
+            )
+            inline_code_style: str = _WebModels.Field(
+                description="Preferred style for inline code spans (e.g. backtick delimiting)."
+            )
+            consistent_fencing: bool = _WebModels.Field(
+                description="Whether fenced code blocks must use a consistent fence character throughout."
+            )
+            fence_style: str = _WebModels.Field(
+                description="Preferred fence character for code blocks (e.g. backtick or tilde)."
+            )
 
         class StyleIssue(_WebModels.ManagedModel):
             """A documentation style violation."""
 
-            type: str
-            line: int
-            content: str
-            message: str
-            severity: str
+            type: str = _WebModels.Field(description="Identifier of the style rule that was violated.")
+            line: int = _WebModels.Field(description="One-based line number where the violation occurred.")
+            content: str = _WebModels.Field(description="Text content of the offending line.")
+            message: str = _WebModels.Field(description="Human-readable description of the violation.")
+            severity: str = _WebModels.Field(description="Severity level of the violation (e.g. critical, high, medium, low).")
 
         class StyleFileResults(_WebModels.ManagedModel):
             """Style findings for one file."""
 
-            file: str
-            violations: MutableSequence[FlextQualityModels.Quality.StyleIssue]
-            issues: MutableSequence[FlextQualityModels.Quality.StyleIssue]
-            suggestions: MutableSequence[str]
+            file: str = _WebModels.Field(description="Path of the documentation file that was checked.")
+            violations: MutableSequence[FlextQualityModels.Quality.StyleIssue] = _WebModels.Field(
+                description="Style rule violations found in the file."
+            )
+            issues: MutableSequence[FlextQualityModels.Quality.StyleIssue] = _WebModels.Field(
+                description="All style issues found in the file, including violations and warnings."
+            )
+            suggestions: MutableSequence[str] = _WebModels.Field(
+                description="Human-readable suggestions for improving the file's style."
+            )
 
         class StyleSummaryMetrics(_WebModels.ManagedModel):
             """Counts for a style validation run."""
 
-            total_violations: int
-            critical_issues: int
-            warnings: int
-            suggestions_count: int
-            accessibility_issues: int
+            total_violations: int = _WebModels.Field(
+                description="Total number of style violations found across all checked files."
+            )
+            critical_issues: int = _WebModels.Field(
+                description="Number of style issues classified as critical severity."
+            )
+            warnings: int = _WebModels.Field(
+                description="Number of style warnings raised during the run."
+            )
+            suggestions_count: int = _WebModels.Field(
+                description="Number of style improvement suggestions generated during the run."
+            )
+            accessibility_issues: int = _WebModels.Field(
+                description="Number of accessibility-related style issues found during the run."
+            )
 
         class StyleValidationResults(_WebModels.ManagedModel):
             """Aggregated style findings."""
 
-            files_checked: int
-            style_violations: MutableSequence[FlextQualityModels.Quality.StyleIssue]
-            accessibility_issues: MutableSequence[FlextQualityModels.Quality.StyleIssue]
-            formatting_errors: MutableSequence[FlextQualityModels.Quality.StyleIssue]
-            suggestions: MutableSequence[str]
-            summary: FlextQualityModels.Quality.StyleSummaryMetrics
+            files_checked: int = _WebModels.Field(
+                description="Number of documentation files inspected during the style validation run."
+            )
+            style_violations: MutableSequence[FlextQualityModels.Quality.StyleIssue] = _WebModels.Field(
+                description="Style rule violations found across all checked files."
+            )
+            accessibility_issues: MutableSequence[FlextQualityModels.Quality.StyleIssue] = _WebModels.Field(
+                description="Accessibility-related issues found across all checked files."
+            )
+            formatting_errors: MutableSequence[FlextQualityModels.Quality.StyleIssue] = _WebModels.Field(
+                description="Formatting rule violations found across all checked files."
+            )
+            suggestions: MutableSequence[str] = _WebModels.Field(
+                description="Human-readable suggestions for improving style across all checked files."
+            )
+            summary: FlextQualityModels.Quality.StyleSummaryMetrics = _WebModels.Field(
+                description="Aggregate counts summarizing the style validation run."
+            )
 
         class GithubLinkConfig(_WebModels.ManagedModel):
             """GitHub link checks declared in validation YAML."""
 
-            validate_existence: bool
-            check_rate_limits: bool
+            validate_existence: bool = _WebModels.Field(
+                description="Whether to verify that linked GitHub resources (repos, issues, files) actually exist."
+            )
+            check_rate_limits: bool = _WebModels.Field(
+                description="Whether to respect and check GitHub API rate limits while validating links."
+            )
 
         class DocumentationLinkConfig(_WebModels.ManagedModel):
             """Documentation link checks declared in validation YAML."""
 
-            validate_structure: bool
-            check_anchors: bool
+            validate_structure: bool = _WebModels.Field(
+                description="Whether to verify that internal documentation links point to a valid document structure."
+            )
+            check_anchors: bool = _WebModels.Field(
+                description="Whether to verify that heading anchors referenced by internal links actually exist."
+            )
 
         class LinkValidationConfig(_WebModels.ManagedModel):
             """Configuration for link validation settings."""
 
-            timeout: int
-            user_agent: str
-            check_external: bool
-            check_internal: bool
-            check_images: bool
-            follow_redirects: bool
-            max_redirects: int
-            acceptable_status_codes: t.SequenceOf[int]
-            validate_content_type: bool
-            expected_content_types: t.StrSequence
-            allowed_domains: t.StrSequence
-            blocked_domains: t.StrSequence
-            github_links: FlextQualityModels.Quality.GithubLinkConfig
-            documentation_links: FlextQualityModels.Quality.DocumentationLinkConfig
+            timeout: int = _WebModels.Field(
+                description="Timeout, in seconds, allowed for a single link check request."
+            )
+            user_agent: str = _WebModels.Field(
+                description="User-Agent header string sent with outbound link check requests."
+            )
+            check_external: bool = _WebModels.Field(
+                description="Whether to validate links pointing outside the documentation repository."
+            )
+            check_internal: bool = _WebModels.Field(
+                description="Whether to validate links pointing to other files within the documentation repository."
+            )
+            check_images: bool = _WebModels.Field(
+                description="Whether to validate image references as links."
+            )
+            follow_redirects: bool = _WebModels.Field(
+                description="Whether to follow HTTP redirects when validating a link."
+            )
+            max_redirects: int = _WebModels.Field(
+                description="Maximum number of HTTP redirects to follow before treating a link as broken."
+            )
+            acceptable_status_codes: t.SequenceOf[int] = _WebModels.Field(
+                description="HTTP status codes treated as a successful link check response."
+            )
+            validate_content_type: bool = _WebModels.Field(
+                description="Whether to verify the response Content-Type header of a checked link."
+            )
+            expected_content_types: t.StrSequence = _WebModels.Field(
+                description="Content-Type values accepted when validate_content_type is enabled."
+            )
+            allowed_domains: t.StrSequence = _WebModels.Field(
+                description="Domains explicitly permitted for external links; empty means no allowlist restriction."
+            )
+            blocked_domains: t.StrSequence = _WebModels.Field(
+                description="Domains explicitly forbidden for external links."
+            )
+            github_links: FlextQualityModels.Quality.GithubLinkConfig = _WebModels.Field(
+                description="Validation settings specific to links pointing at GitHub resources."
+            )
+            documentation_links: FlextQualityModels.Quality.DocumentationLinkConfig = _WebModels.Field(
+                description="Validation settings specific to internal documentation links."
+            )
 
         class ValidationRunConfig(_WebModels.ManagedModel):
             """Execution limits for validation operations."""
 
-            enabled: bool
-            fail_on_errors: bool
-            verbose_output: bool
-            save_results: bool
-            max_concurrent_requests: t.PositiveInt
-            request_timeout: t.PositiveInt
-            requests_per_second: t.PositiveInt
-            burst_limit: t.PositiveInt
+            enabled: bool = _WebModels.Field(
+                description="Whether the validation run is enabled."
+            )
+            fail_on_errors: bool = _WebModels.Field(
+                description="Whether the validation run should exit with failure when errors are found."
+            )
+            verbose_output: bool = _WebModels.Field(
+                description="Whether the validation run should emit verbose diagnostic output."
+            )
+            save_results: bool = _WebModels.Field(
+                description="Whether validation results should be persisted to disk."
+            )
+            max_concurrent_requests: t.PositiveInt = _WebModels.Field(
+                description="Maximum number of concurrent requests the validation run may issue."
+            )
+            request_timeout: t.PositiveInt = _WebModels.Field(
+                description="Timeout, in seconds, applied to each individual validation request."
+            )
+            requests_per_second: t.PositiveInt = _WebModels.Field(
+                description="Maximum sustained rate of requests, per second, the validation run may issue."
+            )
+            burst_limit: t.PositiveInt = _WebModels.Field(
+                description="Maximum number of requests permitted in a short burst above the sustained rate."
+            )
 
         class ContentAnalysisConfig(_WebModels.ManagedModel):
             """Configuration for content analysis parameters."""
 
-            check_structure: bool
-            min_section_depth: int
-            required_sections: t.StrSequence
-            min_word_count: int
-            check_readability: bool
-            readability_target_score: int
-            check_todos: bool
-            check_fixmes: bool
+            check_structure: bool = _WebModels.Field(
+                description="Whether to analyze document structure (sections, headings) during content analysis."
+            )
+            min_section_depth: int = _WebModels.Field(
+                description="Minimum number of nested section levels a document must contain."
+            )
+            required_sections: t.StrSequence = _WebModels.Field(
+                description="Section headings that must be present in every analyzed document."
+            )
+            min_word_count: int = _WebModels.Field(
+                description="Minimum number of words required for a document to pass content analysis."
+            )
+            check_readability: bool = _WebModels.Field(
+                description="Whether to compute and check a document's readability score."
+            )
+            readability_target_score: int = _WebModels.Field(
+                description="Target readability score a document should meet or exceed."
+            )
+            check_todos: bool = _WebModels.Field(
+                description="Whether to flag unresolved TODO markers found in document content."
+            )
+            check_fixmes: bool = _WebModels.Field(
+                description="Whether to flag unresolved FIXME markers found in document content."
+            )
 
         class RuleDefinition(_WebModels.ManagedModel):
             """A rule definition from YAML."""
 
-            name: str
-            type: c.Quality.RuleType
-            description: str
-            pattern: str | None = None
-            action: str
-            enabled: bool = True
+            name: str = _WebModels.Field(description="Unique name identifying the rule.")
+            type: c.Quality.RuleType = _WebModels.Field(
+                description="Category of quality rule (e.g. content, style, link, accessibility)."
+            )
+            description: str = _WebModels.Field(
+                description="Human-readable explanation of what the rule checks."
+            )
+            pattern: str | None = _WebModels.Field(
+                default=None,
+                description="Optional regular expression pattern the rule matches against, when applicable.",
+            )
+            action: str = _WebModels.Field(
+                description="Action to take when the rule matches (e.g. flag as error or warning)."
+            )
+            enabled: bool = _WebModels.Field(
+                default=True, description="Whether this rule is active during validation runs."
+            )
 
         class Issue(_WebModels.ManagedModel):
             """Canonical issue model for documentation tooling."""
@@ -249,122 +468,272 @@ class FlextQualityModels(_WebModels):
             ] = ""
             context: Annotated[
                 t.MappingKV[str, t.Primitives | None] | None,
-                _WebModels.Field(default=None),
+                _WebModels.Field(
+                    default=None,
+                    description="Optional structured context data associated with the issue.",
+                ),
             ]
 
         class ValidationResult(_WebModels.ManagedModel):
             """Canonical validation result for documentation tooling."""
 
-            total_items: int = 0
-            valid_items: int = 0
-            invalid_items: int = 0
-            issues: MutableSequence[FlextQualityModels.Quality.Issue] = (
-                _WebModels.Field(default_factory=list)
+            total_items: int = _WebModels.Field(
+                default=0, description="Total number of items evaluated by the validation run."
             )
-            warnings: MutableSequence[str] = _WebModels.Field(default_factory=list)
-            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
+            valid_items: int = _WebModels.Field(
+                default=0, description="Number of items that passed validation."
+            )
+            invalid_items: int = _WebModels.Field(
+                default=0, description="Number of items that failed validation."
+            )
+            issues: MutableSequence[FlextQualityModels.Quality.Issue] = (
+                _WebModels.Field(
+                    default_factory=list,
+                    description="Issues found during the validation run.",
+                )
+            )
+            warnings: MutableSequence[str] = _WebModels.Field(
+                default_factory=list,
+                description="Non-fatal warning messages produced during the validation run.",
+            )
+            errors: MutableSequence[str] = _WebModels.Field(
+                default_factory=list,
+                description="Fatal error messages produced during the validation run.",
+            )
             metadata: MutableMapping[str, t.Primitives] = _WebModels.Field(
-                default_factory=dict
+                default_factory=dict,
+                description="Additional metadata describing the validation run.",
             )
 
         class FileMetadata(_WebModels.ManagedModel):
             """Metadata about a documentation file."""
 
-            path: str
-            size: int = 0
-            modified_time: float = 0.0
-            extension: str = ""
-            is_markdown: bool = False
-            lines: int = 0
-            words: int = 0
+            path: str = _WebModels.Field(description="Filesystem path of the documentation file.")
+            size: int = _WebModels.Field(
+                default=0, description="File size in bytes."
+            )
+            modified_time: float = _WebModels.Field(
+                default=0.0, description="Last modification time of the file, as a Unix timestamp."
+            )
+            extension: str = _WebModels.Field(
+                default="", description="File extension, including the leading dot (e.g. '.md')."
+            )
+            is_markdown: bool = _WebModels.Field(
+                default=False, description="Whether the file is a Markdown document."
+            )
+            lines: int = _WebModels.Field(
+                default=0, description="Number of lines in the file."
+            )
+            words: int = _WebModels.Field(
+                default=0, description="Number of words in the file."
+            )
 
         class ScheduleTaskConfig(_WebModels.ManagedModel):
             """Task configuration for scheduled documentation maintenance."""
 
-            description: str
-            command: str
-            timeout: Annotated[t.PositiveInt, _WebModels.Field(default=300)]
+            description: str = _WebModels.Field(
+                description="Human-readable description of what the scheduled task does."
+            )
+            command: str = _WebModels.Field(
+                description="Shell command executed when the scheduled task runs."
+            )
+            timeout: Annotated[
+                t.PositiveInt,
+                _WebModels.Field(
+                    default=300,
+                    description="Maximum time, in seconds, the task command may run before being terminated.",
+                ),
+            ]
 
         class ScheduleEntry(_WebModels.ManagedModel):
             """Single schedule entry definition."""
 
-            enabled: bool = True
-            time: str
-            tasks: t.StrSequence = _WebModels.Field(default_factory=list)
-            day: str | None = None
+            enabled: bool = _WebModels.Field(
+                default=True, description="Whether this schedule entry is active."
+            )
+            time: str = _WebModels.Field(
+                description="Time of day at which the scheduled tasks should run."
+            )
+            tasks: t.StrSequence = _WebModels.Field(
+                default_factory=tuple,
+                description="Names of the tasks executed by this schedule entry.",
+            )
+            day: str | None = _WebModels.Field(
+                default=None,
+                description="Optional day of the week this schedule entry applies to; None means every day.",
+            )
 
         class ErrorHandlingConfig(_WebModels.ManagedModel):
             """Error handling settings for scheduled maintenance."""
 
-            max_retries: Annotated[t.NonNegativeInt, _WebModels.Field(default=3)]
-            retry_delay: Annotated[t.NonNegativeInt, _WebModels.Field(default=60)]
-            fail_fast: bool = False
-            notify_on_failure: bool = True
+            max_retries: Annotated[
+                t.NonNegativeInt,
+                _WebModels.Field(
+                    default=3,
+                    description="Maximum number of times a failed scheduled task is retried.",
+                ),
+            ]
+            retry_delay: Annotated[
+                t.NonNegativeInt,
+                _WebModels.Field(
+                    default=60,
+                    description="Delay, in seconds, between retry attempts for a failed scheduled task.",
+                ),
+            ]
+            fail_fast: bool = _WebModels.Field(
+                default=False,
+                description="Whether to stop scheduled maintenance immediately on the first task failure.",
+            )
+            notify_on_failure: bool = _WebModels.Field(
+                default=True,
+                description="Whether to send a notification when a scheduled task fails.",
+            )
 
         class LoggingConfig(_WebModels.ManagedModel):
             """Logging configuration for scheduled maintenance."""
 
-            enabled: bool = True
-            log_file: str
-            max_log_size: str = "10MB"
-            retention_days: Annotated[t.PositiveInt, _WebModels.Field(default=30)]
+            enabled: bool = _WebModels.Field(
+                default=True, description="Whether logging is enabled for scheduled maintenance runs."
+            )
+            log_file: str = _WebModels.Field(
+                description="Filesystem path of the log file written by scheduled maintenance."
+            )
+            max_log_size: str = _WebModels.Field(
+                default="10MB",
+                description="Maximum size the log file may reach before rotation (e.g. '10MB').",
+            )
+            retention_days: Annotated[
+                t.PositiveInt,
+                _WebModels.Field(
+                    default=30,
+                    description="Number of days rotated log files are retained before deletion.",
+                ),
+            ]
 
         class MaintenanceConfig(_WebModels.ManagedModel):
             """Root configuration for scheduled documentation maintenance."""
 
-            enabled: bool = True
-            reports_dir: str
-            backup_dir: str
+            enabled: bool = _WebModels.Field(
+                default=True, description="Whether scheduled documentation maintenance is enabled."
+            )
+            reports_dir: str = _WebModels.Field(
+                description="Directory where maintenance reports are written."
+            )
+            backup_dir: str = _WebModels.Field(
+                description="Directory where backups created during maintenance are stored."
+            )
             schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = (
-                _WebModels.Field(default_factory=dict)
+                _WebModels.Field(
+                    default_factory=dict,
+                    description="Named schedule entries controlling when maintenance tasks run.",
+                )
             )
             tasks: MutableMapping[
                 str, FlextQualityModels.Quality.ScheduleTaskConfig
-            ] = _WebModels.Field(default_factory=dict)
-            error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
-            logging: FlextQualityModels.Quality.LoggingConfig
+            ] = _WebModels.Field(
+                default_factory=dict,
+                description="Named task definitions available to be run by schedule entries.",
+            )
+            error_handling: FlextQualityModels.Quality.ErrorHandlingConfig = _WebModels.Field(
+                description="Error handling policy applied to scheduled maintenance task failures."
+            )
+            logging: FlextQualityModels.Quality.LoggingConfig = _WebModels.Field(
+                description="Logging configuration applied to scheduled maintenance runs."
+            )
 
         class ScheduleResults(_WebModels.ManagedModel):
             """Execution summary for scheduled maintenance runs."""
 
-            start_time: str
-            tasks_completed: int = 0
-            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
-            warnings: MutableSequence[str] = _WebModels.Field(default_factory=list)
-            end_time: str = ""
-            duration_seconds: int = 0
+            start_time: str = _WebModels.Field(
+                description="Timestamp at which the scheduled maintenance run started."
+            )
+            tasks_completed: int = _WebModels.Field(
+                default=0, description="Number of scheduled tasks that completed successfully."
+            )
+            errors: MutableSequence[str] = _WebModels.Field(
+                default_factory=list,
+                description="Error messages produced by failed scheduled tasks.",
+            )
+            warnings: MutableSequence[str] = _WebModels.Field(
+                default_factory=list,
+                description="Warning messages produced during the scheduled maintenance run.",
+            )
+            end_time: str = _WebModels.Field(
+                default="", description="Timestamp at which the scheduled maintenance run ended."
+            )
+            duration_seconds: int = _WebModels.Field(
+                default=0, description="Total duration of the scheduled maintenance run, in seconds."
+            )
 
         class ArgumentOptionSpec(_WebModels.ManagedModel):
             """Typed argparse option spec for quality tooling."""
 
-            flags: t.StrSequence
-            help: str
-            action: c.Quality.ArgumentAction | None = None
-            default: t.JsonValue | None = None
-            value_type: c.Quality.ArgumentValueType | None = None
-            nargs: int | str | None = None
-            choices: t.StrSequence | None = None
-            dest: str | None = None
+            flags: t.StrSequence = _WebModels.Field(
+                description="Command-line flag strings for this option (e.g. '-v', '--verbose')."
+            )
+            help: str = _WebModels.Field(
+                description="Help text describing the option, shown in command-line usage output."
+            )
+            action: c.Quality.ArgumentAction | None = _WebModels.Field(
+                default=None,
+                description="Argparse action to perform when the option is provided (e.g. store_true).",
+            )
+            default: t.JsonValue | None = _WebModels.Field(
+                default=None, description="Default value used for the option when it is not provided."
+            )
+            value_type: c.Quality.ArgumentValueType | None = _WebModels.Field(
+                default=None,
+                description="Type the option's value is converted to (e.g. string, integer, boolean).",
+            )
+            nargs: int | str | None = _WebModels.Field(
+                default=None,
+                description="Number of command-line arguments this option consumes, per argparse nargs semantics.",
+            )
+            choices: t.StrSequence | None = _WebModels.Field(
+                default=None,
+                description="Restricted set of values the option accepts; None means any value is accepted.",
+            )
+            dest: str | None = _WebModels.Field(
+                default=None,
+                description="Name of the attribute the parsed option value is stored under; None derives it from the flags.",
+            )
 
         class ArgumentParserSpec(_WebModels.ManagedModel):
             """Typed parser spec consumed by canonical quality utilities."""
 
-            description: str
-            options: t.SequenceOf[FlextQualityModels.Quality.ArgumentOptionSpec]
+            description: str = _WebModels.Field(
+                description="Human-readable description of the command-line parser's purpose."
+            )
+            options: t.SequenceOf[FlextQualityModels.Quality.ArgumentOptionSpec] = _WebModels.Field(
+                description="Option specifications registered on the command-line parser."
+            )
 
         class AuditRecommendation(_WebModels.ManagedModel):
             """Typed recommendation from documentation audit."""
 
-            priority: str
-            category: str
-            recommendation: str
-            actions: t.StrSequence = _WebModels.Field(default_factory=list)
+            priority: str = _WebModels.Field(
+                description="Priority level of the recommendation (e.g. high, medium, low)."
+            )
+            category: str = _WebModels.Field(
+                description="Category the recommendation belongs to (e.g. content, style, links)."
+            )
+            recommendation: str = _WebModels.Field(
+                description="Human-readable text describing the recommended improvement."
+            )
+            actions: t.StrSequence = _WebModels.Field(
+                default_factory=tuple,
+                description="Concrete action items suggested to address the recommendation.",
+            )
 
         class AuditorResults(_WebModels.ManagedModel):
             """Results for documentation audit execution."""
 
-            timestamp: str
-            files_analyzed: int = 0
+            timestamp: str = _WebModels.Field(
+                description="Timestamp at which the documentation audit was executed."
+            )
+            files_analyzed: int = _WebModels.Field(
+                default=0, description="Number of documentation files the audit analyzed."
+            )
             issues: MutableSequence[
                 MutableMapping[
                     str,
@@ -379,180 +748,356 @@ class FlextQualityModels(_WebModels):
                         | t.SequenceOf[t.StrMapping]
                         | None,
                     ]
-                ]
+                ],
+                description="Raw issue records collected during the audit, keyed by field name.",
             )
-            metrics: FlextQualityModels.Quality.AuditMetrics
+            metrics: FlextQualityModels.Quality.AuditMetrics = _WebModels.Field(
+                description="Aggregate quality metrics computed from the audit's findings."
+            )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
-            ] = _WebModels.Field(default_factory=list)
+            ] = _WebModels.Field(
+                default_factory=list,
+                description="Recommendations generated from the audit's findings.",
+            )
 
         class LinkRecord(_WebModels.ManagedModel):
             """Record of a link found in documentation."""
 
-            text: str
-            url: str
-            type: str
-            file: str
-            line_number: int | None = None
-            reference: str | None = None
-            context: t.JsonMapping | None = None
+            text: str = _WebModels.Field(description="Visible text of the link as it appears in the document.")
+            url: str = _WebModels.Field(description="Target URL or path the link points to.")
+            type: str = _WebModels.Field(description="Kind of link (e.g. external, internal, anchor, image).")
+            file: str = _WebModels.Field(description="Path of the documentation file the link was found in.")
+            line_number: int | None = _WebModels.Field(
+                default=None, description="One-based line number where the link was found."
+            )
+            reference: str | None = _WebModels.Field(
+                default=None, description="Reference label, for reference-style Markdown links."
+            )
+            context: t.JsonMapping | None = _WebModels.Field(
+                default=None, description="Optional structured context data associated with the link."
+            )
 
         class LinkCheckResult(_WebModels.ManagedModel):
             """Result of checking a single link."""
 
-            valid: bool | None = None
-            url: str | None = None
-            file: str | None = None
-            line: int | None = None
-            status_code: int | None = None
-            error: str | None = None
-            type: str | None = None
-            target: str | None = None
-            src: str | None = None
-            text: str | None = None
-            anchor: str | None = None
-            warning: str | None = None
-            context: t.JsonMapping = _WebModels.Field(default_factory=dict)
-            response_time: float | None = None
-            redirected: bool | None = None
-            final_url: str | None = None
-            content_type: str | None = None
+            valid: bool | None = _WebModels.Field(
+                default=None, description="Whether the link was found to be valid; None if not yet checked."
+            )
+            url: str | None = _WebModels.Field(
+                default=None, description="Target URL or path that was checked."
+            )
+            file: str | None = _WebModels.Field(
+                default=None, description="Path of the documentation file the checked link was found in."
+            )
+            line: int | None = _WebModels.Field(
+                default=None, description="One-based line number where the checked link was found."
+            )
+            status_code: int | None = _WebModels.Field(
+                default=None, description="HTTP status code returned when checking an external link."
+            )
+            error: str | None = _WebModels.Field(
+                default=None, description="Error message describing why the link check failed, when applicable."
+            )
+            type: str | None = _WebModels.Field(
+                default=None, description="Kind of link that was checked (e.g. external, internal, anchor, image)."
+            )
+            target: str | None = _WebModels.Field(
+                default=None, description="Resolved target the link points to."
+            )
+            src: str | None = _WebModels.Field(
+                default=None, description="Source attribute value for an image or media link."
+            )
+            text: str | None = _WebModels.Field(
+                default=None, description="Visible text of the checked link."
+            )
+            anchor: str | None = _WebModels.Field(
+                default=None, description="Heading anchor the link references, when applicable."
+            )
+            warning: str | None = _WebModels.Field(
+                default=None, description="Non-fatal warning raised while checking the link."
+            )
+            context: t.JsonMapping = _WebModels.Field(
+                default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+                description="Additional structured context captured while checking the link.",
+            )
+            response_time: float | None = _WebModels.Field(
+                default=None, description="Time taken, in seconds, to receive a response for the link check."
+            )
+            redirected: bool | None = _WebModels.Field(
+                default=None, description="Whether the link check followed one or more HTTP redirects."
+            )
+            final_url: str | None = _WebModels.Field(
+                default=None, description="Final URL reached after following any redirects."
+            )
+            content_type: str | None = _WebModels.Field(
+                default=None, description="Content-Type header value returned by the checked link's response."
+            )
 
         class LinkPerformanceMetrics(_WebModels.ManagedModel):
             """Measured link validation duration."""
 
-            total_time: float = 0.0
-            average_response_time: float = 0.0
-            slowest_response: float = 0.0
+            total_time: float = _WebModels.Field(
+                default=0.0, description="Total time, in seconds, spent validating all links."
+            )
+            average_response_time: float = _WebModels.Field(
+                default=0.0, description="Average response time, in seconds, across all checked links."
+            )
+            slowest_response: float = _WebModels.Field(
+                default=0.0, description="Slowest single response time, in seconds, observed while checking links."
+            )
 
         class ContentIssue(_WebModels.ManagedModel):
             """FlextQualityModels.Quality.Issue found in documentation content."""
 
-            type: str
-            file: str | None = None
-            line: int | None = None
-            content: str | None = None
-            error: str | None = None
-            word_count: int | None = None
-            readability_score: float | None = None
-            warning: str | None = None
+            type: str = _WebModels.Field(description="Identifier of the content issue type.")
+            file: str | None = _WebModels.Field(
+                default=None, description="Path of the documentation file the issue was found in."
+            )
+            line: int | None = _WebModels.Field(
+                default=None, description="One-based line number where the issue was found."
+            )
+            content: str | None = _WebModels.Field(
+                default=None, description="Text content associated with the issue."
+            )
+            error: str | None = _WebModels.Field(
+                default=None, description="Error message describing the issue, when applicable."
+            )
+            word_count: int | None = _WebModels.Field(
+                default=None, description="Word count measured for the content associated with the issue."
+            )
+            readability_score: float | None = _WebModels.Field(
+                default=None, description="Readability score measured for the content associated with the issue."
+            )
+            warning: str | None = _WebModels.Field(
+                default=None, description="Non-fatal warning message associated with the issue."
+            )
 
         class LinkValidatorResults(_WebModels.ManagedModel):
             """Results for documentation link validation."""
 
-            timestamp: str
-            links_checked: int = 0
-            valid_links: int = 0
-            broken_links: int = 0
-            warnings: int = 0
+            timestamp: str = _WebModels.Field(
+                description="Timestamp at which the link validation run was executed."
+            )
+            links_checked: int = _WebModels.Field(
+                default=0, description="Total number of links checked during the run."
+            )
+            valid_links: int = _WebModels.Field(
+                default=0, description="Number of links found to be valid."
+            )
+            broken_links: int = _WebModels.Field(
+                default=0, description="Number of links found to be broken."
+            )
+            warnings: int = _WebModels.Field(
+                default=0, description="Number of non-fatal warnings raised during the run."
+            )
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = (
-                _WebModels.Field(default_factory=list)
+                _WebModels.Field(
+                    default_factory=list,
+                    description="Detailed results for links that failed validation.",
+                )
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
-            ] = _WebModels.Field(default_factory=list)
-            performance: FlextQualityModels.Quality.LinkPerformanceMetrics
+            ] = _WebModels.Field(
+                default_factory=list,
+                description="Detailed results for links that produced a non-fatal warning.",
+            )
+            performance: FlextQualityModels.Quality.LinkPerformanceMetrics = _WebModels.Field(
+                description="Measured timing performance of the link validation run."
+            )
 
         class ContentValidatorResults(_WebModels.ManagedModel):
             """Results for documentation content validation."""
 
-            timestamp: str
-            files_checked: int = 0
+            timestamp: str = _WebModels.Field(
+                description="Timestamp at which the content validation run was executed."
+            )
+            files_checked: int = _WebModels.Field(
+                default=0, description="Number of documentation files checked during the run."
+            )
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
-                _WebModels.Field(default_factory=list)
+                _WebModels.Field(
+                    default_factory=list,
+                    description="Content issues found across all checked files.",
+                )
             )
             quality_metrics: t.MutableScalarMapping = _WebModels.Field(
-                default_factory=dict
+                default_factory=dict,
+                description="Aggregate scalar quality metrics computed from the checked content.",
             )
 
         class ContentMetrics(_WebModels.ManagedModel):
             """Content quality metrics for a documentation file."""
 
-            word_count: int = 0
-            sentence_count: int = 0
-            avg_words_per_sentence: float = 0.0
-            readability_score: float = 0.0
-            has_code_blocks: bool = False
-            has_lists: bool = False
-            has_headers: bool = False
+            word_count: int = _WebModels.Field(
+                default=0, description="Number of words in the document."
+            )
+            sentence_count: int = _WebModels.Field(
+                default=0, description="Number of sentences in the document."
+            )
+            avg_words_per_sentence: float = _WebModels.Field(
+                default=0.0, description="Average number of words per sentence in the document."
+            )
+            readability_score: float = _WebModels.Field(
+                default=0.0, description="Computed readability score for the document."
+            )
+            has_code_blocks: bool = _WebModels.Field(
+                default=False, description="Whether the document contains one or more code blocks."
+            )
+            has_lists: bool = _WebModels.Field(
+                default=False, description="Whether the document contains one or more lists."
+            )
+            has_headers: bool = _WebModels.Field(
+                default=False, description="Whether the document contains one or more headings."
+            )
 
         class ChannelConfig(_WebModels.ManagedModel):
             """Notification channel toggle configuration."""
 
-            enabled: bool = True
+            enabled: bool = _WebModels.Field(
+                default=True, description="Whether this notification channel is active."
+            )
 
         class NotifierResults(_WebModels.ManagedModel):
             """Results for documentation notification runs."""
 
-            notifications_sent: int = 0
-            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
-            timestamp: str
+            notifications_sent: int = _WebModels.Field(
+                default=0, description="Number of notifications successfully sent."
+            )
+            errors: MutableSequence[str] = _WebModels.Field(
+                default_factory=list,
+                description="Error messages produced while sending notifications.",
+            )
+            timestamp: str = _WebModels.Field(
+                description="Timestamp at which the notification run was executed."
+            )
 
         class AuditRulesConfig(_WebModels.FlexibleInternalModel):
             """Configuration for audit rules and thresholds."""
 
-            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig
+            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = _WebModels.Field(
+                description="Threshold limits applied when auditing documentation quality."
+            )
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig = _WebModels.Field(
+                description="Toggles controlling which content checks are performed during the audit."
+            )
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = _WebModels.Field(
+                description="Mapping of issue type identifiers to severity level categorization."
+            )
 
         class StyleGuideConfig(_WebModels.FlexibleInternalModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig
-            formatting: FlextQualityModels.Quality.FormattingConfig
-            headings: FlextQualityModels.Quality.HeadingsConfig
-            code: FlextQualityModels.Quality.CodeStyleConfig
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = _WebModels.Field(
+                description="Preferred Markdown style conventions."
+            )
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig = _WebModels.Field(
+                description="Accessibility requirements applied by the style guide."
+            )
+            formatting: FlextQualityModels.Quality.FormattingConfig = _WebModels.Field(
+                description="Formatting standards applied by the style guide."
+            )
+            headings: FlextQualityModels.Quality.HeadingsConfig = _WebModels.Field(
+                description="Heading hierarchy policy applied by the style guide."
+            )
+            code: FlextQualityModels.Quality.CodeStyleConfig = _WebModels.Field(
+                description="Code block style policy applied by the style guide."
+            )
 
         class ValidationConfig(_WebModels.FlexibleInternalModel):
             """Configuration for validation settings."""
 
-            validation: FlextQualityModels.Quality.ValidationRunConfig
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig
-            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig
+            validation: FlextQualityModels.Quality.ValidationRunConfig = _WebModels.Field(
+                description="Execution limits applied to validation runs."
+            )
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig = _WebModels.Field(
+                description="Settings controlling how links are validated."
+            )
+            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = _WebModels.Field(
+                description="Settings controlling how document content is analyzed."
+            )
 
         class OptimizerResults(_WebModels.ManagedModel):
             """Results of a documentation optimization run."""
 
-            timestamp: str
-            files_processed: int = 0
-            changes_made: int = 0
+            timestamp: str = _WebModels.Field(
+                description="Timestamp at which the documentation optimization run was executed."
+            )
+            files_processed: int = _WebModels.Field(
+                default=0, description="Number of documentation files processed during the run."
+            )
+            changes_made: int = _WebModels.Field(
+                default=0, description="Number of changes applied to documentation files during the run."
+            )
             backups_created: MutableSequence[str] = _WebModels.Field(
-                default_factory=list
+                default_factory=list,
+                description="Paths of backup files created before modifying documentation.",
             )
             optimizations: MutableSequence[t.MutableStrMapping] = _WebModels.Field(
-                default_factory=list[t.MutableStrMapping]
+                default_factory=list[t.MutableStrMapping],
+                description="Records describing each optimization applied during the run.",
             )
 
         class ExecutionRequest(_WebModels.ManagedModel):
             """Request payload for a deferred command execution."""
 
-            script_path: Path
-            runtime: str
-            args: t.StrSequence = _WebModels.Field(default_factory=list)
-            timeout_ms: int
+            script_path: Path = _WebModels.Field(
+                description="Filesystem path of the script to execute."
+            )
+            runtime: str = _WebModels.Field(
+                description="Runtime used to execute the script (e.g. python, typescript, ruff, basedpyright)."
+            )
+            args: t.StrSequence = _WebModels.Field(
+                default_factory=tuple,
+                description="Command-line arguments passed to the script.",
+            )
+            timeout_ms: int = _WebModels.Field(
+                description="Maximum time, in milliseconds, the execution may run before being terminated."
+            )
 
         class ExecutionResult(_WebModels.ManagedModel):
             """Structured result payload from a command execution."""
 
-            success: bool
-            exit_code: int
-            stdout: str = ""
-            stderr: str = ""
+            success: bool = _WebModels.Field(
+                description="Whether the executed command completed successfully."
+            )
+            exit_code: int = _WebModels.Field(
+                description="Process exit code returned by the executed command."
+            )
+            stdout: str = _WebModels.Field(
+                default="", description="Standard output captured from the executed command."
+            )
+            stderr: str = _WebModels.Field(
+                default="", description="Standard error output captured from the executed command."
+            )
 
         class McpToolCall(_WebModels.ManagedModel):
             """MCP tool invocation request contract."""
 
-            server: str
-            tool: str
-            params: t.JsonMapping = _WebModels.Field(default_factory=dict)
+            server: str = _WebModels.Field(
+                description="Identifier of the MCP server hosting the tool to invoke."
+            )
+            tool: str = _WebModels.Field(
+                description="Name of the MCP tool to invoke on the server."
+            )
+            params: t.JsonMapping = _WebModels.Field(
+                default_factory=lambda: MappingProxyType[str, t.JsonValue]({}),
+                description="Parameters passed to the invoked MCP tool.",
+            )
 
         class McpToolResult(_WebModels.ManagedModel):
             """MCP tool invocation response contract."""
 
-            success: bool
-            data: t.StrMapping | None = None
-            error: str | None = None
+            success: bool = _WebModels.Field(
+                description="Whether the MCP tool invocation completed successfully."
+            )
+            data: t.StrMapping | None = _WebModels.Field(
+                default=None, description="Data payload returned by the MCP tool invocation."
+            )
+            error: str | None = _WebModels.Field(
+                default=None, description="Error message returned by the MCP tool invocation, when applicable."
+            )
 
 
 m = FlextQualityModels

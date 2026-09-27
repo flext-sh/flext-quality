@@ -294,7 +294,7 @@ class FlextQualityDocumentationAuditor:
                     "issues": accessibility_issues,
                     "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
                 })
-            if accessibility_cfg.heading_structure:
+            if accessibility_cfg.proper_heading_hierarchy:
                 heading_issues = self._check_heading_hierarchy(content)
                 if heading_issues:
                     self.results.issues.append({
@@ -350,7 +350,7 @@ class FlextQualityDocumentationAuditor:
                     }
                     for img in images_without_alt
                 ])
-        if accessibility_cfg.descriptive_links:
+        if accessibility_cfg.descriptive_link_text:
             generic_links = u.Quality.compile_pattern(
                 r"\\[here|click here|link|read more\\]\\([^)]+\\)", ignorecase=True
             ).findall(content)
