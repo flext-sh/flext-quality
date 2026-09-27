@@ -17,8 +17,7 @@ from enum import StrEnum, auto, unique
 from types import MappingProxyType
 from typing import TYPE_CHECKING, ClassVar, Final
 
-from flext_infra import FlextInfraConstants, c
-from flext_web import FlextWebConstants
+from flext_web import FlextWebConstants, c
 
 from ._constants.values import FlextQualityConstantsValues
 
@@ -26,7 +25,7 @@ if TYPE_CHECKING:
     from flext_quality import t
 
 
-class FlextQualityConstants(FlextInfraConstants, FlextWebConstants):
+class FlextQualityConstants(FlextWebConstants):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,
