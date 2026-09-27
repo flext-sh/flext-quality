@@ -101,13 +101,20 @@ class FlextQualityModels(_WebModels):
             """Documentation heading hierarchy policy."""
 
             enforce_hierarchy: bool
+            max_heading_level: int
             require_space_after_hash: bool
+            allow_closing_hashes: bool
             first_heading_level: int
+            toc_heading_level: int
 
         class CodeStyleConfig(_WebModels.ManagedModel):
             """Documentation code block policy."""
 
             require_language_specifier: bool
+            preferred_languages: t.StrSequence
+            inline_code_style: str
+            consistent_fencing: bool
+            fence_style: str
 
         class StyleIssue(_WebModels.ManagedModel):
             """A documentation style violation."""
@@ -145,6 +152,18 @@ class FlextQualityModels(_WebModels):
             suggestions: MutableSequence[str]
             summary: FlextQualityModels.Quality.StyleSummaryMetrics
 
+        class GithubLinkConfig(_WebModels.ManagedModel):
+            """GitHub link checks declared in validation YAML."""
+
+            validate_existence: bool
+            check_rate_limits: bool
+
+        class DocumentationLinkConfig(_WebModels.ManagedModel):
+            """Documentation link checks declared in validation YAML."""
+
+            validate_structure: bool
+            check_anchors: bool
+
         class LinkValidationConfig(_WebModels.ManagedModel):
             """Configuration for link validation settings."""
 
@@ -160,15 +179,25 @@ class FlextQualityModels(_WebModels):
             expected_content_types: t.StrSequence
             allowed_domains: t.StrSequence
             blocked_domains: t.StrSequence
+            github_links: FlextQualityModels.Quality.GithubLinkConfig
+            documentation_links: FlextQualityModels.Quality.DocumentationLinkConfig
 
         class ValidationRunConfig(_WebModels.ManagedModel):
             """Execution limits for validation operations."""
 
+            enabled: bool
+            fail_on_errors: bool
+            verbose_output: bool
+            save_results: bool
             max_concurrent_requests: t.PositiveInt
+            request_timeout: t.PositiveInt
+            requests_per_second: t.PositiveInt
+            burst_limit: t.PositiveInt
 
         class ContentAnalysisConfig(_WebModels.ManagedModel):
             """Configuration for content analysis parameters."""
 
+            check_structure: bool
             min_section_depth: int
             required_sections: t.StrSequence
             min_word_count: int
