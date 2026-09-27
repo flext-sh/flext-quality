@@ -13,8 +13,6 @@ validation:
   # Performance settings
   max_concurrent_requests: 5
   request_timeout: 10
-  retry_attempts: 3
-  retry_delay: 1
 
   # Rate limiting
   requests_per_second: 10

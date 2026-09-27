@@ -557,38 +557,13 @@ repos:
 
 ## ⚙️ Configuration
 
-### Audit Rules (`settings/audit_rules.yaml`)
+### Audit and style configuration
 
-```yaml
-quality_thresholds:
-  max_age_days: 90
-  min_word_count: 100
-  max_broken_links: 0
-
-style_rules:
-  heading_hierarchy: true
-  list_consistency: true
-  code_block_formatting: true
-
-validation_rules:
-  external_link_timeout: 10
-  retry_attempts: 3
-  check_images: true
-```
-
-### Style Guide (`settings/style_guide.yaml`)
-
-```yaml
-markdown:
-  heading_style: "atx" # # ## ### or setext
-  list_style: "dash" # dash, asterisk, or plus
-  emphasis_style: "*" # * or _
-
-accessibility:
-  require_alt_text: true
-  descriptive_links: true
-  heading_structure: true
-```
+`src/flext_quality/docs/config/audit_rules.yaml`, `style_guide.yaml`, and
+`validation_config.yaml` own the documentation rules. The public
+`FlextQualityConfigManager` validates them into the `m.Quality` models. A missing or
+invalid file fails at the reader; there are no model defaults or alternate values in
+the auditor.
 
 ## 🔧 Maintenance Scripts
 
@@ -783,12 +758,10 @@ python -c "import yaml; yaml.safe_load(open('docs/maintenance/settings/audit_rul
 
 **Link Validation Timeout**
 
-```yaml
-# Update timeout in settings/validation_config.yaml
-validation:
-  link_timeout: 30 # Increase from default 10 seconds
-  retry_attempts: 5 # Increase retry attempts
-```
+Set `link_validation.timeout` in `src/flext_quality/docs/config/validation_config.yaml`.
+The link checker uses the validated value for both synchronous and asynchronous calls.
+Transport failures propagate; there is no retry or automatic fallback to another
+transport.
 
 **Style Validation Errors**
 
