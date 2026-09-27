@@ -113,6 +113,11 @@ class FlextQualityModels(_WebModels):
             allowed_domains: t.StrSequence
             blocked_domains: t.StrSequence
 
+        class ValidationRunConfig(_WebModels.ManagedModel):
+            """Execution limits for validation operations."""
+
+            max_concurrent_requests: t.PositiveInt
+
         class ContentAnalysisConfig(_WebModels.ManagedModel):
             """Configuration for content analysis parameters."""
 
@@ -170,23 +175,6 @@ class FlextQualityModels(_WebModels):
                 _WebModels.Field(default=None),
             ]
 
-            def to_dict(
-                self,
-            ) -> t.MappingKV[
-                str, str | int | t.MappingKV[str, t.Primitives | None] | None
-            ]:
-                """Convert issue to dictionary representation."""
-                context: t.MutableMappingKV[str, t.Primitives | None] = {}
-                return {
-                    "type": self.type,
-                    "severity": self.severity,
-                    "file": self.file,
-                    "line": self.line,
-                    "description": self.description,
-                    "recommendation": self.recommendation,
-                    "context": self.context if self.context is not None else context,
-                }
-
         class ValidationResult(_WebModels.ManagedModel):
             """Canonical validation result for documentation tooling."""
 
@@ -201,21 +189,6 @@ class FlextQualityModels(_WebModels):
             metadata: MutableMapping[str, t.Primitives] = _WebModels.Field(
                 default_factory=dict
             )
-
-            @property
-            def success_rate(self) -> float:
-                """Success rate as a percentage."""
-                if self.total_items == 0:
-                    return 100.0
-                return (self.valid_items / self.total_items) * 100.0
-
-            def add_issue(self, issue: FlextQualityModels.Quality.Issue) -> None:
-                """Add an issue to the validation result."""
-                self.issues.append(issue)
-                if issue.severity == "critical":
-                    self.invalid_items += 1
-                else:
-                    self.valid_items += 1
 
         class FileMetadata(_WebModels.ManagedModel):
             """Metadata about a documentation file."""
@@ -346,6 +319,8 @@ class FlextQualityModels(_WebModels):
             type: str
             file: str
             line_number: int | None = None
+            reference: str | None = None
+            context: t.JsonMapping | None = None
 
         class LinkCheckResult(_WebModels.ManagedModel):
             """Result of checking a single link."""
@@ -362,6 +337,18 @@ class FlextQualityModels(_WebModels):
             text: str | None = None
             anchor: str | None = None
             warning: str | None = None
+            context: t.JsonMapping = _WebModels.Field(default_factory=dict)
+            response_time: float | None = None
+            redirected: bool | None = None
+            final_url: str | None = None
+            content_type: str | None = None
+
+        class LinkPerformanceMetrics(_WebModels.ManagedModel):
+            """Measured link validation duration."""
+
+            total_time: float = 0.0
+            average_response_time: float = 0.0
+            slowest_response: float = 0.0
 
         class ContentIssue(_WebModels.ManagedModel):
             """FlextQualityModels.Quality.Issue found in documentation content."""
@@ -389,6 +376,9 @@ class FlextQualityModels(_WebModels):
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
             ] = _WebModels.Field(default_factory=list)
+            performance: FlextQualityModels.Quality.LinkPerformanceMetrics = (
+                _WebModels.Field(default_factory=LinkPerformanceMetrics)
+            )
 
         class ContentValidatorResults(_WebModels.ManagedModel):
             """Results for documentation content validation."""
@@ -442,6 +432,7 @@ class FlextQualityModels(_WebModels):
         class ValidationConfig(_WebModels.FlexibleInternalModel):
             """Configuration for validation settings."""
 
+            validation: FlextQualityModels.Quality.ValidationRunConfig
             link_validation: FlextQualityModels.Quality.LinkValidationConfig
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig
 

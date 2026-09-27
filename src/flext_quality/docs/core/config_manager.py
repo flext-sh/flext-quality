@@ -9,144 +9,49 @@ from __future__ import annotations
 from collections.abc import MutableMapping
 from pathlib import Path
 
-from flext_quality import FlextQualityModels, c, m, t, u
+from flext_quality import m, t, u
 
 
 class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
-
-    class AuditRules(FlextQualityModels.Quality.AuditRulesConfig):
-        """Configuration for audit rules and thresholds."""
-
-        link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
-        )
-        style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
-        )
-        accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
-        )
-
-        def get_threshold(
-            self, key: str, *, default: t.Primitives | None = None
-        ) -> t.Primitives | None:
-            """Get a quality threshold value."""
-            threshold = getattr(self.quality_thresholds, key, default)
-            return threshold if isinstance(threshold, t.PRIMITIVES_TYPES) else default
-
-        def is_check_enabled(self, check_type: str, check_name: str) -> bool:
-            """Check if a specific audit check is enabled."""
-            check_value = False
-            match check_type:
-                case "content":
-                    check_value = bool(getattr(self.content_checks, check_name, False))
-                case "link":
-                    check_value = bool(self.link_checks.get(check_name, False))
-                case "style":
-                    check_value = bool(self.style_checks.get(check_name, False))
-                case "accessibility":
-                    check_value = bool(self.accessibility_checks.get(check_name, False))
-                case _:
-                    pass
-            return check_value
-
-    class StyleGuide(FlextQualityModels.Quality.StyleGuideConfig):
-        """Configuration for style and formatting guidelines."""
-
-        def get_markdown_rule(
-            self, rule: str, *, default: t.Primitives | None = None
-        ) -> t.Primitives | None:
-            """Get a markdown formatting rule."""
-            value = getattr(self.markdown, rule, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
-
-        def get_accessibility_rule(
-            self, rule: str, *, default: t.Primitives | None = None
-        ) -> t.Primitives | None:
-            """Get an accessibility rule."""
-            value = getattr(self.accessibility, rule, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
-
-    class ValidationSettings(FlextQualityModels.Quality.ValidationConfig):
-        """Configuration for validation operations."""
-
-        content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
-        )
-        image_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
-        )
-        accessibility_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
-        )
-        security_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
-        )
-        performance_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
-        )
-
-        def get_link_setting(
-            self, setting: str, *, default: t.Primitives | None = None
-        ) -> t.Primitives | None:
-            """Get a link validation setting."""
-            value = getattr(self.link_validation, setting, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
-
-        def get_content_setting(
-            self, setting: str, *, default: t.Primitives | None = None
-        ) -> t.Primitives | None:
-            """Get a content validation setting."""
-            value = self.content_validation.get(setting, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the configuration manager.
 
         Args:
             config_dir: Directory containing configuration files. If None,
-                       uses the default settings directory.
+                       uses the package's declared config directory.
 
         """
         if config_dir is None:
-            # Find settings directory relative to this file
             self.config_dir = Path(__file__).parent.parent / "config"
         else:
             self.config_dir = Path(config_dir)
 
         self._cache: MutableMapping[str, t.JsonMapping] = {}
-        self._audit_rules: FlextQualityConfigManager.AuditRules | None = None
-        self._style_guide: FlextQualityConfigManager.StyleGuide | None = None
-        self._validation_config: FlextQualityConfigManager.ValidationSettings | None = (
-            None
-        )
+        self._audit_rules: m.Quality.AuditRulesConfig | None = None
+        self._style_guide: m.Quality.StyleGuideConfig | None = None
+        self._validation_config: m.Quality.ValidationConfig | None = None
 
-    def get_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
+    def get_audit_rules(self) -> m.Quality.AuditRulesConfig:
         """Get audit rules configuration."""
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
-            self._audit_rules = FlextQualityConfigManager.AuditRules.model_validate(
-                data
-            )
+            self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
         return self._audit_rules
 
-    def get_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
+    def get_style_guide(self) -> m.Quality.StyleGuideConfig:
         """Get style guide configuration."""
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
-            self._style_guide = FlextQualityConfigManager.StyleGuide.model_validate(
-                data
-            )
+            self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
         return self._style_guide
 
-    def get_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
+    def get_validation_config(self) -> m.Quality.ValidationConfig:
         """Get validation configuration."""
         if self._validation_config is None:
             data = self._load_config_file("validation_config.yaml")
-            self._validation_config = (
-                FlextQualityConfigManager.ValidationSettings.model_validate(data)
-            )
+            self._validation_config = m.Quality.ValidationConfig.model_validate(data)
         return self._validation_config
 
     def get_config(self, name: str) -> t.JsonMapping:
@@ -168,48 +73,11 @@ class FlextQualityConfigManager:
         self._validation_config = None
 
     def validate_configs(self) -> t.StrSequence:
-        """Validate all configuration files and return any issues."""
-        # Check required settings files exist
-        required_files = [
-            "audit_rules.yaml",
-            "style_guide.yaml",
-            "validation_config.yaml",
-        ]
-        issues = [
-            f"Missing required settings file: {filename}"
-            for filename in required_files
-            if not (self.config_dir / filename).exists()
-        ]
-
-        validations = (
-            (
-                self.get_audit_rules,
-                "quality_thresholds",
-                "Audit rules missing quality_thresholds section",
-                "audit_rules.yaml",
-            ),
-            (
-                self.get_style_guide,
-                "markdown",
-                "Style guide missing markdown section",
-                "style_guide.yaml",
-            ),
-            (
-                self.get_validation_config,
-                "link_validation",
-                "Validation settings missing link_validation section",
-                "validation_config.yaml",
-            ),
-        )
-        for getter, required_attr, missing_message, filename in validations:
-            try:
-                config = getter()
-                if not getattr(config, required_attr):
-                    issues.append(missing_message)
-            except c.EXC_FS_KEY_VALUE as exc:
-                issues.append(f"Invalid {filename}: {exc}")
-
-        return issues
+        """Validate declared configuration and propagate the first failure."""
+        self.get_audit_rules()
+        self.get_style_guide()
+        self.get_validation_config()
+        return []
 
     def get_all_configs(self) -> t.JsonMapping:
         """Get all configurations as a single dictionary."""
