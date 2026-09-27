@@ -416,13 +416,10 @@ class FlextQualityStyleValidator:
         """Generate style validation report."""
         if output_format == "summary":
             return self._generate_summary_report()
-        adapter = m.TypeAdapter(m.Quality.StyleValidationResults)
-        report_text: str = (
-            adapter.dump_json(self.results, indent=2).decode()
-            if output_format == "json"
-            else adapter.dump_json(self.results).decode()
-        )
-        return report_text
+        if output_format == "json":
+            return self.results.model_dump_json(indent=2)
+        msg = f"Unsupported report format: {output_format}"
+        raise ValueError(msg)
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""
