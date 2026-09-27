@@ -15,45 +15,116 @@ from collections.abc import MutableMapping, MutableSequence
 from pathlib import Path
 from typing import Annotated
 
-from flext_infra import (
-    FlextInfraModels as _InfraModels,
-    FlextInfraUtilities as _InfraUtilities,
-)
 from flext_web import FlextWebModels as _WebModels
 
 from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
-from flext_quality._model_defaults import FlextQualityModelDefaults
 
 
-class FlextQualityModels(_InfraModels, _WebModels):
+class FlextQualityModels(_WebModels):
     """Namespace for flext-quality models."""
 
     class Quality:
         """Quality-specific models namespace."""
 
-        AuditMetrics = FlextQualityModelDefaults.AuditMetrics
-        QualityThresholdsConfig = FlextQualityModelDefaults.QualityThresholdsConfig
-        ContentChecksConfig = FlextQualityModelDefaults.ContentChecksConfig
-        SeverityLevelsConfig = FlextQualityModelDefaults.SeverityLevelsConfig
-        MarkdownStyleConfig = FlextQualityModelDefaults.MarkdownStyleConfig
-        AccessibilityConfig = FlextQualityModelDefaults.AccessibilityConfig
-        FormattingConfig = FlextQualityModelDefaults.FormattingConfig
-        LinkValidationConfig = FlextQualityModelDefaults.LinkValidationConfig
-        ContentAnalysisConfig = FlextQualityModelDefaults.ContentAnalysisConfig
+        class AuditMetrics(_WebModels.ManagedModel):
+            """Typed metrics for documentation audit results."""
 
-        @staticmethod
-        def _empty_list_str() -> MutableSequence[str]:
-            return []
+            total_issues: int = 0
+            severity_breakdown: t.MutableIntMapping = _WebModels.Field(default_factory=dict)
+            quality_score: int = 0
+            files_analyzed: int = 0
+            issues_per_file: float = 0.0
 
-        @staticmethod
-        def _empty_dict_str_str() -> t.StrMapping:
-            return dict[str, str]()
+        class QualityThresholdsConfig(_WebModels.ManagedModel):
+            """Configuration for quality threshold limits."""
 
-        @staticmethod
-        def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:
-            return []
+            max_age_days: int
+            min_word_count: int
+            max_broken_links: int
+            min_completeness_score: float
+            max_file_size_mb: int
 
-        class RuleDefinition(_InfraModels.BaseModel):
+        class ContentChecksConfig(_WebModels.ManagedModel):
+            """Configuration for content validation checks."""
+
+            check_freshness: bool
+            check_completeness: bool
+            check_consistency: bool
+            check_links: bool
+            check_structure: bool
+            check_accessibility: bool
+
+        class SeverityLevelsConfig(_WebModels.ManagedModel):
+            """Configuration for severity level categorization."""
+
+            critical: t.StrSequence
+            high: t.StrSequence
+            medium: t.StrSequence
+            low: t.StrSequence
+
+        class MarkdownStyleConfig(_WebModels.ManagedModel):
+            """Configuration for Markdown style preferences."""
+
+            heading_style: str
+            list_style: str
+            emphasis_style: str
+            code_block_style: str
+            link_style: str
+
+        class AccessibilityConfig(_WebModels.ManagedModel):
+            """Configuration for accessibility requirements."""
+
+            require_alt_text: bool
+            descriptive_link_text: bool
+            proper_heading_hierarchy: bool
+            min_alt_text_length: int
+            max_alt_text_length: int
+            check_color_contrast: bool
+            minimum_contrast_ratio: float
+
+        class FormattingConfig(_WebModels.ManagedModel):
+            """Configuration for formatting standards."""
+
+            max_line_length: int
+            soft_line_limit: int
+            consistent_indentation: bool
+            trailing_spaces: bool
+            trailing_newlines: bool
+            indentation_type: str
+            indentation_size: int
+            blank_lines_before_headings: bool
+            blank_lines_after_headings: bool
+            blank_lines_around_lists: bool
+            blank_lines_around_code_blocks: bool
+
+        class LinkValidationConfig(_WebModels.ManagedModel):
+            """Configuration for link validation settings."""
+
+            timeout: int
+            user_agent: str
+            check_external: bool
+            check_internal: bool
+            check_images: bool
+            follow_redirects: bool
+            max_redirects: int
+            acceptable_status_codes: t.SequenceOf[int]
+            validate_content_type: bool
+            expected_content_types: t.StrSequence
+            allowed_domains: t.StrSequence
+            blocked_domains: t.StrSequence
+
+        class ContentAnalysisConfig(_WebModels.ManagedModel):
+            """Configuration for content analysis parameters."""
+
+            min_section_depth: int
+            required_sections: t.StrSequence
+            min_word_count: int
+            check_readability: bool
+            readability_target_score: int
+            check_todos: bool
+            check_fixmes: bool
+
+        class RuleDefinition(_WebModels.ManagedModel):
             """A rule definition from YAML."""
 
             name: str
@@ -63,40 +134,40 @@ class FlextQualityModels(_InfraModels, _WebModels):
             action: str
             enabled: bool = True
 
-        class Issue(_InfraModels.BaseModel):
+        class Issue(_WebModels.ManagedModel):
             """Canonical issue model for documentation tooling."""
 
             type: Annotated[
                 str,
-                _InfraUtilities.Field(
+                _WebModels.Field(
                     description="FlextQualityModels.Quality.Issue type identifier"
                 ),
             ]
             severity: Annotated[
-                str, _InfraUtilities.Field(description="Severity level identifier")
+                str, _WebModels.Field(description="Severity level identifier")
             ]
             file: Annotated[
                 str,
-                _InfraUtilities.Field(description="File path where issue was found"),
+                _WebModels.Field(description="File path where issue was found"),
             ]
             line: Annotated[
                 int | None,
-                _InfraUtilities.Field(
+                _WebModels.Field(
                     description="FlextQualityModels.Quality.Issue line number"
                 ),
             ] = None
             description: Annotated[
                 str,
-                _InfraUtilities.Field(
+                _WebModels.Field(
                     description="FlextQualityModels.Quality.Issue description"
                 ),
             ] = ""
             recommendation: Annotated[
-                str, _InfraUtilities.Field(description="Recommended fix")
+                str, _WebModels.Field(description="Recommended fix")
             ] = ""
             context: Annotated[
                 t.MappingKV[str, t.Primitives | None] | None,
-                _InfraUtilities.Field(default=None),
+                _WebModels.Field(default=None),
             ]
 
             def to_dict(
@@ -116,18 +187,18 @@ class FlextQualityModels(_InfraModels, _WebModels):
                     "context": self.context if self.context is not None else context,
                 }
 
-        class ValidationResult(_InfraModels.BaseModel):
+        class ValidationResult(_WebModels.ManagedModel):
             """Canonical validation result for documentation tooling."""
 
             total_items: int = 0
             valid_items: int = 0
             invalid_items: int = 0
             issues: MutableSequence[FlextQualityModels.Quality.Issue] = (
-                _InfraUtilities.Field(default_factory=list)
+                _WebModels.Field(default_factory=list)
             )
-            warnings: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
-            errors: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
-            metadata: MutableMapping[str, t.Primitives] = _InfraUtilities.Field(
+            warnings: MutableSequence[str] = _WebModels.Field(default_factory=list)
+            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
+            metadata: MutableMapping[str, t.Primitives] = _WebModels.Field(
                 default_factory=dict
             )
 
@@ -146,7 +217,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
                 else:
                     self.valid_items += 1
 
-        class FileMetadata(_InfraModels.BaseModel):
+        class FileMetadata(_WebModels.ManagedModel):
             """Metadata about a documentation file."""
 
             path: str
@@ -157,63 +228,63 @@ class FlextQualityModels(_InfraModels, _WebModels):
             lines: int = 0
             words: int = 0
 
-        class ScheduleTaskConfig(_InfraModels.BaseModel):
+        class ScheduleTaskConfig(_WebModels.ManagedModel):
             """Task configuration for scheduled documentation maintenance."""
 
             description: str
             command: str
-            timeout: Annotated[t.PositiveInt, _InfraUtilities.Field(default=300)]
+            timeout: Annotated[t.PositiveInt, _WebModels.Field(default=300)]
 
-        class ScheduleEntry(_InfraModels.BaseModel):
+        class ScheduleEntry(_WebModels.ManagedModel):
             """Single schedule entry definition."""
 
             enabled: bool = True
             time: str
-            tasks: t.StrSequence = _InfraUtilities.Field(default_factory=list)
+            tasks: t.StrSequence = _WebModels.Field(default_factory=list)
             day: str | None = None
 
-        class ErrorHandlingConfig(_InfraModels.BaseModel):
+        class ErrorHandlingConfig(_WebModels.ManagedModel):
             """Error handling settings for scheduled maintenance."""
 
-            max_retries: Annotated[t.NonNegativeInt, _InfraUtilities.Field(default=3)]
-            retry_delay: Annotated[t.NonNegativeInt, _InfraUtilities.Field(default=60)]
+            max_retries: Annotated[t.NonNegativeInt, _WebModels.Field(default=3)]
+            retry_delay: Annotated[t.NonNegativeInt, _WebModels.Field(default=60)]
             fail_fast: bool = False
             notify_on_failure: bool = True
 
-        class LoggingConfig(_InfraModels.BaseModel):
+        class LoggingConfig(_WebModels.ManagedModel):
             """Logging configuration for scheduled maintenance."""
 
             enabled: bool = True
             log_file: str
             max_log_size: str = "10MB"
-            retention_days: Annotated[t.PositiveInt, _InfraUtilities.Field(default=30)]
+            retention_days: Annotated[t.PositiveInt, _WebModels.Field(default=30)]
 
-        class MaintenanceConfig(_InfraModels.BaseModel):
+        class MaintenanceConfig(_WebModels.ManagedModel):
             """Root configuration for scheduled documentation maintenance."""
 
             enabled: bool = True
             reports_dir: str
             backup_dir: str
             schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = (
-                _InfraUtilities.Field(default_factory=dict)
+                _WebModels.Field(default_factory=dict)
             )
             tasks: MutableMapping[
                 str, FlextQualityModels.Quality.ScheduleTaskConfig
-            ] = _InfraUtilities.Field(default_factory=dict)
+            ] = _WebModels.Field(default_factory=dict)
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
             logging: FlextQualityModels.Quality.LoggingConfig
 
-        class ScheduleResults(_InfraModels.BaseModel):
+        class ScheduleResults(_WebModels.ManagedModel):
             """Execution summary for scheduled maintenance runs."""
 
             start_time: str
             tasks_completed: int = 0
-            errors: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
-            warnings: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
+            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
+            warnings: MutableSequence[str] = _WebModels.Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
 
-        class ArgumentOptionSpec(_InfraModels.BaseModel):
+        class ArgumentOptionSpec(_WebModels.ManagedModel):
             """Typed argparse option spec for quality tooling."""
 
             flags: t.StrSequence
@@ -225,21 +296,21 @@ class FlextQualityModels(_InfraModels, _WebModels):
             choices: t.StrSequence | None = None
             dest: str | None = None
 
-        class ArgumentParserSpec(_InfraModels.BaseModel):
+        class ArgumentParserSpec(_WebModels.ManagedModel):
             """Typed parser spec consumed by canonical quality utilities."""
 
             description: str
             options: t.SequenceOf[FlextQualityModels.Quality.ArgumentOptionSpec]
 
-        class AuditRecommendation(_InfraModels.BaseModel):
+        class AuditRecommendation(_WebModels.ManagedModel):
             """Typed recommendation from documentation audit."""
 
             priority: str
             category: str
             recommendation: str
-            actions: t.StrSequence = _InfraUtilities.Field(default_factory=list)
+            actions: t.StrSequence = _WebModels.Field(default_factory=list)
 
-        class AuditorResults(_InfraModels.BaseModel):
+        class AuditorResults(_WebModels.ManagedModel):
             """Results for documentation audit execution."""
 
             timestamp: str
@@ -249,7 +320,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
                     str,
                     t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
                 ]
-            ] = _InfraUtilities.Field(
+            ] = _WebModels.Field(
                 default_factory=list[
                     MutableMapping[
                         str,
@@ -260,14 +331,14 @@ class FlextQualityModels(_InfraModels, _WebModels):
                     ]
                 ]
             )
-            metrics: FlextQualityModels.Quality.AuditMetrics = _InfraUtilities.Field(
-                default_factory=FlextQualityModelDefaults.AuditMetrics
+            metrics: FlextQualityModels.Quality.AuditMetrics = _WebModels.Field(
+                default_factory=AuditMetrics
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
-            ] = _InfraUtilities.Field(default_factory=list)
+            ] = _WebModels.Field(default_factory=list)
 
-        class LinkRecord(_InfraModels.BaseModel):
+        class LinkRecord(_WebModels.ManagedModel):
             """Record of a link found in documentation."""
 
             text: str
@@ -276,7 +347,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
             file: str
             line_number: int | None = None
 
-        class LinkCheckResult(_InfraModels.BaseModel):
+        class LinkCheckResult(_WebModels.ManagedModel):
             """Result of checking a single link."""
 
             valid: bool | None = None
@@ -292,7 +363,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
             anchor: str | None = None
             warning: str | None = None
 
-        class ContentIssue(_InfraModels.BaseModel):
+        class ContentIssue(_WebModels.ManagedModel):
             """FlextQualityModels.Quality.Issue found in documentation content."""
 
             type: str
@@ -304,7 +375,7 @@ class FlextQualityModels(_InfraModels, _WebModels):
             readability_score: float | None = None
             warning: str | None = None
 
-        class LinkValidatorResults(_InfraModels.BaseModel):
+        class LinkValidatorResults(_WebModels.ManagedModel):
             """Results for documentation link validation."""
 
             timestamp: str
@@ -313,25 +384,25 @@ class FlextQualityModels(_InfraModels, _WebModels):
             broken_links: int = 0
             warnings: int = 0
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = (
-                _InfraUtilities.Field(default_factory=list)
+                _WebModels.Field(default_factory=list)
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
-            ] = _InfraUtilities.Field(default_factory=list)
+            ] = _WebModels.Field(default_factory=list)
 
-        class ContentValidatorResults(_InfraModels.BaseModel):
+        class ContentValidatorResults(_WebModels.ManagedModel):
             """Results for documentation content validation."""
 
             timestamp: str
             files_checked: int = 0
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
-                _InfraUtilities.Field(default_factory=list)
+                _WebModels.Field(default_factory=list)
             )
-            quality_metrics: t.MutableScalarMapping = _InfraUtilities.Field(
+            quality_metrics: t.MutableScalarMapping = _WebModels.Field(
                 default_factory=dict
             )
 
-        class ContentMetrics(_InfraModels.BaseModel):
+        class ContentMetrics(_WebModels.ManagedModel):
             """Content quality metrics for a documentation file."""
 
             word_count: int = 0
@@ -342,92 +413,60 @@ class FlextQualityModels(_InfraModels, _WebModels):
             has_lists: bool = False
             has_headers: bool = False
 
-        class ChannelConfig(_InfraModels.BaseModel):
+        class ChannelConfig(_WebModels.ManagedModel):
             """Notification channel toggle configuration."""
 
             enabled: bool = True
 
-        class NotifierResults(_InfraModels.BaseModel):
+        class NotifierResults(_WebModels.ManagedModel):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: MutableSequence[str] = _InfraUtilities.Field(default_factory=list)
+            errors: MutableSequence[str] = _WebModels.Field(default_factory=list)
             timestamp: str
 
-        class AuditRulesConfig(_InfraModels.BaseModel):
+        class AuditRulesConfig(_WebModels.FlexibleInternalModel):
             """Configuration for audit rules and thresholds."""
 
-            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.QualityThresholdsConfig
-                )
-            )
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.ContentChecksConfig
-                )
-            )
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.SeverityLevelsConfig
-                )
-            )
+            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig
 
-        class StyleGuideConfig(_InfraModels.BaseModel):
+        class StyleGuideConfig(_WebModels.FlexibleInternalModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.MarkdownStyleConfig
-                )
-            )
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.AccessibilityConfig
-                )
-            )
-            formatting: FlextQualityModels.Quality.FormattingConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.FormattingConfig
-                )
-            )
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig
+            formatting: FlextQualityModels.Quality.FormattingConfig
 
-        class ValidationConfig(_InfraModels.BaseModel):
+        class ValidationConfig(_WebModels.FlexibleInternalModel):
             """Configuration for validation settings."""
 
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.LinkValidationConfig
-                )
-            )
-            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
-                _InfraUtilities.Field(
-                    default_factory=FlextQualityModelDefaults.ContentAnalysisConfig
-                )
-            )
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig
+            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig
 
-        class OptimizerResults(_InfraModels.BaseModel):
+        class OptimizerResults(_WebModels.ManagedModel):
             """Results of a documentation optimization run."""
 
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: MutableSequence[str] = _InfraUtilities.Field(
+            backups_created: MutableSequence[str] = _WebModels.Field(
                 default_factory=list
             )
-            optimizations: MutableSequence[t.MutableStrMapping] = _InfraUtilities.Field(
+            optimizations: MutableSequence[t.MutableStrMapping] = _WebModels.Field(
                 default_factory=list[t.MutableStrMapping]
             )
 
-        class ExecutionRequest(_InfraModels.BaseModel):
+        class ExecutionRequest(_WebModels.ManagedModel):
             """Request payload for a deferred command execution."""
 
             script_path: Path
             runtime: str
-            args: t.StrSequence = _InfraUtilities.Field(default_factory=list)
+            args: t.StrSequence = _WebModels.Field(default_factory=list)
             timeout_ms: int
 
-        class ExecutionResult(_InfraModels.BaseModel):
+        class ExecutionResult(_WebModels.ManagedModel):
             """Structured result payload from a command execution."""
 
             success: bool
@@ -435,14 +474,14 @@ class FlextQualityModels(_InfraModels, _WebModels):
             stdout: str = ""
             stderr: str = ""
 
-        class McpToolCall(_InfraModels.BaseModel):
+        class McpToolCall(_WebModels.ManagedModel):
             """MCP tool invocation request contract."""
 
             server: str
             tool: str
-            params: t.JsonMapping = _InfraUtilities.Field(default_factory=dict)
+            params: t.JsonMapping = _WebModels.Field(default_factory=dict)
 
-        class McpToolResult(_InfraModels.BaseModel):
+        class McpToolResult(_WebModels.ManagedModel):
             """MCP tool invocation response contract."""
 
             success: bool

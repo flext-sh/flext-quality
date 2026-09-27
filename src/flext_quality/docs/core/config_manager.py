@@ -6,7 +6,7 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from pathlib import Path
 
 from flext_quality import FlextQualityModels, c, m, t, u
@@ -14,16 +14,6 @@ from flext_quality import FlextQualityModels, c, m, t, u
 
 class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
-
-    type ConfigValue = t.Primitives | t.StrSequence
-    type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
-    type ConfigData = MutableMapping[
-        str, MutableMapping[str, t.Primitives | t.StrSequence]
-    ]
-    type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
-    type RawConfigMap = t.MappingKV[
-        str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
-    ]
 
     class AuditRules(FlextQualityModels.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
@@ -111,36 +101,6 @@ class FlextQualityConfigManager:
             value = self.content_validation.get(setting, default)
             return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
-    @staticmethod
-    def _as_section(
-        value: FlextQualityConfigManager.RawSectionMap | t.JsonValue,
-    ) -> FlextQualityConfigManager.ConfigSection:
-        """Normalize any value into a configuration section mapping."""
-        if not isinstance(value, Mapping):
-            return {}
-        section: FlextQualityConfigManager.ConfigSection = {}
-        for key, item in value.items():
-            key_str = key
-            if isinstance(item, t.PRIMITIVES_TYPES):
-                section[key_str] = item
-            elif isinstance(item, list):
-                section[key_str] = [str(entry) for entry in item]
-        return section
-
-    @staticmethod
-    def _as_config_data(
-        value: FlextQualityConfigManager.RawConfigMap | t.JsonMapping | None,
-    ) -> FlextQualityConfigManager.ConfigData:
-        """Normalize loaded YAML content into typed settings data."""
-        if not isinstance(value, Mapping):
-            return {}
-        settings: FlextQualityConfigManager.ConfigData = {}
-        for key, item in value.items():
-            section = FlextQualityConfigManager._as_section(item)
-            if section:
-                settings[key] = section
-        return settings
-
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the configuration manager.
 
@@ -151,11 +111,11 @@ class FlextQualityConfigManager:
         """
         if config_dir is None:
             # Find settings directory relative to this file
-            self.config_dir = Path(__file__).parent.parent / "settings"
+            self.config_dir = Path(__file__).parent.parent / "config"
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: MutableMapping[str, FlextQualityConfigManager.ConfigData] = {}
+        self._cache: MutableMapping[str, t.JsonMapping] = {}
         self._audit_rules: FlextQualityConfigManager.AuditRules | None = None
         self._style_guide: FlextQualityConfigManager.StyleGuide | None = None
         self._validation_config: FlextQualityConfigManager.ValidationSettings | None = (
@@ -189,79 +149,16 @@ class FlextQualityConfigManager:
             )
         return self._validation_config
 
-    def get_config(self, name: str) -> FlextQualityConfigManager.ConfigData:
+    def get_config(self, name: str) -> t.JsonMapping:
         """Get a configuration file by name."""
         if name not in self._cache:
             self._cache[name] = self._load_config_file(f"{name}.yaml")
         return self._cache[name]
 
-    def _load_config_file(self, filename: str) -> FlextQualityConfigManager.ConfigData:
+    def _load_config_file(self, filename: str) -> t.JsonMapping:
         """Load a YAML configuration file."""
         config_path = self.config_dir / filename
-
-        try:
-            raw = u.Cli.yaml_load_mapping(config_path)
-            return (
-                self._as_config_data(raw) if raw else self._get_default_config(filename)
-            )
-        except FileNotFoundError:
-            return self._get_default_config(filename)
-        except (OSError, PermissionError, UnicodeDecodeError) as exc:
-            _ = exc
-            return self._get_default_config(filename)
-
-    def _get_default_config(
-        self, filename: str
-    ) -> FlextQualityConfigManager.ConfigData:
-        """Get default configuration for a file."""
-        defaults: t.MappingKV[str, FlextQualityConfigManager.RawConfigMap] = {
-            "audit_rules.yaml": {
-                "quality_thresholds": {
-                    "max_age_days": 90,
-                    "min_word_count": 100,
-                    "max_broken_links": 0,
-                    "min_completeness_score": 0.8,
-                },
-                "content_checks": {
-                    "check_freshness": True,
-                    "check_completeness": True,
-                    "check_readability": False,
-                },
-                "link_checks": {
-                    "check_external": True,
-                    "check_internal": True,
-                    "check_images": True,
-                },
-                "style_checks": {"check_formatting": True, "check_consistency": True},
-                "accessibility_checks": {
-                    "check_alt_text": True,
-                    "check_headings": True,
-                    "check_links": True,
-                },
-            },
-            "style_guide.yaml": {
-                "markdown": {
-                    "heading_style": "atx",
-                    "list_style": "dash",
-                    "emphasis_style": "*",
-                    "max_line_length": 88,
-                },
-                "accessibility": {
-                    "require_alt_text": True,
-                    "descriptive_links": True,
-                    "heading_structure": True,
-                },
-                "formatting": {
-                    "max_line_length": 88,
-                    "consistent_indentation": True,
-                    "trailing_spaces": False,
-                },
-            },
-            "validation_config.yaml": {**m.Quality.ValidationConfig().model_dump()},
-        }
-
-        default_value = defaults.get(filename)
-        return self._as_config_data(default_value)
+        return u.Cli.yaml_safe_load(config_path).value
 
     def reload_configs(self) -> None:
         """Reload all configurations from disk."""

@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Annotated, Final, override
 import requests
 from flext_cli import cli
 
-from flext_quality import c, m, p, r, s, t, u
+from flext_quality import FlextQualityConfigManager, c, m, p, r, s, t, u
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
@@ -40,101 +40,22 @@ _AUDIT_REPORT_TEMPLATE: Final[str] = (
 class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
-    def __init__(self, config_path: str = "docs/maintenance/settings/") -> None:
-        """Initialize documentation audit system.
-
-        Args:
-            config_path: Path to configuration directory for audit rules.
-
-        """
-        self.config_path = Path(config_path)
+    def __init__(self, config_path: str | Path | None = None) -> None:
+        """Initialize the documentation auditor from validated configuration."""
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: m.Quality.AuditRulesConfig = self.get_default_audit_rules()
-        self.style_guide: m.Quality.StyleGuideConfig = self.get_default_style_guide()
-        self.validation_config: m.Quality.ValidationConfig = (
-            self.get_default_validation_config()
+        self.config_manager = FlextQualityConfigManager(config_path)
+        self.audit_rules: m.Quality.AuditRulesConfig = (
+            self.config_manager.get_audit_rules()
         )
-        self.load_config()
+        self.style_guide: m.Quality.StyleGuideConfig = (
+            self.config_manager.get_style_guide()
+        )
+        self.validation_config: m.Quality.ValidationConfig = (
+            self.config_manager.get_validation_config()
+        )
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat()
         )
-
-    def load_config(self) -> None:
-        """Load audit configuration files."""
-        try:
-            audit_data = u.Cli.yaml_load_mapping(self.config_path / "audit_rules.yaml")
-            if audit_data:
-                self.audit_rules = m.Quality.AuditRulesConfig.model_validate(audit_data)
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.audit_rules = self.get_default_audit_rules()
-
-        try:
-            style_data = u.Cli.yaml_load_mapping(self.config_path / "style_guide.yaml")
-            if style_data:
-                self.style_guide = m.Quality.StyleGuideConfig.model_validate(style_data)
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.style_guide = self.get_default_style_guide()
-
-        try:
-            validation_data = u.Cli.yaml_load_mapping(
-                self.config_path / "validation_config.yaml"
-            )
-            if validation_data:
-                self.validation_config = m.Quality.ValidationConfig.model_validate(
-                    validation_data
-                )
-        except c.EXC_FS_TYPE_VALIDATION:
-            self.validation_config = self.get_default_validation_config()
-
-    def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
-        """Default audit rules if settings file not found."""
-        config: m.Quality.AuditRulesConfig = m.Quality.AuditRulesConfig.model_validate({
-            "quality_thresholds": {
-                "max_age_days": 90,
-                "min_word_count": 100,
-                "max_broken_links": 0,
-                "min_completeness_score": 0.8,
-            },
-            "content_checks": {
-                "check_freshness": True,
-                "check_completeness": True,
-                "check_consistency": True,
-                "check_links": True,
-            },
-            "severity_levels": {
-                "critical": ["broken_external_link", "missing_section"],
-                "high": ["outdated_content", "broken_internal_link"],
-                "medium": ["style_inconsistency", "missing_alt_text"],
-                "low": ["formatting_issue", "readability_warning"],
-            },
-        })
-        return config
-
-    def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
-        """Default style guide if settings file not found."""
-        config: m.Quality.StyleGuideConfig = m.Quality.StyleGuideConfig.model_validate({
-            "markdown": {
-                "heading_style": "atx",
-                "list_style": "dash",
-                "emphasis_style": "*",
-                "code_block_style": "fenced",
-            },
-            "accessibility": {
-                "require_alt_text": True,
-                "descriptive_links": True,
-                "heading_structure": True,
-            },
-            "formatting": {
-                "max_line_length": 88,
-                "consistent_indentation": True,
-                "trailing_spaces": False,
-            },
-        })
-        return config
-
-    def get_default_validation_config(self) -> m.Quality.ValidationConfig:
-        """Default validation settings if settings file not found."""
-        return m.Quality.ValidationConfig()
 
     def find_documentation_files(self) -> t.SequenceOf[Path]:
         """Find all documentation files in the project."""
@@ -829,13 +750,13 @@ class FlextQualityDocumentationAuditor:
             ),
         ] = "json"
         config_dir: Annotated[
-            str,
+            str | None,
             u.Field(
                 alias="config",
                 description="Audit configuration directory",
                 validate_default=True,
             ),
-        ] = c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR
+        ] = None
 
         @override
         def execute(self) -> p.Result[bool]:
