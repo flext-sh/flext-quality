@@ -305,12 +305,10 @@ class FlextQualityLinkChecker:
         """Generate validation report."""
         if report_format == "summary":
             return self._generate_summary_report()
-        report_text: str = (
-            self.results.model_dump_json(indent=2)
-            if report_format == "json"
-            else self.results.model_dump_json()
-        )
-        return report_text
+        if report_format == "json":
+            return self.results.model_dump_json(indent=2)
+        msg = f"Unsupported report format: {report_format}"
+        raise ValueError(msg)
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""
@@ -371,7 +369,7 @@ Broken Links:
     ) -> m.Quality.LinkValidatorResults:
         """Validate links synchronously."""
         checker = FlextQualityLinkChecker(config_dir)
-        return asyncio.run(checker.validate_links(links, use_async=True))
+        return asyncio.run(checker.validate_links(links, use_async=False))
 
     @staticmethod
     async def run_demo() -> None:
