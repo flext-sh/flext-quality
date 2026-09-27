@@ -104,7 +104,8 @@ class FlextQualityLinkChecker:
         """Check one link and propagate the first transport failure."""
         start_time = time.time()
         if self.session is None:
-            raise RuntimeError("Link checker session is not initialized")
+            msg = "Link checker session is not initialized"
+            raise RuntimeError(msg)
 
         async with self.session.head(
             url,
