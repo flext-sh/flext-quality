@@ -562,8 +562,8 @@ repos:
 `src/flext_quality/docs/config/audit_rules.yaml`, `style_guide.yaml`, and
 `validation_config.yaml` own the documentation rules. The public
 `FlextQualityConfigManager` validates them into the `m.Quality` models. A missing or
-invalid file fails at the reader; there are no model defaults or alternate values in
-the auditor.
+invalid file fails at the reader; there are no model defaults or alternate values in the
+auditor.
 
 ## 🔧 Maintenance Scripts
 
