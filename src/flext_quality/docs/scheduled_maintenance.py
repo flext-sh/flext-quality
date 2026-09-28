@@ -97,7 +97,7 @@ class FlextQualityScheduledMaintenance:
 
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
         """Load maintenance schedule configuration, returning the merged config."""
-        default_config = self.get_default_config()
+        default_config = self.build_default_config()
         resolved_config_path = (
             Path(config_path)
             if config_path is not None
@@ -205,7 +205,7 @@ class FlextQualityScheduledMaintenance:
         )
         return config
 
-    def get_default_config(self) -> m.Quality.MaintenanceConfig:
+    def build_default_config(self) -> m.Quality.MaintenanceConfig:
         """Default maintenance configuration."""
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())

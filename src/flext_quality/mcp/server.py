@@ -13,7 +13,7 @@ class FlextQualityMcpServer:
     """MCP server namespace for flext-quality."""
 
     @staticmethod
-    def get_server() -> FastMCP:
+    def resolve_server() -> FastMCP:
         """Get the MCP server instance."""
         return _mcp
 

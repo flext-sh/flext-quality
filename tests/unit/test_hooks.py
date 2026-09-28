@@ -182,6 +182,3 @@ class TestsFlextQualityHookManager:
         entries = config.get("PreToolUse")
         assert isinstance(entries, list)
         tm.that(len(entries), eq=2)
-
-
-__all__: list[str] = ["TestsFlextQualityBaseHook", "TestsFlextQualityHookManager"]
