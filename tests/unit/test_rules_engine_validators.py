@@ -381,10 +381,3 @@ class TestsFlextQualityRulesLoader:
         result = loader.load_multiple([good, missing])
         tm.that(result.failure, eq=True)
         tm.that(result.error or "", has=str(missing))
-
-
-__all__: list[str] = [
-    "TestsFlextQualityRulesEngine",
-    "TestsFlextQualityRulesLoader",
-    "TestsFlextQualityValidators",
-]

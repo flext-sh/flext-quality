@@ -244,6 +244,3 @@ class TestsFlextQualityIntegrations:
         client = FlextQualityClaudeMemClient()
         result = client.health_check()
         tm.that(result.value.get("server"), eq="claude-mem")
-
-
-__all__: list[str] = ["TestsFlextQualityIntegrations"]

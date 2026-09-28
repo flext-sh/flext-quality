@@ -175,6 +175,3 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(command.port, eq=8080)
         tm.that(command.debug, eq=False)
         tm.that(command.reports_dir, eq="docs/maintenance/reports/")
-
-
-__all__: list[str] = ["TestsFlextQualityDocumentationDashboard"]

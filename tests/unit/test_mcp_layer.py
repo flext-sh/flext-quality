@@ -143,10 +143,3 @@ class TestsFlextQualityMcpResources:
         tm.that(output, is_=str)
         tm.that(output, has="claude_mem")
         tm.that(output, has="claude_context")
-
-
-__all__: list[str] = [
-    "TestsFlextQualityMcpResources",
-    "TestsFlextQualityMcpServer",
-    "TestsFlextQualityMcpTools",
-]

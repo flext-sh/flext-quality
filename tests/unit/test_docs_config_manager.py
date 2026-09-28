@@ -223,6 +223,3 @@ class TestsFlextQualityConfigManager:
         manager = FlextQualityConfigManager(tmp_path)
         issues = manager.validate_configs()
         tm.that(issues, eq=[])
-
-
-__all__: list[str] = ["TestsFlextQualityConfigManager"]
