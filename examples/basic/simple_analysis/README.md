@@ -347,6 +347,6 @@ After mastering this basic example:
 - **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system
   documentation
 - **CodeAnalyzer API** - Detailed API reference (_Documentation coming soon_)
-- **Quality Metrics Guide** - Understanding quality scoring (_Documentation coming
-  soon_)
+- **Quality Metrics Guide** - Understanding quality scoring
+  (_Documentation coming soon_)
 - **Integration Patterns** - FLEXT ecosystem integration (_Documentation coming soon_)

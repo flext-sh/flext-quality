@@ -162,7 +162,7 @@ class FlextQualityConfigManager:
             None
         )
 
-    def get_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
+    def resolve_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
         """Get audit rules configuration."""
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
@@ -171,7 +171,7 @@ class FlextQualityConfigManager:
             )
         return self._audit_rules
 
-    def get_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
+    def resolve_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
         """Get style guide configuration."""
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
@@ -180,7 +180,7 @@ class FlextQualityConfigManager:
             )
         return self._style_guide
 
-    def get_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
+    def resolve_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
         """Get validation configuration."""
         if self._validation_config is None:
             data = self._load_config_file("validation_config.yaml")
@@ -189,7 +189,7 @@ class FlextQualityConfigManager:
             )
         return self._validation_config
 
-    def get_config(self, name: str) -> FlextQualityConfigManager.ConfigData:
+    def resolve_config(self, name: str) -> FlextQualityConfigManager.ConfigData:
         """Get a configuration file by name."""
         if name not in self._cache:
             self._cache[name] = self._load_config_file(f"{name}.yaml")
@@ -286,19 +286,19 @@ class FlextQualityConfigManager:
 
         validations = (
             (
-                self.get_audit_rules,
+                self.resolve_audit_rules,
                 "quality_thresholds",
                 "Audit rules missing quality_thresholds section",
                 "audit_rules.yaml",
             ),
             (
-                self.get_style_guide,
+                self.resolve_style_guide,
                 "markdown",
                 "Style guide missing markdown section",
                 "style_guide.yaml",
             ),
             (
-                self.get_validation_config,
+                self.resolve_validation_config,
                 "link_validation",
                 "Validation settings missing link_validation section",
                 "validation_config.yaml",
@@ -314,14 +314,16 @@ class FlextQualityConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> t.JsonMapping:
+    def resolve_all_configs(self) -> t.JsonMapping:
         """Get all configurations as a single dictionary."""
         return t.json_mapping_adapter().validate_python({
-            "audit_rules": self.get_audit_rules().model_dump(mode="json"),
-            "style_guide": self.get_style_guide().model_dump(mode="json"),
-            "validation_config": self.get_validation_config().model_dump(mode="json"),
+            "audit_rules": self.resolve_audit_rules().model_dump(mode="json"),
+            "style_guide": self.resolve_style_guide().model_dump(mode="json"),
+            "validation_config": self.resolve_validation_config().model_dump(
+                mode="json"
+            ),
             "raw_configs": {
-                name: self.get_config(name)
+                name: self.resolve_config(name)
                 for name in ["audit_rules", "style_guide", "validation_config"]
             },
         })

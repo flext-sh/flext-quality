@@ -537,8 +537,8 @@ team + product owners **Preparation**: Review monthly comprehensive report
 
 ### Critical Content Issues
 
-**Trigger**: Documentation content affecting user safety or legal compliance **Response
-Time**: Immediate
+**Trigger**: Documentation content affecting user safety or legal compliance
+**Response Time**: Immediate
 
 #### Procedure
 

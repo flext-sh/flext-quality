@@ -376,9 +376,9 @@ ls -la /path/to/project
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../docs/README.md)** - Complete system documentation
-- **API Reference** - REST API and Python SDK documentation (_Documentation coming
-  soon_)
-- **Integration Guide** - FLEXT ecosystem integration patterns (_Documentation coming
-  soon_)
-- **Development Guide** - Development setup and contribution guidelines (_Documentation
-  coming soon_)
+- **API Reference** - REST API and Python SDK documentation
+  (_Documentation coming soon_)
+- **Integration Guide** - FLEXT ecosystem integration patterns
+  (_Documentation coming soon_)
+- **Development Guide** - Development setup and contribution guidelines
+  (_Documentation coming soon_)

@@ -62,7 +62,7 @@ class FlextQualityClaudeMemClient:
             c.Quality.CLAUDE_MEM_SERVER_NAME, "timeline", params
         )
 
-    def get_observations_command(
+    def build_observations_command(
         self, ids: t.SequenceOf[int]
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations."""
@@ -70,7 +70,7 @@ class FlextQualityClaudeMemClient:
             self._mcp.build_call_command
         )
 
-    def get_search_command(
+    def build_search_command(
         self, query: str, *, limit: int | None = None
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search."""
@@ -79,7 +79,7 @@ class FlextQualityClaudeMemClient:
             self._mcp.build_call_command
         )
 
-    def get_timeline_command(
+    def build_timeline_command(
         self,
         anchor: int,
         *,

@@ -349,6 +349,3 @@ class TestsFlextQualityDocumentationNotifier:
         result = command.execute()
         tm.that(result.failure, eq=True)
         tm.that(result.error or "", has="No action selected")
-
-
-__all__: list[str] = ["TestsFlextQualityDocumentationNotifier"]
