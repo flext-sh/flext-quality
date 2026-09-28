@@ -13,7 +13,7 @@ from flext_quality import (
 )
 from flext_quality.mcp.server import FlextQualityMcpServer
 
-_mcp = FlextQualityMcpServer.get_server()
+_mcp = FlextQualityMcpServer.resolve_server()
 
 
 class FlextQualityMcpResources:
@@ -21,7 +21,7 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("settings://hooks")
     @staticmethod
-    def get_hooks_config() -> str:
+    def read_hooks_config() -> str:
         """Get current hooks configuration."""
         manager = FlextQualityHookManager()
         settings = manager.fetch_config()
@@ -35,10 +35,10 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("settings://rules")
     @staticmethod
-    def get_rules_config() -> str:
+    def read_rules_config() -> str:
         """Get current rules configuration."""
         engine = FlextQualityRulesEngine()
-        rules = engine.get_rules()
+        rules = engine.list_rules()
         rules_json: str = (
             t
             .json_mapping_sequence_adapter()
@@ -51,7 +51,7 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("status://integrations")
     @staticmethod
-    def get_integrations_status() -> str:
+    def read_integrations_status() -> str:
         """Get status of all integrations."""
         mem_client = FlextQualityClaudeMemClient()
         mem_health = mem_client.health_check()

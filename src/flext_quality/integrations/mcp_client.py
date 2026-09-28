@@ -38,7 +38,7 @@ class FlextQualityMcpClient:
         self, call: m.Quality.McpToolCall
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
-        if not self.is_mcp_cli_available():
+        if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
         params_json = t.json_mapping_adapter().dump_json(call.params).decode("utf-8")
@@ -46,7 +46,7 @@ class FlextQualityMcpClient:
 
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
         """Build the mcp-cli info command for a tool."""
-        if not self.is_mcp_cli_available():
+        if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{server}/{tool}"
         return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
@@ -66,7 +66,7 @@ class FlextQualityMcpClient:
 
     def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if MCP infrastructure is available."""
-        available = self.is_mcp_cli_available()
+        available = self.mcp_cli_available()
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if available
@@ -97,7 +97,7 @@ class FlextQualityMcpClient:
             "mcp_cli": health_data.get("mcp_cli", False),
         })
 
-    def is_mcp_cli_available(self) -> bool:
+    def mcp_cli_available(self) -> bool:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 

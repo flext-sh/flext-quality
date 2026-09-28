@@ -24,28 +24,28 @@ class TestsFlextQualityConfigManager:
     ) -> None:
         """An empty config directory yields the built-in audit-rule defaults."""
         manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.get_audit_rules()
+        rules = manager.resolve_audit_rules()
         tm.that(rules.quality_thresholds.max_age_days, eq=90)
         tm.that(rules.content_checks.check_freshness, eq=True)
 
     def test_get_audit_rules_is_cached_across_calls(self, tmp_path: Path) -> None:
         """Repeated lookups return the identical cached configuration object."""
         manager = FlextQualityConfigManager(tmp_path)
-        first = manager.get_audit_rules()
-        second = manager.get_audit_rules()
+        first = manager.resolve_audit_rules()
+        second = manager.resolve_audit_rules()
         tm.that(first is second, eq=True)
 
     def test_get_style_guide_falls_back_to_defaults(self, tmp_path: Path) -> None:
         """An empty config directory yields the built-in style-guide defaults."""
         manager = FlextQualityConfigManager(tmp_path)
-        guide = manager.get_style_guide()
+        guide = manager.resolve_style_guide()
         tm.that(guide.markdown.heading_style, eq="atx")
         tm.that(guide.accessibility.require_alt_text, eq=True)
 
     def test_get_validation_config_falls_back_to_defaults(self, tmp_path: Path) -> None:
         """An empty config directory yields the built-in validation defaults."""
         manager = FlextQualityConfigManager(tmp_path)
-        validation = manager.get_validation_config()
+        validation = manager.resolve_validation_config()
         tm.that(validation.link_validation.timeout, eq=10)
 
     def test_get_audit_rules_reads_real_yaml_overrides(self, tmp_path: Path) -> None:
@@ -59,16 +59,16 @@ class TestsFlextQualityConfigManager:
             encoding="utf-8",
         )
         manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.get_audit_rules()
+        rules = manager.resolve_audit_rules()
         tm.that(rules.quality_thresholds.max_age_days, eq=30)
         tm.that(rules.content_checks.check_freshness, eq=False)
 
     def test_reload_configs_clears_cached_state(self, tmp_path: Path) -> None:
         """Reloading clears the memoized typed configuration models."""
         manager = FlextQualityConfigManager(tmp_path)
-        first_rules = manager.get_audit_rules()
+        first_rules = manager.resolve_audit_rules()
         manager.reload_configs()
-        second_rules = manager.get_audit_rules()
+        second_rules = manager.resolve_audit_rules()
         tm.that(first_rules is second_rules, eq=False)
 
     def test_validate_configs_reports_missing_required_files(
@@ -94,9 +94,9 @@ class TestsFlextQualityConfigManager:
         )
 
     def test_default_config_dir_derives_from_package_location(self) -> None:
-        """Omitting ``config_dir`` resolves a settings directory near the package."""
+        """Omitting ``config_dir`` resolves the declared config directory near the package."""
         manager = FlextQualityConfigManager()
-        tm.that(str(manager.config_dir), has="settings")
+        tm.that(str(manager.config_dir), has="config")
 
     def test_config_dir_accepts_a_string_path(self, tmp_path: Path) -> None:
         """A string ``config_dir`` is normalized into a ``Path`` internally."""

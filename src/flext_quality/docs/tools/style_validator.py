@@ -20,7 +20,7 @@ class FlextQualityStyleValidator:
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize style validation from declared, validated configuration."""
         self.settings: m.Quality.StyleGuideConfig = (
-            FlextQualityConfigManager(config_dir).get_style_guide()
+            FlextQualityConfigManager(config_dir).resolve_style_guide()
         )
         self.results: m.Quality.StyleValidationResults = (
             m.Quality.StyleValidationResults(

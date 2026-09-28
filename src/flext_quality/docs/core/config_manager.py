@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityConfigManager:
@@ -31,21 +31,21 @@ class FlextQualityConfigManager:
         self._style_guide: m.Quality.StyleGuideConfig | None = None
         self._validation_config: m.Quality.ValidationConfig | None = None
 
-    def get_audit_rules(self) -> m.Quality.AuditRulesConfig:
+    def resolve_audit_rules(self) -> m.Quality.AuditRulesConfig:
         """Get audit rules configuration."""
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
             self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
         return self._audit_rules
 
-    def get_style_guide(self) -> m.Quality.StyleGuideConfig:
+    def resolve_style_guide(self) -> m.Quality.StyleGuideConfig:
         """Get style guide configuration."""
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
             self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
         return self._style_guide
 
-    def get_validation_config(self) -> m.Quality.ValidationConfig:
+    def resolve_validation_config(self) -> m.Quality.ValidationConfig:
         """Get validation configuration."""
         if self._validation_config is None:
             data = self._load_config_file("validation_config.yaml")
@@ -64,11 +64,48 @@ class FlextQualityConfigManager:
         self._validation_config = None
 
     def validate_configs(self) -> t.StrSequence:
-        """Validate declared configuration and propagate the first failure."""
-        self.get_audit_rules()
-        self.get_style_guide()
-        self.get_validation_config()
-        return []
+        """Validate all configuration files and return any issues."""
+        # Check required settings files exist
+        required_files = [
+            "audit_rules.yaml",
+            "style_guide.yaml",
+            "validation_config.yaml",
+        ]
+        issues = [
+            f"Missing required settings file: {filename}"
+            for filename in required_files
+            if not (self.config_dir / filename).exists()
+        ]
+
+        validations = (
+            (
+                self.resolve_audit_rules,
+                "quality_thresholds",
+                "Audit rules missing quality_thresholds section",
+                "audit_rules.yaml",
+            ),
+            (
+                self.resolve_style_guide,
+                "markdown",
+                "Style guide missing markdown section",
+                "style_guide.yaml",
+            ),
+            (
+                self.resolve_validation_config,
+                "link_validation",
+                "Validation settings missing link_validation section",
+                "validation_config.yaml",
+            ),
+        )
+        for getter, required_attr, missing_message, filename in validations:
+            try:
+                config = getter()
+                if not getattr(config, required_attr):
+                    issues.append(missing_message)
+            except c.EXC_FS_KEY_VALUE as exc:
+                issues.append(f"Invalid {filename}: {exc}")
+
+        return issues
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
