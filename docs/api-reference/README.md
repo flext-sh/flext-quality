@@ -25,9 +25,9 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: `FlextQuality`, `FlextQualityBaseHook`, `FlextQualityCli`,
-  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`,
-  `FlextQualityCodeExecutionBridge` (+16 more)
+- Primary facades: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
+  `FlextQualityConstants`, `FlextQualityMcpResources`, `FlextQualityMcpServer`
+  (+7 more)
 - Generated module pages: `12`
 
 Back to [project docs](../index.md).
