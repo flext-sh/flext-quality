@@ -116,7 +116,7 @@ class FlextQualityDocumentationNotifier:
         )
 
     def _load_user_config(self, loaded: t.JsonMapping) -> _NotifierConfig:
-        cfg = self.get_default_config()
+        cfg = self.build_default_config()
 
         channels = loaded.get("channels")
         if isinstance(channels, dict):
@@ -189,7 +189,7 @@ class FlextQualityDocumentationNotifier:
 
         return cfg
 
-    def get_default_config(self) -> _NotifierConfig:
+    def build_default_config(self) -> _NotifierConfig:
         """Default notification configuration."""
         return FlextQualityDocumentationNotifier._NotifierConfig(
             enabled=True,

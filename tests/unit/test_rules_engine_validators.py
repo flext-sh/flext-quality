@@ -49,15 +49,15 @@ class TestsFlextQualityRulesEngine:
     def test_get_rules_starts_empty(self) -> None:
         """A freshly constructed engine has no loaded rules."""
         engine = FlextQualityRulesEngine()
-        tm.that(engine.get_rules(), eq=[])
+        tm.that(engine.list_rules(), eq=[])
 
     def test_load_rules_populates_engine(self, tmp_path: Path) -> None:
-        """Loading rules from YAML makes them retrievable via ``get_rules``."""
+        """Loading rules from YAML makes them retrievable via ``list_rules``."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         result = engine.load_rules()
         tm.that(result.success, eq=True)
         tm.that(result.value, eq=2)
-        tm.that(len(engine.get_rules()), eq=2)
+        tm.that(len(engine.list_rules()), eq=2)
 
     def test_load_rules_explicit_path_overrides_constructor_path(
         self, tmp_path: Path

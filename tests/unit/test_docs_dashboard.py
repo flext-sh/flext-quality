@@ -24,7 +24,7 @@ class TestsFlextQualityDocumentationDashboard:
     def test_get_current_metrics_reports_no_audit_data(self, tmp_path: Path) -> None:
         """With no audit report present, metrics report a zeroed default."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        metrics = dashboard.get_current_metrics()
+        metrics = dashboard.compute_current_metrics()
         tm.that(metrics.get("quality_score"), eq=0)
         tm.that(metrics.get("status"), eq="No audit data available")
 
@@ -44,7 +44,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.ok(audit_dump)
         (tmp_path / "latest_audit.json").write_text(audit_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        metrics = dashboard.get_current_metrics()
+        metrics = dashboard.compute_current_metrics()
         tm.that(metrics.get("quality_score"), eq=87)
         tm.that(metrics.get("files_analyzed"), eq=12)
         tm.that(metrics.get("status"), eq="Current")
@@ -55,13 +55,13 @@ class TestsFlextQualityDocumentationDashboard:
         """Malformed JSON in the latest audit report yields an error status."""
         (tmp_path / "latest_audit.json").write_text("not json at all", encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        metrics = dashboard.get_current_metrics()
+        metrics = dashboard.compute_current_metrics()
         tm.that(metrics.get("status") or "", has="Error")
 
     def test_get_quality_trends_with_no_reports_is_empty(self, tmp_path: Path) -> None:
         """No matching report files yield a trend payload with zero data points."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        trends = dashboard.get_quality_trends(days=7)
+        trends = dashboard.compute_quality_trends(days=7)
         tm.that(trends.get("period_days"), eq=7)
         tm.that(trends.get("data_points"), eq=0)
         tm.that(trends.get("trends"), eq=[])
@@ -79,7 +79,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.ok(report_dump)
         report_file.write_text(report_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        trends = dashboard.get_quality_trends(days=3650)
+        trends = dashboard.compute_quality_trends(days=3650)
         tm.that(trends.get("data_points"), eq=1)
         trend_entries = trends.get("trends")
         tm.that(trend_entries, is_=list)
@@ -92,7 +92,7 @@ class TestsFlextQualityDocumentationDashboard:
     def test_get_recent_reports_with_no_reports_is_empty(self, tmp_path: Path) -> None:
         """No matching report files yield an empty recent-reports listing."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        tm.that(dashboard.get_recent_reports(), eq=[])
+        tm.that(dashboard.fetch_recent_reports(), eq=[])
 
     def test_get_recent_reports_sorts_newest_first_and_respects_limit(
         self, tmp_path: Path
@@ -111,7 +111,7 @@ class TestsFlextQualityDocumentationDashboard:
             tm.ok(report_dump)
             report_file.write_text(report_dump.value, encoding="utf-8")
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        reports = dashboard.get_recent_reports(limit=2)
+        reports = dashboard.fetch_recent_reports(limit=2)
         tm.that(len(reports), eq=2)
         tm.that(reports[0]["quality_score"], eq=70)
         tm.that(reports[1]["quality_score"], eq=60)
@@ -119,7 +119,7 @@ class TestsFlextQualityDocumentationDashboard:
     def test_get_dashboard_html_returns_nonempty_page(self, tmp_path: Path) -> None:
         """The dashboard HTML template renders a nonempty document."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
-        html = dashboard.get_dashboard_html()
+        html = dashboard.render_dashboard_html()
         tm.that(html, has="FLEXT Quality Documentation Dashboard")
 
     def test_index_route_serves_dashboard_html(self, tmp_path: Path) -> None:

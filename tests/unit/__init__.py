@@ -4,73 +4,14 @@
 from __future__ import annotations
 
 from types import MappingProxyType
-from typing import TYPE_CHECKING
 
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-if TYPE_CHECKING:
-    from .test_cli import TestsFlextQualityCli
-    from .test_code_execution import TestsFlextQualityCodeExecutionBridge
-    from .test_docs_config_manager import TestsFlextQualityConfigManager
-    from .test_docs_dashboard import TestsFlextQualityDocumentationDashboard
-    from .test_docs_notifications import TestsFlextQualityDocumentationNotifier
-    from .test_hooks import TestsFlextQualityBaseHook, TestsFlextQualityHookManager
-    from .test_integrations import TestsFlextQualityIntegrations
-    from .test_mcp_layer import (
-        TestsFlextQualityMcpResources,
-        TestsFlextQualityMcpServer,
-        TestsFlextQualityMcpTools,
-    )
-    from .test_rules_engine_validators import (
-        TestsFlextQualityRulesEngine,
-        TestsFlextQualityRulesLoader,
-        TestsFlextQualityValidators,
-    )
-
-
-__all__: tuple[str, ...] = (
-    "TestsFlextQualityBaseHook",
-    "TestsFlextQualityCli",
-    "TestsFlextQualityCodeExecutionBridge",
-    "TestsFlextQualityConfigManager",
-    "TestsFlextQualityDocumentationDashboard",
-    "TestsFlextQualityDocumentationNotifier",
-    "TestsFlextQualityHookManager",
-    "TestsFlextQualityIntegrations",
-    "TestsFlextQualityMcpResources",
-    "TestsFlextQualityMcpServer",
-    "TestsFlextQualityMcpTools",
-    "TestsFlextQualityRulesEngine",
-    "TestsFlextQualityRulesLoader",
-    "TestsFlextQualityValidators",
-)
+__all__: tuple[str, ...] = ()
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
-        MappingProxyType({
-            ".test_cli": ("TestsFlextQualityCli",),
-            ".test_code_execution": ("TestsFlextQualityCodeExecutionBridge",),
-            ".test_docs_config_manager": ("TestsFlextQualityConfigManager",),
-            ".test_docs_dashboard": ("TestsFlextQualityDocumentationDashboard",),
-            ".test_docs_notifications": ("TestsFlextQualityDocumentationNotifier",),
-            ".test_hooks": (
-                "TestsFlextQualityBaseHook",
-                "TestsFlextQualityHookManager",
-            ),
-            ".test_integrations": ("TestsFlextQualityIntegrations",),
-            ".test_mcp_layer": (
-                "TestsFlextQualityMcpResources",
-                "TestsFlextQualityMcpServer",
-                "TestsFlextQualityMcpTools",
-            ),
-            ".test_rules_engine_validators": (
-                "TestsFlextQualityRulesEngine",
-                "TestsFlextQualityRulesLoader",
-                "TestsFlextQualityValidators",
-            ),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
+        MappingProxyType({}), alias_groups=MappingProxyType({}), sort_keys=False
     )
 )
 

@@ -34,13 +34,13 @@ class TestsFlextQualityMcpServer:
 
     def test_get_server_returns_the_same_instance(self) -> None:
         """Repeated lookups return the identical FastMCP server instance."""
-        first = FlextQualityMcpServer.get_server()
-        second = FlextQualityMcpServer.get_server()
+        first = FlextQualityMcpServer.resolve_server()
+        second = FlextQualityMcpServer.resolve_server()
         tm.that(first is second, eq=True)
 
     def test_get_server_exposes_configured_name(self) -> None:
         """The server carries the configured flext-quality identity."""
-        server = FlextQualityMcpServer.get_server()
+        server = FlextQualityMcpServer.resolve_server()
         tm.that(server.name, eq="flext-quality")
 
 
@@ -126,20 +126,20 @@ class TestsFlextQualityMcpResources:
     """Contract tests for MCP resource functions registered on the server."""
 
     def test_get_hooks_config_returns_json_object(self) -> None:
-        """get_hooks_config renders the hook manager's empty config as JSON."""
-        output = FlextQualityMcpResources.get_hooks_config()
+        """read_hooks_config renders the hook manager's empty config as JSON."""
+        output = FlextQualityMcpResources.read_hooks_config()
         tm.that(output, is_=str)
         tm.that(output.strip(), eq="{}")
 
     def test_get_rules_config_returns_json_array(self) -> None:
-        """get_rules_config renders the (empty, unloaded) rule set as JSON."""
-        output = FlextQualityMcpResources.get_rules_config()
+        """read_rules_config renders the (empty, unloaded) rule set as JSON."""
+        output = FlextQualityMcpResources.read_rules_config()
         tm.that(output, is_=str)
         tm.that(output.strip(), eq="[]")
 
     def test_get_integrations_status_reports_both_clients(self) -> None:
-        """get_integrations_status reports health for both MCP integrations."""
-        output = FlextQualityMcpResources.get_integrations_status()
+        """read_integrations_status reports health for both MCP integrations."""
+        output = FlextQualityMcpResources.read_integrations_status()
         tm.that(output, is_=str)
         tm.that(output, has="claude_mem")
         tm.that(output, has="claude_context")

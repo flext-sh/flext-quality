@@ -20,7 +20,7 @@ class FlextQualityRulesEngine:
         self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
+    def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
         return list(self._rules)
 

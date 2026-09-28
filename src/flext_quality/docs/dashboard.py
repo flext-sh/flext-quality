@@ -39,7 +39,7 @@ class FlextQualityDocumentationDashboard:
         @self.app.route("/")
         def index() -> str:
             """Serve the main dashboard page."""
-            return self.get_dashboard_html()
+            return self.render_dashboard_html()
 
         _ = index
 
@@ -48,7 +48,7 @@ class FlextQualityDocumentationDashboard:
             """Return current metrics as a JSON response."""
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_current_metrics()
+                    self.compute_current_metrics()
                 ).decode(),
                 mimetype="application/json",
             )
@@ -61,7 +61,7 @@ class FlextQualityDocumentationDashboard:
             days = int(request.args.get("days", 30))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_quality_trends(days)
+                    self.compute_quality_trends(days)
                 ).decode(),
                 mimetype="application/json",
             )
@@ -74,14 +74,14 @@ class FlextQualityDocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return Response(
                 t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-                    self.get_recent_reports(limit)
+                    self.fetch_recent_reports(limit)
                 ).decode(),
                 mimetype="application/json",
             )
 
         _ = api_reports
 
-    def get_current_metrics(self) -> t.JsonMapping:
+    def compute_current_metrics(self) -> t.JsonMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -146,7 +146,7 @@ class FlextQualityDocumentationDashboard:
             "status": "Current",
         }
 
-    def get_quality_trends(self, days: int = 30) -> t.JsonMapping:
+    def compute_quality_trends(self, days: int = 30) -> t.JsonMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = u.now() - timedelta(days=days)
 
@@ -207,7 +207,7 @@ class FlextQualityDocumentationDashboard:
             "high_issues": audit_metrics.severity_breakdown.get("high", 0),
         }
 
-    def get_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
+    def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
         """Get list of recent audit reports."""
         reports: MutableSequence[t.JsonMapping] = []
 
@@ -255,7 +255,7 @@ class FlextQualityDocumentationDashboard:
             "files_analyzed": r_files_analyzed,
         }
 
-    def get_dashboard_html(self) -> str:
+    def render_dashboard_html(self) -> str:
         """Generate the main dashboard HTML."""
         return """
 <!DOCTYPE html>
