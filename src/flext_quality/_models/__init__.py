@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Tests.unit package."""
+"""Flext Quality. Models package."""
 
 from __future__ import annotations
 
@@ -9,16 +9,14 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from .test_docs_config_manager import TestsFlextQualityConfigManager
+    from ._payloads import FlextQualityModelDefaults
 
 
-__all__: tuple[str, ...] = ("TestsFlextQualityConfigManager",)
+__all__: tuple[str, ...] = ("FlextQualityModelDefaults",)
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
-        MappingProxyType({
-            ".test_docs_config_manager": ("TestsFlextQualityConfigManager",)
-        }),
+        MappingProxyType({"._payloads": ("FlextQualityModelDefaults",)}),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
     )

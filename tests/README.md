@@ -416,5 +416,5 @@ make setup
 - **Development Guide** - Development setup and workflows (_Documentation coming soon_)
 - **[Architecture Documentation](../docs/architecture/README.md)** - System design and
   patterns
-- **Quality Standards** - Quality requirements and validation (_Documentation coming
-  soon_)
+- **Quality Standards** - Quality requirements and validation
+  (_Documentation coming soon_)

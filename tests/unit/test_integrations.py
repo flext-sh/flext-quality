@@ -25,14 +25,14 @@ class TestsFlextQualityIntegrations:
     def test_is_mcp_cli_available_reports_real_path_lookup(self) -> None:
         """The availability probe mirrors the real ``shutil.which`` result."""
         client = FlextQualityMcpClient()
-        tm.that(client.is_mcp_cli_available(), is_=bool)
+        tm.that(client.mcp_cli_available(), is_=bool)
 
     def test_health_check_reports_disconnected_when_cli_absent(self) -> None:
         """Health check reflects mcp-cli's real (missing) PATH availability."""
         client = FlextQualityMcpClient()
         result = client.health_check()
         tm.that(result.success, eq=True)
-        available = client.is_mcp_cli_available()
+        available = client.mcp_cli_available()
         tm.that(result.value.get("available"), eq=available)
         expected_status = "connected" if available else "disconnected"
         tm.that(result.value.get("status"), eq=expected_status)
@@ -69,7 +69,7 @@ class TestsFlextQualityIntegrations:
     def test_build_call_command_fails_when_cli_unavailable(self) -> None:
         """Command building fails fast when mcp-cli is absent from PATH."""
         client = FlextQualityMcpClient()
-        if client.is_mcp_cli_available():
+        if client.mcp_cli_available():
             return
         call = client.build_tool_call("srv", "tool", {"q": "x"}).unwrap()
         result = client.build_call_command(call)
@@ -78,7 +78,7 @@ class TestsFlextQualityIntegrations:
     def test_build_info_command_fails_when_cli_unavailable(self) -> None:
         """Info command building fails fast when mcp-cli is absent from PATH."""
         client = FlextQualityMcpClient()
-        if client.is_mcp_cli_available():
+        if client.mcp_cli_available():
             return
         result = client.build_info_command("srv", "tool")
         tm.that(result.failure, eq=True)
@@ -166,14 +166,14 @@ class TestsFlextQualityIntegrations:
         """The chained search command mirrors the real mcp-cli availability."""
         client = FlextQualityClaudeContextClient()
         expected_ok = bool(client.health_check().value.get("available"))
-        result = client.get_search_command("query text")
+        result = client.build_search_command("query text")
         tm.that(result.success, eq=expected_ok)
 
     def test_claude_context_get_index_command_reports_availability(self) -> None:
         """The chained index command mirrors the real mcp-cli availability."""
         client = FlextQualityClaudeContextClient()
         expected_ok = bool(client.health_check().value.get("available"))
-        result = client.get_index_command()
+        result = client.build_index_command()
         tm.that(result.success, eq=expected_ok)
 
     def test_claude_context_health_check_reports_server_name(self) -> None:
@@ -222,21 +222,21 @@ class TestsFlextQualityIntegrations:
         """The chained observations command mirrors real mcp-cli availability."""
         client = FlextQualityClaudeMemClient()
         expected_ok = bool(client.health_check().value.get("available"))
-        result = client.get_observations_command([1])
+        result = client.build_observations_command([1])
         tm.that(result.success, eq=expected_ok)
 
     def test_claude_mem_get_search_command_reports_availability(self) -> None:
         """The chained search command mirrors real mcp-cli availability."""
         client = FlextQualityClaudeMemClient()
         expected_ok = bool(client.health_check().value.get("available"))
-        result = client.get_search_command("find this")
+        result = client.build_search_command("find this")
         tm.that(result.success, eq=expected_ok)
 
     def test_claude_mem_get_timeline_command_reports_availability(self) -> None:
         """The chained timeline command mirrors real mcp-cli availability."""
         client = FlextQualityClaudeMemClient()
         expected_ok = bool(client.health_check().value.get("available"))
-        result = client.get_timeline_command(1)
+        result = client.build_timeline_command(1)
         tm.that(result.success, eq=expected_ok)
 
     def test_claude_mem_health_check_reports_server_name(self) -> None:
@@ -244,6 +244,3 @@ class TestsFlextQualityIntegrations:
         client = FlextQualityClaudeMemClient()
         result = client.health_check()
         tm.that(result.value.get("server"), eq="claude-mem")
-
-
-__all__: list[str] = ["TestsFlextQualityIntegrations"]

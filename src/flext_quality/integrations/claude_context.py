@@ -54,11 +54,11 @@ class FlextQualityClaudeContextClient:
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME, "get_indexing_status", {}
         )
 
-    def get_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
+    def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing."""
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
-    def get_search_command(
+    def build_search_command(
         self, query: str, *, limit: int | None = None
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search."""

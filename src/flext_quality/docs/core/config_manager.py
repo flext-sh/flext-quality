@@ -1,14 +1,24 @@
 """FLEXT Quality Documentation Maintenance - Configuration Management.
 
 Centralized configuration management system for all maintenance components.
-Handles loading, validation, and access to configuration files.
+Handles loading, validation, and access to configuration files. Missing or
+partial configuration files resolve through the canonical model defaults,
+so an empty configuration directory still yields a fully typed, valid
+configuration.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Final
 
 from flext_quality import m, t, u
+
+_REQUIRED_CONFIG_FILES: Final[t.StrSequence] = (
+    "audit_rules.yaml",
+    "style_guide.yaml",
+    "validation_config.yaml",
+)
 
 
 class FlextQualityConfigManager:
@@ -31,31 +41,37 @@ class FlextQualityConfigManager:
         self._style_guide: m.Quality.StyleGuideConfig | None = None
         self._validation_config: m.Quality.ValidationConfig | None = None
 
-    def get_audit_rules(self) -> m.Quality.AuditRulesConfig:
-        """Get audit rules configuration."""
+    def resolve_audit_rules(self) -> m.Quality.AuditRulesConfig:
+        """Resolve the audit rules configuration, applying model defaults."""
         if self._audit_rules is None:
-            data = self._load_config_file("audit_rules.yaml")
-            self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
+            self._audit_rules = m.Quality.AuditRulesConfig.model_validate(
+                self._load_config_file("audit_rules.yaml")
+            )
         return self._audit_rules
 
-    def get_style_guide(self) -> m.Quality.StyleGuideConfig:
-        """Get style guide configuration."""
+    def resolve_style_guide(self) -> m.Quality.StyleGuideConfig:
+        """Resolve the style guide configuration, applying model defaults."""
         if self._style_guide is None:
-            data = self._load_config_file("style_guide.yaml")
-            self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
+            self._style_guide = m.Quality.StyleGuideConfig.model_validate(
+                self._load_config_file("style_guide.yaml")
+            )
         return self._style_guide
 
-    def get_validation_config(self) -> m.Quality.ValidationConfig:
-        """Get validation configuration."""
+    def resolve_validation_config(self) -> m.Quality.ValidationConfig:
+        """Resolve the validation configuration, applying model defaults."""
         if self._validation_config is None:
-            data = self._load_config_file("validation_config.yaml")
-            self._validation_config = m.Quality.ValidationConfig.model_validate(data)
+            self._validation_config = m.Quality.ValidationConfig.model_validate(
+                self._load_config_file("validation_config.yaml")
+            )
         return self._validation_config
 
     def _load_config_file(self, filename: str) -> t.JsonMapping:
-        """Load a YAML configuration file."""
+        """Load a YAML configuration file; a missing file yields empty data."""
         config_path = self.config_dir / filename
-        return u.Cli.yaml_safe_load(config_path).value
+        if not config_path.is_file():
+            return {}
+        loaded: t.JsonMapping = u.Cli.yaml_safe_load(config_path).value
+        return loaded or {}
 
     def reload_configs(self) -> None:
         """Reload all configurations from disk."""
@@ -64,11 +80,12 @@ class FlextQualityConfigManager:
         self._validation_config = None
 
     def validate_configs(self) -> t.StrSequence:
-        """Validate declared configuration and propagate the first failure."""
-        self.get_audit_rules()
-        self.get_style_guide()
-        self.get_validation_config()
-        return []
+        """Validate declared configuration and report every required file that is absent."""
+        return [
+            f"Missing required settings file: {name}"
+            for name in _REQUIRED_CONFIG_FILES
+            if not (self.config_dir / name).is_file()
+        ]
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive

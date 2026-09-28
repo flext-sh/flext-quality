@@ -20,7 +20,7 @@ class FlextQualityRulesEngine:
         self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
+    def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
         return list(self._rules)
 
@@ -106,7 +106,8 @@ class FlextQualityRulesEngine:
         """Get Python files from path."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
-        return list(u.Cli.files_matching(path, includes=["*.py"]))
+        matched = u.Cli.files_matching(path, includes=["*.py"])
+        return list(matched.value) if matched.success else []
 
     def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity."""

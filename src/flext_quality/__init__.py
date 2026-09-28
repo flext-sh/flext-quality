@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     from .api import FlextQuality, quality
     from .base import FlextQualityServiceBase, s
     from .cli import FlextQualityCli, main
-    from .constants import FlextQualityConstants, c
+    from .constants import FlextQualityConstants, FlextQualityConstants as c
     from .docs.core.config_manager import FlextQualityConfigManager
     from .docs.dashboard import FlextQualityDocumentationDashboard
     from .docs.notifications import FlextQualityDocumentationNotifier
