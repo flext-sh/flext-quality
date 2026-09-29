@@ -9,14 +9,18 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from ._payloads import FlextQualityModelDefaults
+    from .flextqualitymodels_part_01 import FlextQualityModelsPart01
+    from .flextqualitymodels_part_02 import FlextQualityModelsPart02
 
 
-__all__: tuple[str, ...] = ("FlextQualityModelDefaults",)
+__all__: tuple[str, ...] = ("FlextQualityModelsPart01", "FlextQualityModelsPart02")
 
 _LAZY_IMPORTS = MappingProxyType(
     build_lazy_import_map(
-        MappingProxyType({"._payloads": ("FlextQualityModelDefaults",)}),
+        MappingProxyType({
+            ".flextqualitymodels_part_01": ("FlextQualityModelsPart01",),
+            ".flextqualitymodels_part_02": ("FlextQualityModelsPart02",),
+        }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
     )
