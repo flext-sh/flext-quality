@@ -7,9 +7,10 @@ read from the declared configuration directory and validated into its canonical
 
 from __future__ import annotations
 
+from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityConfigManager:
@@ -25,7 +26,7 @@ class FlextQualityConfigManager:
         str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
     ]
 
-    class AuditRules(FlextQualityModels.Quality.AuditRulesConfig):
+    class AuditRules(m.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
@@ -61,7 +62,7 @@ class FlextQualityConfigManager:
                     pass
             return check_value
 
-    class StyleGuide(FlextQualityModels.Quality.StyleGuideConfig):
+    class StyleGuide(m.Quality.StyleGuideConfig):
         """Configuration for style and formatting guidelines."""
 
         def get_markdown_rule(
@@ -78,7 +79,7 @@ class FlextQualityConfigManager:
             value = getattr(self.accessibility, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
-    class ValidationSettings(FlextQualityModels.Quality.ValidationConfig):
+    class ValidationSettings(m.Quality.ValidationConfig):
         """Configuration for validation operations."""
 
         content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
