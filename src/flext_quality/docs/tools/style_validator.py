@@ -19,9 +19,9 @@ class FlextQualityStyleValidator:
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize style validation from declared, validated configuration."""
-        self.settings: m.Quality.StyleGuideConfig = (
-            FlextQualityConfigManager(config_dir).resolve_style_guide()
-        )
+        self.settings: m.Quality.StyleGuideConfig = FlextQualityConfigManager(
+            config_dir
+        ).resolve_style_guide()
         self.results: m.Quality.StyleValidationResults = (
             m.Quality.StyleValidationResults(
                 files_checked=0,
@@ -96,9 +96,11 @@ class FlextQualityStyleValidator:
                     )
                 )
 
-            if self.settings.headings.require_space_after_hash and line.startswith("#") and not u.Quality.compile_pattern(
-                r"^#{1,6}\s"
-            ).match(line):
+            if (
+                self.settings.headings.require_space_after_hash
+                and line.startswith("#")
+                and not u.Quality.compile_pattern(r"^#{1,6}\s").match(line)
+            ):
                 violations.append(
                     m.Quality.StyleIssue(
                         type="heading_format",
@@ -199,7 +201,10 @@ class FlextQualityStyleValidator:
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
         code_block_style = self.settings.markdown.code_block_style
-        if code_block_style == "fenced" and self.settings.code.require_language_specifier:
+        if (
+            code_block_style == "fenced"
+            and self.settings.code.require_language_specifier
+        ):
             code_blocks = u.Quality.compile_pattern(
                 r"```\n(.*?)\n```", dotall=True
             ).findall(content)
@@ -238,9 +243,7 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_accessibility(
-        self, content: str
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_accessibility(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
         """Check accessibility compliance."""
         issues: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -279,9 +282,7 @@ class FlextQualityStyleValidator:
 
         return issues
 
-    def _check_line_length(
-        self, content: str
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_line_length(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
         """Check line length compliance."""
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -312,9 +313,7 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_whitespace(
-        self, content: str
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_whitespace(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
         """Check whitespace formatting."""
         violations: MutableSequence[m.Quality.StyleIssue] = []
 

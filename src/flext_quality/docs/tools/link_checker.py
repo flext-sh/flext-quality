@@ -22,10 +22,7 @@ from flext_quality import FlextQualityConfigManager, c, m, t, u
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
 
-    def __init__(
-        self,
-        config_dir: str | pathlib.Path | None = None,
-    ) -> None:
+    def __init__(self, config_dir: str | pathlib.Path | None = None) -> None:
         """Initialize the link checker with validated configuration."""
         self.validation_config = FlextQualityConfigManager(
             config_dir
@@ -34,11 +31,9 @@ class FlextQualityLinkChecker:
             self.validation_config.link_validation
         )
         self.session: ClientSession | None = None
-        self.results: m.Quality.LinkValidatorResults = (
-            m.Quality.LinkValidatorResults(
-                timestamp=u.now().isoformat(),
-                performance=m.Quality.LinkPerformanceMetrics(),
-            )
+        self.results: m.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
+            timestamp=u.now().isoformat(),
+            performance=m.Quality.LinkPerformanceMetrics(),
         )
 
     def find_all_links(
@@ -59,7 +54,8 @@ class FlextQualityLinkChecker:
                     text=text,
                     type=link_type,
                     file=str(file_path),
-                    line_number=content.count("\n", 0, content.find(f"[{text}]({url})")) + 1,
+                    line_number=content.count("\n", 0, content.find(f"[{text}]({url})"))
+                    + 1,
                 )
                 all_links.append(link_info)
 
@@ -104,7 +100,8 @@ class FlextQualityLinkChecker:
         """Check one link and propagate the first transport failure."""
         start_time = time.time()
         if self.session is None:
-            raise RuntimeError("Link checker session is not initialized")
+            msg = "Link checker session is not initialized"
+            raise RuntimeError(msg)
 
         async with self.session.head(
             url,
@@ -181,9 +178,7 @@ class FlextQualityLinkChecker:
         self.results.performance.total_time = time.time() - start_time
 
         valid_times: t.SequenceOf[float] = [
-            r.response_time
-            for r in results
-            if r.response_time is not None and r.valid
+            r.response_time for r in results if r.response_time is not None and r.valid
         ]
 
         if valid_times:
@@ -199,9 +194,7 @@ class FlextQualityLinkChecker:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
-        def check_single(
-            link_info: m.Quality.LinkRecord,
-        ) -> m.Quality.LinkCheckResult:
+        def check_single(link_info: m.Quality.LinkRecord) -> m.Quality.LinkCheckResult:
             url = link_info.url
             ctx = link_info.context
             return self.check_link_sync(url, ctx)
@@ -225,10 +218,7 @@ class FlextQualityLinkChecker:
         return results
 
     async def validate_links(
-        self,
-        links: t.SequenceOf[m.Quality.LinkRecord],
-        *,
-        use_async: bool = True,
+        self, links: t.SequenceOf[m.Quality.LinkRecord], *, use_async: bool = True
     ) -> m.Quality.LinkValidatorResults:
         """Validate all provided links."""
         self.results.links_checked = len(links)
