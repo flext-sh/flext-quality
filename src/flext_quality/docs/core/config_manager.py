@@ -43,7 +43,7 @@ class FlextQualityConfigManager:
         ) -> t.Primitives | None:
             """Get a quality threshold value."""
             threshold = getattr(self.quality_thresholds, key, default)
-            return threshold if isinstance(threshold, t.PRIMITIVES_TYPES) else default
+            return threshold if isinstance(threshold, c.PRIMITIVES_TYPES) else default
 
         def is_check_enabled(self, check_type: str, check_name: str) -> bool:
             """Check if a specific audit check is enabled."""
@@ -69,14 +69,14 @@ class FlextQualityConfigManager:
         ) -> t.Primitives | None:
             """Get a markdown formatting rule."""
             value = getattr(self.markdown, rule, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
+            return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_accessibility_rule(
             self, rule: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get an accessibility rule."""
             value = getattr(self.accessibility, rule, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
+            return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
     class ValidationSettings(FlextQualityModels.Quality.ValidationConfig):
         """Configuration for validation operations."""
@@ -102,14 +102,14 @@ class FlextQualityConfigManager:
         ) -> t.Primitives | None:
             """Get a link validation setting."""
             value = getattr(self.link_validation, setting, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
+            return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_content_setting(
             self, setting: str, *, default: t.Primitives | None = None
         ) -> t.Primitives | None:
             """Get a content validation setting."""
             value = self.content_validation.get(setting, default)
-            return value if isinstance(value, t.PRIMITIVES_TYPES) else default
+            return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
     @staticmethod
     def _as_section(
@@ -121,7 +121,7 @@ class FlextQualityConfigManager:
         section: FlextQualityConfigManager.ConfigSection = {}
         for key, item in value.items():
             key_str = key
-            if isinstance(item, t.PRIMITIVES_TYPES):
+            if isinstance(item, c.PRIMITIVES_TYPES):
                 section[key_str] = item
             elif isinstance(item, list):
                 section[key_str] = [str(entry) for entry in item]
