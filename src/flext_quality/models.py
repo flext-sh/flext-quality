@@ -109,6 +109,27 @@ class FlextQualityModels(_WebModels):
             first_heading_level: int
             toc_heading_level: int
 
+        class CodeStyleConfig(_WebModels.BaseModel):
+            """Code block policy declared in ``style_guide.yaml``."""
+
+            require_language_specifier: bool
+            preferred_languages: t.StrSequence
+            inline_code_style: str
+            consistent_fencing: bool
+            fence_style: str
+
+        class ValidationRunConfig(_WebModels.BaseModel):
+            """Execution limits declared in ``validation_config.yaml``."""
+
+            enabled: bool
+            fail_on_errors: bool
+            verbose_output: bool
+            save_results: bool
+            max_concurrent_requests: t.PositiveInt
+            request_timeout: t.PositiveInt
+            requests_per_second: t.PositiveInt
+            burst_limit: t.PositiveInt
+
         class LinkValidationConfig(_WebModels.BaseModel):
             """Link validation settings declared in ``validation_config.yaml``."""
 
@@ -231,23 +252,6 @@ class FlextQualityModels(_WebModels):
                 _WebModels.Field(default=None),
             ]
 
-            def to_dict(
-                self,
-            ) -> t.MappingKV[
-                str, str | int | t.MappingKV[str, t.Primitives | None] | None
-            ]:
-                """Convert issue to dictionary representation."""
-                context: t.MutableMappingKV[str, t.Primitives | None] = {}
-                return {
-                    "type": self.type,
-                    "severity": self.severity,
-                    "file": self.file,
-                    "line": self.line,
-                    "description": self.description,
-                    "recommendation": self.recommendation,
-                    "context": self.context if self.context is not None else context,
-                }
-
         class ValidationResult(_WebModels.BaseModel):
             """Canonical validation result for documentation tooling."""
 
@@ -262,21 +266,6 @@ class FlextQualityModels(_WebModels):
             metadata: MutableMapping[str, t.Primitives] = _WebModels.Field(
                 default_factory=dict
             )
-
-            @property
-            def success_rate(self) -> float:
-                """Success rate as a percentage."""
-                if self.total_items == 0:
-                    return 100.0
-                return (self.valid_items / self.total_items) * 100.0
-
-            def add_issue(self, issue: FlextQualityModels.Quality.Issue) -> None:
-                """Add an issue to the validation result."""
-                self.issues.append(issue)
-                if issue.severity == "critical":
-                    self.invalid_items += 1
-                else:
-                    self.valid_items += 1
 
         class FileMetadata(_WebModels.BaseModel):
             """Metadata about a documentation file."""
@@ -506,10 +495,12 @@ class FlextQualityModels(_WebModels):
             accessibility: FlextQualityModels.Quality.AccessibilityConfig
             formatting: FlextQualityModels.Quality.FormattingConfig
             headings: FlextQualityModels.Quality.HeadingsConfig
+            code: FlextQualityModels.Quality.CodeStyleConfig
 
         class ValidationConfig(_WebModels.BaseModel):
             """Validation settings declared in ``validation_config.yaml``."""
 
+            validation: FlextQualityModels.Quality.ValidationRunConfig
             link_validation: FlextQualityModels.Quality.LinkValidationConfig
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig
 

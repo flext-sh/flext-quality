@@ -167,3 +167,9 @@ class TestsFlextQualityConfigConsumers:
             [(r.url, r.line_number, r.reference) for r in records],
             eq=[("https://example.org", 3, None), ("https://example.com", None, "one")],
         )
+
+    def test_unsupported_report_formats_fail_loudly(self) -> None:
+        """Only the declared report formats render; anything else raises."""
+        for tool in (FlextQualityStyleValidator(), FlextQualityLinkChecker()):
+            with pytest.raises(ValueError, match="Unsupported report format"):
+                tool.generate_report("xml")

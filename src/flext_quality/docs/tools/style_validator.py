@@ -34,24 +34,8 @@ class FlextQualityStyleValidator:
 
     def validate_file(self, file_path: Path) -> m.Quality.StyleFileResults:
         """Validate a single documentation file."""
-        read = u.Cli.files_read_text(file_path)
-        if read.failure:
-            return m.Quality.StyleFileResults(
-                file=str(file_path),
-                violations=[],
-                issues=[
-                    m.Quality.StyleIssue(
-                        type="file-read-error",
-                        line=0,
-                        content="",
-                        message=f"Failed to read file: {read.error}",
-                        severity="error",
-                    )
-                ],
-                suggestions=[],
-            )
-        content = read.value
-        filename = str(file_path.relative_to(file_path.parents[2]))
+        content = u.Cli.files_read_text(file_path).value
+        filename = str(file_path)
 
         violations_list: MutableSequence[m.Quality.StyleIssue] = []
         issues_list: MutableSequence[m.Quality.StyleIssue] = []
@@ -107,9 +91,11 @@ class FlextQualityStyleValidator:
                     )
                 )
 
-            if line.startswith("#") and not u.Quality.compile_pattern(
-                r"^#{1,6}\s"
-            ).match(line):
+            if (
+                self.settings.headings.require_space_after_hash
+                and line.startswith("#")
+                and not u.Quality.compile_pattern(r"^#{1,6}\s").match(line)
+            ):
                 violations.append(
                     m.Quality.StyleIssue(
                         type="heading_format",
@@ -154,13 +140,14 @@ class FlextQualityStyleValidator:
                     )
                 expected_level = level
 
-        if headings and headings[0][0] != 1:
+        first_level = self.settings.headings.first_heading_level
+        if headings and headings[0][0] != first_level:
             violations.append(
                 m.Quality.StyleIssue(
                     type="first_heading_level",
                     line=headings[0][2],
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
-                    message="Document should start with H1 heading",
+                    message=f"Document should start with H{first_level} heading",
                     severity="low",
                 )
             )
@@ -210,7 +197,10 @@ class FlextQualityStyleValidator:
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
         code_block_style = self.settings.markdown.code_block_style
-        if code_block_style == "fenced":
+        if (
+            code_block_style == "fenced"
+            and self.settings.code.require_language_specifier
+        ):
             code_blocks = u.Quality.compile_pattern(
                 r"```\n(.*?)\n```", dotall=True
             ).findall(content)
@@ -421,13 +411,10 @@ class FlextQualityStyleValidator:
         """Generate style validation report."""
         if output_format == "summary":
             return self._generate_summary_report()
-        adapter = m.TypeAdapter(m.Quality.StyleValidationResults)
-        report_text: str = (
-            adapter.dump_json(self.results, indent=2).decode()
-            if output_format == "json"
-            else adapter.dump_json(self.results).decode()
-        )
-        return report_text
+        if output_format == "json":
+            return self.results.model_dump_json(indent=2)
+        msg = f"Unsupported report format: {output_format}"
+        raise ValueError(msg)
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""
@@ -501,10 +488,8 @@ Top Issues:
         )
 
         results = FlextQualityStyleValidator.validate_file_style(file_path, config_dir)
-
-        for _violation in results.violations[:3]:
-            pass
-        return 0
+        sys.stdout.write(results.model_dump_json(indent=2) + "\n")
+        return int(bool(results.violations or results.issues))
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
