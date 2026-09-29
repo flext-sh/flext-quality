@@ -15,7 +15,7 @@ from flext_quality import (
 )
 from flext_quality.mcp.server import FlextQualityMcpServer
 
-_mcp = FlextQualityMcpServer.get_server()
+_mcp = FlextQualityMcpServer.resolve_server()
 
 
 class FlextQualityMcpTools:
@@ -32,7 +32,7 @@ class FlextQualityMcpTools:
         result = client.build_search_call(query=query, limit=search_limit)
         if result.failure:
             return {"error": result.error}
-        command_result = client.get_search_command(query=query, limit=search_limit)
+        command_result = client.build_search_command(query=query, limit=search_limit)
         if command_result.failure:
             return {"error": command_result.error}
         params = u.normalize_to_json_value(result.value.params)
@@ -55,7 +55,7 @@ class FlextQualityMcpTools:
         result = client.build_search_call(query=query, limit=search_limit)
         if result.failure:
             return {"error": result.error}
-        command_result = client.get_search_command(query=query, limit=search_limit)
+        command_result = client.build_search_command(query=query, limit=search_limit)
         if command_result.failure:
             return {"error": command_result.error}
         params = u.normalize_to_json_value(result.value.params)

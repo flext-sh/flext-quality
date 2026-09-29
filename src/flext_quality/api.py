@@ -16,9 +16,9 @@ from flext_quality import (
     t,
     u,
 )
-from flext_quality.base import FlextQualityServiceBase
 
 from ._settings import FlextQualitySettings
+from .base import FlextQualityServiceBase
 
 
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):

@@ -131,6 +131,3 @@ class TestsFlextQualityCodeExecutionBridge:
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.health_check()
         tm.that(result.value.get("working_dir"), is_=str)
-
-
-__all__: list[str] = ["TestsFlextQualityCodeExecutionBridge"]

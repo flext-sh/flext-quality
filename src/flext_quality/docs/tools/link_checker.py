@@ -29,7 +29,7 @@ class FlextQualityLinkChecker:
         """Initialize the link checker with validated configuration."""
         self.validation_config = FlextQualityConfigManager(
             config_dir
-        ).get_validation_config()
+        ).resolve_validation_config()
         self.settings: m.Quality.LinkValidationConfig = (
             self.validation_config.link_validation
         )

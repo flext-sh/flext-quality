@@ -45,13 +45,13 @@ class FlextQualityDocumentationAuditor:
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.config_manager = FlextQualityConfigManager(config_path)
         self.audit_rules: m.Quality.AuditRulesConfig = (
-            self.config_manager.get_audit_rules()
+            self.config_manager.resolve_audit_rules()
         )
         self.style_guide: m.Quality.StyleGuideConfig = (
-            self.config_manager.get_style_guide()
+            self.config_manager.resolve_style_guide()
         )
         self.validation_config: m.Quality.ValidationConfig = (
-            self.config_manager.get_validation_config()
+            self.config_manager.resolve_validation_config()
         )
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(), metrics=m.Quality.AuditMetrics()
@@ -294,7 +294,7 @@ class FlextQualityDocumentationAuditor:
                     "issues": accessibility_issues,
                     "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
                 })
-            if accessibility_cfg.heading_structure:
+            if accessibility_cfg.proper_heading_hierarchy:
                 heading_issues = self._check_heading_hierarchy(content)
                 if heading_issues:
                     self.results.issues.append({
@@ -350,7 +350,7 @@ class FlextQualityDocumentationAuditor:
                     }
                     for img in images_without_alt
                 ])
-        if accessibility_cfg.descriptive_links:
+        if accessibility_cfg.descriptive_link_text:
             generic_links = u.Quality.compile_pattern(
                 r"\\[here|click here|link|read more\\]\\([^)]+\\)", ignorecase=True
             ).findall(content)
