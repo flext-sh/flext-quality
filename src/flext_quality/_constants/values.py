@@ -11,7 +11,7 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, ClassVar, Final
 
-from flext_infra import c
+from flext_web import c
 
 if TYPE_CHECKING:
     from flext_quality import t
@@ -65,8 +65,6 @@ class FlextQualityConstantsValues:
         "Rules directory path."
         PATHS_DOCS_MAINTENANCE_REPORTS_DIR: Final[str] = "docs/maintenance/reports/"
         "Documentation maintenance reports directory path."
-        PATHS_DOCS_MAINTENANCE_SETTINGS_DIR: Final[str] = "docs/maintenance/settings/"
-        "Documentation maintenance settings directory path."
         SCHEDULED_MAINTENANCE_MIN_PYTHON_ARGS: Final[int] = 2
         "Minimum command parts for a python -m invocation."
         SCHEDULED_MAINTENANCE_MIN_GIT_ARGS: Final[int] = 2

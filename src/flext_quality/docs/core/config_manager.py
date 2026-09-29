@@ -1,15 +1,15 @@
 """FLEXT Quality Documentation Maintenance - Configuration Management.
 
-Centralized configuration management system for all maintenance components.
-Handles loading, validation, and access to configuration files.
+Single loader for the documentation maintenance configuration. Every file is
+read from the declared configuration directory and validated into its canonical
+``m.Quality`` model; a missing, unreadable, or invalid file fails loudly.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping
 from pathlib import Path
 
-from flext_quality import FlextQualityModels, c, m, t, u
+from flext_quality import m, t, u
 
 
 class FlextQualityConfigManager:
@@ -145,188 +145,46 @@ class FlextQualityConfigManager:
         """Initialize the configuration manager.
 
         Args:
-            config_dir: Directory containing configuration files. If None,
-                       uses the default settings directory.
+            config_dir: Directory containing the configuration files. ``None``
+                selects the package's declared ``docs/config`` directory.
 
         """
-        if config_dir is None:
-            # Find settings directory relative to this file
-            self.config_dir = Path(__file__).parent.parent / "settings"
-        else:
-            self.config_dir = Path(config_dir)
-
-        self._cache: MutableMapping[str, FlextQualityConfigManager.ConfigData] = {}
-        self._audit_rules: FlextQualityConfigManager.AuditRules | None = None
-        self._style_guide: FlextQualityConfigManager.StyleGuide | None = None
-        self._validation_config: FlextQualityConfigManager.ValidationSettings | None = (
-            None
+        self.config_dir = (
+            Path(__file__).parent.parent / "config"
+            if config_dir is None
+            else Path(config_dir)
         )
+        self._audit_rules: m.Quality.AuditRulesConfig | None = None
+        self._style_guide: m.Quality.StyleGuideConfig | None = None
+        self._validation_config: m.Quality.ValidationConfig | None = None
 
-    def resolve_audit_rules(self) -> FlextQualityConfigManager.AuditRules:
-        """Get audit rules configuration."""
+    def resolve_audit_rules(self) -> m.Quality.AuditRulesConfig:
+        """Return the validated ``audit_rules.yaml`` configuration."""
         if self._audit_rules is None:
-            data = self._load_config_file("audit_rules.yaml")
-            self._audit_rules = FlextQualityConfigManager.AuditRules.model_validate(
-                data
+            self._audit_rules = m.Quality.AuditRulesConfig.model_validate(
+                self._load_config_file("audit_rules.yaml")
             )
         return self._audit_rules
 
-    def resolve_style_guide(self) -> FlextQualityConfigManager.StyleGuide:
-        """Get style guide configuration."""
+    def resolve_style_guide(self) -> m.Quality.StyleGuideConfig:
+        """Return the validated ``style_guide.yaml`` configuration."""
         if self._style_guide is None:
-            data = self._load_config_file("style_guide.yaml")
-            self._style_guide = FlextQualityConfigManager.StyleGuide.model_validate(
-                data
+            self._style_guide = m.Quality.StyleGuideConfig.model_validate(
+                self._load_config_file("style_guide.yaml")
             )
         return self._style_guide
 
-    def resolve_validation_config(self) -> FlextQualityConfigManager.ValidationSettings:
-        """Get validation configuration."""
+    def resolve_validation_config(self) -> m.Quality.ValidationConfig:
+        """Return the validated ``validation_config.yaml`` configuration."""
         if self._validation_config is None:
-            data = self._load_config_file("validation_config.yaml")
-            self._validation_config = (
-                FlextQualityConfigManager.ValidationSettings.model_validate(data)
+            self._validation_config = m.Quality.ValidationConfig.model_validate(
+                self._load_config_file("validation_config.yaml")
             )
         return self._validation_config
 
-    def resolve_config(self, name: str) -> FlextQualityConfigManager.ConfigData:
-        """Get a configuration file by name."""
-        if name not in self._cache:
-            self._cache[name] = self._load_config_file(f"{name}.yaml")
-        return self._cache[name]
-
-    def _load_config_file(self, filename: str) -> FlextQualityConfigManager.ConfigData:
-        """Load a YAML configuration file."""
-        config_path = self.config_dir / filename
-
-        try:
-            raw = u.Cli.yaml_load_mapping(config_path)
-            return (
-                self._as_config_data(raw) if raw else self._get_default_config(filename)
-            )
-        except FileNotFoundError:
-            return self._get_default_config(filename)
-        except (OSError, PermissionError, UnicodeDecodeError) as exc:
-            _ = exc
-            return self._get_default_config(filename)
-
-    def _get_default_config(
-        self, filename: str
-    ) -> FlextQualityConfigManager.ConfigData:
-        """Get default configuration for a file."""
-        defaults: t.MappingKV[str, FlextQualityConfigManager.RawConfigMap] = {
-            "audit_rules.yaml": {
-                "quality_thresholds": {
-                    "max_age_days": 90,
-                    "min_word_count": 100,
-                    "max_broken_links": 0,
-                    "min_completeness_score": 0.8,
-                },
-                "content_checks": {
-                    "check_freshness": True,
-                    "check_completeness": True,
-                    "check_readability": False,
-                },
-                "link_checks": {
-                    "check_external": True,
-                    "check_internal": True,
-                    "check_images": True,
-                },
-                "style_checks": {"check_formatting": True, "check_consistency": True},
-                "accessibility_checks": {
-                    "check_alt_text": True,
-                    "check_headings": True,
-                    "check_links": True,
-                },
-            },
-            "style_guide.yaml": {
-                "markdown": {
-                    "heading_style": "atx",
-                    "list_style": "dash",
-                    "emphasis_style": "*",
-                    "max_line_length": 88,
-                },
-                "accessibility": {
-                    "require_alt_text": True,
-                    "descriptive_links": True,
-                    "heading_structure": True,
-                },
-                "formatting": {
-                    "max_line_length": 88,
-                    "consistent_indentation": True,
-                    "trailing_spaces": False,
-                },
-            },
-            "validation_config.yaml": {**m.Quality.ValidationConfig().model_dump()},
-        }
-
-        default_value = defaults.get(filename)
-        return self._as_config_data(default_value)
-
-    def reload_configs(self) -> None:
-        """Reload all configurations from disk."""
-        self._cache.clear()
-        self._audit_rules = None
-        self._style_guide = None
-        self._validation_config = None
-
-    def validate_configs(self) -> t.StrSequence:
-        """Validate all configuration files and return any issues."""
-        # Check required settings files exist
-        required_files = [
-            "audit_rules.yaml",
-            "style_guide.yaml",
-            "validation_config.yaml",
-        ]
-        issues = [
-            f"Missing required settings file: {filename}"
-            for filename in required_files
-            if not (self.config_dir / filename).exists()
-        ]
-
-        validations = (
-            (
-                self.resolve_audit_rules,
-                "quality_thresholds",
-                "Audit rules missing quality_thresholds section",
-                "audit_rules.yaml",
-            ),
-            (
-                self.resolve_style_guide,
-                "markdown",
-                "Style guide missing markdown section",
-                "style_guide.yaml",
-            ),
-            (
-                self.resolve_validation_config,
-                "link_validation",
-                "Validation settings missing link_validation section",
-                "validation_config.yaml",
-            ),
-        )
-        for getter, required_attr, missing_message, filename in validations:
-            try:
-                config = getter()
-                if not getattr(config, required_attr):
-                    issues.append(missing_message)
-            except c.EXC_FS_KEY_VALUE as exc:
-                issues.append(f"Invalid {filename}: {exc}")
-
-        return issues
-
-    def resolve_all_configs(self) -> t.JsonMapping:
-        """Get all configurations as a single dictionary."""
-        return t.json_mapping_adapter().validate_python({
-            "audit_rules": self.resolve_audit_rules().model_dump(mode="json"),
-            "style_guide": self.resolve_style_guide().model_dump(mode="json"),
-            "validation_config": self.resolve_validation_config().model_dump(
-                mode="json"
-            ),
-            "raw_configs": {
-                name: self.resolve_config(name)
-                for name in ["audit_rules", "style_guide", "validation_config"]
-            },
-        })
+    def _load_config_file(self, filename: str) -> t.JsonMapping:
+        """Load one YAML configuration file and propagate its failure."""
+        return u.Cli.yaml_safe_load(self.config_dir / filename).unwrap()
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
