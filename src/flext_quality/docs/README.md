@@ -28,8 +28,8 @@
   - [Link & Reference Validation](#link-reference-validation)
   - [Style & Accessibility](#style-accessibility)
 - [⚙️ Configuration](#configuration)
-  - [Audit Rules (`settings/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
-  - [Style Guide (`settings/style_guide.yaml`)](#style-guide-configstyleguideyaml)
+  - [Audit Rules (`config/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
+  - [Style Guide (`config/style_guide.yaml`)](#style-guide-configstyleguideyaml)
 - [🔧 Maintenance Scripts](#maintenance-scripts)
   - [Comprehensive Audit (`scripts/audit.py`)](#comprehensive-audit-scriptsauditpy)
   - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
@@ -137,8 +137,8 @@
     - Link & Reference Validation
     - Style & Accessibility
   - ⚙️ Configuration
-    - Audit Rules (`settings/audit_rules.yaml`)
-    - Style Guide (`settings/style_guide.yaml`)
+    - Audit Rules (`config/audit_rules.yaml`)
+    - Style Guide (`config/style_guide.yaml`)
   - 🔧 Maintenance Scripts
     - Comprehensive Audit (`scripts/audit.py`)
 - Full documentation quality assessment
@@ -181,7 +181,7 @@
 - Check Python dependencies
 - Verify file permissions
 - Check configuration files
-- Update timeout in settings/validation_config.YAML
+- Update timeout in config/validation_config.yaml
 - Review style guide configuration
 - Run with verbose output
   - 📚 API Reference
@@ -557,7 +557,7 @@ repos:
 
 ## ⚙️ Configuration
 
-### Audit Rules (`settings/audit_rules.yaml`)
+### Audit Rules (`config/audit_rules.yaml`)
 
 ```yaml
 quality_thresholds:
@@ -570,13 +570,12 @@ style_rules:
   list_consistency: true
   code_block_formatting: true
 
-validation_rules:
-  external_link_timeout: 10
-  retry_attempts: 3
+link_validation:
+  external_timeout: 10
   check_images: true
 ```
 
-### Style Guide (`settings/style_guide.yaml`)
+### Style Guide (`config/style_guide.yaml`)
 
 ```yaml
 markdown:
@@ -586,8 +585,8 @@ markdown:
 
 accessibility:
   require_alt_text: true
-  descriptive_links: true
-  heading_structure: true
+  descriptive_link_text: true
+  proper_heading_hierarchy: true
 ```
 
 ## 🔧 Maintenance Scripts
@@ -784,10 +783,9 @@ python -c "import yaml; yaml.safe_load(open('docs/maintenance/settings/audit_rul
 **Link Validation Timeout**
 
 ```yaml
-# Update timeout in settings/validation_config.yaml
-validation:
-  link_timeout: 30 # Increase from default 10 seconds
-  retry_attempts: 5 # Increase retry attempts
+# Update timeout in config/validation_config.yaml
+link_validation:
+  timeout: 30 # Increase from the declared 10 seconds
 ```
 
 **Style Validation Errors**

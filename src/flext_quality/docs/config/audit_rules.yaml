@@ -84,9 +84,6 @@ link_validation:
   # Timeout for external link checks (seconds)
   external_timeout: 10
 
-  # Retry attempts for failed requests
-  retry_attempts: 3
-
   # User agent for external requests
   user_agent: "FLEXT-Quality-Doc-Auditor/1.0"
 
