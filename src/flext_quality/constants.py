@@ -15,7 +15,6 @@ from __future__ import annotations
 from enum import StrEnum, auto, unique
 from typing import TYPE_CHECKING
 
-from flext_infra import FlextInfraConstants
 from flext_web import FlextWebConstants
 
 from ._constants.values import FlextQualityConstantsValues
@@ -24,7 +23,7 @@ if TYPE_CHECKING:
     from flext_quality import t
 
 
-class FlextQualityConstants(FlextInfraConstants, FlextWebConstants):
+class FlextQualityConstants(FlextWebConstants):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,

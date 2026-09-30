@@ -17,8 +17,8 @@ class TestsFlextQualityBasic:
     """Public contract of the flext-quality package facade and constants."""
 
     def test_facade_constructs_without_arguments(self) -> None:
-        """FlextQuality() is constructible with no arguments."""
-        tm.that(FlextQuality(), is_=FlextQuality)
+        """FlextQuality() is constructible with no arguments and executes."""
+        tm.that(FlextQuality().execute().success, eq=True)
 
     def test_global_alias_is_facade_instance(self) -> None:
         """The module-level ``quality`` alias is a FlextQuality facade."""

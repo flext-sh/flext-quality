@@ -1,225 +1,175 @@
-"""Behavioral tests for ``FlextQualityConfigManager``.
+"""Behavioral tests for ``FlextQualityConfigManager`` and its consumers.
 
-Exercises real YAML loading, defaulting, caching and validation against
-``tmp_path`` — no mocks, no patched collaborators.
+Exercises real YAML loading from the packaged configuration directory and from
+``tmp_path`` — no mocks, no patched collaborators. Expected values are read from
+the same YAML files the manager validates, never frozen in the test.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import shutil
+from pathlib import Path
 
+import pytest
 from flext_tests import tm
 
-from flext_quality import FlextQualityConfigManager
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from flext_quality import (
+    FlextQualityConfigManager,
+    FlextQualityDocumentationAuditor,
+    FlextQualityLinkChecker,
+    FlextQualityStyleValidator,
+    t,
+    u,
+)
 
 
 class TestsFlextQualityConfigManager:
     """Contract tests for the documentation configuration manager."""
 
-    def test_get_audit_rules_falls_back_to_defaults_for_empty_dir(
-        self, tmp_path: Path
-    ) -> None:
-        """An empty config directory yields the built-in audit-rule defaults."""
-        manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.quality_thresholds.max_age_days, eq=90)
-        tm.that(rules.content_checks.check_freshness, eq=True)
+    @staticmethod
+    def _declared(manager: FlextQualityConfigManager, filename: str) -> t.JsonMapping:
+        return u.Cli.yaml_safe_load(manager.config_dir / filename).unwrap()
 
-    def test_get_audit_rules_is_cached_across_calls(self, tmp_path: Path) -> None:
-        """Repeated lookups return the identical cached configuration object."""
-        manager = FlextQualityConfigManager(tmp_path)
-        first = manager.resolve_audit_rules()
-        second = manager.resolve_audit_rules()
-        tm.that(first is second, eq=True)
-
-    def test_get_style_guide_falls_back_to_defaults(self, tmp_path: Path) -> None:
-        """An empty config directory yields the built-in style-guide defaults."""
-        manager = FlextQualityConfigManager(tmp_path)
-        guide = manager.resolve_style_guide()
-        tm.that(guide.markdown.heading_style, eq="atx")
-        tm.that(guide.accessibility.require_alt_text, eq=True)
-
-    def test_get_validation_config_falls_back_to_defaults(self, tmp_path: Path) -> None:
-        """An empty config directory yields the built-in validation defaults."""
-        manager = FlextQualityConfigManager(tmp_path)
-        validation = manager.resolve_validation_config()
-        tm.that(validation.link_validation.timeout, eq=10)
-
-    def test_get_audit_rules_reads_real_yaml_overrides(self, tmp_path: Path) -> None:
-        """A real YAML file on disk overrides the built-in threshold defaults."""
-        (tmp_path / "audit_rules.yaml").write_text(
-            "quality_thresholds:\n"
-            "  max_age_days: 30\n"
-            "  min_word_count: 50\n"
-            "content_checks:\n"
-            "  check_freshness: false\n",
-            encoding="utf-8",
-        )
-        manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.quality_thresholds.max_age_days, eq=30)
-        tm.that(rules.content_checks.check_freshness, eq=False)
-
-    def test_get_config_caches_raw_mapping_by_name(self, tmp_path: Path) -> None:
-        """``resolve_config`` loads and caches the raw section mapping by name."""
-        (tmp_path / "custom.yaml").write_text(
-            "section:\n  flag: true\n  items:\n    - a\n    - b\n", encoding="utf-8"
-        )
-        manager = FlextQualityConfigManager(tmp_path)
-        data = manager.resolve_config("custom")
-        tm.that(data.get("section", {}).get("flag"), eq=True)
-        tm.that(data.get("section", {}).get("items"), eq=["a", "b"])
-        tm.that(manager.resolve_config("custom") is data, eq=True)
-
-    def test_get_config_returns_default_for_missing_file(self, tmp_path: Path) -> None:
-        """A configuration name with no matching file loads its safe default."""
-        manager = FlextQualityConfigManager(tmp_path)
-        tm.that(manager.resolve_config("audit_rules"), has="quality_thresholds")
-        tm.that(manager.resolve_config("unknown_config"), eq={})
-
-    def test_reload_configs_clears_cached_state(self, tmp_path: Path) -> None:
-        """Reloading clears the memoized audit/style/validation/config caches."""
-        manager = FlextQualityConfigManager(tmp_path)
-        first_rules = manager.resolve_audit_rules()
-        manager.resolve_config("audit_rules")
-        manager.reload_configs()
-        second_rules = manager.resolve_audit_rules()
-        tm.that(first_rules is second_rules, eq=False)
-
-    def test_validate_configs_reports_missing_required_files(
-        self, tmp_path: Path
-    ) -> None:
-        """Validation reports every required settings file that is absent."""
-        manager = FlextQualityConfigManager(tmp_path)
-        issues = manager.validate_configs()
-        tm.that(len(issues) >= 3, eq=True)
-        tm.that(any("audit_rules.yaml" in issue for issue in issues), eq=True)
-
-    def test_validate_configs_passes_when_files_present_with_defaults(
-        self, tmp_path: Path
-    ) -> None:
-        """With every required file present, no missing-file issues remain."""
-        (tmp_path / "audit_rules.yaml").write_text("{}\n", encoding="utf-8")
-        (tmp_path / "style_guide.yaml").write_text("{}\n", encoding="utf-8")
-        (tmp_path / "validation_config.yaml").write_text("{}\n", encoding="utf-8")
-        manager = FlextQualityConfigManager(tmp_path)
-        issues = manager.validate_configs()
-        tm.that(
-            any("Missing required settings file" in issue for issue in issues), eq=False
-        )
-
-    def test_get_all_configs_returns_composite_mapping(self, tmp_path: Path) -> None:
-        """``resolve_all_configs`` composes typed and raw sections for every file."""
-        manager = FlextQualityConfigManager(tmp_path)
-        composite = manager.resolve_all_configs()
-        tm.that(composite, has=("audit_rules", "style_guide", "validation_config"))
-        tm.that(composite, has="raw_configs")
-
-    def test_default_config_dir_derives_from_package_location(self) -> None:
-        """Omitting ``config_dir`` resolves a settings directory near the package."""
+    def test_default_config_dir_holds_every_declared_file(self) -> None:
+        """Omitting ``config_dir`` selects the packaged configuration directory."""
         manager = FlextQualityConfigManager()
-        tm.that(str(manager.config_dir), has="settings")
+        for filename in (
+            "audit_rules.yaml",
+            "style_guide.yaml",
+            "validation_config.yaml",
+        ):
+            tm.that((manager.config_dir / filename).is_file(), eq=True)
+
+    def test_audit_rules_match_the_declared_yaml(self) -> None:
+        """Audit rules are the validated sections of ``audit_rules.yaml``."""
+        manager = FlextQualityConfigManager()
+        declared = self._declared(manager, "audit_rules.yaml")
+        rules = manager.resolve_audit_rules()
+        for section in ("quality_thresholds", "content_checks", "severity_levels"):
+            tm.that(getattr(rules, section).model_dump(), eq=declared[section])
+
+    def test_style_guide_matches_the_declared_yaml(self) -> None:
+        """The style guide is the validated sections of ``style_guide.yaml``."""
+        manager = FlextQualityConfigManager()
+        declared = self._declared(manager, "style_guide.yaml")
+        guide = manager.resolve_style_guide()
+        for section in ("markdown", "accessibility", "formatting", "headings"):
+            tm.that(getattr(guide, section).model_dump(), eq=declared[section])
+
+    def test_validation_config_matches_the_declared_yaml(self) -> None:
+        """Link and content settings come from ``validation_config.yaml``."""
+        manager = FlextQualityConfigManager()
+        declared = self._declared(manager, "validation_config.yaml")
+        validation = manager.resolve_validation_config()
+        adapter = t.json_mapping_adapter()
+        link = validation.link_validation.model_dump()
+        declared_link = adapter.validate_python(declared["link_validation"])
+        tm.that(link, eq={key: declared_link[key] for key in link})
+        content = validation.content_analysis.model_dump()
+        declared_content = adapter.validate_python(declared["content_analysis"])
+        tm.that(content, eq={key: declared_content[key] for key in content})
+
+    def test_declared_configuration_carries_no_retry_policy(self) -> None:
+        """Neither the YAML nor the model declares a retry policy."""
+        manager = FlextQualityConfigManager()
+        for filename in ("audit_rules.yaml", "validation_config.yaml"):
+            text = (manager.config_dir / filename).read_text(encoding="utf-8")
+            tm.that("retry_" in text, eq=False)
+        link = manager.resolve_validation_config().link_validation.model_dump()
+        tm.that(any(key.startswith("retry_") for key in link), eq=False)
+
+    def test_resolved_configuration_is_cached(self) -> None:
+        """Repeated lookups return the identical validated configuration."""
+        manager = FlextQualityConfigManager()
+        tm.that(manager.resolve_audit_rules() is manager.resolve_audit_rules(), eq=True)
 
     def test_config_dir_accepts_a_string_path(self, tmp_path: Path) -> None:
-        """A string ``config_dir`` is normalized into a ``Path`` internally."""
+        """A string ``config_dir`` is normalized into a ``Path``."""
         manager = FlextQualityConfigManager(str(tmp_path))
         tm.that(manager.config_dir, eq=tmp_path)
 
-    def test_audit_rules_get_threshold_reads_a_known_field(
-        self, tmp_path: Path
-    ) -> None:
-        """``get_threshold`` reads a real field from the quality thresholds."""
+    def test_missing_file_fails_loudly(self, tmp_path: Path) -> None:
+        """An absent configuration file raises instead of loading defaults."""
         manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.get_threshold("max_age_days"), eq=90)
+        with pytest.raises(RuntimeError, match=r"audit_rules\.yaml"):
+            manager.resolve_audit_rules()
 
-    def test_audit_rules_get_threshold_falls_back_to_default(
-        self, tmp_path: Path
-    ) -> None:
-        """An unknown threshold key returns the supplied default value."""
+    def test_incomplete_section_fails_loudly(self, tmp_path: Path) -> None:
+        """A section missing a declared key is rejected, never defaulted."""
+        packaged = FlextQualityConfigManager().config_dir
+        shutil.copy(packaged / "style_guide.yaml", tmp_path / "style_guide.yaml")
         manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.get_threshold("not_a_field", default=42), eq=42)
-
-    def test_audit_rules_is_check_enabled_for_each_check_type(
-        self, tmp_path: Path
-    ) -> None:
-        """``is_check_enabled`` dispatches across every supported check type.
-
-        The built-in defaults (``_get_default_config``) enable every listed
-        link/style/accessibility check, so each real default is ``True``;
-        only an unrecognized check type falls through to ``False``.
-        """
-        manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.is_check_enabled("content", "check_freshness"), eq=True)
-        tm.that(rules.is_check_enabled("link", "check_external"), eq=True)
-        tm.that(rules.is_check_enabled("style", "check_formatting"), eq=True)
-        tm.that(rules.is_check_enabled("accessibility", "check_alt_text"), eq=True)
-        tm.that(rules.is_check_enabled("link", "no-such-check"), eq=False)
-        tm.that(rules.is_check_enabled("unknown-type", "anything"), eq=False)
-
-    def test_audit_rules_is_check_enabled_reads_real_link_check_yaml(
-        self, tmp_path: Path
-    ) -> None:
-        """A real YAML-configured link check overrides the enabled default."""
-        (tmp_path / "audit_rules.yaml").write_text(
-            "link_checks:\n  check_external: false\n", encoding="utf-8"
-        )
-        manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.is_check_enabled("link", "check_external"), eq=False)
-
-    def test_style_guide_get_markdown_rule(self, tmp_path: Path) -> None:
-        """``get_markdown_rule`` reads a real field from the markdown config."""
-        manager = FlextQualityConfigManager(tmp_path)
-        guide = manager.resolve_style_guide()
-        tm.that(guide.get_markdown_rule("heading_style"), eq="atx")
-        tm.that(guide.get_markdown_rule("not_a_field", default="x"), eq="x")
-
-    def test_style_guide_get_accessibility_rule(self, tmp_path: Path) -> None:
-        """``get_accessibility_rule`` reads a real field from the accessibility config."""
-        manager = FlextQualityConfigManager(tmp_path)
-        guide = manager.resolve_style_guide()
-        tm.that(guide.get_accessibility_rule("require_alt_text"), eq=True)
-        tm.that(guide.get_accessibility_rule("not_a_field", default=False), eq=False)
-
-    def test_validation_config_get_link_setting(self, tmp_path: Path) -> None:
-        """``get_link_setting`` reads a real field from the link validation config."""
-        manager = FlextQualityConfigManager(tmp_path)
-        validation = manager.resolve_validation_config()
-        tm.that(validation.get_link_setting("timeout"), eq=10)
-        tm.that(validation.get_link_setting("not_a_field", default=1), eq=1)
-
-    def test_validation_config_get_content_setting(self, tmp_path: Path) -> None:
-        """``get_content_setting`` reads from the raw content-validation mapping."""
-        manager = FlextQualityConfigManager(tmp_path)
-        validation = manager.resolve_validation_config()
         tm.that(
-            validation.get_content_setting("missing", default="fallback"), eq="fallback"
+            manager.resolve_style_guide(),
+            eq=FlextQualityConfigManager(packaged).resolve_style_guide(),
         )
-
-    def test_as_section_coerces_list_items_to_strings(self, tmp_path: Path) -> None:
-        """A YAML list value is normalized into a list of strings."""
-        (tmp_path / "custom.yaml").write_text(
-            "section:\n  items:\n    - 1\n    - true\n    - text\n", encoding="utf-8"
-        )
-        manager = FlextQualityConfigManager(tmp_path)
-        data = manager.resolve_config("custom")
-        tm.that(data.get("section", {}).get("items"), eq=["1", "True", "text"])
-
-    def test_validate_configs_reports_invalid_yaml_content(
-        self, tmp_path: Path
-    ) -> None:
-        """Configuration missing a required attribute is reported as an issue."""
         (tmp_path / "audit_rules.yaml").write_text(
             "quality_thresholds: {}\n", encoding="utf-8"
         )
-        (tmp_path / "style_guide.yaml").write_text("{}\n", encoding="utf-8")
-        (tmp_path / "validation_config.yaml").write_text("{}\n", encoding="utf-8")
-        manager = FlextQualityConfigManager(tmp_path)
-        issues = manager.validate_configs()
-        tm.that(issues, eq=[])
+        with pytest.raises(ValueError, match="quality_thresholds"):
+            manager.resolve_audit_rules()
+
+
+class TestsFlextQualityConfigConsumers:
+    """The documentation tools consume the manager's validated configuration."""
+
+    def test_consumers_fail_loudly_without_configuration(self, tmp_path: Path) -> None:
+        """Every tool raises on a directory without configuration files."""
+        for tool in (
+            FlextQualityDocumentationAuditor,
+            FlextQualityStyleValidator,
+            FlextQualityLinkChecker,
+        ):
+            with pytest.raises(RuntimeError):
+                tool(tmp_path)
+
+    def test_auditor_uses_the_declared_configuration(self) -> None:
+        """The auditor exposes the manager's validated configuration."""
+        manager = FlextQualityConfigManager()
+        auditor = FlextQualityDocumentationAuditor()
+        tm.that(auditor.audit_rules, eq=manager.resolve_audit_rules())
+        tm.that(auditor.style_guide, eq=manager.resolve_style_guide())
+        tm.that(auditor.validation_config, eq=manager.resolve_validation_config())
+
+    def test_style_validator_uses_the_declared_style_guide(
+        self, tmp_path: Path
+    ) -> None:
+        """Line-length findings follow the declared formatting limit."""
+        limit = FlextQualityConfigManager().resolve_style_guide().formatting
+        document = tmp_path / "a" / "b" / "doc.md"
+        document.parent.mkdir(parents=True)
+        document.write_text(
+            "# Title\n\n" + "x" * (limit.max_line_length + 1) + "\n", encoding="utf-8"
+        )
+        validator = FlextQualityStyleValidator()
+        results = validator.validate_file(document)
+        tm.that(
+            [v.type for v in results.violations if v.type == "line_too_long"],
+            eq=["line_too_long"],
+        )
+        tm.that(validator.results.files_checked, eq=1)
+
+    def test_link_checker_records_links_with_their_origin(self, tmp_path: Path) -> None:
+        """Inline and reference links become canonical link records."""
+        document = tmp_path / "doc.md"
+        document.write_text(
+            "# Links\n\n[inline](https://example.org)\n\n[ref][one]\n\n"
+            "[one]: https://example.com\n",
+            encoding="utf-8",
+        )
+        checker = FlextQualityLinkChecker()
+        tm.that(
+            checker.settings,
+            eq=FlextQualityConfigManager().resolve_validation_config().link_validation,
+        )
+        records = checker.find_all_links([document])
+        tm.that(
+            [(r.url, r.line_number, r.reference) for r in records],
+            eq=[("https://example.org", 3, None), ("https://example.com", None, "one")],
+        )
+
+    def test_unsupported_report_formats_fail_loudly(self) -> None:
+        """Only the declared report formats render; anything else raises."""
+        for tool in (FlextQualityStyleValidator(), FlextQualityLinkChecker()):
+            with pytest.raises(ValueError, match="Unsupported report format"):
+                tool.generate_report("xml")

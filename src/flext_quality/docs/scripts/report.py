@@ -299,7 +299,12 @@ class FlextQualityDocumentationReporter:
                             error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                                 e_raw
                             )
-                        except c.EXC_TYPE_VALIDATION:
+                        except c.EXC_TYPE_VALIDATION as exc:
+                            self.logger.warning(
+                                "Skipping unparsable validation error entry %s: %s",
+                                e_raw,
+                                exc,
+                            )
                             continue
                         error_type = error_entry.get("type")
                         if error_type in {
@@ -309,7 +314,7 @@ class FlextQualityDocumentationReporter:
                             normalized: t.MappingKV[str, t.Primitives] = {
                                 key: value
                                 for key, value in error_entry.items()
-                                if isinstance(value, t.PRIMITIVES_TYPES)
+                                if isinstance(value, c.PRIMITIVES_TYPES)
                             }
                             if normalized:
                                 broken_links.append(normalized)
@@ -524,7 +529,10 @@ class FlextQualityDocumentationReporter:
                 continue
             try:
                 report_data_dict = self._load_recent_report(report_file, cutoff_date)
-            except (ValueError, KeyError):
+            except (ValueError, KeyError) as exc:
+                self.logger.warning(
+                    "Skipping unreadable trend report %s: %s", report_file, exc
+                )
                 continue
             if report_data_dict is not None:
                 recent_reports.append(report_data_dict)

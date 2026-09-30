@@ -4,11 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_infra import FlextInfraTypes, m, t
-from flext_web import FlextWebTypes
+from flext_web import FlextWebTypes, m, t
 
 
-class FlextQualityTypes(FlextInfraTypes, FlextWebTypes):
+class FlextQualityTypes(FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
     class Quality:
