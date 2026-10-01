@@ -18,13 +18,7 @@ class FlextQualityStyleValidator:
     """Documentation style validation and consistency checking system."""
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
-        """Initialize the style validator from the validated style guide.
-
-        Args:
-            config_dir: Configuration directory; ``None`` selects the package's
-                declared configuration directory.
-
-        """
+        """Initialize style validation from declared, validated configuration."""
         self.settings: m.Quality.StyleGuideConfig = FlextQualityConfigManager(
             config_dir
         ).resolve_style_guide()

@@ -107,8 +107,8 @@ class FlextQualityRulesEngine:
     def _get_files(self, path: Path) -> p.Result[t.SequenceOf[Path]]:
         """Select the Python files under ``path`` through the CLI file owner."""
         if path.is_file():
-            return r[t.SequenceOf[Path]].ok([path] if path.suffix == ".py" else [])
-        return u.Cli.files_matching(path, includes=["*.py"])
+            return [path] if path.suffix == ".py" else []
+        return list(u.Cli.files_matching(path, includes=["*.py"]).value)
 
     def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity."""

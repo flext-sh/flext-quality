@@ -49,11 +49,15 @@ class FlextQualityDocumentationAuditor:
 
         """
         self.project_root = Path(__file__).parent.parent.parent.parent
-        config = FlextQualityConfigManager(config_dir)
-        self.audit_rules: m.Quality.AuditRulesConfig = config.resolve_audit_rules()
-        self.style_guide: m.Quality.StyleGuideConfig = config.resolve_style_guide()
+        self.config_manager = FlextQualityConfigManager(config_path)
+        self.audit_rules: m.Quality.AuditRulesConfig = (
+            self.config_manager.resolve_audit_rules()
+        )
+        self.style_guide: m.Quality.StyleGuideConfig = (
+            self.config_manager.resolve_style_guide()
+        )
         self.validation_config: m.Quality.ValidationConfig = (
-            config.resolve_validation_config()
+            self.config_manager.resolve_validation_config()
         )
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(), metrics=m.Quality.AuditMetrics()

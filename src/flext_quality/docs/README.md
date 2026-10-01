@@ -559,35 +559,11 @@ repos:
 
 ### Audit Rules (`config/audit_rules.yaml`)
 
-```yaml
-quality_thresholds:
-  max_age_days: 90
-  min_word_count: 100
-  max_broken_links: 0
-
-style_rules:
-  heading_hierarchy: true
-  list_consistency: true
-  code_block_formatting: true
-
-link_validation:
-  external_timeout: 10
-  check_images: true
-```
-
-### Style Guide (`config/style_guide.yaml`)
-
-```yaml
-markdown:
-  heading_style: "atx" # # ## ### or setext
-  list_style: "dash" # dash, asterisk, or plus
-  emphasis_style: "*" # * or _
-
-accessibility:
-  require_alt_text: true
-  descriptive_link_text: true
-  proper_heading_hierarchy: true
-```
+`src/flext_quality/docs/config/audit_rules.yaml`, `style_guide.yaml`, and
+`validation_config.yaml` own the documentation rules. The public
+`FlextQualityConfigManager` validates them into the `m.Quality` models. A missing or
+partial file resolves through the canonical model defaults, and `validate_configs`
+reports every required settings file that is absent; values present on disk always win.
 
 ## 🔧 Maintenance Scripts
 
