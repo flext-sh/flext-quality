@@ -135,8 +135,8 @@ endif
 # === SECTION: verb dispatch (managed) ===
 # Source: config:make.verbs and the canonical gate vocabulary. A verb exists
 # only in the profiles it declares (make.verbs[].profiles).
-PUBLIC_VERBS := help setup upg build check test test-full fmt fix fix-enforcement fix-namespace fix-accessors audit status docs clean release-plan release-version release-tag release-build publication gen bootstrap-candidate initialize mod mod-snapshots waza duplication sonarcloud-sync
-BUILTIN_VERBS := help setup upg build check test test-full fmt fix fix-enforcement fix-namespace fix-accessors audit status docs clean release-plan release-version release-tag release-build publication gen bootstrap-candidate initialize mod mod-snapshots waza duplication sonarcloud-sync
+PUBLIC_VERBS := help setup upg build check smells test test-full fmt fix fix-enforcement fix-namespace fix-accessors audit status docs clean release-plan release-version release-tag release-build publication gen bootstrap-candidate initialize mod mod-text mod-text-candidate mod-snapshots waza duplication sonarcloud-sync
+BUILTIN_VERBS := help setup upg build check smells test test-full fmt fix fix-enforcement fix-namespace fix-accessors audit status docs clean release-plan release-version release-tag release-build publication gen bootstrap-candidate initialize mod mod-text mod-text-candidate mod-snapshots waza duplication sonarcloud-sync
 SCRIPT_VERBS :=
 
 CUSTOM_MAKEFILE := $(MAKEFILE_ROOT)/custom.mk
@@ -921,6 +921,17 @@ _activated-check: _builtin_require_environment
 
 
 
+smells: _builtin_require_workspace
+	+@direnv exec "$(PROJECT_ROOT)" $(SELF_MAKE) _activated-smells
+
+.PHONY: _activated-smells
+_activated-smells: _builtin_require_environment
+
+	$(call RUN_PUBLIC,smells)
+
+
+
+
 test: _builtin_require_workspace
 	+@direnv exec "$(PROJECT_ROOT)" $(SELF_MAKE) _activated-test
 
@@ -1137,6 +1148,28 @@ _activated-mod: _builtin_require_environment
 
 
 
+mod-text: _builtin_require_workspace
+	+@direnv exec "$(PROJECT_ROOT)" $(SELF_MAKE) _activated-mod-text
+
+.PHONY: _activated-mod-text
+_activated-mod-text: _builtin_require_environment
+
+	$(call RUN_PUBLIC,mod-text)
+
+
+
+
+mod-text-candidate: _builtin_require_workspace
+	+@direnv exec "$(PROJECT_ROOT)" $(SELF_MAKE) _activated-mod-text-candidate
+
+.PHONY: _activated-mod-text-candidate
+_activated-mod-text-candidate: _builtin_require_environment
+
+	$(call RUN_PUBLIC,mod-text-candidate)
+
+
+
+
 mod-snapshots: _builtin_require_workspace
 	+@direnv exec "$(PROJECT_ROOT)" $(SELF_MAKE) _activated-mod-snapshots
 
@@ -1229,7 +1262,9 @@ _builtin-help:
 
 	@printf '  %-16s %s\n' 'build' 'Build the project distribution artifacts.';
 
-	@printf '  %-16s %s\n' 'check' 'Run every configured non-test gate.';
+	@printf '  %-16s %s\n' 'check' 'Run the configured non-test gates except the dedicated smells audit.';
+
+	@printf '  %-16s %s\n' 'smells' 'Run the strict code-smell audit as a dedicated gate.';
 
 	@printf '  %-16s %s\n' 'test' 'Run incremental tests through the persistent testmon cache.';
 
@@ -1270,6 +1305,10 @@ _builtin-help:
 	@printf '  %-16s %s\n' 'initialize' 'Materialize the declared package initializer graph.';
 
 	@printf '  %-16s %s\n' 'mod' 'Apply the declared structural codemods; committed rule-test snapshots are verified, never rewritten.';
+
+	@printf '  %-16s %s\n' 'mod-text' 'Apply only declared Sed text rules with syntax preflight and atomic publication.';
+
+	@printf '  %-16s %s\n' 'mod-text-candidate' 'Replay Sed rules in the single candidate worktree declared by the workspace manifest.';
 
 	@printf '  %-16s %s\n' 'mod-snapshots' 'Regenerate the owned ast-grep rule-test snapshots from their tests for a reviewed commit.';
 
@@ -1430,18 +1469,10 @@ _builtin_setup_submodules:
 		validate_submodule "$$root" "$$child_path"; \
 	done
 
-.PHONY: _builtin_require_github_auth
-# The credential check precedes the Mise pin check even under -j. `make setup`
-# first runs on the host's make before Mise installs the declared one, so the
-# ordering uses .NOTPARALLEL (every GNU Make; 4.4+ serializes only this target's
-# prerequisites) instead of .WAIT, which older releases read as a missing target.
-.NOTPARALLEL: _bootstrap_setup_tools
-_bootstrap_setup_tools: _builtin_require_github_auth $(if $(filter upg,$(MAKECMDGOALS)),,_builtin_require_mise_pin)
-_builtin_require_github_auth:
-	@if [ -z "$${GITHUB_TOKEN:-}" ]; then \
-		printf 'ERROR: GitHub credential is absent for network bootstrap\n' >&2; \
-		exit 1; \
-	fi
+# A provisioned local setup needs no GitHub credential. Mise and Git receive
+# only the explicit process credential above; an operation that actually needs
+# network access reports its own failure without a preflight or fallback.
+_bootstrap_setup_tools: $(if $(filter upg,$(MAKECMDGOALS)),,_builtin_require_mise_pin)
 
 .PHONY: _builtin_require_mise_pin
 _builtin_require_mise_pin:
@@ -1516,6 +1547,14 @@ _upg_lifecycle: _builtin_setup_submodules
 		--apply --rewrite-constraints --projects .
 	@$(SELF_MAKE) gen
 	@$(SELF_MAKE) _upg_relock
+	@set -eu; \
+	if [ -d .mise/locks ]; then \
+		if git add -- .mise/locks; then \
+			printf 'INFO: staged the .mise/locks sidecars written by mise lock (declared tracked by the generated .gitignore; commit them with the relock)\n'; \
+		else \
+			printf 'WARN: .mise/locks exist but could not be staged (not a git worktree?); commit them manually\n'; \
+		fi; \
+	fi
 
 # The second half belongs to the Makefile `gen` just rendered, so it runs as a
 # fresh make invocation rather than as lines of the recipe already expanded
@@ -1548,21 +1587,10 @@ _upg_converge:
 		printf 'ERROR: make upg did not converge; `make gen` still rewrites:\n%s\n' "$$after" >&2; \
 		exit 2; \
 	fi
-	@$(SELF_MAKE) _lock_mise_verify
+	@$(PROJECT_FLEXT_INFRA) deps verify-locks --repository-root "$(PROJECT_ROOT)"
 	+@XDG_DATA_HOME="$${SETUP_DIRENV_XDG_DATA_HOME:?missing persistent direnv data home}" \
 		"$${SETUP_DIRENV:?missing Mise-resolved direnv executable}" exec "$(PROJECT_ROOT)" $(SELF_MAKE) _upg_activated
 	@$(SELF_MAKE) check
-
-# `uv.lock` is staged, validated with `lock --check` and renamed atomically by
-# `_lock_project`. Mise has no such writer: it resolves `mise.lock` in place and
-# appends one resolution per platform set, so repeated `make upg` runs can leave
-# duplicated `[[tools...]]`, `.options` or `.platforms.*` sections. The result
-# parses as TOML only by accident and breaks `make gen` far from its cause, as a
-# red `gen fixed point` in CI. Fail loud here instead: the committed lock must
-# parse and must not repeat a section, or the resolved set is not publishable.
-.PHONY: _lock_mise_verify
-_lock_mise_verify:
-	@$(RUNTIME_PYTHON) -c 'import collections, re, sys, tomllib; path = sys.argv[1]; text = open(path, encoding="utf-8").read(); tomllib.loads(text); keys = re.findall(r"(?m)^\[([^\]]+)\]\s*$$", text); duplicated = sorted(k for k, n in collections.Counter(keys).items() if n > 1); sys.exit(f"mise.lock repeats TOML section(s), the Mise resolver appended instead of replacing: {duplicated}") if duplicated else None' "$(PROJECT_ROOT)/mise.lock"
 
 .PHONY: _upg_activated
 _upg_activated:
@@ -1587,7 +1615,6 @@ _builtin_build_artifacts:
 _builtin_check_all: _builtin_require_environment
 	@set -eu; \
 printf '%s\n' 'INFO: SUSPENDED check gate namespace; authority=flext-itpd1.3; operator decision 2026-09-27 (keep plan v12 suspension); flext-infra#913; reason=Fleet namespace backlog (141 findings here) is repaired after the fleet is green; the gate returns with its Rope single-cycle owner fix.'; \
-printf '%s\n' 'INFO: SUSPENDED check gate smells; authority=operator ruling 2026-09-27 (smells/infra-codegen/slow-tests non-blocking for merge until further notice, coordination gc-wisp-bm2jtn); flext-w41u6; reason=Pre-existing qlty smell backlog (751 in flext-infra, already red on a9af10130) is burned down under flext-w41u6; the gate returns when the ruling is lifted.'; \
 gates="lint,pyrefly,mypy,pyright,silent-failure,deferred-self-reference,security,markdown,loc-cap,boundary,runtime-census,tier-whitelist,index-declarations,codemod,layout,canonical-alias,direnv,duplication"; \
 		if [ "$(strip $(CI))" = "Y" ]; then \
 			gates="lint,mypy,pyright,silent-failure,deferred-self-reference,security,markdown,loc-cap,boundary,runtime-census,tier-whitelist,index-declarations,codemod,layout,canonical-alias,direnv,duplication"; \
@@ -1628,7 +1655,7 @@ TESTMON_DATAFILE="$$database" $(PYTEST_BOUNDED) $(UV_RUN) python -m flext_infra.
 # breaks the verb; a formatter's residual findings stay reportable and are
 # enforced by `make check`.
 _builtin_fmt_all: _builtin_require_environment
-	@$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "markdown-format" --apply
+	@$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "format,markdown-format" --apply
 
 _builtin_fix_all: _builtin_require_environment
 	@$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "lint,markdown,markdown-code,canonical-alias" --apply --report-findings
@@ -1693,11 +1720,14 @@ profile-gen-report: _builtin_require_environment
 		'import pstats, sys; pstats.Stats(sys.argv[1]).sort_stats("cumtime").print_stats(50)' \
 		"$(PROFILE_REPORTS_DIR)/lazy-init.pstats"
 
-# Profile the canonical pytest entry (flext_infra._pytest_entry) under cProfile
-# for cold-run diagnosis (flext-itpd1.3.7): the same persistent testmon database
+# Profile the cold canonical pytest execution through its thin entrypoint
+# for startup diagnosis (flext-itpd1.3.7): the same persistent testmon database
 # guard and environment as the bounded gate, but deliberately NOT wrapped in
-# PYTEST_BOUNDED so the diagnostic completes and dumps its profile; the gate's
-# own timeout on `make test` stays untouched.
+# PYTEST_BOUNDED. The runner's own deadline still applies. Central collection
+# children also write profiles beside their manifests and print their paths.
+# The stdlib-only adapter starts profiling before runner/model/pytest imports.
+# The parent sidecar binds the exact run;
+# reports never combine a parent profile with the mutable latest.txt pointer.
 .PHONY: profile-test
 profile-test: _builtin_require_environment
 	@mkdir -p "$(PROFILE_REPORTS_DIR)"
@@ -1707,15 +1737,13 @@ case "$$database" in /*) ;; *) printf 'ERROR: persistent testmon database requir
 case "$$database" in "$(PROJECT_ROOT)"/*) printf 'ERROR: persistent testmon database must be outside the checkout: %s\n' "$$database" >&2; exit 2 ;; esac; \
 case "$$database" in "$${TMPDIR:-/tmp}"/*|/tmp/*) printf 'ERROR: persistent testmon database must not live under the temporary directory: %s\n' "$$database" >&2; exit 2 ;; esac; \
 mkdir -p "$$(dirname "$$database")"; \
-	TESTMON_DATAFILE="$$database" $(PROJECT_TOOL_EXEC) "$(RUNTIME_PYTHON)" -c \
-		'import cProfile, sys; path = sys.argv[1]; sys.argv = [sys.argv[0]]; from flext_infra._pytest_entry import FlextInfraPytestEntry; profile = cProfile.Profile(); status = profile.runcall(FlextInfraPytestEntry.main); profile.dump_stats(path); raise SystemExit(status)' \
+	TESTMON_DATAFILE="$$database" $(PROJECT_TOOL_EXEC) "$(RUNTIME_PYTHON)" -m flext_infra._pytest_entry profile \
 		"$(PROFILE_REPORTS_DIR)/pytest.pstats"
 
 .PHONY: profile-test-report
 profile-test-report: _builtin_require_environment
-	@$(PROJECT_TOOL_EXEC) "$(RUNTIME_PYTHON)" -c \
-		'import pstats, sys; pstats.Stats(sys.argv[1]).sort_stats("cumtime").print_stats(50)' \
-		"$(PROFILE_REPORTS_DIR)/pytest.pstats"
+	@$(PROJECT_TOOL_EXEC) "$(RUNTIME_PYTHON)" -m flext_infra._cprofile_entry \
+		"$(PROFILE_REPORTS_DIR)/pytest.pstats" "$(PROFILE_REPORTS_DIR)/pytest.pstats.json"
 
 _builtin_status_diagnostics: _builtin_require_environment
 	@printf 'profile=%s\nproject=%s\nruntime=%s\n' \
@@ -1846,6 +1874,10 @@ _builtin-mod: _builtin_mod_apply
 _builtin-mod-snapshots: _builtin_mod_snapshots
 _builtin-waza:
 	@cd "$(PROJECT_ROOT)" && $(PROJECT_TOOL_EXEC) waza check --no-update-check
+
+_builtin-smells:
+	@$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "smells"
+
 _builtin-duplication:
 	@$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "duplication"
 _builtin-sonarcloud-sync: _builtin_sonarcloud_sync_all
