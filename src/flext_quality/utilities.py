@@ -7,11 +7,12 @@ import sys
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
-from flext_web import FlextWebUtilities as u
+from flext_web import FlextWebTypes, FlextWebUtilities as u
 
 from flext_core import FlextResult as r
 from flext_quality import (
     FlextQualityConstants as c,
+    FlextQualityModels as m,
     FlextQualityProtocols as p,
     FlextQualityTypes as t,
 )
@@ -19,12 +20,32 @@ from flext_quality import (
 if TYPE_CHECKING:
     from pathlib import Path
 
+DocumentationReportValue = FlextWebTypes.JsonMapping
+
 
 class FlextQualityUtilities(u):
     """Namespace for flext-quality utilities."""
 
     class Quality:
         """Quality-specific utilities namespace."""
+
+        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[
+            t.JsonMapping
+        ] = u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
+        RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
+            t.SequenceOf[t.JsonMapping]
+        ] = u.type_adapter(
+            t.SequenceOf[t.JsonMapping], config=m.ConfigDict(strict=False)
+        )
+        MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
+            t.MutableOptionalFeatureFlagMapping
+        ] = u.type_adapter(t.MutableOptionalFeatureFlagMapping)
+        STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
+            t.MutableSequenceOf[t.StrMapping]
+        ] = u.type_adapter(t.MutableSequenceOf[t.StrMapping])
+        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
+            t.MappingKV[str, DocumentationReportValue]
+        ] = u.type_adapter(t.MappingKV[str, DocumentationReportValue])
 
         @staticmethod
         def compile_pattern(
@@ -82,7 +103,7 @@ class FlextQualityUtilities(u):
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
             serialized_output: bytes = (
-                t.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                FlextQualityUtilities.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
                     output
                 )
             )
