@@ -135,7 +135,7 @@ class FlextQualityMcpClient:
             m.Quality.McpToolResult(
                 success=True,
                 data={
-                    "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
+                    "items": u.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
                         coerced_data
                     ).decode("utf-8")
                 },

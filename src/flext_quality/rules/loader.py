@@ -39,7 +39,7 @@ class FlextQualityRulesLoader:
                 "Invalid YAML: 'rules' must be a list"
             )
         rules_data: t.SequenceOf[t.JsonMapping] = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+            u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
                 rules_data_val
             )
         )
