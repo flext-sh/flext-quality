@@ -28,8 +28,8 @@
   - [Link & Reference Validation](#link-reference-validation)
   - [Style & Accessibility](#style-accessibility)
 - [⚙️ Configuration](#configuration)
-  - [Audit Rules (`settings/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
-  - [Style Guide (`settings/style_guide.yaml`)](#style-guide-configstyleguideyaml)
+  - [Audit Rules (`config/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
+  - [Style Guide (`config/style_guide.yaml`)](#style-guide-configstyleguideyaml)
 - [🔧 Maintenance Scripts](#maintenance-scripts)
   - [Comprehensive Audit (`scripts/audit.py`)](#comprehensive-audit-scriptsauditpy)
   - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
@@ -137,8 +137,8 @@
     - Link & Reference Validation
     - Style & Accessibility
   - ⚙️ Configuration
-    - Audit Rules (`settings/audit_rules.yaml`)
-    - Style Guide (`settings/style_guide.yaml`)
+    - Audit Rules (`config/audit_rules.yaml`)
+    - Style Guide (`config/style_guide.yaml`)
   - 🔧 Maintenance Scripts
     - Comprehensive Audit (`scripts/audit.py`)
 - Full documentation quality assessment
@@ -181,7 +181,7 @@
 - Check Python dependencies
 - Verify file permissions
 - Check configuration files
-- Update timeout in settings/validation_config.YAML
+- Update timeout in config/validation_config.yaml
 - Review style guide configuration
 - Run with verbose output
   - 📚 API Reference
@@ -557,7 +557,7 @@ repos:
 
 ## ⚙️ Configuration
 
-### Audit and style configuration
+### Audit Rules (`config/audit_rules.yaml`)
 
 `src/flext_quality/docs/config/audit_rules.yaml`, `style_guide.yaml`, and
 `validation_config.yaml` own the documentation rules. The public
@@ -758,10 +758,11 @@ python -c "import yaml; yaml.safe_load(open('docs/maintenance/settings/audit_rul
 
 **Link Validation Timeout**
 
-Set `link_validation.timeout` in `src/flext_quality/docs/config/validation_config.yaml`.
-The link checker uses the validated value for both synchronous and asynchronous calls.
-Transport failures propagate; there is no retry or automatic fallback to another
-transport.
+```yaml
+# Update timeout in config/validation_config.yaml
+link_validation:
+  timeout: 30 # Increase from the declared 10 seconds
+```
 
 **Style Validation Errors**
 

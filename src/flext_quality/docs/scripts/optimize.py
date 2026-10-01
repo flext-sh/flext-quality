@@ -377,7 +377,7 @@ class FlextQualityDocumentationOptimizer:
         metadata: t.MutableJsonMapping = {
             k: v
             for k, v in (parsed_fm or {}).items()
-            if isinstance(v, t.PRIMITIVES_TYPES)
+            if isinstance(v, c.PRIMITIVES_TYPES)
         }
         metadata["updated"] = u.now().strftime("%Y-%m-%d")
         new_frontmatter = u.Cli.yaml_dump_str(metadata).strip()

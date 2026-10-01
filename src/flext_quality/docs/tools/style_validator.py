@@ -23,20 +23,7 @@ class FlextQualityStyleValidator:
             config_dir
         ).resolve_style_guide()
         self.results: m.Quality.StyleValidationResults = (
-            m.Quality.StyleValidationResults(
-                files_checked=0,
-                style_violations=[],
-                accessibility_issues=[],
-                formatting_errors=[],
-                suggestions=[],
-                summary=m.Quality.StyleSummaryMetrics(
-                    total_violations=0,
-                    critical_issues=0,
-                    warnings=0,
-                    suggestions_count=0,
-                    accessibility_issues=0,
-                ),
-            )
+            m.Quality.StyleValidationResults(summary=m.Quality.StyleSummaryMetrics())
         )
 
     def validate_file(self, file_path: Path) -> m.Quality.StyleFileResults:
@@ -47,11 +34,13 @@ class FlextQualityStyleValidator:
         violations_list: MutableSequence[m.Quality.StyleIssue] = []
         issues_list: MutableSequence[m.Quality.StyleIssue] = []
         suggestions_list: MutableSequence[str] = []
-        file_results = m.Quality.StyleFileResults(
-            file=filename,
-            violations=violations_list,
-            issues=issues_list,
-            suggestions=suggestions_list,
+        file_results: m.Quality.StyleFileResults = (
+            m.Quality.StyleFileResults.model_validate({
+                "file": filename,
+                "violations": violations_list,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
+            })
         )
 
         file_results.violations.extend(self._check_markdown_formatting(content))
@@ -145,13 +134,14 @@ class FlextQualityStyleValidator:
                     )
                 expected_level = level
 
-        if headings and headings[0][0] != self.settings.headings.first_heading_level:
+        first_level = self.settings.headings.first_heading_level
+        if headings and headings[0][0] != first_level:
             violations.append(
                 m.Quality.StyleIssue(
                     type="first_heading_level",
                     line=headings[0][2],
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
-                    message=f"Document should start with H{self.settings.headings.first_heading_level} heading",
+                    message=f"Document should start with H{first_level} heading",
                     severity="low",
                 )
             )

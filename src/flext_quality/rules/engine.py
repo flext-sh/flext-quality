@@ -48,9 +48,11 @@ class FlextQualityRulesEngine:
         target_path = Path(path)
         if not target_path.exists():
             return r[t.SequenceOf[t.JsonMapping]].fail(f"Path does not exist: {path}")
-        violations: MutableSequence[t.JsonMapping] = []
         files = self._get_files(target_path)
-        for file_path in files:
+        if files.failure:
+            return r[t.SequenceOf[t.JsonMapping]].fail(files.error)
+        violations: MutableSequence[t.JsonMapping] = []
+        for file_path in files.value:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
         return r[t.SequenceOf[t.JsonMapping]].ok(violations)
@@ -102,8 +104,8 @@ class FlextQualityRulesEngine:
                 })
         return violations
 
-    def _get_files(self, path: Path) -> t.SequenceOf[Path]:
-        """Get Python files from path."""
+    def _get_files(self, path: Path) -> p.Result[t.SequenceOf[Path]]:
+        """Select the Python files under ``path`` through the CLI file owner."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
         return list(u.Cli.files_matching(path, includes=["*.py"]).value)
