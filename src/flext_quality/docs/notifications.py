@@ -239,13 +239,13 @@ class FlextQualityDocumentationNotifier:
 
         metrics_val = audit_data.get("metrics")
         metrics: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity_m: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -475,13 +475,13 @@ Timestamp: {u.now().isoformat()}
         """Format message for critical issues notification."""
         metrics_val = audit_data.get("metrics")
         metrics: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -494,7 +494,7 @@ Timestamp: {u.now().isoformat()}
         critical_issues: MutableSequence[t.JsonMapping] = []
         if isinstance(issues_val, list):
             issues_seq: t.SequenceOf[t.JsonMapping] = (
-                t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+                u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
                     issues_val
                 )
             )
@@ -629,7 +629,7 @@ Found {len(broken_links)} broken links that need attention:
                 audit_read = u.Cli.files_read_text(Path(self.audit_data))
                 if audit_read.failure:
                     return r[bool].from_failure(audit_read)
-                audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                audit_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     audit_read.value
                 )
                 _ = notifier.notify_critical_issues(audit_data)
@@ -649,7 +649,7 @@ Found {len(broken_links)} broken links that need attention:
                 weekly_read = u.Cli.files_read_text(Path(self.weekly_report))
                 if weekly_read.failure:
                     return r[bool].from_failure(weekly_read)
-                report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     weekly_read.value
                 )
                 _ = notifier.notify_weekly_report(report_data)
@@ -658,7 +658,7 @@ Found {len(broken_links)} broken links that need attention:
                 monthly_read = u.Cli.files_read_text(Path(self.monthly_report))
                 if monthly_read.failure:
                     return r[bool].from_failure(monthly_read)
-                report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     monthly_read.value
                 )
                 _ = notifier.notify_monthly_report(report_data)

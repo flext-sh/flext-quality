@@ -1,32 +1,34 @@
-"""Behavioral tests for ``FlextQualityConfigManager``.
+"""Behavioral tests for ``FlextQualityConfigManager`` and its consumers.
 
-Exercises real YAML loading, defaulting, caching and validation against
-``tmp_path`` — no mocks, no patched collaborators.
+Exercises real YAML loading from the packaged configuration directory and from
+``tmp_path`` — no mocks, no patched collaborators. Expected values are read from
+the same YAML files the manager validates, never frozen in the test.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import shutil
+from pathlib import Path
 
+import pytest
 from flext_tests import tm
 
-from flext_quality import FlextQualityConfigManager
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from flext_quality import (
+    FlextQualityConfigManager,
+    FlextQualityDocumentationAuditor,
+    FlextQualityLinkChecker,
+    FlextQualityStyleValidator,
+    t,
+    u,
+)
 
 
 class TestsFlextQualityConfigManager:
     """Contract tests for the documentation configuration manager."""
 
-    def test_get_audit_rules_falls_back_to_defaults_for_empty_dir(
-        self, tmp_path: Path
-    ) -> None:
-        """An empty config directory yields the built-in audit-rule defaults."""
-        manager = FlextQualityConfigManager(tmp_path)
-        rules = manager.resolve_audit_rules()
-        tm.that(rules.quality_thresholds.max_age_days, eq=90)
-        tm.that(rules.content_checks.check_freshness, eq=True)
+    @staticmethod
+    def _declared(manager: FlextQualityConfigManager, filename: str) -> t.JsonMapping:
+        return u.Cli.yaml_safe_load(manager.config_dir / filename).unwrap()
 
     def test_get_audit_rules_is_cached_across_calls(self, tmp_path: Path) -> None:
         """Repeated lookups return the identical cached configuration object."""
@@ -99,7 +101,7 @@ class TestsFlextQualityConfigManager:
         tm.that(str(manager.config_dir), has="config")
 
     def test_config_dir_accepts_a_string_path(self, tmp_path: Path) -> None:
-        """A string ``config_dir`` is normalized into a ``Path`` internally."""
+        """A string ``config_dir`` is normalized into a ``Path``."""
         manager = FlextQualityConfigManager(str(tmp_path))
         tm.that(manager.config_dir, eq=tmp_path)
 

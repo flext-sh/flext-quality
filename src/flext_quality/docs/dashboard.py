@@ -47,7 +47,7 @@ class FlextQualityDocumentationDashboard:
         def api_metrics() -> Response:
             """Return current metrics as a JSON response."""
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
                     self.compute_current_metrics()
                 ).decode(),
                 mimetype="application/json",
@@ -60,7 +60,7 @@ class FlextQualityDocumentationDashboard:
             """Return quality trends as a JSON response."""
             days = int(request.args.get("days", 30))
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
                     self.compute_quality_trends(days)
                 ).decode(),
                 mimetype="application/json",
@@ -73,7 +73,7 @@ class FlextQualityDocumentationDashboard:
             """Return recent reports as a JSON response."""
             limit = int(request.args.get("limit", 10))
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
+                u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
                     self.fetch_recent_reports(limit)
                 ).decode(),
                 mimetype="application/json",
@@ -119,7 +119,7 @@ class FlextQualityDocumentationDashboard:
 
     def _build_current_metrics(self, audit_payload: str) -> t.JsonMapping:
         """Build the dashboard metrics payload from the latest audit JSON."""
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
         metrics_raw = data.get("metrics")
         metrics: t.JsonMapping = metrics_raw if isinstance(metrics_raw, Mapping) else {}
         severity_raw = metrics.get("severity_breakdown")
@@ -191,10 +191,10 @@ class FlextQualityDocumentationDashboard:
         if read.failure:
             msg = f"Skipping unreadable report {report_file}: {read.error}"
             raise ValueError(msg)
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_v = data.get("metrics")
         metrics_m: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_v)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_v)
             if isinstance(metrics_v, Mapping)
             else {}
         )
@@ -236,7 +236,7 @@ class FlextQualityDocumentationDashboard:
         if read.failure:
             msg = f"Skipping unreadable report {report_file}: {read.error}"
             raise ValueError(msg)
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_rv = data.get("metrics")
         metrics_rm: t.JsonMapping = (
             metrics_rv if isinstance(metrics_rv, Mapping) else {}

@@ -102,9 +102,9 @@ class FlextQualityDocumentationReporter:
 
         timestamp: str
         title: str
-        audit: t.MappingKV[str, t.Quality.DocumentationReportValue] | None
-        validation: t.MappingKV[str, t.Quality.DocumentationReportValue] | None
-        optimization: t.MappingKV[str, t.Quality.DocumentationReportValue] | None
+        audit: t.MappingKV[str, u.Quality.DocumentationReportValue] | None
+        validation: t.MappingKV[str, u.Quality.DocumentationReportValue] | None
+        optimization: t.MappingKV[str, u.Quality.DocumentationReportValue] | None
         summary: FlextQualityDocumentationReporter.SummaryMetrics
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: t.SequenceOf[FlextQualityDocumentationReporter.Recommendation]
@@ -114,14 +114,14 @@ class FlextQualityDocumentationReporter:
         self.reports_dir = Path(reports_dir)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.template_dir = Path(__file__).parent / "templates"
-        self.audit_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None = (
+        self.audit_data: t.MappingKV[str, u.Quality.DocumentationReportValue] | None = (
             None
         )
         self.validation_data: (
-            t.MappingKV[str, t.Quality.DocumentationReportValue] | None
+            t.MappingKV[str, u.Quality.DocumentationReportValue] | None
         ) = None
         self.optimization_data: (
-            t.MappingKV[str, t.Quality.DocumentationReportValue] | None
+            t.MappingKV[str, u.Quality.DocumentationReportValue] | None
         ) = None
         self.reports_dir.mkdir(parents=True, exist_ok=True)
         self.load_latest_reports()
@@ -134,14 +134,14 @@ class FlextQualityDocumentationReporter:
 
     def _load_json_report(
         self, filename: str
-    ) -> t.MappingKV[str, t.Quality.DocumentationReportValue] | None:
+    ) -> t.MappingKV[str, u.Quality.DocumentationReportValue] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         read = u.Cli.files_read_text(filepath)
-        loaded: t.MappingKV[str, t.Quality.DocumentationReportValue] | None = None
+        loaded: t.MappingKV[str, u.Quality.DocumentationReportValue] | None = None
         if read.success:
             try:
-                loaded = t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                loaded = u.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
                     read.value
                 )
             except c.EXC_OS_VALUE as exc:
@@ -166,7 +166,7 @@ class FlextQualityDocumentationReporter:
         if report_format == "html":
             return self._generate_html_report(report_data)
         if report_format == "json":
-            adapter = m.TypeAdapter(FlextQualityDocumentationReporter.ReportData)
+            adapter = u.type_adapter(FlextQualityDocumentationReporter.ReportData)
             report_text: str = adapter.dump_json(report_data, indent=2).decode()
             return report_text
         if report_format == "markdown":
@@ -296,7 +296,7 @@ class FlextQualityDocumentationReporter:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                            error_entry: t.JsonMapping = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                                 e_raw
                             )
                         except c.EXC_TYPE_VALIDATION as exc:
@@ -314,7 +314,7 @@ class FlextQualityDocumentationReporter:
                             normalized: t.MappingKV[str, t.Primitives] = {
                                 key: value
                                 for key, value in error_entry.items()
-                                if isinstance(value, t.PRIMITIVES_TYPES)
+                                if isinstance(value, c.PRIMITIVES_TYPES)
                             }
                             if normalized:
                                 broken_links.append(normalized)
@@ -417,13 +417,13 @@ class FlextQualityDocumentationReporter:
         return "\n".join(md)
 
     def _summarize_audit_data(
-        self, audit_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None
+        self, audit_data: t.MappingKV[str, u.Quality.DocumentationReportValue] | None
     ) -> FlextQualityDocumentationReporter.AuditSummary | None:
         """Summarize audit data for reporting."""
         if not audit_data or not isinstance(audit_data, dict):
             return None
         issues_raw_obj = audit_data.get("issues")
-        issues_raw_val: list[t.Quality.DocumentationReportValue] = (
+        issues_raw_val: list[u.Quality.DocumentationReportValue] = (
             list(issues_raw_obj) if isinstance(issues_raw_obj, list) else []
         )
         metrics_raw_obj = audit_data.get("metrics")
@@ -464,7 +464,7 @@ class FlextQualityDocumentationReporter:
 
     def _summarize_validation_data(
         self,
-        validation_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None,
+        validation_data: t.MappingKV[str, u.Quality.DocumentationReportValue] | None,
     ) -> FlextQualityDocumentationReporter.ValidationSummary | None:
         """Summarize validation data for reporting."""
         if not validation_data or not isinstance(validation_data, dict):
@@ -488,7 +488,7 @@ class FlextQualityDocumentationReporter:
 
     def _summarize_optimization_data(
         self,
-        optimization_data: t.MappingKV[str, t.Quality.DocumentationReportValue] | None,
+        optimization_data: t.MappingKV[str, u.Quality.DocumentationReportValue] | None,
     ) -> FlextQualityDocumentationReporter.OptimizationSummary | None:
         """Summarize optimization data for reporting."""
         if not optimization_data or not isinstance(optimization_data, dict):
@@ -521,7 +521,7 @@ class FlextQualityDocumentationReporter:
         """Generate trend analysis report over specified time period."""
         report_files = list(self.reports_dir.glob("*.json"))
         recent_reports: MutableSequence[
-            t.MappingKV[str, t.Quality.DocumentationReportValue | datetime]
+            t.MappingKV[str, u.Quality.DocumentationReportValue | datetime]
         ] = []
         cutoff_date = u.now() - timedelta(days=days)
         for report_file in report_files:
@@ -541,7 +541,7 @@ class FlextQualityDocumentationReporter:
 
     def _load_recent_report(
         self, report_file: Path, cutoff_date: datetime
-    ) -> t.MappingKV[str, t.Quality.DocumentationReportValue | datetime] | None:
+    ) -> t.MappingKV[str, u.Quality.DocumentationReportValue | datetime] | None:
         """Load one historical report when it falls inside the trend window."""
         date_str = report_file.name.split("_")[1]
         report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
@@ -553,18 +553,18 @@ class FlextQualityDocumentationReporter:
         if read.failure:
             msg = f"unreadable report {report_file}: {read.error}"
             raise ValueError(msg)
-        report_data_raw: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
-            t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
+        report_data_raw: t.MappingKV[str, u.Quality.DocumentationReportValue] = (
+            u.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
         )
         report_data_dict: t.MappingKV[
-            str, t.Quality.DocumentationReportValue | datetime
+            str, u.Quality.DocumentationReportValue | datetime
         ] = {**report_data_raw, "date": report_date}
         return report_data_dict
 
     def _analyze_trend_data(
         self,
         reports: t.SequenceOf[
-            Mapping[str, t.Quality.DocumentationReportValue | datetime]
+            Mapping[str, u.Quality.DocumentationReportValue | datetime]
         ],
     ) -> FlextQualityDocumentationReporter.TrendData | t.StrMapping:
         """Analyze trend data from historical reports."""

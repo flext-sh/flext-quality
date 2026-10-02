@@ -33,15 +33,21 @@ _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
 _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
 
 _AUDIT_REPORT_TEMPLATE: Final[str] = (
-    """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: $files_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
+    """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: ${file}s_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
 )
 
 
 class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
-    def __init__(self, config_path: str | Path | None = None) -> None:
-        """Initialize the documentation auditor from validated configuration."""
+    def __init__(self, config_dir: str | Path | None = None) -> None:
+        """Initialize the auditor from the validated documentation configuration.
+
+        Args:
+            config_dir: Configuration directory; ``None`` selects the package's
+                declared configuration directory.
+
+        """
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.config_manager = FlextQualityConfigManager(config_path)
         self.audit_rules: m.Quality.AuditRulesConfig = (
