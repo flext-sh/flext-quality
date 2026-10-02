@@ -283,15 +283,15 @@ class FlextQualityConfigManager:
         """Initialize the configuration manager.
 
         Args:
-            config_dir: Directory containing the configuration files. ``None``
-                selects the package's declared ``docs/config`` directory.
+            config_dir: Directory containing configuration files. If None,
+                       uses the package's declared config directory.
 
         """
-        self.config_dir = (
-            Path(__file__).parent.parent / "config"
-            if config_dir is None
-            else Path(config_dir)
-        )
+        if config_dir is None:
+            self.config_dir = Path(__file__).parent.parent / "config"
+        else:
+            self.config_dir = Path(config_dir)
+
         self._audit_rules: m.Quality.AuditRulesConfig | None = None
         self._style_guide: m.Quality.StyleGuideConfig | None = None
         self._validation_config: m.Quality.ValidationConfig | None = None
