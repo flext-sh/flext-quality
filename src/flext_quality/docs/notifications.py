@@ -3,6 +3,9 @@
 Automated notification system for documentation quality alerts,
 reports, and maintenance updates. Supports multiple notification channels
 including email, Slack, webhooks, and project management tools.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -32,6 +35,10 @@ def _validate_outbound_webhook(url: str, allowed_hosts: frozenset[str]) -> None:
     Resolves the host and rejects any non-global address so a forged target
     cannot redirect a server-side request at internal, loopback, or
     link-local services.
+
+    Raises:
+        ValueError: If webhook target is not allowlisted; or if webhook host resolves to
+            a non-public address.
     """
     parsed = urlparse(url)
     host = parsed.hostname or ""
@@ -98,7 +105,8 @@ class FlextQualityDocumentationNotifier:
         webhook: FlextQualityDocumentationNotifier._WebhookConfig
 
     def __init__(
-        self, config_path: str = "docs/maintenance/settings/notification_config.yaml"
+        self,
+        config_path: str = "docs/maintenance/settings/notification_config.yaml",
     ) -> None:
         """Initialize the documentation notifier with configuration.
 
@@ -112,7 +120,7 @@ class FlextQualityDocumentationNotifier:
             self._load_user_config(loaded)
         )
         self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
-            timestamp=u.now().isoformat()
+            timestamp=u.now().isoformat(),
         )
 
     def _load_user_config(self, loaded: t.JsonMapping) -> _NotifierConfig:
@@ -189,8 +197,13 @@ class FlextQualityDocumentationNotifier:
 
         return cfg
 
-    def build_default_config(self) -> _NotifierConfig:
-        """Default notification configuration."""
+    @staticmethod
+    def build_default_config() -> _NotifierConfig:
+        """Default notification configuration.
+
+        Returns:
+            The resulting ``_NotifierConfig``.
+        """
         return FlextQualityDocumentationNotifier._NotifierConfig(
             enabled=True,
             channels=FlextQualityDocumentationNotifier._ChannelsConfig(
@@ -201,19 +214,22 @@ class FlextQualityDocumentationNotifier:
             ),
             alerts=FlextQualityDocumentationNotifier._AlertsConfig(
                 critical_issues=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True, threshold=1
+                    enabled=True,
+                    threshold=1,
                 ),
                 quality_drop=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True, threshold=10
+                    enabled=True,
+                    threshold=10,
                 ),
                 broken_links=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True, threshold=5
+                    enabled=True,
+                    threshold=5,
                 ),
                 weekly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
-                    enabled=True
+                    enabled=True,
                 ),
                 monthly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
-                    enabled=True
+                    enabled=True,
                 ),
             ),
             email=FlextQualityDocumentationNotifier._EmailConfig(
@@ -225,15 +241,23 @@ class FlextQualityDocumentationNotifier:
                 to_addresses=[],
             ),
             slack=FlextQualityDocumentationNotifier._SlackConfig(
-                webhook_url="", channel="#docs-quality", username="FLEXT Quality Bot"
+                webhook_url="",
+                channel="#docs-quality",
+                username="FLEXT Quality Bot",
             ),
             webhook=FlextQualityDocumentationNotifier._WebhookConfig(
-                url="", headers={}, timeout=10
+                url="",
+                headers={},
+                timeout=10,
             ),
         )
 
     def notify_critical_issues(self, audit_data: t.JsonMapping) -> bool:
-        """Send notification for critical documentation issues."""
+        """Send notification for critical documentation issues.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if not self.config.alerts.critical_issues.enabled:
             return True
 
@@ -260,13 +284,19 @@ class FlextQualityDocumentationNotifier:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
             message = self._format_critical_issues_message(audit_data)
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.CRITICAL.value
+                title,
+                message,
+                c.Quality.NotificationPriority.CRITICAL.value,
             )
 
         return True
 
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
-        """Send notification for significant quality score drops."""
+        """Send notification for significant quality score drops.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if not self.config.alerts.quality_drop.enabled:
             return True
 
@@ -286,13 +316,19 @@ This represents a significant degradation in documentation quality.
 Please review recent changes and address any identified issues.
             """.strip()
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.WARNING.value
+                title,
+                message,
+                c.Quality.NotificationPriority.WARNING.value,
             )
 
         return True
 
     def notify_broken_links(self, broken_links: t.JsonList) -> bool:
-        """Send notification for broken links."""
+        """Send notification for broken links.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if not self.config.alerts.broken_links.enabled:
             return True
 
@@ -302,31 +338,45 @@ Please review recent changes and address any identified issues.
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
             message = self._format_broken_links_message(broken_links)
             return self.send_notification(
-                title, message, c.Quality.NotificationPriority.WARNING.value
+                title,
+                message,
+                c.Quality.NotificationPriority.WARNING.value,
             )
 
         return True
 
     def notify_weekly_report(self, report_data: t.JsonMapping) -> bool:
-        """Send weekly quality report notification."""
+        """Send weekly quality report notification.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if not self.config.alerts.weekly_report.enabled:
             return True
 
         title = "📊 Weekly Documentation Quality Report"
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(
-            title, message, c.Quality.NotificationPriority.INFO.value
+            title,
+            message,
+            c.Quality.NotificationPriority.INFO.value,
         )
 
     def notify_monthly_report(self, report_data: t.JsonMapping) -> bool:
-        """Send monthly comprehensive report notification."""
+        """Send monthly comprehensive report notification.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if not self.config.alerts.monthly_report.enabled:
             return True
 
         title = "📈 Monthly Documentation Quality Report"
         message = self._format_monthly_report_message(report_data)
         return self.send_notification(
-            title, message, c.Quality.NotificationPriority.INFO.value
+            title,
+            message,
+            c.Quality.NotificationPriority.INFO.value,
         )
 
     def send_notification(
@@ -335,7 +385,11 @@ Please review recent changes and address any identified issues.
         message: str,
         priority: str = c.Quality.NotificationPriority.INFO.value,
     ) -> bool:
-        """Send notification through all enabled channels."""
+        """Send notification through all enabled channels.
+
+        Returns:
+            The resulting ``bool``.
+        """
         success = True
 
         # Console notification (always enabled)
@@ -372,14 +426,21 @@ Please review recent changes and address any identified issues.
         return success
 
     def _send_console_notification(
-        self, title: str, message: str, priority: str
+        self,
+        title: str,
+        message: str,
+        priority: str,
     ) -> None:
         """Send notification to console."""
         # For now, console notifications are disabled to avoid T201 violations
         # In the future, this could be implemented with proper logging
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
-        """Send notification via email."""
+        """Send notification via email.
+
+        Raises:
+            ValueError: If Email notification requires a non-empty SMTP password.
+        """
         email_config = self.config.email
         password = email_config.password
         if not password:
@@ -410,7 +471,9 @@ Timestamp: {u.now().isoformat()}
         server.login(email_config.username, password)
         text = msg.as_string()
         server.sendmail(
-            email_config.from_address, list(email_config.to_addresses or []), text
+            email_config.from_address,
+            list(email_config.to_addresses or []),
+            text,
         )
         server.quit()
 
@@ -434,18 +497,24 @@ Timestamp: {u.now().isoformat()}
                     "text": message,
                     "footer": "FLEXT Quality Documentation System",
                     "ts": u.now().timestamp(),
-                }
+                },
             ],
         }
 
         _validate_outbound_webhook(slack_config.webhook_url, _SLACK_WEBHOOK_HOSTS)
         response = requests.post(
-            slack_config.webhook_url, json=payload, timeout=10, allow_redirects=False
+            slack_config.webhook_url,
+            json=payload,
+            timeout=10,
+            allow_redirects=False,
         )
         response.raise_for_status()
 
     def _send_webhook_notification(
-        self, title: str, message: str, priority: str
+        self,
+        title: str,
+        message: str,
+        priority: str,
     ) -> None:
         """Send notification via webhook."""
         webhook_config = self.config.webhook
@@ -467,12 +536,20 @@ Timestamp: {u.now().isoformat()}
         timeout = webhook_config.timeout
 
         response = requests.post(
-            webhook_config.url, json=payload, headers=headers, timeout=timeout
+            webhook_config.url,
+            json=payload,
+            headers=headers,
+            timeout=timeout,
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(self, audit_data: t.JsonMapping) -> str:
-        """Format message for critical issues notification."""
+    @staticmethod
+    def _format_critical_issues_message(audit_data: t.JsonMapping) -> str:
+        """Format message for critical issues notification.
+
+        Returns:
+            The resulting ``str``.
+        """
         metrics_val = audit_data.get("metrics")
         metrics: t.JsonMapping = (
             u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
@@ -495,7 +572,7 @@ Timestamp: {u.now().isoformat()}
         if isinstance(issues_val, list):
             issues_seq: t.SequenceOf[t.JsonMapping] = (
                 u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
-                    issues_val
+                    issues_val,
                 )
             )
             for i_m in issues_seq:
@@ -541,8 +618,13 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(self, broken_links: t.JsonList) -> str:
-        """Format message for broken links notification."""
+    @staticmethod
+    def _format_broken_links_message(broken_links: t.JsonList) -> str:
+        """Format message for broken links notification.
+
+        Returns:
+            The resulting ``str``.
+        """
         message = f"""
 BROKEN LINKS DETECTED
 
@@ -551,7 +633,8 @@ Found {len(broken_links)} broken links that need attention:
 """
 
         for i, link in enumerate(
-            broken_links[: c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW], 1
+            broken_links[: c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW],
+            1,
         ):  # Show first MAX_BROKEN_LINKS
             if isinstance(link, Mapping):
                 url_v = link.get("url", "unknown")
@@ -575,14 +658,24 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, _report_data: t.JsonMapping) -> str:
-        """Format message for weekly report notification."""
+    @staticmethod
+    def _format_weekly_report_message(_report_data: t.JsonMapping) -> str:
+        """Format message for weekly report notification.
+
+        Returns:
+            The resulting ``str``.
+        """
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, _report_data: t.JsonMapping) -> str:
-        """Format message for monthly report notification."""
+    @staticmethod
+    def _format_monthly_report_message(_report_data: t.JsonMapping) -> str:
+        """Format message for monthly report notification.
+
+        Returns:
+            The resulting ``str``.
+        """
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
 
@@ -598,21 +691,33 @@ Found {len(broken_links)} broken links that need attention:
             ),
         ] = "docs/maintenance/settings/notification_config.yaml"
         test: bool = u.Field(
-            False, description="Send a test notification", validate_default=True
+            False,
+            description="Send a test notification",
+            validate_default=True,
         )
         audit_data: str | None = u.Field(
-            None, description="Audit data JSON file", validate_default=True
+            None,
+            description="Audit data JSON file",
+            validate_default=True,
         )
         weekly_report: str | None = u.Field(
-            None, description="Weekly report JSON file", validate_default=True
+            None,
+            description="Weekly report JSON file",
+            validate_default=True,
         )
         monthly_report: str | None = u.Field(
-            None, description="Monthly report JSON file", validate_default=True
+            None,
+            description="Monthly report JSON file",
+            validate_default=True,
         )
 
         @override
         def execute(self) -> p.Result[bool]:
-            """Dispatch to the appropriate notification action."""
+            """Dispatch to the appropriate notification action.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
             notifier = FlextQualityDocumentationNotifier(self.settings_path)
             if self.test:
                 notifier.send_notification(
@@ -630,7 +735,7 @@ Found {len(broken_links)} broken links that need attention:
                 if audit_read.failure:
                     return r[bool].from_failure(audit_read)
                 audit_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    audit_read.value
+                    audit_read.value,
                 )
                 _ = notifier.notify_critical_issues(audit_data)
                 issues_raw = audit_data.get("issues")
@@ -650,7 +755,7 @@ Found {len(broken_links)} broken links that need attention:
                 if weekly_read.failure:
                     return r[bool].from_failure(weekly_read)
                 report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    weekly_read.value
+                    weekly_read.value,
                 )
                 _ = notifier.notify_weekly_report(report_data)
                 return r[bool].ok(value=True)
@@ -659,22 +764,30 @@ Found {len(broken_links)} broken links that need attention:
                 if monthly_read.failure:
                     return r[bool].from_failure(monthly_read)
                 report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    monthly_read.value
+                    monthly_read.value,
                 )
                 _ = notifier.notify_monthly_report(report_data)
                 return r[bool].ok(value=True)
             return r[bool].fail(
-                "No action selected (use --test, --audit-data, --weekly-report or --monthly-report)"
+                "No action selected (use --test, --audit-data, --weekly-report or --monthly-report)",
             )
 
     @staticmethod
     def _run_handler(params: FlextQualityDocumentationNotifier.Run) -> p.Result[bool]:
-        """Execute the notifier ``Run`` route (typed, not a lambda, for pyrefly)."""
+        """Execute the notifier ``Run`` route (typed, not a lambda, for pyrefly).
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Run the notification system via the canonical cli facade."""
+        """Run the notification system via the canonical cli facade.
+
+        Returns:
+            The resulting ``int``.
+        """
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-notifications",
@@ -691,8 +804,9 @@ Found {len(broken_links)} broken links that need attention:
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
 # this submodule's package __init__.py exports (flext-1wjg1.16.32).
-__all__: list[str] = ["FlextQualityDocumentationNotifier"]
 
 
 if __name__ == "__main__":
     cli.exit(FlextQualityDocumentationNotifier.main())
+
+__all__: list[str] = ["FlextQualityDocumentationNotifier"]

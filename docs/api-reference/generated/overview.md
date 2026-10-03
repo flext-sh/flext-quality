@@ -28,7 +28,7 @@
   `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`,
   `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+26 more)
 - Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
-- Generated module pages: `35`
+- Generated module pages: `8`
 
 ## Next Pages
 

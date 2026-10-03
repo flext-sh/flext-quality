@@ -4,6 +4,9 @@ Every test exercises the observable public contract of ``FlextQuality`` and its
 shared ``quality`` alias: the ``r[T]`` outcome of fallible operations, returned
 values, and public configuration state. No private attributes, internal
 collaborators, or implementation details are touched.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -26,8 +29,9 @@ class TestsFlextQualityApi:
 
     pytestmark = pytest.mark.usefixtures("_restore_settings")
 
+    @staticmethod
     @pytest.fixture
-    def _restore_settings(self) -> Iterator[None]:
+    def _restore_settings() -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQuality().settings
         rules_dir = settings.Quality.rules_dir
@@ -40,19 +44,22 @@ class TestsFlextQualityApi:
 
     # -- construction / status -------------------------------------------
 
-    def test_facade_constructs_without_arguments(self) -> None:
+    @staticmethod
+    def test_facade_constructs_without_arguments() -> None:
         """FlextQuality() instantiates and reports a successful status."""
         result = FlextQuality().fetch_status()
         tm.that(result.success, eq=True)
         tm.that(result.value, has="name")
 
-    def test_quality_alias_is_a_ready_facade(self) -> None:
+    @staticmethod
+    def test_quality_alias_is_a_ready_facade() -> None:
         """The shared ``quality`` alias exposes the same status contract."""
         result = quality.fetch_status()
         tm.that(result.success, eq=True)
         tm.that(result.value, has="name")
 
-    def test_fetch_status_exposes_full_snapshot_contract(self) -> None:
+    @staticmethod
+    def test_fetch_status_exposes_full_snapshot_contract() -> None:
         """fetch_status returns a mapping with the promised public keys."""
         status = FlextQuality().fetch_status().value
         tm.that(status, is_=dict)
@@ -61,7 +68,8 @@ class TestsFlextQualityApi:
         tm.that(status, has="settings")
         tm.that(status, has="hooks_registered")
 
-    def test_fetch_status_is_idempotent(self) -> None:
+    @staticmethod
+    def test_fetch_status_is_idempotent() -> None:
         """Repeated status snapshots report the same name and version."""
         service = FlextQuality()
         first = service.fetch_status().value
@@ -69,7 +77,8 @@ class TestsFlextQualityApi:
         tm.that(first["name"], eq=second["name"])
         tm.that(first["version"], eq=second["version"])
 
-    def test_execute_delegates_to_status(self) -> None:
+    @staticmethod
+    def test_execute_delegates_to_status() -> None:
         """The default execute() operation yields the status snapshot."""
         result = FlextQuality().execute()
         tm.that(result.success, eq=True)
@@ -77,15 +86,15 @@ class TestsFlextQualityApi:
 
     # -- configuration validation ----------------------------------------
 
-    def test_validate_configuration_succeeds_with_defaults(self) -> None:
+    @staticmethod
+    def test_validate_configuration_succeeds_with_defaults() -> None:
         """Default thresholds validate successfully to True."""
         result = FlextQuality().validate_configuration()
         tm.that(result.success, eq=True)
         tm.that(result.value, eq=True)
 
-    def test_validate_configuration_fails_when_function_exceeds_class_limit(
-        self,
-    ) -> None:
+    @staticmethod
+    def test_validate_configuration_fails_when_function_exceeds_class_limit() -> None:
         """max_function_length greater than max_class_length is rejected.
 
         The invariant is enforced at settings construction time (ADR-005), so
@@ -94,24 +103,26 @@ class TestsFlextQualityApi:
         """
         with pytest.raises(m.ValidationError, match="max_function_length"):
             FlextQualitySettings.model_validate({
-                "Quality": {"max_function_length": 500, "max_class_length": 100}
+                "Quality": {"max_function_length": 500, "max_class_length": 100},
             })
 
     # -- hook output formatting ------------------------------------------
 
+    @staticmethod
     @pytest.mark.parametrize(
         ("continue_exec", "expected"),
         [(True, '"continue":true'), (False, '"continue":false')],
     )
     def test_format_hook_output_encodes_continue_flag(
-        self, *, continue_exec: bool, expected: str
+        *, continue_exec: bool, expected: str,
     ) -> None:
         """The continue flag is serialized into the JSON output string."""
         output = FlextQuality().format_hook_output(continue_exec=continue_exec).value
         tm.that(output, is_=str)
         tm.that(output, has=expected)
 
-    def test_format_hook_output_includes_message(self) -> None:
+    @staticmethod
+    def test_format_hook_output_includes_message() -> None:
         """A provided message is embedded in the formatted output."""
         output = (
             FlextQuality()
@@ -121,19 +132,21 @@ class TestsFlextQualityApi:
         tm.that(output, has='"continue":true')
         tm.that(output, has="Test message")
 
-    def test_format_hook_output_includes_blocked_reason(self) -> None:
+    @staticmethod
+    def test_format_hook_output_includes_blocked_reason() -> None:
         """A blocked reason is emitted with continue disabled."""
         output = (
             FlextQuality()
             .format_hook_output(
-                continue_exec=False, blocked_reason="Blocked for testing"
+                continue_exec=False, blocked_reason="Blocked for testing",
             )
             .value
         )
         tm.that(output, has='"continue":false')
         tm.that(output, has="Blocked for testing")
 
-    def test_fetch_hook_config_json_returns_empty_object(self) -> None:
+    @staticmethod
+    def test_fetch_hook_config_json_returns_empty_object() -> None:
         """With no hooks configured the config JSON is an empty object."""
         result = FlextQuality().fetch_hook_config_json()
         tm.that(result.success, eq=True)
@@ -142,13 +155,15 @@ class TestsFlextQualityApi:
 
     # -- hook execution ---------------------------------------------------
 
-    def test_execute_hook_succeeds_for_known_event(self) -> None:
+    @staticmethod
+    def test_execute_hook_succeeds_for_known_event() -> None:
         """A known event with no registered hooks continues execution."""
         result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
         tm.that(result.success, eq=True)
         tm.that(result.value.get("continue"), eq=True)
 
-    def test_execute_hook_fails_for_unknown_event(self) -> None:
+    @staticmethod
+    def test_execute_hook_fails_for_unknown_event() -> None:
         """An unknown event name yields a failure describing the problem."""
         result = FlextQuality().execute_hook("UnknownEvent", {})
         tm.that(result.failure, eq=True)
@@ -156,14 +171,15 @@ class TestsFlextQualityApi:
 
     # -- rule loading -----------------------------------------------------
 
-    def test_load_rules_parses_definitions_from_yaml_file(self) -> None:
+    @staticmethod
+    def test_load_rules_parses_definitions_from_yaml_file() -> None:
         """load_rules returns the rule definitions declared in a YAML file."""
         rules_yaml = (
             "\nrules:\n  - name: test-rule\n    type: warning\n"
             '    description: Test rule\n    pattern: "test"\n    enabled: true\n'
         )
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".yaml", delete=False
+            encoding="utf-8", mode="w", suffix=".yaml", delete=False,
         ) as handle:
             handle.write(rules_yaml)
             rules_path = Path(handle.name)
@@ -175,13 +191,15 @@ class TestsFlextQualityApi:
         finally:
             rules_path.unlink()
 
-    def test_load_rules_fails_for_missing_file(self) -> None:
+    @staticmethod
+    def test_load_rules_fails_for_missing_file() -> None:
         """load_rules reports a not-found failure for a nonexistent path."""
         result = FlextQuality().load_rules(Path("/nonexistent/rules.yaml"))
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")
 
-    def test_load_rules_from_config_returns_empty_for_empty_directory(self) -> None:
+    @staticmethod
+    def test_load_rules_from_config_returns_empty_for_empty_directory() -> None:
         """A configured but empty rules directory yields an empty rule list."""
         service = FlextQuality()
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -190,25 +208,27 @@ class TestsFlextQualityApi:
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=0)
 
-    def test_load_rules_from_config_loads_every_yaml_and_yml_file(self) -> None:
+    @staticmethod
+    def test_load_rules_from_config_loads_every_yaml_and_yml_file() -> None:
         """load_rules_from_config aggregates rules across .yaml and .yml files."""
         service = FlextQuality()
         with tempfile.TemporaryDirectory() as tmpdir:
             rules_dir = Path(tmpdir)
             (rules_dir / "rules1.yaml").write_text(
                 "\nrules:\n  - name: rule-one\n    type: warning\n"
-                '    description: First rule\n    pattern: "one"\n    enabled: true\n'
+                '    description: First rule\n    pattern: "one"\n    enabled: true\n',
             )
             (rules_dir / "rules2.yml").write_text(
                 "\nrules:\n  - name: rule-two\n    type: blocking\n"
-                '    description: Second rule\n    pattern: "two"\n    enabled: true\n'
+                '    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
             service.settings.Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=2)
 
-    def test_load_rules_from_config_fails_for_missing_directory(self) -> None:
+    @staticmethod
+    def test_load_rules_from_config_fails_for_missing_directory() -> None:
         """A configured rules directory that does not exist yields a failure."""
         service = FlextQuality()
         service.settings.Quality.rules_dir = "/nonexistent/rules/dir"
@@ -218,7 +238,8 @@ class TestsFlextQualityApi:
 
     # -- stdin hook processing (external boundary: sys.stdin) ------------
 
-    def _run_with_stdin(self, payload: str) -> p.Result[t.JsonMapping]:
+    @staticmethod
+    def _run_with_stdin(payload: str) -> p.Result[t.JsonMapping]:
         service = FlextQuality()
         original_stdin = sys.stdin
         sys.stdin = io.StringIO(payload)

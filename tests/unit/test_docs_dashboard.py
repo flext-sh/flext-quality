@@ -3,6 +3,9 @@
 Exercises the real Flask application via its test client, real filesystem
 report scanning against ``tmp_path``, and the ``Run`` CLI command — no
 mocks, no patched collaborators.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -21,15 +24,17 @@ if TYPE_CHECKING:
 class TestsFlextQualityDocumentationDashboard:
     """Contract tests for the documentation health dashboard."""
 
-    def test_get_current_metrics_reports_no_audit_data(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_get_current_metrics_reports_no_audit_data(tmp_path: Path) -> None:
         """With no audit report present, metrics report a zeroed default."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         metrics = dashboard.compute_current_metrics()
         tm.that(metrics.get("quality_score"), eq=0)
         tm.that(metrics.get("status"), eq="No audit data available")
 
+    @staticmethod
     def test_get_current_metrics_parses_a_real_latest_audit_file(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
         """A real ``latest_audit.json`` file is parsed into the metrics payload."""
         audit_dump = u.Cli.json_dumps({
@@ -49,8 +54,9 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(metrics.get("files_analyzed"), eq=12)
         tm.that(metrics.get("status"), eq="Current")
 
+    @staticmethod
     def test_get_current_metrics_reports_error_for_malformed_json(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
         """Malformed JSON in the latest audit report yields an error status."""
         (tmp_path / "latest_audit.json").write_text("not json at all", encoding="utf-8")
@@ -58,7 +64,8 @@ class TestsFlextQualityDocumentationDashboard:
         metrics = dashboard.compute_current_metrics()
         tm.that(metrics.get("status") or "", has="Error")
 
-    def test_get_quality_trends_with_no_reports_is_empty(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_get_quality_trends_with_no_reports_is_empty(tmp_path: Path) -> None:
         """No matching report files yield a trend payload with zero data points."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         trends = dashboard.compute_quality_trends(days=7)
@@ -66,7 +73,8 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(trends.get("data_points"), eq=0)
         tm.that(trends.get("trends"), eq=[])
 
-    def test_get_quality_trends_reads_real_report_files(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_get_quality_trends_reads_real_report_files(tmp_path: Path) -> None:
         """A recent, well-formed report file contributes one trend entry."""
         report_file = tmp_path / "audit_report_20260101_120000.json"
         report_dump = u.Cli.json_dumps({
@@ -74,7 +82,7 @@ class TestsFlextQualityDocumentationDashboard:
                 "quality_score": 91,
                 "total_issues": 2,
                 "severity_breakdown": {"critical": 0, "high": 2},
-            }
+            },
         })
         tm.ok(report_dump)
         report_file.write_text(report_dump.value, encoding="utf-8")
@@ -89,13 +97,15 @@ class TestsFlextQualityDocumentationDashboard:
         assert isinstance(first_entry, dict)
         tm.that(first_entry.get("quality_score"), eq=91)
 
-    def test_get_recent_reports_with_no_reports_is_empty(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_get_recent_reports_with_no_reports_is_empty(tmp_path: Path) -> None:
         """No matching report files yield an empty recent-reports listing."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         tm.that(dashboard.fetch_recent_reports(), eq=[])
 
+    @staticmethod
     def test_get_recent_reports_sorts_newest_first_and_respects_limit(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
         """Recent reports are sorted newest-first and truncated at ``limit``."""
         for stamp, score in (
@@ -116,13 +126,15 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(reports[0]["quality_score"], eq=70)
         tm.that(reports[1]["quality_score"], eq=60)
 
-    def test_get_dashboard_html_returns_nonempty_page(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_get_dashboard_html_returns_nonempty_page(tmp_path: Path) -> None:
         """The dashboard HTML template renders a nonempty document."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         html = dashboard.render_dashboard_html()
         tm.that(html, has="FLEXT Quality Documentation Dashboard")
 
-    def test_index_route_serves_dashboard_html(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_index_route_serves_dashboard_html(tmp_path: Path) -> None:
         """The Flask ``/`` route serves the rendered dashboard page."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         client = dashboard.app.test_client()
@@ -130,7 +142,8 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(response.status_code, eq=200)
         tm.that(response.get_data(as_text=True), has="Dashboard")
 
-    def test_api_metrics_route_returns_json(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_api_metrics_route_returns_json(tmp_path: Path) -> None:
         """The Flask ``/api/metrics`` route returns the metrics payload as JSON."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         client = dashboard.app.test_client()
@@ -141,7 +154,8 @@ class TestsFlextQualityDocumentationDashboard:
         payload = t.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("status"), eq="No audit data available")
 
-    def test_api_trends_route_honors_days_query_param(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_api_trends_route_honors_days_query_param(tmp_path: Path) -> None:
         """The Flask ``/api/trends`` route reads the ``days`` query parameter."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         client = dashboard.app.test_client()
@@ -152,7 +166,8 @@ class TestsFlextQualityDocumentationDashboard:
         payload = t.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("period_days"), eq=5)
 
-    def test_api_reports_route_honors_limit_query_param(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_api_reports_route_honors_limit_query_param(tmp_path: Path) -> None:
         """The Flask ``/api/reports`` route reads the ``limit`` query parameter."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         client = dashboard.app.test_client()
@@ -163,12 +178,14 @@ class TestsFlextQualityDocumentationDashboard:
         payload = payload_result.value
         tm.that(payload, eq=[])
 
-    def test_logger_property_returns_module_logger(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_logger_property_returns_module_logger(tmp_path: Path) -> None:
         """The dashboard exposes its module logger through a public property."""
         dashboard = FlextQualityDocumentationDashboard(str(tmp_path))
         tm.that(dashboard.logger.name, eq=FlextQualityDocumentationDashboard.__module__)
 
-    def test_run_command_model_carries_declared_defaults(self) -> None:
+    @staticmethod
+    def test_run_command_model_carries_declared_defaults() -> None:
         """The ``Run`` command model exposes its documented default fields."""
         command = FlextQualityDocumentationDashboard.Run()
         tm.that(command.host, eq="localhost")

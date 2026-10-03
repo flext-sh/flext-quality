@@ -1,4 +1,8 @@
-"""Protocols for flext-quality."""
+"""Protocols for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -47,7 +51,7 @@ class FlextQualityProtocols(FlextWebProtocols):
                 ...
 
             def validate(
-                self, content: str, file_path: t.Cli.TextPath | None = None
+                self, content: str, file_path: t.Cli.TextPath | None = None,
             ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
                 """Validate content and return violations."""
                 ...
@@ -72,7 +76,7 @@ class FlextQualityProtocols(FlextWebProtocols):
             """Protocol for documentation configuration objects."""
 
             def get(
-                self, key: str, *, default: str | float | bool | None = None
+                self, key: str, *, default: str | float | bool | None = None,
             ) -> t.Primitives | None:
                 """Get a configuration value."""
                 ...
@@ -103,7 +107,7 @@ class FlextQualityProtocols(FlextWebProtocols):
             rule_type: str
 
             def validate(
-                self, settings: t.JsonMapping, context: t.JsonMapping
+                self, settings: t.JsonMapping, context: t.JsonMapping,
             ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...

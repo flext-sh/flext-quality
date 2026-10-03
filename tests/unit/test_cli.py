@@ -28,19 +28,25 @@ class TestsFlextQualityCli:
 
     # ---- Status ---------------------------------------------------------
 
-    def test_status_execute_succeeds_with_mapping_payload(self) -> None:
+    @staticmethod
+    def test_status_execute_succeeds_with_mapping_payload() -> None:
+        """Test status execute succeeds with mapping payload."""
         result = FlextQualityCli.Status().execute()
         tm.that(result.success, eq=True)
         tm.that(result.value, is_=dict)
 
-    def test_status_payload_exposes_service_contract_keys(self) -> None:
+    @staticmethod
+    def test_status_payload_exposes_service_contract_keys() -> None:
+        """Test status payload exposes service contract keys."""
         payload = FlextQualityCli.Status().execute().unwrap()
         for key in ("name", "version", "settings", "hooks_registered"):
             tm.that(payload, has=key)
 
     # ---- Check ----------------------------------------------------------
 
-    def test_check_builds_exactly_lint_then_typecheck(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_check_builds_exactly_lint_then_typecheck(tmp_path: Path) -> None:
+        """Test check builds exactly lint then typecheck."""
         result = FlextQualityCli.Check(target_path=tmp_path).execute()
         tm.that(result.success, eq=True)
         commands = result.unwrap()
@@ -48,16 +54,20 @@ class TestsFlextQualityCli:
         tm.that(commands[0], has="ruff")
         tm.that(commands[1], has="basedpyright")
 
-    def test_check_commands_reference_target_path(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_check_commands_reference_target_path(tmp_path: Path) -> None:
+        """Test check commands reference target path."""
         commands = FlextQualityCli.Check(target_path=tmp_path).execute().unwrap()
         for command in commands:
             tm.that(command, has=str(tmp_path))
 
     # ---- Validate -------------------------------------------------------
 
+    @staticmethod
     def test_validate_extends_check_with_security_and_tests(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
+        """Test validate extends check with security and tests."""
         (tmp_path / "src").mkdir()
         (tmp_path / "tests").mkdir()
         result = FlextQualityCli.Validate(target_path=tmp_path).execute()
@@ -67,7 +77,8 @@ class TestsFlextQualityCli:
         tm.that(commands[2], has="bandit")
         tm.that(commands[4], eq=["python", "-m", "coverage", "report"])
 
-    def test_validate_is_superset_of_check(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_validate_is_superset_of_check(tmp_path: Path) -> None:
         """LSP invariant: Validate keeps Check's lint+typecheck prefix intact."""
         (tmp_path / "src").mkdir()
         (tmp_path / "tests").mkdir()
@@ -76,39 +87,53 @@ class TestsFlextQualityCli:
         tm.that(len(validate), eq=len(check) + 3)
         tm.that(list(validate[:2]), eq=list(check))
 
-    def test_validate_bandit_scans_src_dir_when_present(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_validate_bandit_scans_src_dir_when_present(tmp_path: Path) -> None:
+        """Test validate bandit scans src dir when present."""
         (tmp_path / "src").mkdir()
         (tmp_path / "tests").mkdir()
         commands = FlextQualityCli.Validate(target_path=tmp_path).execute().unwrap()
         tm.that(commands[2], has=str(tmp_path / "src"))
 
+    @staticmethod
     def test_validate_bandit_falls_back_to_target_without_src(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
+        """Test validate bandit falls back to target without src."""
         (tmp_path / "tests").mkdir()
         commands = FlextQualityCli.Validate(target_path=tmp_path).execute().unwrap()
         tm.that(commands[2], has=str(tmp_path))
 
     # ---- Lifecycle ------------------------------------------------------
 
-    def test_facade_execute_reports_ready(self) -> None:
+    @staticmethod
+    def test_facade_execute_reports_ready() -> None:
+        """Test facade execute reports ready."""
         result = FlextQualityCli().execute()
         tm.that(result.success, eq=True)
         tm.that(result.unwrap(), eq=True)
 
     # ---- main() exit codes ---------------------------------------------
 
-    def test_main_status_exits_zero(self) -> None:
+    @staticmethod
+    def test_main_status_exits_zero() -> None:
+        """Test main status exits zero."""
         tm.that(main(["status"]), eq=0)
 
-    def test_main_check_exits_zero(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_main_check_exits_zero(tmp_path: Path) -> None:
+        """Test main check exits zero."""
         tm.that(main(["check", "--target-path", str(tmp_path)]), eq=0)
 
-    def test_main_validate_exits_zero(self, tmp_path: Path) -> None:
+    @staticmethod
+    def test_main_validate_exits_zero(tmp_path: Path) -> None:
+        """Test main validate exits zero."""
         (tmp_path / "src").mkdir()
         (tmp_path / "tests").mkdir()
         tm.that(main(["validate", "--target-path", str(tmp_path)]), eq=0)
 
+    @staticmethod
     @pytest.mark.parametrize("bad_args", [["unknown"], ["not-a-command"], ["xyz"]])
-    def test_main_unknown_command_exits_nonzero(self, bad_args: list[str]) -> None:
+    def test_main_unknown_command_exits_nonzero(bad_args: list[str]) -> None:
+        """Test main unknown command exits nonzero."""
         tm.that(main(bad_args), eq=1)

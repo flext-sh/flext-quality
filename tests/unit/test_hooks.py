@@ -2,6 +2,9 @@
 
 Exercises real hook subclasses registered and executed through the manager —
 no mocks, no patched collaborators.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -64,7 +67,8 @@ class _FailingHook(FlextQualityBaseHook):
 class TestsFlextQualityBaseHook:
     """Contract tests for the concrete hook base class."""
 
-    def test_execute_raises_not_implemented_on_base(self) -> None:
+    @staticmethod
+    def test_execute_raises_not_implemented_on_base() -> None:
         """The base ``execute`` is abstract and always raises."""
 
         class _BareHook(FlextQualityBaseHook):
@@ -73,20 +77,23 @@ class TestsFlextQualityBaseHook:
         with pytest.raises(NotImplementedError):
             _BareHook().execute({})
 
-    def test_should_run_defaults_true_without_a_matcher(self) -> None:
+    @staticmethod
+    def test_should_run_defaults_true_without_a_matcher() -> None:
         """A hook without a matcher runs for every input."""
         hook = _AlwaysRunHook()
         tm.that(hook.should_run({"tool_name": "Anything"}), eq=True)
         tm.that(hook.should_run({}), eq=True)
 
-    def test_should_run_matches_configured_glob_patterns(self) -> None:
+    @staticmethod
+    def test_should_run_matches_configured_glob_patterns() -> None:
         """A hook with a matcher runs only for tool names matching any pattern."""
         hook = _MatcherHook()
         tm.that(hook.should_run({"tool_name": "Edit"}), eq=True)
         tm.that(hook.should_run({"tool_name": "WriteFile"}), eq=True)
         tm.that(hook.should_run({"tool_name": "Bash"}), eq=False)
 
-    def test_should_run_treats_missing_tool_name_as_empty_string(self) -> None:
+    @staticmethod
+    def test_should_run_treats_missing_tool_name_as_empty_string() -> None:
         """A matcher hook without a ``tool_name`` behaves as if it were empty."""
         hook = _MatcherHook()
         tm.that(hook.should_run({}), eq=False)
@@ -95,21 +102,24 @@ class TestsFlextQualityBaseHook:
 class TestsFlextQualityHookManager:
     """Contract tests for the hook lifecycle manager."""
 
-    def test_execute_unknown_event_fails(self) -> None:
+    @staticmethod
+    def test_execute_unknown_event_fails() -> None:
         """Executing an unregistered event name reports a descriptive failure."""
         manager = FlextQualityHookManager()
         result = manager.execute("NotARealEvent", {})
         tm.that(result.failure, eq=True)
         tm.that(result.error or "", has="Unknown event")
 
-    def test_execute_with_no_registered_hooks_continues(self) -> None:
+    @staticmethod
+    def test_execute_with_no_registered_hooks_continues() -> None:
         """A known event with nothing registered always continues."""
         manager = FlextQualityHookManager()
         result = manager.execute("PreToolUse", {})
         tm.that(result.success, eq=True)
         tm.that(result.value.get("continue"), eq=True)
 
-    def test_register_and_execute_runs_matching_hook(self) -> None:
+    @staticmethod
+    def test_register_and_execute_runs_matching_hook() -> None:
         """A registered hook that runs and continues yields the default outcome.
 
         The manager only short-circuits (returning a hook's own payload) when
@@ -124,7 +134,8 @@ class TestsFlextQualityHookManager:
         tm.that(result.success, eq=True)
         tm.that(result.value, eq={"continue": True})
 
-    def test_execute_skips_hooks_that_should_not_run(self) -> None:
+    @staticmethod
+    def test_execute_skips_hooks_that_should_not_run() -> None:
         """A hook whose matcher rejects the input is skipped entirely."""
         manager = FlextQualityHookManager()
         manager.register(_MatcherHook())
@@ -132,7 +143,8 @@ class TestsFlextQualityHookManager:
         tm.that(result.success, eq=True)
         tm.that(result.value, eq={"continue": True})
 
-    def test_execute_stops_chain_when_a_hook_blocks(self) -> None:
+    @staticmethod
+    def test_execute_stops_chain_when_a_hook_blocks() -> None:
         """A hook returning ``continue: False`` halts the remaining chain."""
         manager = FlextQualityHookManager()
         manager.register(_AlwaysRunHook())
@@ -142,7 +154,8 @@ class TestsFlextQualityHookManager:
         tm.that(result.value.get("continue"), eq=False)
         tm.that(result.value.get("reason"), eq="blocked")
 
-    def test_execute_propagates_hook_failure(self) -> None:
+    @staticmethod
+    def test_execute_propagates_hook_failure() -> None:
         """A hook that fails short-circuits execution with its own error."""
         manager = FlextQualityHookManager()
         manager.register(_FailingHook())
@@ -150,7 +163,8 @@ class TestsFlextQualityHookManager:
         tm.that(result.failure, eq=True)
         tm.that(result.error, eq="boom")
 
-    def test_fetch_config_reports_registered_hooks_by_event(self) -> None:
+    @staticmethod
+    def test_fetch_config_reports_registered_hooks_by_event() -> None:
         """The rendered config groups registered hooks by their event name."""
         manager = FlextQualityHookManager()
         manager.register(_MatcherHook())
@@ -165,7 +179,8 @@ class TestsFlextQualityHookManager:
         assert isinstance(first_entry, dict)
         tm.that(first_entry.get("matcher"), eq=["Edit", "Write*"])
 
-    def test_fetch_config_json_renders_configured_hooks(self) -> None:
+    @staticmethod
+    def test_fetch_config_json_renders_configured_hooks() -> None:
         """The JSON rendering of the hook config includes the matcher list."""
         manager = FlextQualityHookManager()
         manager.register(_AlwaysRunHook())
@@ -173,7 +188,8 @@ class TestsFlextQualityHookManager:
         tm.that(output, is_=str)
         tm.that(output, has="PreToolUse")
 
-    def test_register_appends_multiple_hooks_for_same_event(self) -> None:
+    @staticmethod
+    def test_register_appends_multiple_hooks_for_same_event() -> None:
         """Multiple hooks registered for one event all execute in order."""
         manager = FlextQualityHookManager()
         manager.register(_AlwaysRunHook())

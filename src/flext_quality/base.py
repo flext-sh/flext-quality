@@ -1,4 +1,8 @@
-"""Shared service foundation for flext-quality components."""
+"""Shared service foundation for flext-quality components.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
