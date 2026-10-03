@@ -1,4 +1,8 @@
-"""Base hook implementation."""
+"""Base hook implementation.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -20,14 +24,23 @@ class FlextQualityBaseHook:
         raise NotImplementedError
 
     def should_run(self, input_data: t.JsonMapping) -> bool:
-        """Check if hook should run for this input."""
+        """Check if hook should run for this input.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if self.matcher is None:
             return True
         tool_name = str(input_data.get("tool_name", ""))
         return any(self._match_pattern(pattern, tool_name) for pattern in self.matcher)
 
-    def _match_pattern(self, pattern: str, value: str) -> bool:
-        """Match pattern against value (supports wildcards)."""
+    @staticmethod
+    def _match_pattern(pattern: str, value: str) -> bool:
+        """Match pattern against value (supports wildcards).
+
+        Returns:
+            The resulting ``bool``.
+        """
         return fnmatch.fnmatch(value, pattern)
 
 

@@ -47,7 +47,7 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     Quality: Annotated[
         _QualityNamespace,
         m.Field(
-            description="Open namespace exposing ``config/*.yaml`` under ``Quality``."
+            description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
     ] = _QualityNamespace()
 

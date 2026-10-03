@@ -3,6 +3,9 @@
 Single loader for the documentation maintenance configuration. Every file is
 read from the declared configuration directory and validated into its canonical
 ``m.Quality`` model; a missing, unreadable, or invalid file fails loudly.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -137,9 +140,13 @@ _DEFAULT_VALIDATION_CONFIG: t.JsonMapping = MappingProxyType({
 
 
 def _merged_over_defaults(
-    defaults: t.JsonMapping, overrides: t.JsonMapping
+    defaults: t.JsonMapping, overrides: t.JsonMapping,
 ) -> t.JsonMapping:
-    """Merge YAML overrides over the built-in default payload."""
+    """Merge YAML overrides over the built-in default payload.
+
+    Returns:
+        The resulting ``t.JsonMapping``.
+    """
     merged: dict[str, t.JsonValue] = dict(defaults)
     for key, value in overrides.items():
         current = merged.get(key)
@@ -156,35 +163,43 @@ class FlextQualityConfigManager:
     type ConfigValue = t.Primitives | t.StrSequence
     type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
     type ConfigData = MutableMapping[
-        str, MutableMapping[str, t.Primitives | t.StrSequence]
+        str, MutableMapping[str, t.Primitives | t.StrSequence],
     ]
     type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
     type RawConfigMap = t.MappingKV[
-        str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
+        str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
     ]
 
     class AuditRules(m.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
             u.Field(default_factory=dict)
         )
 
         def get_threshold(
-            self, key: str, *, default: t.Primitives | None = None
+            self, key: str, *, default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a quality threshold value."""
+            """Get a quality threshold value.
+
+            Returns:
+                The resulting ``t.Primitives | None``.
+            """
             threshold = getattr(self.quality_thresholds, key, default)
             return threshold if isinstance(threshold, c.PRIMITIVES_TYPES) else default
 
         def is_check_enabled(self, check_type: str, check_name: str) -> bool:
-            """Check if a specific audit check is enabled."""
+            """Check if a specific audit check is enabled.
+
+            Returns:
+                The resulting ``bool``.
+            """
             check_value = False
             match check_type:
                 case "content":
@@ -203,16 +218,24 @@ class FlextQualityConfigManager:
         """Configuration for style and formatting guidelines."""
 
         def get_markdown_rule(
-            self, rule: str, *, default: t.Primitives | None = None
+            self, rule: str, *, default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a markdown formatting rule."""
+            """Get a markdown formatting rule.
+
+            Returns:
+                The resulting ``t.Primitives | None``.
+            """
             value = getattr(self.markdown, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_accessibility_rule(
-            self, rule: str, *, default: t.Primitives | None = None
+            self, rule: str, *, default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get an accessibility rule."""
+            """Get an accessibility rule.
+
+            Returns:
+                The resulting ``t.Primitives | None``.
+            """
             value = getattr(self.accessibility, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
@@ -220,10 +243,10 @@ class FlextQualityConfigManager:
         """Configuration for validation operations."""
 
         content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         image_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict
+            default_factory=dict,
         )
         accessibility_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
             u.Field(default_factory=dict)
@@ -236,16 +259,24 @@ class FlextQualityConfigManager:
         )
 
         def get_link_setting(
-            self, setting: str, *, default: t.Primitives | None = None
+            self, setting: str, *, default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a link validation setting."""
+            """Get a link validation setting.
+
+            Returns:
+                The resulting ``t.Primitives | None``.
+            """
             value = getattr(self.link_validation, setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_content_setting(
-            self, setting: str, *, default: t.Primitives | None = None
+            self, setting: str, *, default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a content validation setting."""
+            """Get a content validation setting.
+
+            Returns:
+                The resulting ``t.Primitives | None``.
+            """
             value = self.content_validation.get(setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
@@ -253,7 +284,11 @@ class FlextQualityConfigManager:
     def _as_section(
         value: FlextQualityConfigManager.RawSectionMap | t.JsonValue,
     ) -> FlextQualityConfigManager.ConfigSection:
-        """Normalize any value into a configuration section mapping."""
+        """Normalize any value into a configuration section mapping.
+
+        Returns:
+            The resulting ``FlextQualityConfigManager.ConfigSection``.
+        """
         if not isinstance(value, Mapping):
             return {}
         section: FlextQualityConfigManager.ConfigSection = {}
@@ -269,7 +304,11 @@ class FlextQualityConfigManager:
     def _as_config_data(
         value: FlextQualityConfigManager.RawConfigMap | t.JsonMapping | None,
     ) -> FlextQualityConfigManager.ConfigData:
-        """Normalize loaded YAML content into typed settings data."""
+        """Normalize loaded YAML content into typed settings data.
+
+        Returns:
+            The resulting ``FlextQualityConfigManager.ConfigData``.
+        """
         if not isinstance(value, Mapping):
             return {}
         settings: FlextQualityConfigManager.ConfigData = {}
@@ -297,25 +336,37 @@ class FlextQualityConfigManager:
         self._validation_config: m.Quality.ValidationConfig | None = None
 
     def resolve_audit_rules(self) -> m.Quality.AuditRulesConfig:
-        """Get audit rules configuration."""
+        """Get audit rules configuration.
+
+        Returns:
+            The resulting ``m.Quality.AuditRulesConfig``.
+        """
         if self._audit_rules is None:
             data = _merged_over_defaults(
-                _DEFAULT_AUDIT_RULES, self._load_config_file("audit_rules.yaml")
+                _DEFAULT_AUDIT_RULES, self._load_config_file("audit_rules.yaml"),
             )
             self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
         return self._audit_rules
 
     def resolve_style_guide(self) -> m.Quality.StyleGuideConfig:
-        """Get style guide configuration."""
+        """Get style guide configuration.
+
+        Returns:
+            The resulting ``m.Quality.StyleGuideConfig``.
+        """
         if self._style_guide is None:
             data = _merged_over_defaults(
-                _DEFAULT_STYLE_GUIDE, self._load_config_file("style_guide.yaml")
+                _DEFAULT_STYLE_GUIDE, self._load_config_file("style_guide.yaml"),
             )
             self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
         return self._style_guide
 
     def resolve_validation_config(self) -> m.Quality.ValidationConfig:
-        """Get validation configuration."""
+        """Get validation configuration.
+
+        Returns:
+            The resulting ``m.Quality.ValidationConfig``.
+        """
         if self._validation_config is None:
             data = _merged_over_defaults(
                 _DEFAULT_VALIDATION_CONFIG,
@@ -330,6 +381,9 @@ class FlextQualityConfigManager:
         A missing or unreadable file yields ``{}`` so the canonical models
         validate against the built-in default payload; hard failures surface
         through the required-file checks in ``validate_configs``.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
         """
         config_path = self.config_dir / filename
         loaded = u.Cli.yaml_safe_load(config_path)
@@ -342,7 +396,11 @@ class FlextQualityConfigManager:
         self._validation_config = None
 
     def validate_configs(self) -> t.StrSequence:
-        """Validate all configuration files and return any issues."""
+        """Validate all configuration files and return any issues.
+
+        Returns:
+            The resulting ``t.StrSequence``.
+        """
         # Check required settings files exist
         required_files = [
             "audit_rules.yaml",

@@ -1,6 +1,9 @@
 """FLEXT Quality Link Validation Tool.
 
 Link validation using the declared configuration and causal transport errors.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -25,7 +28,7 @@ class FlextQualityLinkChecker:
     def __init__(self, config_dir: str | pathlib.Path | None = None) -> None:
         """Initialize the link checker with validated configuration."""
         self.validation_config = FlextQualityConfigManager(
-            config_dir
+            config_dir,
         ).resolve_validation_config()
         self.settings: m.Quality.LinkValidationConfig = (
             self.validation_config.link_validation
@@ -37,15 +40,20 @@ class FlextQualityLinkChecker:
         )
 
     def find_all_links(
-        self, file_paths: t.SequenceOf[pathlib.Path]
+        self,
+        file_paths: t.SequenceOf[pathlib.Path],
     ) -> t.SequenceOf[m.Quality.LinkRecord]:
-        """Extract all links from the given files."""
+        """Extract all links from the given files.
+
+        Returns:
+            The resulting ``t.SequenceOf[m.Quality.LinkRecord]``.
+        """
         all_links: MutableSequence[m.Quality.LinkRecord] = []
 
         for file_path in file_paths:
             content = u.Cli.files_read_text(file_path).value
             md_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\(([^)]+)\)").findall(
-                content
+                content,
             )
             for text, url in md_links:
                 link_type = self._classify_link(url)
@@ -60,10 +68,10 @@ class FlextQualityLinkChecker:
                 all_links.append(link_info)
 
             ref_links = u.Quality.compile_pattern(r"\[([^\]]+)\]\[([^\]]+)\]").findall(
-                content
+                content,
             )
             ref_defs = u.Quality.compile_pattern(r"\[([^\]]+)\]:\s*([^\s]+)").findall(
-                content
+                content,
             )
 
             ref_dict: t.StrMapping = dict(ref_defs)
@@ -82,8 +90,13 @@ class FlextQualityLinkChecker:
 
         return all_links
 
-    def _classify_link(self, url: str) -> str:
-        """Classify link type based on URL."""
+    @staticmethod
+    def _classify_link(url: str) -> str:
+        """Classify link type based on URL.
+
+        Returns:
+            The resulting ``str``.
+        """
         if url.startswith(("http://", "https://")):
             return "external"
         if url.startswith("#"):
@@ -95,9 +108,18 @@ class FlextQualityLinkChecker:
         return "internal"
 
     async def check_link_async(
-        self, url: str, context: t.JsonMapping | None = None
+        self,
+        url: str,
+        context: t.JsonMapping | None = None,
     ) -> m.Quality.LinkCheckResult:
-        """Check one link and propagate the first transport failure."""
+        """Check one link and propagate the first transport failure.
+
+        Returns:
+            The resulting ``m.Quality.LinkCheckResult``.
+
+        Raises:
+            RuntimeError: If Link checker session is not initialized.
+        """
         start_time = time.time()
         if self.session is None:
             msg = "Link checker session is not initialized"
@@ -122,14 +144,21 @@ class FlextQualityLinkChecker:
                 context=context or {},
             )
             self.results.performance.slowest_response = max(
-                self.results.performance.slowest_response, response_time
+                self.results.performance.slowest_response,
+                response_time,
             )
             return result
 
     def check_link_sync(
-        self, url: str, context: t.JsonMapping | None = None
+        self,
+        url: str,
+        context: t.JsonMapping | None = None,
     ) -> m.Quality.LinkCheckResult:
-        """Check a link once and propagate the first transport failure."""
+        """Check a link once and propagate the first transport failure.
+
+        Returns:
+            The resulting ``m.Quality.LinkCheckResult``.
+        """
         start_time = time.time()
         response = requests.head(
             url,
@@ -149,18 +178,24 @@ class FlextQualityLinkChecker:
             context=context or {},
         )
         self.results.performance.slowest_response = max(
-            self.results.performance.slowest_response, response_time
+            self.results.performance.slowest_response,
+            response_time,
         )
         return result
 
     async def check_links_batch_async(
-        self, links: t.SequenceOf[m.Quality.LinkRecord]
+        self,
+        links: t.SequenceOf[m.Quality.LinkRecord],
     ) -> t.SequenceOf[m.Quality.LinkCheckResult]:
-        """Check multiple links asynchronously."""
+        """Check multiple links asynchronously.
+
+        Returns:
+            The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+        """
         start_time = time.time()
 
         semaphore = asyncio.Semaphore(
-            self.validation_config.validation.max_concurrent_requests
+            self.validation_config.validation.max_concurrent_requests,
         )
 
         async def check_with_semaphore(
@@ -183,15 +218,20 @@ class FlextQualityLinkChecker:
 
         if valid_times:
             self.results.performance.average_response_time = sum(valid_times) / len(
-                valid_times
+                valid_times,
             )
 
         return results
 
     def check_links_batch_sync(
-        self, links: t.SequenceOf[m.Quality.LinkRecord]
+        self,
+        links: t.SequenceOf[m.Quality.LinkRecord],
     ) -> t.SequenceOf[m.Quality.LinkCheckResult]:
-        """Check multiple links synchronously with thread pool."""
+        """Check multiple links synchronously with thread pool.
+
+        Returns:
+            The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+        """
         start_time = time.time()
 
         def check_single(link_info: m.Quality.LinkRecord) -> m.Quality.LinkCheckResult:
@@ -200,7 +240,7 @@ class FlextQualityLinkChecker:
             return self.check_link_sync(url, ctx)
 
         with ThreadPoolExecutor(
-            max_workers=self.validation_config.validation.max_concurrent_requests
+            max_workers=self.validation_config.validation.max_concurrent_requests,
         ) as executor:
             results = list(executor.map(check_single, links))
 
@@ -212,15 +252,22 @@ class FlextQualityLinkChecker:
 
         if valid_times:
             self.results.performance.average_response_time = sum(valid_times) / len(
-                valid_times
+                valid_times,
             )
 
         return results
 
     async def validate_links(
-        self, links: t.SequenceOf[m.Quality.LinkRecord], *, use_async: bool = True
+        self,
+        links: t.SequenceOf[m.Quality.LinkRecord],
+        *,
+        use_async: bool = True,
     ) -> m.Quality.LinkValidatorResults:
-        """Validate all provided links."""
+        """Validate all provided links.
+
+        Returns:
+            The resulting ``m.Quality.LinkValidatorResults``.
+        """
         self.results.links_checked = len(links)
 
         if use_async:
@@ -244,16 +291,25 @@ class FlextQualityLinkChecker:
         return self.results
 
     def check_robots_txt(self, domain: str) -> bool:
-        """Check if crawling is allowed by robots.txt."""
+        """Check if crawling is allowed by robots.txt.
+
+        Returns:
+            The resulting ``bool``.
+        """
         rp = RobotFileParser()
         rp.set_url(f"https://{domain}/robots.txt")
         rp.read()
         return rp.can_fetch(self.settings.user_agent, "/")
 
     def validate_github_links(
-        self, links: t.SequenceOf[t.JsonMapping]
+        self,
+        links: t.SequenceOf[t.JsonMapping],
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Perform special validation for GitHub links."""
+        """Perform special validation for GitHub links.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         github_links: t.SequenceOf[t.JsonMapping] = [
             link
             for link in links
@@ -270,8 +326,13 @@ class FlextQualityLinkChecker:
 
         return validated_links
 
-    def _validate_github_url_structure(self, url: str) -> bool:
-        """Validate GitHub URL structure without making requests."""
+    @staticmethod
+    def _validate_github_url_structure(url: str) -> bool:
+        """Validate GitHub URL structure without making requests.
+
+        Returns:
+            The resulting ``bool``.
+        """
         parsed = urlparse(url)
 
         if parsed.netloc != "github.com":
@@ -295,7 +356,14 @@ class FlextQualityLinkChecker:
         return False
 
     def generate_report(self, report_format: str = "json") -> str:
-        """Generate validation report."""
+        """Generate validation report.
+
+        Returns:
+            The resulting ``str``.
+
+        Raises:
+            ValueError: If Unsupported report format.
+        """
         if report_format == "summary":
             return self._generate_summary_report()
         if report_format == "json":
@@ -304,7 +372,11 @@ class FlextQualityLinkChecker:
         raise ValueError(msg)
 
     def _generate_summary_report(self) -> str:
-        """Generate a human-readable summary report."""
+        """Generate a human-readable summary report.
+
+        Returns:
+            The resulting ``str``.
+        """
         r = self.results
 
         report = f"""
@@ -344,14 +416,21 @@ Broken Links:
         return report
 
     def save_report(
-        self, output_path: str = "docs/maintenance/reports/"
+        self,
+        output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
-        """Save validation report."""
+        """Save validation report.
+
+        Returns:
+            The resulting ``pathlib.Path``.
+        """
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"link_validation_{timestamp}.json"
         filepath = pathlib.Path(output_path) / filename
         _ = u.Cli.json_write(
-            filepath, self.results, options=m.Cli.JsonWriteOptions(indent=2)
+            filepath,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
         ).unwrap()
         return filepath
 
@@ -360,7 +439,11 @@ Broken Links:
         links: t.SequenceOf[m.Quality.LinkRecord],
         config_dir: str | pathlib.Path | None = None,
     ) -> m.Quality.LinkValidatorResults:
-        """Validate links synchronously."""
+        """Validate links synchronously.
+
+        Returns:
+            The resulting ``m.Quality.LinkValidatorResults``.
+        """
         checker = FlextQualityLinkChecker(config_dir)
         return asyncio.run(checker.validate_links(links, use_async=False))
 
@@ -396,15 +479,20 @@ Broken Links:
 
     @staticmethod
     def main() -> int:
-        """Run the example CLI entrypoint."""
+        """Run the example CLI entrypoint.
+
+        Returns:
+            The resulting ``int``.
+        """
         asyncio.run(FlextQualityLinkChecker.run_demo())
         return 0
 
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
 # this submodule's package __init__.py exports (flext-1wjg1.16.32).
-__all__: list[str] = ["FlextQualityLinkChecker"]
 
 
 if __name__ == "__main__":
     raise SystemExit(FlextQualityLinkChecker.main())
+
+__all__: list[str] = ["FlextQualityLinkChecker"]

@@ -2,6 +2,9 @@
 
 Real-time monitoring dashboard for documentation quality metrics.
 Provides web interface to view audit results, trends, and quality scores.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -38,7 +41,11 @@ class FlextQualityDocumentationDashboard:
 
         @self.app.route("/")
         def index() -> str:
-            """Serve the main dashboard page."""
+            """Serve the main dashboard page.
+
+            Returns:
+                The resulting ``str``.
+            """
             return self.render_dashboard_html()
 
         _ = index
@@ -48,7 +55,7 @@ class FlextQualityDocumentationDashboard:
             """Return current metrics as a JSON response."""
             return Response(
                 u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.compute_current_metrics()
+                    self.compute_current_metrics(),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -61,7 +68,7 @@ class FlextQualityDocumentationDashboard:
             days = int(request.args.get("days", 30))
             return Response(
                 u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.compute_quality_trends(days)
+                    self.compute_quality_trends(days),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -74,7 +81,7 @@ class FlextQualityDocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return Response(
                 u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-                    self.fetch_recent_reports(limit)
+                    self.fetch_recent_reports(limit),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -82,7 +89,11 @@ class FlextQualityDocumentationDashboard:
         _ = api_reports
 
     def compute_current_metrics(self) -> t.JsonMapping:
-        """Get current quality metrics from latest audit."""
+        """Get current quality metrics from latest audit.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         latest_audit = self.reports_dir / "latest_audit.json"
 
         if not latest_audit.exists():
@@ -117,8 +128,13 @@ class FlextQualityDocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def _build_current_metrics(self, audit_payload: str) -> t.JsonMapping:
-        """Build the dashboard metrics payload from the latest audit JSON."""
+    @staticmethod
+    def _build_current_metrics(audit_payload: str) -> t.JsonMapping:
+        """Build the dashboard metrics payload from the latest audit JSON.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
         metrics_raw = data.get("metrics")
         metrics: t.JsonMapping = metrics_raw if isinstance(metrics_raw, Mapping) else {}
@@ -147,7 +163,11 @@ class FlextQualityDocumentationDashboard:
         }
 
     def compute_quality_trends(self, days: int = 30) -> t.JsonMapping:
-        """Get quality trends over the specified number of days."""
+        """Get quality trends over the specified number of days.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         cutoff_date = u.now() - timedelta(days=days)
 
         trend_data: t.MutableSequenceOf[t.JsonDict] = []
@@ -159,7 +179,8 @@ class FlextQualityDocumentationDashboard:
                 trend_entry = self._load_quality_trend_entry(report_file, cutoff_date)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process trend data: %s", str(e)
+                    "Failed to process trend data: %s",
+                    str(e),
                 )
                 continue
             if trend_entry is not None:
@@ -177,13 +198,22 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_values,
         }
 
+    @staticmethod
     def _load_quality_trend_entry(
-        self, report_file: Path, cutoff_date: datetime
+        report_file: Path,
+        cutoff_date: datetime,
     ) -> t.JsonDict | None:
-        """Load one audit report trend entry when it is inside the window."""
+        """Load one audit report trend entry when it is inside the window.
+
+        Returns:
+            The resulting ``t.JsonDict | None``.
+
+        Raises:
+            ValueError: If Skipping unreadable report.
+        """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone()
+            tzinfo=u.configured_timezone(),
         )
         if report_date < cutoff_date:
             return None
@@ -208,7 +238,11 @@ class FlextQualityDocumentationDashboard:
         }
 
     def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
-        """Get list of recent audit reports."""
+        """Get list of recent audit reports.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         reports: MutableSequence[t.JsonMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
@@ -216,7 +250,8 @@ class FlextQualityDocumentationDashboard:
                 report_summary = self._load_recent_report_summary(report_file)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process report file: %s", str(e)
+                    "Failed to process report file: %s",
+                    str(e),
                 )
                 continue
             if report_summary is not None:
@@ -226,11 +261,19 @@ class FlextQualityDocumentationDashboard:
         reports = sorted(reports, key=operator.itemgetter("date"), reverse=True)
         return reports[:limit]
 
-    def _load_recent_report_summary(self, report_file: Path) -> t.JsonMapping | None:
-        """Load one recent report summary for the dashboard list."""
+    @staticmethod
+    def _load_recent_report_summary(report_file: Path) -> t.JsonMapping | None:
+        """Load one recent report summary for the dashboard list.
+
+        Returns:
+            The resulting ``t.JsonMapping | None``.
+
+        Raises:
+            ValueError: If Skipping unreadable report.
+        """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone()
+            tzinfo=u.configured_timezone(),
         )
         read = u.Cli.files_read_text(report_file)
         if read.failure:
@@ -255,8 +298,13 @@ class FlextQualityDocumentationDashboard:
             "files_analyzed": r_files_analyzed,
         }
 
-    def render_dashboard_html(self) -> str:
-        """Generate the main dashboard HTML."""
+    @staticmethod
+    def render_dashboard_html() -> str:
+        """Generate the main dashboard HTML.
+
+        Returns:
+            The resulting ``str``.
+        """
         return """
 <!DOCTYPE html>
 <html lang="en">
@@ -575,7 +623,11 @@ class FlextQualityDocumentationDashboard:
         """
 
     def run(
-        self, host: str = "localhost", port: int = 8080, *, debug: bool = False
+        self,
+        host: str = "localhost",
+        port: int = 8080,
+        *,
+        debug: bool = False,
     ) -> None:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
@@ -584,13 +636,19 @@ class FlextQualityDocumentationDashboard:
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(
-            "localhost", description="Dashboard bind host", validate_default=True
+            "localhost",
+            description="Dashboard bind host",
+            validate_default=True,
         )
         port: int = u.Field(
-            8080, description="Dashboard bind port", validate_default=True
+            8080,
+            description="Dashboard bind port",
+            validate_default=True,
         )
         debug: bool = u.Field(
-            False, description="Enable dashboard debug mode", validate_default=True
+            False,
+            description="Enable dashboard debug mode",
+            validate_default=True,
         )
         reports_dir: str = u.Field(
             "docs/maintenance/reports/",
@@ -600,19 +658,31 @@ class FlextQualityDocumentationDashboard:
 
         @override
         def execute(self) -> p.Result[bool]:
-            """Run the dashboard server."""
+            """Run the dashboard server.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
             dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
             dashboard.run(host=self.host, port=self.port, debug=self.debug)
             return r[bool].ok(value=True)
 
     @staticmethod
     def _run_handler(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
-        """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly)."""
+        """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly).
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Run the dashboard via the canonical cli facade."""
+        """Run the dashboard via the canonical cli facade.
+
+        Returns:
+            The resulting ``int``.
+        """
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-dashboard",
@@ -629,8 +699,9 @@ class FlextQualityDocumentationDashboard:
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
 # this submodule's package __init__.py exports (flext-1wjg1.16.32).
-__all__: list[str] = ["FlextQualityDocumentationDashboard"]
 
 
 if __name__ == "__main__":
     cli.exit(FlextQualityDocumentationDashboard.main())
+
+__all__: list[str] = ["FlextQualityDocumentationDashboard"]

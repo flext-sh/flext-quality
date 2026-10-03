@@ -1,10 +1,14 @@
-"""Type definitions for flext-quality."""
+"""Type definitions for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_web import FlextWebTypes, m, t
+from flext_web import FlextWebTypes, t
 
 
 class FlextQualityTypes(FlextWebTypes):

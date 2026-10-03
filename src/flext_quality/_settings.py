@@ -20,7 +20,7 @@ class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality; fields under ``settings.Quality.*``."""
 
     model_config = m.SettingsConfigDict(
-        env_prefix="FLEXT_QUALITY_", env_nested_delimiter="__", extra="ignore"
+        env_prefix="FLEXT_QUALITY_", env_nested_delimiter="__", extra="ignore",
     )
 
     class _Quality(m.BaseModel):
@@ -36,7 +36,14 @@ class FlextQualitySettings(FlextSettings):
 
         @u.model_validator(mode="after")
         def _validate_thresholds(self) -> FlextQualitySettings._Quality:
-            """Ensure function length ceiling does not exceed class length ceiling."""
+            """Ensure function length ceiling does not exceed class length ceiling.
+
+            Returns:
+                The resulting ``FlextQualitySettings._Quality``.
+
+            Raises:
+                ValueError: If max_function_length.
+            """
             if self.max_function_length > self.max_class_length:
                 msg = (
                     f"max_function_length ({self.max_function_length}) must be <= "
@@ -49,7 +56,7 @@ class FlextQualitySettings(FlextSettings):
         Quality: _Quality
     else:
         Quality: _Quality = m.Field(
-            default_factory=_Quality, description="Namespaced quality settings."
+            default_factory=_Quality, description="Namespaced quality settings.",
         )
 
 

@@ -1,4 +1,8 @@
-"""MCP resources for flext-quality."""
+"""MCP resources for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -22,7 +26,11 @@ class FlextQualityMcpResources:
     @_mcp.resource("settings://hooks")
     @staticmethod
     def read_hooks_config() -> str:
-        """Get current hooks configuration."""
+        """Get current hooks configuration.
+
+        Returns:
+            The resulting ``str``.
+        """
         manager = FlextQualityHookManager()
         settings = manager.fetch_config()
         config_json: str = (
@@ -36,14 +44,18 @@ class FlextQualityMcpResources:
     @_mcp.resource("settings://rules")
     @staticmethod
     def read_rules_config() -> str:
-        """Get current rules configuration."""
+        """Get current rules configuration.
+
+        Returns:
+            The resulting ``str``.
+        """
         engine = FlextQualityRulesEngine()
         rules = engine.list_rules()
         rules_json: str = (
             t
             .json_mapping_sequence_adapter()
             .dump_json(
-                [rule.model_dump() for rule in rules], indent=c.Quality.JSON_INDENT
+                [rule.model_dump() for rule in rules], indent=c.Quality.JSON_INDENT,
             )
             .decode("utf-8")
         )
@@ -52,7 +64,11 @@ class FlextQualityMcpResources:
     @_mcp.resource("status://integrations")
     @staticmethod
     def read_integrations_status() -> str:
-        """Get status of all integrations."""
+        """Get status of all integrations.
+
+        Returns:
+            The resulting ``str``.
+        """
         mem_client = FlextQualityClaudeMemClient()
         mem_health = mem_client.health_check()
         mem_status = (

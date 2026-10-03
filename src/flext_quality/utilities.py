@@ -1,4 +1,8 @@
-"""Utility functions for flext-quality."""
+"""Utility functions for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -20,22 +24,23 @@ from flext_quality import (
 if TYPE_CHECKING:
     from pathlib import Path
 
-DocumentationReportValue = FlextWebTypes.JsonMapping
-
 
 class FlextQualityUtilities(u):
     """Namespace for flext-quality utilities."""
 
+    DocumentationReportValue = FlextWebTypes.JsonMapping
+
     class Quality:
         """Quality-specific utilities namespace."""
 
-        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[
-            t.JsonMapping
-        ] = u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
+        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = (
+            u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
+        )
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
             t.SequenceOf[t.JsonMapping]
         ] = u.type_adapter(
-            t.SequenceOf[t.JsonMapping], config=m.ConfigDict(strict=False)
+            t.SequenceOf[t.JsonMapping],
+            config=m.ConfigDict(strict=False),
         )
         MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
             t.MutableOptionalFeatureFlagMapping
@@ -44,8 +49,10 @@ class FlextQualityUtilities(u):
             t.MutableSequenceOf[t.StrMapping]
         ] = u.type_adapter(t.MutableSequenceOf[t.StrMapping])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MappingKV[str, DocumentationReportValue]
-        ] = u.type_adapter(t.MappingKV[str, DocumentationReportValue])
+            t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
+        ] = u.type_adapter(
+            t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
+        )
 
         @staticmethod
         def compile_pattern(
@@ -55,7 +62,11 @@ class FlextQualityUtilities(u):
             multiline: bool = False,
             dotall: bool = False,
         ) -> t.RegexPattern:
-            """Compile a runtime-supplied regex pattern for quality tooling."""
+            """Compile a runtime-supplied regex pattern for quality tooling.
+
+            Returns:
+                The resulting ``t.RegexPattern``.
+            """
             flags = re.NOFLAG
             for enabled, flag in (
                 (ignorecase, re.IGNORECASE),
@@ -68,7 +79,11 @@ class FlextQualityUtilities(u):
 
         @staticmethod
         def escape_pattern(text: str) -> str:
-            """Escape literal text for safe regex interpolation."""
+            """Escape literal text for safe regex interpolation.
+
+            Returns:
+                The resulting ``str``.
+            """
             return re.escape(text)
 
         @staticmethod
@@ -79,7 +94,11 @@ class FlextQualityUtilities(u):
             app_help: str,
             route: p.Cli.ResultCommandRoute,
         ) -> int:
-            """Execute a single result-command Typer application."""
+            """Execute a single result-command Typer application.
+
+            Returns:
+                The resulting ``int``.
+            """
             app = cli.create_app_with_common_params(name=app_name, help_text=app_help)
             cli.register_result_routes(app, [route])
             outcome = cli.execute_app(
@@ -96,16 +115,18 @@ class FlextQualityUtilities(u):
             message: str | None = None,
             blocked_reason: str | None = None,
         ) -> str:
-            """Format hook output JSON."""
+            """Format hook output JSON.
+
+            Returns:
+                The resulting ``str``.
+            """
             output: t.MutableOptionalFeatureFlagMapping = {"continue": continue_exec}
             if message:
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            serialized_output: bytes = (
-                FlextQualityUtilities.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
-                    output
-                )
+            serialized_output: bytes = FlextQualityUtilities.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                output,
             )
             decoded_output: str = serialized_output.decode(c.DEFAULT_ENCODING)
             return decoded_output
@@ -114,11 +135,15 @@ class FlextQualityUtilities(u):
         def extract_rules_from_yaml(
             parsed: t.JsonMapping,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Validate and extract the rules list from parsed YAML."""
+            """Validate and extract the rules list from parsed YAML.
+
+            Returns:
+                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            """
             if not isinstance(parsed, dict):
                 return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
             parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
-                parsed
+                parsed,
             )
             raw_rules_val = parsed_dict.get("rules", [])
             if not isinstance(raw_rules_val, list):
@@ -132,24 +157,33 @@ class FlextQualityUtilities(u):
 
         @staticmethod
         def load_yaml_rules(path: Path) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Load rules from YAML file."""
+            """Load rules from YAML file.
+
+            Returns:
+                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            """
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
                 if yaml_result.failure:
                     return r[t.SequenceOf[t.JsonMapping]].fail(
-                        f"Failed to load YAML: {yaml_result.error}"
+                        f"Failed to load YAML: {yaml_result.error}",
                     )
                 return FlextQualityUtilities.Quality.extract_rules_from_yaml(
-                    yaml_result.value
+                    yaml_result.value,
                 )
             except c.EXC_BROAD_IO_TYPE as e:
                 return r[t.SequenceOf[t.JsonMapping]].fail(
-                    f"Failed to load rules: {e}", exception=e
+                    f"Failed to load rules: {e}",
+                    exception=e,
                 )
 
         @staticmethod
         def parse_hook_input(raw: str) -> p.Result[t.JsonMapping]:
-            """Parse hook input JSON."""
+            """Parse hook input JSON.
+
+            Returns:
+                The resulting ``p.Result[t.JsonMapping]``.
+            """
             try:
                 parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(raw)
                 coerced_input: t.JsonMapping = parsed
@@ -159,16 +193,25 @@ class FlextQualityUtilities(u):
 
         @staticmethod
         def read_stdin() -> p.Result[str]:
-            """Read JSON from stdin (for hooks)."""
+            """Read JSON from stdin (for hooks).
+
+            Returns:
+                The resulting ``p.Result[str]``.
+            """
             return u.try_(sys.stdin.read, catch=Exception).map_error(
-                lambda e: f"Failed to read stdin: {e}"
+                lambda e: f"Failed to read stdin: {e}",
             )
 
         @staticmethod
         def run_shell_command(
-            cmd: t.StrSequence, timeout_ms: int = c.Quality.HOOK_TIMEOUT_MS
+            cmd: t.StrSequence,
+            timeout_ms: int = c.Quality.HOOK_TIMEOUT_MS,
         ) -> p.Result[str]:
-            """Run a shell command with timeout."""
+            """Run a shell command with timeout.
+
+            Returns:
+                The resulting ``p.Result[str]``.
+            """
             timeout_secs = int(timeout_ms / c.Quality.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)
             if cmd_result.failure:
