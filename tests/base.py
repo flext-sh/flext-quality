@@ -1,15 +1,20 @@
-"""Service base for flext-quality tests."""
+"""Service base for flext-quality tests.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from typing import override
 
+from flext_tests import FlextTestsServiceBase
+
 from flext_quality import m
-from flext_tests import s as tests_s
 from tests.settings import TestsFlextQualitySettings
 
 
-class TestsFlextQualityServiceBase(tests_s):
+class TestsFlextQualityServiceBase(FlextTestsServiceBase):
     """Quality test service base with source and test settings namespaces."""
 
     @classmethod
@@ -20,7 +25,7 @@ class TestsFlextQualityServiceBase(tests_s):
 
     @classmethod
     @override
-    def _runtime_bootstrap_options(cls) -> m.RuntimeBootstrapOptions:
+    def runtime_bootstrap_options(cls) -> m.RuntimeBootstrapOptions:
         return m.RuntimeBootstrapOptions(settings_type=TestsFlextQualitySettings)
 
 

@@ -1,4 +1,8 @@
-"""YAML Rules Engine for flext-quality."""
+"""YAML Rules Engine for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -20,12 +24,20 @@ class FlextQualityRulesEngine:
         self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
-        """Get loaded rules."""
+    def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
+        """Get loaded rules.
+
+        Returns:
+            The resulting ``MutableSequence[m.Quality.RuleDefinition]``.
+        """
         return list(self._rules)
 
     def load_rules(self, rules_path: Path | None = None) -> p.Result[int]:
-        """Load rules from YAML file."""
+        """Load rules from YAML file.
+
+        Returns:
+            The resulting ``p.Result[int]``.
+        """
         path = rules_path or self._rules_path
         if path is None:
             path = Path(__file__).parent.parent.parent.parent / "rules" / "default.yaml"
@@ -38,9 +50,13 @@ class FlextQualityRulesEngine:
         return r[int].ok(len(self._rules))
 
     def validate(
-        self, path: str, context: t.JsonMapping | None = None
+        self, path: str, context: t.JsonMapping | None = None,
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-        """Validate code against loaded rules."""
+        """Validate code against loaded rules.
+
+        Returns:
+            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+        """
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
@@ -48,17 +64,23 @@ class FlextQualityRulesEngine:
         target_path = Path(path)
         if not target_path.exists():
             return r[t.SequenceOf[t.JsonMapping]].fail(f"Path does not exist: {path}")
-        violations: MutableSequence[t.JsonMapping] = []
         files = self._get_files(target_path)
-        for file_path in files:
+        if files.failure:
+            return r[t.SequenceOf[t.JsonMapping]].fail(files.error)
+        violations: MutableSequence[t.JsonMapping] = []
+        for file_path in files.value:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
         return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def validate_content(
-        self, content: str, filename: str = "<string>"
+        self, content: str, filename: str = "<string>",
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-        """Validate content string against loaded rules."""
+        """Validate content string against loaded rules.
+
+        Returns:
+            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+        """
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
@@ -72,9 +94,13 @@ class FlextQualityRulesEngine:
         return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     def _check_rule(
-        self, rule: m.Quality.RuleDefinition, content: str, filename: str
+        self, rule: m.Quality.RuleDefinition, content: str, filename: str,
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Check a single rule against content."""
+        """Check a single rule against content.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
             return violations
@@ -102,14 +128,24 @@ class FlextQualityRulesEngine:
                 })
         return violations
 
-    def _get_files(self, path: Path) -> t.SequenceOf[Path]:
-        """Get Python files from path."""
+    @staticmethod
+    def _get_files(path: Path) -> p.Result[t.SequenceOf[Path]]:
+        """Select the Python files under ``path`` through the CLI file owner.
+
+        Returns:
+            The resulting ``p.Result[t.SequenceOf[Path]]``.
+        """
         if path.is_file():
             return [path] if path.suffix == ".py" else []
-        return list(u.Infra.iter_matching_files(path, includes=["*.py"]))
+        return list(u.Cli.files_matching(path, includes=["*.py"]).value)
 
-    def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
-        """Convert rule type to severity."""
+    @staticmethod
+    def _rule_type_to_severity(rule_type: c.Quality.RuleType) -> str:
+        """Convert rule type to severity.
+
+        Returns:
+            The resulting ``str``.
+        """
         mapping = {
             c.Quality.RuleType.BLOCKING: c.Quality.Severity.ERROR,
             c.Quality.RuleType.WARNING: c.Quality.Severity.WARNING,
@@ -118,9 +154,13 @@ class FlextQualityRulesEngine:
         return str(mapping.get(rule_type, c.Quality.Severity.INFO))
 
     def _validate_file(
-        self, file_path: Path, context: t.JsonMapping
+        self, file_path: Path, context: t.JsonMapping,
     ) -> t.SequenceOf[t.JsonMapping]:
-        """Validate a single file against rules."""
+        """Validate a single file against rules.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         validation_context = t.json_dict_adapter().validate_python(context or {})
         read = u.Cli.files_read_text(file_path)
         if read.failure:
@@ -131,7 +171,7 @@ class FlextQualityRulesEngine:
                     "message": f"Failed to read file: {read.error}",
                     "severity": c.Quality.Severity.ERROR,
                     "context": validation_context,
-                }
+                },
             ]
         content = read.value
         violations: MutableSequence[t.JsonMapping] = []
@@ -146,3 +186,8 @@ class FlextQualityRulesEngine:
                 ]
             violations.extend(rule_violations)
         return violations
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityRulesEngine"]

@@ -6,8 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality import FlextQualityModels
 from flext_tests import FlextTestsModels
+
+from flext_quality import FlextQualityModels
 
 
 class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):

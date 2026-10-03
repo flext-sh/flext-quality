@@ -1,9 +1,14 @@
-"""Runtime settings for flext-quality tests."""
+"""Runtime settings for flext-quality tests.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
-from flext_quality import FlextQualitySettings
 from flext_tests import FlextTestsSettings
+
+from flext_quality import FlextQualitySettings
 
 
 class TestsFlextQualitySettings(FlextQualitySettings, FlextTestsSettings):

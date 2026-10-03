@@ -6,15 +6,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_tests import tm
+
 from flext_quality import m
 from flext_quality.docs.scheduled_maintenance import FlextQualityScheduledMaintenance
-from flext_tests import tm
 
 
 class TestsFlextQualityScheduledMaintenanceTimeout:
     """Public run_single_task preserves Git failure diagnostics via timeout runner."""
 
-    def test_git_failure_preserves_exception_detail(self) -> None:
+    @staticmethod
+    def test_git_failure_preserves_exception_detail() -> None:
         """Git non-zero exit text is recorded in results.errors."""
         maintenance = FlextQualityScheduledMaintenance()
         task = m.Quality.ScheduleTaskConfig(
@@ -29,7 +31,8 @@ class TestsFlextQualityScheduledMaintenanceTimeout:
         tm.that(joined, has="Task failed in git missing ref")
         tm.that(joined.lower(), has="fatal:")
 
-    def test_git_success_leaves_errors_empty(self) -> None:
+    @staticmethod
+    def test_git_success_leaves_errors_empty() -> None:
         """Successful timed git tasks do not append errors."""
         maintenance = FlextQualityScheduledMaintenance()
         task = m.Quality.ScheduleTaskConfig(

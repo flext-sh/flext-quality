@@ -1,38 +1,31 @@
 # AUTO-GENERATED FILE — Regenerate with: make gen
-"""Tests package."""
+"""Tests package.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
+from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from types import MappingProxyType
-
-from flext_core.lazy import build_lazy_import_map, install_lazy_exports
+from flext_core import build_lazy_import_map, install_lazy_exports
 
 if TYPE_CHECKING:
-    from . import helpers as helpers
-    from . import unit as unit
-    from flext_quality import FlextQualityConstants
-    from flext_tests import FlextTestsConstants, d, e, h, r, td, tf, tk, tm, tv, x
+    from flext_tests import api, d, e, h, r, td, tf, tk, tm, x
 
-    from .base import TestsFlextQualityServiceBase, TestsFlextQualityServiceBase as s
-    from .constants import TestsFlextQualityConstants, TestsFlextQualityConstants as c
-    from .helpers.assertions import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-    )
-    from .models import TestsFlextQualityModels, TestsFlextQualityModels as m
-    from .protocols import TestsFlextQualityProtocols, TestsFlextQualityProtocols as p
-    from .settings import TestsFlextQualitySettings
-    from .typings import TestsFlextQualityTypes, TestsFlextQualityTypes as t
-    from .utilities import TestsFlextQualityUtilities, TestsFlextQualityUtilities as u
+    from tests import helpers, unit
+    from tests.base import TestsFlextQualityServiceBase, s
+    from tests.constants import TestsFlextQualityConstants, c
+    from tests.models import TestsFlextQualityModels, m
+    from tests.protocols import TestsFlextQualityProtocols, p
+    from tests.settings import TestsFlextQualitySettings
+    from tests.typings import TestsFlextQualityTypes, t
+    from tests.utilities import TestsFlextQualityUtilities, u
+
+
 __all__: tuple[str, ...] = (
-    "FlextQualityConstants",
-    "FlextTestsConstants",
     "TestsFlextQualityConstants",
     "TestsFlextQualityModels",
     "TestsFlextQualityProtocols",
@@ -40,12 +33,7 @@ __all__: tuple[str, ...] = (
     "TestsFlextQualitySettings",
     "TestsFlextQualityTypes",
     "TestsFlextQualityUtilities",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
+    "api",
     "c",
     "d",
     "e",
@@ -60,7 +48,6 @@ __all__: tuple[str, ...] = (
     "tf",
     "tk",
     "tm",
-    "tv",
     "u",
     "unit",
     "x",
@@ -72,38 +59,17 @@ _LAZY_IMPORTS = MappingProxyType(
             ".base": ("TestsFlextQualityServiceBase", "s"),
             ".constants": ("TestsFlextQualityConstants", "c"),
             ".helpers": ("helpers",),
-            ".helpers.assertions": (
-                "assert_analysis_results_structure",
-                "assert_dict_structure",
-                "assert_is_dict",
-                "assert_is_list",
-                "assert_issues_structure",
-                "assert_metrics_structure",
-            ),
             ".models": ("TestsFlextQualityModels", "m"),
             ".protocols": ("TestsFlextQualityProtocols", "p"),
             ".settings": ("TestsFlextQualitySettings",),
             ".typings": ("TestsFlextQualityTypes", "t"),
             ".unit": ("unit",),
             ".utilities": ("TestsFlextQualityUtilities", "u"),
-            "flext_quality": ("FlextQualityConstants",),
-            "flext_tests": (
-                "FlextTestsConstants",
-                "d",
-                "e",
-                "h",
-                "r",
-                "td",
-                "tf",
-                "tk",
-                "tm",
-                "tv",
-                "x",
-            ),
+            "flext_tests": ("api", "d", "e", "h", "r", "td", "tf", "tk", "tm", "x"),
         }),
         alias_groups=MappingProxyType({}),
         sort_keys=False,
-    )
+    ),
 )
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)

@@ -1,6 +1,7 @@
 # C4 Model - FLEXT Quality Architecture
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [🎯 C4 Model Overview](#c4-model-overview)
   - [1. Context (Level 1)](#1-context-level-1)
@@ -33,6 +34,7 @@
 - [📋 Quality Assurance](#quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -72,7 +74,8 @@
 
 **C4 Model Views**: System Context → Containers → Components → Code
 
-Structured architectural documentation following the C4 model methodology for clear, hierarchical system understanding.
+Structured architectural documentation following the C4 model methodology for clear,
+hierarchical system understanding.
 
 ## 🎯 C4 Model Overview
 
@@ -80,27 +83,24 @@ The C4 model provides four hierarchical levels of architectural documentation:
 
 ### 1. Context (Level 1)
 
-**Purpose**: System landscape and external relationships
-**Audience**: Everyone (business stakeholders, users, developers)
-**Content**: System boundaries, external systems, user roles
+**Purpose**: System landscape and external relationships **Audience**: Everyone
+(business stakeholders, users, developers) **Content**: System boundaries, external
+systems, user roles
 
 ### 2. Containers (Level 2)
 
-**Purpose**: High-level technology choices and deployment
-**Audience**: Technical stakeholders and architects
-**Content**: Applications, data stores, technology stacks
+**Purpose**: High-level technology choices and deployment **Audience**: Technical
+stakeholders and architects **Content**: Applications, data stores, technology stacks
 
 ### 3. Components (Level 3)
 
-**Purpose**: Detailed component responsibilities and interactions
-**Audience**: Developers and technical leads
-**Content**: Component boundaries, APIs, data flows
+**Purpose**: Detailed component responsibilities and interactions **Audience**:
+Developers and technical leads **Content**: Component boundaries, APIs, data flows
 
 ### 4. Code (Level 4)
 
-**Purpose**: Implementation details and relationships
-**Audience**: Developers working on the codebase
-**Content**: Classes, interfaces, implementation details
+**Purpose**: Implementation details and relationships **Audience**: Developers working
+on the codebase **Content**: Classes, interfaces, implementation details
 
 ## 📋 FLEXT Quality C4 Views
 
@@ -109,7 +109,7 @@ The C4 model provides four hierarchical levels of architectural documentation:
 | **1** | [System Context](context.md)            | External systems and users      | [Context Diagram](diagrams/context.puml)      |
 | **2** | [Container Architecture](containers.md) | High-level system components    | [Container Diagram](diagrams/containers.puml) |
 | **3** | [Component Architecture](components.md) | Detailed component interactions | [Component Diagram](diagrams/components.puml) |
-| **4** | [Code Architecture](code.md)            | Implementation-level details    | Code Diagrams               |
+| **4** | [Code Architecture](code.md)            | Implementation-level details    | Code Diagrams                                 |
 
 ## 🏗️ Architecture Principles Applied
 
@@ -177,7 +177,8 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 
 - **Domain Layer**: ✅ Complete - Rich domain model implemented
 - **Application Layer**: ✅ Functional - Service layer operational
-- **Infrastructure Layer**: ⚠️ Partial - Core analyzer accessible but model integration issues
+- **Infrastructure Layer**: ⚠️ Partial - Core analyzer accessible but model integration
+  issues
 - **Presentation Layer**: ⚠️ Limited - CLI and API partially implemented
 
 ### Scaling Considerations
@@ -200,7 +201,8 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 
 1. **Start Here**: [System Context](context.md) - Understand the big picture
 1. **Technical View**: [Container Architecture](containers.md) - Technology choices
-1. **Implementation**: [Component Architecture](components.md) - How components work together
+1. **Implementation**: [Component Architecture](components.md) - How components work
+   together
 1. **Deep Dive**: [Code Architecture](code.md) - Implementation details
 
 ### For Different Audiences
@@ -225,7 +227,7 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 **DevOps Engineers**:
 
 - Focus on [Container Architecture](containers.md)
-- Review **Deployment Architecture** (_Documentation coming soon_)
+- Review [deployment diagrams](../diagrams/deployment/README.md)
 - Examine infrastructure requirements and dependencies
 
 ## 🛠️ Tooling & Automation
@@ -268,6 +270,7 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 - **Accuracy**: Diagrams and documentation reflect actual implementation
 - **Maintenance**: Regular review and update process established
 
-______________________________________________________________________
+---
 
-**C4 Model Documentation** - Structured architectural understanding from system context to implementation details.
+**C4 Model Documentation** - Structured architectural understanding from system context
+to implementation details.

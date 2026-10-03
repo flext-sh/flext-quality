@@ -48,7 +48,7 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping, required_keys: t.StrSequence
+    data: t.ScalarMapping, required_keys: t.StrSequence,
 ) -> t.ScalarMapping:
     """Assert that t.JsonValue is dict with required keys - DRY pattern.
 
@@ -105,5 +105,5 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
     """
     assert_is_dict(issues)
     return assert_dict_structure(
-        issues, ["security", "complexity", "dead_code", "duplicates"]
+        issues, ["security", "complexity", "dead_code", "duplicates"],
     )

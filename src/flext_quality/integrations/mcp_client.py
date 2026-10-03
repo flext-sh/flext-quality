@@ -35,38 +35,55 @@ class FlextQualityMcpClient:
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
-        self, call: m.Quality.McpToolCall
+        self, call: m.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
-        """Build the mcp-cli command for a tool call."""
-        if not self.is_mcp_cli_available():
+        """Build the mcp-cli command for a tool call.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
+        if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
         params_json = t.json_mapping_adapter().dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
-        """Build the mcp-cli info command for a tool."""
-        if not self.is_mcp_cli_available():
+        """Build the mcp-cli info command for a tool.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
+        if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{server}/{tool}"
         return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
 
+    @staticmethod
     def build_tool_call(
-        self, server: str, tool: str, params: t.JsonMapping | None = None
+        server: str, tool: str, params: t.JsonMapping | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
-        """Build an MCP tool call request."""
+        """Build an MCP tool call request.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.McpToolCall]``.
+        """
         call_params = t.json_dict_adapter().validate_python(params or {})
         return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
                 "server": server,
                 "tool": tool,
                 "params": call_params,
-            })
+            }),
         )
 
     def health_check(self) -> p.Result[t.JsonMapping]:
-        """Check if MCP infrastructure is available."""
-        available = self.is_mcp_cli_available()
+        """Check if MCP infrastructure is available.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
+        available = self.mcp_cli_available()
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if available
@@ -80,7 +97,11 @@ class FlextQualityMcpClient:
         })
 
     def build_server_health_result(self, server_name: str) -> p.Result[t.JsonMapping]:
-        """Build a normalized health result for a named MCP server."""
+        """Build a normalized health result for a named MCP server.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         mcp_health = self.health_check()
         if mcp_health.failure:
             return r[t.JsonMapping].fail(mcp_health.error)
@@ -97,25 +118,39 @@ class FlextQualityMcpClient:
             "mcp_cli": health_data.get("mcp_cli", False),
         })
 
-    def is_mcp_cli_available(self) -> bool:
-        """Check if mcp-cli is available in PATH."""
+    @staticmethod
+    def mcp_cli_available() -> bool:
+        """Check if mcp-cli is available in PATH.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return shutil.which("mcp-cli") is not None
 
+    @staticmethod
     def _build_object_result(
-        self, parsed: t.JsonMapping
+        parsed: t.JsonMapping,
     ) -> p.Result[m.Quality.McpToolResult]:
-        """Build an MCP tool result from parsed JSON object output."""
+        """Build an MCP tool result from parsed JSON object output.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.McpToolResult]``.
+        """
         result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
         return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult.model_validate({
                 "success": True,
                 "data": result_data,
                 "error": None,
-            })
+            }),
         )
 
     def _build_list_result(self, output: str) -> p.Result[m.Quality.McpToolResult]:
-        """Build an MCP tool result from parsed JSON list output."""
+        """Build an MCP tool result from parsed JSON list output.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.McpToolResult]``.
+        """
         try:
             parsed_list: t.JsonList = t.json_list_adapter().validate_json(output)
         except ValueError:
@@ -135,34 +170,48 @@ class FlextQualityMcpClient:
             m.Quality.McpToolResult(
                 success=True,
                 data={
-                    "items": t.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
-                        coerced_data
-                    ).decode("utf-8")
+                    "items": u.Quality.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
+                        coerced_data,
+                    ).decode("utf-8"),
                 },
                 error=None,
-            )
+            ),
         )
 
-    def _build_raw_result(self, output: str) -> p.Result[m.Quality.McpToolResult]:
-        """Build an MCP tool result preserving raw output."""
+    @staticmethod
+    def _build_raw_result(output: str) -> p.Result[m.Quality.McpToolResult]:
+        """Build an MCP tool result preserving raw output.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.McpToolResult]``.
+        """
         return r[m.Quality.McpToolResult].ok(
-            m.Quality.McpToolResult(success=True, data={"raw": output}, error=None)
+            m.Quality.McpToolResult(success=True, data={"raw": output}, error=None),
         )
 
     def parse_result(
-        self, output: str, exit_code: int
+        self, output: str, exit_code: int,
     ) -> p.Result[m.Quality.McpToolResult]:
-        """Parse the output from an mcp-cli call."""
+        """Parse the output from an mcp-cli call.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.McpToolResult]``.
+        """
         if exit_code != 0:
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult(
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
-                )
+                ),
             )
         try:
             parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(output)
             return self._build_object_result(parsed)
         except ValueError:
             return self._build_list_result(output)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityMcpClient"]

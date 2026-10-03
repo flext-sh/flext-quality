@@ -1,4 +1,8 @@
-"""Hook lifecycle manager."""
+"""Hook lifecycle manager.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -18,12 +22,16 @@ class FlextQualityHookManager:
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional settings path."""
         self._hooks: MutableMapping[
-            c.Quality.HookEvent, MutableSequence[FlextQualityBaseHook]
+            c.Quality.HookEvent, MutableSequence[FlextQualityBaseHook],
         ] = {}
         self._config_path = config_path
 
     def execute(self, event: str, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        """Execute all hooks for an event."""
+        """Execute all hooks for an event.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         try:
             hook_event = c.Quality.HookEvent(event)
         except ValueError:
@@ -41,7 +49,11 @@ class FlextQualityHookManager:
         return r[t.JsonMapping].ok({"continue": True})
 
     def fetch_config(self) -> t.JsonMapping:
-        """Get hooks configuration as dict."""
+        """Get hooks configuration as dict.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         config: t.JsonDict = {}
         for event, hooks in self._hooks.items():
             hook_entries: t.JsonValueList = []
@@ -57,7 +69,11 @@ class FlextQualityHookManager:
         return config
 
     def fetch_config_json(self) -> str:
-        """Get hooks configuration as JSON."""
+        """Get hooks configuration as JSON.
+
+        Returns:
+            The resulting ``str``.
+        """
         config_json: str = (
             t
             .json_mapping_adapter()
@@ -67,9 +83,18 @@ class FlextQualityHookManager:
         return config_json
 
     def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
-        """Register a hook."""
+        """Register a hook.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         event = hook.event
         if event not in self._hooks:
             self._hooks[event] = list[FlextQualityBaseHook]()
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
+
+
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+__all__: list[str] = ["FlextQualityHookManager"]
