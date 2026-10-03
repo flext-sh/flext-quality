@@ -36,7 +36,64 @@ _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
 _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
 
 _AUDIT_REPORT_TEMPLATE: Final[str] = (
-    """\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body { font-family: Arial, sans-serif; margin: 40px; }\n        .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }\n        .metrics { display: flex; gap: 20px; margin: 20px 0; }\n        .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }\n        .issues { margin: 20px 0; }\n        .issue { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }\n        .severity-critical { border-left: 5px solid #dc3545; }\n        .severity-high { border-left: 5px solid #fd7e14; }\n        .severity-medium { border-left: 5px solid #ffc107; }\n        .severity-low { border-left: 5px solid #28a745; }\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: $generated_at</p>\n        <p>Files Analyzed: ${file}s_analyzed</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: $score_color;">\n                $quality_score%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $total_issues\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                $issues_per_file\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: $critical_count</li>\n        <li>High: $high_count</li>\n        <li>Medium: $medium_count</li>\n        <li>Low: $low_count</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
+"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>FLEXT Quality Documentation Audit Report</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .header { background: #f0f0f0; padding: 20px; border-radius: 5px; }
+            .metrics { display: flex; gap: 20px; margin: 20px 0; }
+            .metric { background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }
+            .issues { margin: 20px 0; }
+            .issue { border: 1px solid #ddd;
+                margin: 10px 0; padding: 10px; border-radius: 5px; }
+            .severity-critical { border-left: 5px solid #dc3545; }
+            .severity-high { border-left: 5px solid #fd7e14; }
+            .severity-medium { border-left: 5px solid #ffc107; }
+            .severity-low { border-left: 5px solid #28a745; }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>FLEXT Quality Documentation Audit Report</h1>
+            <p>Generated: $generated_at</p>
+            <p>Files Analyzed: ${file}s_analyzed</p>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <h3>Quality Score</h3>
+                <div style="font-size: 2em; font-weight: bold; color: $score_color;">
+                    $quality_score%
+                </div>
+            </div>
+            <div class="metric">
+                <h3>Total Issues</h3>
+                <div style="font-size: 2em; font-weight: bold;">
+                    $total_issues
+                </div>
+            </div>
+            <div class="metric">
+                <h3>Issues per File</h3>
+                <div style="font-size: 2em; font-weight: bold;">
+                    $issues_per_file
+                </div>
+            </div>
+        </div>
+
+        <h2>Issues by Severity</h2>
+        <ul>
+            <li>Critical: $critical_count</li>
+            <li>High: $high_count</li>
+            <li>Medium: $medium_count</li>
+            <li>Low: $low_count</li>
+        </ul>
+
+        <div class="issues">
+            <h2>Detailed Issues</h2>
+    """
 )
 
 
@@ -251,7 +308,10 @@ class FlextQualityDocumentationAuditor:
                     "file": str(file_path.relative_to(self.project_root)),
                     "word_count": word_count,
                     "minimum_required": min_word_count,
-                    "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
+                    "recommendation": (
+                        f"Expand content (currently {word_count} words, "
+                        f"minimum {min_word_count})"
+                    ),
                 })
             if "README.md" in str(file_path) or "docs/" in str(file_path):
                 missing_sections = self._check_required_sections(
@@ -264,7 +324,9 @@ class FlextQualityDocumentationAuditor:
                         "severity": "medium",
                         "file": str(file_path.relative_to(self.project_root)),
                         "missing_sections": missing_sections,
-                        "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
+                        "recommendation": (
+                            f"Add missing sections: {', '.join(missing_sections)}"
+                        ),
                     })
             if check_todos:
                 todos = u.Quality.compile_pattern(
@@ -339,7 +401,10 @@ class FlextQualityDocumentationAuditor:
                     "severity": severity,
                     "file": str(file_path.relative_to(self.project_root)),
                     "issues": accessibility_issues,
-                    "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
+                    "recommendation": (
+                        f"Address {len(accessibility_issues)} accessibility "
+                        f"issues"
+                    ),
                 })
             if accessibility_cfg.proper_heading_hierarchy:
                 heading_issues = self._check_heading_hierarchy(content)
@@ -516,7 +581,9 @@ class FlextQualityDocumentationAuditor:
                         "file": link["file"],
                         "url": link["url"],
                         "status_code": response.status_code,
-                        "recommendation": f"Fix or remove broken link (HTTP {response.status_code})",
+                        "recommendation": (
+                            f"Fix or remove broken link (HTTP {response.status_code})"
+                        ),
                     })
             except requests.RequestException as e:
                 self.results.issues.append({
@@ -551,7 +618,9 @@ class FlextQualityDocumentationAuditor:
                         "severity": "high",
                         "file": link["file"],
                         "target": link["url"],
-                        "recommendation": f"Fix broken internal link to '{link['url']}'",
+                        "recommendation": (
+                            f"Fix broken internal link to '{link['url']}'"
+                        ),
                     })
 
     def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
@@ -610,7 +679,9 @@ class FlextQualityDocumentationAuditor:
                 m.Quality.AuditRecommendation(
                     priority="critical",
                     category="overall_quality",
-                    recommendation="Immediate attention required - documentation quality is poor",
+                    recommendation=(
+                        "Immediate attention required - documentation quality is poor"
+                    ),
                     actions=[
                         "Address all critical and high-severity issues immediately",
                         "Implement automated quality gates in CI/CD",
@@ -742,7 +813,14 @@ class FlextQualityDocumentationAuditor:
             severity_class = f"severity-{issue.get('severity', 'info')}"
             type_str = str(issue.get("type", ""))
             sev_str = str(issue.get("severity", ""))
-            html += f"""\n        <div class="issue {severity_class}">\n            <h4>{type_str.replace("_", " ").title()} ({sev_str.upper()})</h4>\n            <p><strong>File:</strong> {issue.get("file", "N/A")}</p>\n            <p><strong>Recommendation:</strong> {issue.get("recommendation", "N/A")}</p>\n"""
+            html += f"""
+                    <div class="issue {severity_class}">
+                        <h4>{type_str.replace("_", " ").title()}
+                        ({sev_str.upper()})</h4>
+                        <p><strong>File:</strong> {issue.get("file", "N/A")}</p>
+                        <p><strong>Recommendation:</strong>
+                        {issue.get("recommendation", "N/A")}</p>
+            """
             if "age_days" in issue:
                 html += f"<p><strong>Age:</strong> {issue['age_days']} days</p>"
             if "word_count" in issue:
@@ -750,7 +828,10 @@ class FlextQualityDocumentationAuditor:
             if "status_code" in issue:
                 html += f"<p><strong>Status Code:</strong> {issue['status_code']}</p>"
             if "url" in issue:
-                html += f"<p><strong>URL:</strong> <a href='{issue['url']}'>{issue['url']}</a></p>"
+                html += (
+                    "<p><strong>URL:</strong> "
+                    f"<a href='{issue['url']}'>{issue['url']}</a></p>"
+                )
             html += "</div>"
         html += "\n    </div>\n</body>\n</html>\n"
         return html
@@ -800,37 +881,37 @@ class FlextQualityDocumentationAuditor:
         """CLI command for FLEXT Quality documentation audit."""
 
         comprehensive: bool = u.Field(
-            False,
+            default=False,
             description="Run all audit checks",
             validate_default=True,
         )
         check_freshness: bool = u.Field(
-            False,
+            default=False,
             description="Check content freshness",
             validate_default=True,
         )
         check_completeness: bool = u.Field(
-            False,
+            default=False,
             description="Check documentation completeness",
             validate_default=True,
         )
         check_consistency: bool = u.Field(
-            False,
+            default=False,
             description="Check content consistency",
             validate_default=True,
         )
         check_links: bool = u.Field(
-            False,
+            default=False,
             description="Check documentation links",
             validate_default=True,
         )
         ci_mode: bool = u.Field(
-            False,
+            default=False,
             description="Enable CI mode",
             validate_default=True,
         )
         fail_on_errors: bool = u.Field(
-            False,
+            default=False,
             description="Fail when audit errors are present",
             validate_default=True,
         )

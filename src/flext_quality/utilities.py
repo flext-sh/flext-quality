@@ -125,8 +125,10 @@ class FlextQualityUtilities(u):
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            serialized_output: bytes = FlextQualityUtilities.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
-                output,
+            serialized_output: bytes = (
+                FlextQualityUtilities.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                    output,
+                )
             )
             decoded_output: str = serialized_output.decode(c.DEFAULT_ENCODING)
             return decoded_output

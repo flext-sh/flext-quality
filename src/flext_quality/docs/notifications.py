@@ -460,7 +460,8 @@ FLEXT Quality Documentation Alert
 {message}
 
 ---
-This is an automated notification from the FLEXT Quality Documentation Maintenance System.
+This is an automated notification from the FLEXT Quality Documentation
+Maintenance System.
 Timestamp: {u.now().isoformat()}
         """.strip()
 
@@ -614,7 +615,10 @@ Top Critical Issues:
             message += f"   File: {file_v}\n"
             message += f"   Description: {desc_v}\n\n"
 
-        message += "\nIMMEDIATE ACTION REQUIRED: Please review and fix critical issues immediately."
+        message += (
+            "\nIMMEDIATE ACTION REQUIRED: Please review and fix critical issues "
+            "immediately."
+        )
 
         return message.strip()
 
@@ -667,7 +671,10 @@ Found {len(broken_links)} broken links that need attention:
         """
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
-        return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
+        return (
+            "Weekly documentation quality report is now available. Check the reports "
+            "dashboard for detailed metrics and trends."
+        )
 
     @staticmethod
     def _format_monthly_report_message(_report_data: t.JsonMapping) -> str:
@@ -677,7 +684,10 @@ Found {len(broken_links)} broken links that need attention:
             The resulting ``str``.
         """
         # Implementation would depend on monthly report data structure
-        return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
+        return (
+            "Monthly comprehensive documentation quality report is now available. "
+            "Review trends and plan improvements for the next month."
+        )
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation notifications."""
@@ -691,7 +701,7 @@ Found {len(broken_links)} broken links that need attention:
             ),
         ] = "docs/maintenance/settings/notification_config.yaml"
         test: bool = u.Field(
-            False,
+            default=False,
             description="Send a test notification",
             validate_default=True,
         )
@@ -769,7 +779,10 @@ Found {len(broken_links)} broken links that need attention:
                 _ = notifier.notify_monthly_report(report_data)
                 return r[bool].ok(value=True)
             return r[bool].fail(
-                "No action selected (use --test, --audit-data, --weekly-report or --monthly-report)",
+                (
+                    "No action selected (use --test, --audit-data, --weekly-report or "
+                    "--monthly-report)"
+                ),
             )
 
     @staticmethod

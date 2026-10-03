@@ -258,7 +258,9 @@ class FlextQualityScheduledMaintenance:
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
+        config: (
+            m.Quality.MaintenanceConfig
+        ) = m.Quality.MaintenanceConfig.model_validate({
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -298,52 +300,84 @@ class FlextQualityScheduledMaintenance:
             "tasks": {
                 "audit_quick": {
                     "description": "Quick daily audit for critical issues",
-                    "command": f"python -m flext_quality.docs.scripts.audit --check-freshness --check-completeness --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.audit "
+                        f"--check-freshness --check-completeness --output "
+                        f"{reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "audit_comprehensive": {
                     "description": "Full comprehensive audit",
-                    "command": f"python -m flext_quality.docs.scripts.audit --comprehensive --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.audit "
+                        f"--comprehensive --output {reports_dir}"
+                    ),
                     "timeout": 600,
                 },
                 "validate_links": {
                     "description": "Validate all links and references",
-                    "command": f"python -m flext_quality.docs.scripts.validate --external-links --internal-links --images --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.validate "
+                        f"--external-links --internal-links --images "
+                        f"--output {reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "check_critical": {
                     "description": "Check for critical issues and send alerts",
-                    "command": f"python -m flext_quality.docs.notifications --audit-data {latest_audit_report}",
+                    "command": (
+                        f"python -m flext_quality.docs.notifications "
+                        f"--audit-data {latest_audit_report}"
+                    ),
                     "timeout": 60,
                 },
                 "optimize_formatting": {
                     "description": "Auto-fix formatting issues",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --fix-formatting --backup --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--fix-formatting --backup --output {reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "optimize_full": {
                     "description": "Full optimization suite",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --comprehensive --backup --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--comprehensive --backup --output {reports_dir}"
+                    ),
                     "timeout": 600,
                 },
                 "update_toc": {
                     "description": "Update table of contents",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --update-toc --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--update-toc --output {reports_dir}"
+                    ),
                     "timeout": 180,
                 },
                 "generate_report": {
                     "description": "Generate quality report",
-                    "command": f"python -m flext_quality.docs.scripts.report --format html --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.report "
+                        f"--format html --output {reports_dir}"
+                    ),
                     "timeout": 120,
                 },
                 "generate_monthly_report": {
                     "description": "Generate comprehensive monthly report",
-                    "command": f"python -m flext_quality.docs.scripts.report --monthly-trends --format html --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.report "
+                        f"--monthly-trends --format html --output {reports_dir}"
+                    ),
                     "timeout": 180,
                 },
                 "notify_weekly": {
                     "description": "Send weekly notification",
-                    "command": f"python -m flext_quality.docs.notifications --weekly-report {latest_audit_report}",
+                    "command": (
+                        f"python -m flext_quality.docs.notifications "
+                        f"--weekly-report {latest_audit_report}"
+                    ),
                     "timeout": 60,
                 },
                 "cleanup_old_reports": {
@@ -472,8 +506,11 @@ class FlextQualityScheduledMaintenance:
         if handler:
             return handler(cmd_parts, timeout, description)
         self.results.warnings.append(
-            f"Unsupported command: {cmd_name} in task: {description}. "
-            "Please install appropriate Python libraries or configure supported commands.",
+            (
+                f"Unsupported command: {cmd_name} in task: {description}. "
+                "Please install appropriate Python libraries or configure "
+                "supported commands."
+            ),
         )
         return False
 
@@ -606,7 +643,8 @@ class FlextQualityScheduledMaintenance:
         Returns:
             The resulting ``bool``.
         """
-        # Note: timeout parameter reserved for future make execution timeout implementation
+        # Note: timeout parameter reserved for future make execution timeout
+        # implementation
         _ = timeout  # Reserved for future use
 
         try:
@@ -633,8 +671,11 @@ class FlextQualityScheduledMaintenance:
         if not targets:
             targets = ["default"]
         self.results.warnings.append(
-            f"Make command '{' '.join(cmd_parts)}' requires make tool. "
-            f"For task: {description}, consider specifying the actual command directly.",
+            (
+                f"Make command '{' '.join(cmd_parts)}' requires make tool. "
+                f"For task: {description}, consider specifying the actual "
+                "command directly."
+            ),
         )
         return False
 
@@ -696,7 +737,8 @@ class FlextQualityScheduledMaintenance:
         Returns:
             The resulting ``bool``.
         """
-        # Note: timeout parameter reserved for future echo execution timeout implementation
+        # Note: timeout parameter reserved for future echo execution timeout
+        # implementation
         _ = timeout  # Reserved for future use
 
         try:
@@ -884,7 +926,7 @@ class FlextQualityScheduledMaintenance:
             ),
         ]
         daemon: bool = u.Field(
-            False,
+            default=False,
             description="Run scheduler daemon",
             validate_default=True,
         )
@@ -894,7 +936,7 @@ class FlextQualityScheduledMaintenance:
             validate_default=True,
         )
         list_schedules: bool = u.Field(
-            False,
+            default=False,
             description="List configured schedules",
             validate_default=True,
         )
@@ -947,7 +989,8 @@ class FlextQualityScheduledMaintenance:
             route=m.Cli.ResultCommandRoute(
                 name="run",
                 help_text=(
-                    "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
+                    "Run scheduled maintenance (use --daemon, --manual or "
+                    "--list-schedules)"
                 ),
                 model_cls=FlextQualityScheduledMaintenance.Run,
                 handler=FlextQualityScheduledMaintenance._run_handler,

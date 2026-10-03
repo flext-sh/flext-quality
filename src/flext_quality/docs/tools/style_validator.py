@@ -157,7 +157,10 @@ class FlextQualityStyleValidator:
                             type="heading_hierarchy",
                             line=line_num,
                             content=f"{'#' * level} {text}",
-                            message=f"Heading skips level (expected H{expected_level} or H{expected_level + 1}, got H{level})",
+                            message=(
+                                f"Heading skips level (expected H{expected_level} "
+                                f"or H{expected_level + 1}, got H{level})"
+                            ),
                             severity="medium",
                         ),
                     )
@@ -169,7 +172,10 @@ class FlextQualityStyleValidator:
                     type="first_heading_level",
                     line=headings[0][2],
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
-                    message=f"Document should start with H{self.settings.headings.first_heading_level} heading",
+                    message=(
+                        f"Document should start with "
+                        f"H{self.settings.headings.first_heading_level} heading"
+                    ),
                     severity="low",
                 ),
             )
@@ -345,7 +351,10 @@ class FlextQualityStyleValidator:
                         + "..."
                         if len(line) > c.Quality.STYLE_VALIDATOR_MAX_LINE_PREVIEW_LENGTH
                         else line,
-                        message=f"Line exceeds {max_length} characters ({len(line)} chars)",
+                        message=(
+                            f"Line exceeds {max_length} characters ({len(line)} "
+                            f"chars)"
+                        ),
                         severity="low",
                     ),
                 )

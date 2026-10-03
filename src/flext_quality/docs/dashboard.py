@@ -316,7 +316,8 @@ class FlextQualityDocumentationDashboard:
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+            Roboto, sans-serif;
             background: #f5f5f5;
             color: #333;
             line-height: 1.6;
@@ -481,10 +482,14 @@ class FlextQualityDocumentationDashboard:
                 const metricsResponse = await fetch('/api/metrics');
                 const metrics = await metricsResponse.json();
 
-                document.getElementById('quality-score').textContent = metrics.quality_score;
-                document.getElementById('files-analyzed').textContent = metrics.files_analyzed;
-                document.getElementById('total-issues').textContent = metrics.total_issues;
-                document.getElementById('critical-issues').textContent = metrics.severity_breakdown.critical || 0;
+                document.getElementById('quality-score').textContent =
+                    metrics.quality_score;
+                document.getElementById('files-analyzed').textContent =
+                    metrics.files_analyzed;
+                document.getElementById('total-issues').textContent =
+                    metrics.total_issues;
+                document.getElementById('critical-issues').textContent =
+                    metrics.severity_breakdown.critical || 0;
 
                 // Update last updated time
                 const lastUpdated = new Date(metrics.timestamp);
@@ -506,7 +511,8 @@ class FlextQualityDocumentationDashboard:
 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                document.getElementById('last-updated').textContent = 'Error loading data';
+                document.getElementById('last-updated').textContent =
+                    'Error loading data';
             }
         }
 
@@ -587,14 +593,16 @@ class FlextQualityDocumentationDashboard:
             container.innerHTML = '';
 
             if (reports.length === 0) {
-                container.innerHTML = '<div class="report-item">No recent reports found</div>';
+                container.innerHTML =
+                    '<div class="report-item">No recent reports found</div>';
                 return;
             }
 
             reports.forEach(report => {
                 const date = new Date(report.date);
                 const scoreClass = report.quality_score >= 80 ? 'score-excellent' :
-                                 report.quality_score >= 60 ? 'score-good' : 'score-poor';
+                                 report.quality_score >= 60
+                                 ? 'score-good' : 'score-poor';
 
                 const item = document.createElement('div');
                 item.className = 'report-item';
@@ -604,8 +612,10 @@ class FlextQualityDocumentationDashboard:
                         <div class="report-date">${date.toLocaleString()}</div>
                     </div>
                     <div>
-                        <span class="report-score ${scoreClass}">${report.quality_score}</span>
-                        <div style="font-size: 0.8em; color: #666;">${report.total_issues} issues</div>
+                        <span class="report-score ${scoreClass}">
+                            ${report.quality_score}</span>
+                        <div style="font-size: 0.8em; color: #666;">
+                            ${report.total_issues} issues</div>
                     </div>
                 `;
                 container.appendChild(item);
@@ -646,7 +656,7 @@ class FlextQualityDocumentationDashboard:
             validate_default=True,
         )
         debug: bool = u.Field(
-            False,
+            default=False,
             description="Enable dashboard debug mode",
             validate_default=True,
         )

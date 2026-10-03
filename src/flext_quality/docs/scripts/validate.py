@@ -539,7 +539,10 @@ class FlextQualityDocumentationValidator:
                             url=link.url,
                             file=link.file,
                             line=link.line_number,
-                            warning="Link text is not descriptive enough for accessibility",
+                            warning=(
+                                "Link text is not descriptive enough for "
+                                "accessibility"
+                            ),
                         ),
                     )
                     self.results.warnings += 1
@@ -786,47 +789,47 @@ class FlextQualityDocumentationValidator:
         """CLI command for FLEXT Quality documentation validation."""
 
         external_links: bool = u.Field(
-            False,
+            default=False,
             description="Validate external links",
             validate_default=True,
         )
         internal_links: bool = u.Field(
-            False,
+            default=False,
             description="Validate internal links",
             validate_default=True,
         )
         images: bool = u.Field(
-            False,
+            default=False,
             description="Validate image references",
             validate_default=True,
         )
         anchors: bool = u.Field(
-            False,
+            default=False,
             description="Validate anchor links",
             validate_default=True,
         )
         link_text: bool = u.Field(
-            False,
+            default=False,
             description="Check link text quality",
             validate_default=True,
         )
         markdown_syntax: bool = u.Field(
-            False,
+            default=False,
             description="Validate markdown syntax",
             validate_default=True,
         )
         content_quality: bool = u.Field(
-            False,
+            default=False,
             description="Check content quality",
             validate_default=True,
         )
         all: bool = u.Field(
-            False,
+            default=False,
             description="Run all validation checks",
             validate_default=True,
         )
         verbose: bool = u.Field(
-            False,
+            default=False,
             description="Enable verbose output",
             validate_default=True,
         )
