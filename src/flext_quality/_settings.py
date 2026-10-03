@@ -61,6 +61,9 @@ class FlextQualitySettings(FlextSettings):
 
 
 settings: FlextQualitySettings = FlextQualitySettings.fetch_global()
-"""Pre-instantiated project settings singleton — ``from flext_quality import settings``."""
+"""Pre-instantiated project settings singleton.
+
+``from flext_quality import settings``.
+"""
 
 __all__: list[str] = ["FlextQualitySettings", "settings"]

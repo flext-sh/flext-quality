@@ -291,7 +291,9 @@ class FlextQualityDocumentationReporter:
                             priority="critical",
                             category="immediate_fixes",
                             title=f"Fix {len(critical_issues)} Critical Issues",
-                            description="Address critical documentation issues immediately",
+                            description=(
+                                "Address critical documentation issues immediately"
+                            ),
                             actions=[
                                 "Review critical issues in audit report",
                                 "Prioritize fixes",
@@ -310,7 +312,10 @@ class FlextQualityDocumentationReporter:
                             priority="high",
                             category="content_freshness",
                             title=f"Update {len(outdated)} Outdated Documents",
-                            description="Review and update documentation that hasn't been modified recently",
+                            description=(
+                                "Review and update documentation that hasn't been "
+                                "modified recently"
+                            ),
                             actions=[
                                 "Identify documents needing updates",
                                 "Review content accuracy",
@@ -329,8 +334,10 @@ class FlextQualityDocumentationReporter:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: t.JsonMapping = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                e_raw,
+                            error_entry: t.JsonMapping = (
+                                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                                    e_raw,
+                                )
                             )
                         except c.EXC_TYPE_VALIDATION as exc:
                             self.logger.warning(
@@ -357,7 +364,10 @@ class FlextQualityDocumentationReporter:
                                 priority="high",
                                 category="link_maintenance",
                                 title=f"Fix {len(broken_links)} Broken Links",
-                                description="Repair or remove broken internal and external links",
+                                description=(
+                                    "Repair or remove broken internal and external "
+                                    "links"
+                                ),
                                 actions=[
                                     "Review broken link report",
                                     "Update or remove invalid URLs",
@@ -389,7 +399,9 @@ class FlextQualityDocumentationReporter:
                     priority="low",
                     category="maintenance_setup",
                     title="Establish Regular Maintenance Schedule",
-                    description="Set up automated quality checks and maintenance procedures",
+                    description=(
+                        "Set up automated quality checks and maintenance procedures"
+                    ),
                     actions=[
                         "Schedule weekly audits",
                         "Configure automated reporting",
@@ -439,7 +451,10 @@ class FlextQualityDocumentationReporter:
         md.extend([
             "## Summary",
             "",
-            f"- **Overall Quality Score:** {summary.overall_score}% ({summary.quality_trend})",
+            (
+                f"- **Overall Quality Score:** {summary.overall_score}% "
+                f"({summary.quality_trend})"
+            ),
             f"- **Files Analyzed:** {summary.files_analyzed}",
             f"- **Total Issues:** {summary.total_issues}",
             f"- **Links Checked:** {summary.links_checked}",
@@ -825,22 +840,22 @@ class FlextQualityDocumentationReporter:
             validate_default=True,
         )
         monthly_trends: bool = u.Field(
-            False,
+            default=False,
             description="Generate monthly trend report",
             validate_default=True,
         )
         weekly_trends: bool = u.Field(
-            False,
+            default=False,
             description="Generate weekly trend report",
             validate_default=True,
         )
         include_trends: bool = u.Field(
-            False,
+            default=False,
             description="Include trend data",
             validate_default=True,
         )
         notify: bool = u.Field(
-            False,
+            default=False,
             description="Send report notification",
             validate_default=True,
         )
@@ -850,7 +865,7 @@ class FlextQualityDocumentationReporter:
             validate_default=True,
         )
         serve: bool = u.Field(
-            False,
+            default=False,
             description="Serve the report dashboard",
             validate_default=True,
         )

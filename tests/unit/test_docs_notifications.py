@@ -366,7 +366,8 @@ class TestsFlextQualityDocumentationNotifier:
         report_path = tmp_path / "monthly.json"
         report_path.write_text("{}", encoding="utf-8")
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"), monthly_report=str(report_path),
+            settings_path=str(tmp_path / "absent.yaml"),
+            monthly_report=str(report_path),
         )
         result = command.execute()
         tm.that(result.success, eq=True)

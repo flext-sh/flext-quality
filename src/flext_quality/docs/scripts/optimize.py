@@ -80,7 +80,10 @@ class FlextQualityDocumentationOptimizer:
                 self.results.optimizations.append({
                     "file": str(file_path.relative_to(self.project_root)),
                     "type": "formatting_fixes",
-                    "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
+                    "description": (
+                        "Fixed trailing spaces, list indentation, and emphasis "
+                        "consistency"
+                    ),
                 })
             self.results.files_processed += 1
         return self.results
@@ -465,7 +468,9 @@ class FlextQualityDocumentationOptimizer:
                 self.results.optimizations.append({
                     "file": str(file_path.relative_to(self.project_root)),
                     "type": "metadata_update",
-                    "description": "Updated frontmatter and added modification timestamp",
+                    "description": (
+                        "Updated frontmatter and added modification timestamp"
+                    ),
                 })
             self.results.files_processed += 1
         return self.results
@@ -522,7 +527,7 @@ class FlextQualityDocumentationOptimizer:
         write = u.Cli.atomic_write_text_file(file_path, content)
         if write.failure:
             return r[bool].from_failure(write)
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report.
@@ -568,42 +573,42 @@ class FlextQualityDocumentationOptimizer:
         """CLI command for FLEXT Quality documentation optimization."""
 
         fix_formatting: bool = u.Field(
-            False,
+            default=False,
             description="Fix formatting",
             validate_default=True,
         )
         update_toc: bool = u.Field(
-            False,
+            default=False,
             description="Update tables of contents",
             validate_default=True,
         )
         add_alt_text: bool = u.Field(
-            False,
+            default=False,
             description="Add missing alt text",
             validate_default=True,
         )
         improve_accessibility: bool = u.Field(
-            False,
+            default=False,
             description="Improve accessibility",
             validate_default=True,
         )
         optimize_structure: bool = u.Field(
-            False,
+            default=False,
             description="Optimize content structure",
             validate_default=True,
         )
         update_metadata: bool = u.Field(
-            False,
+            default=False,
             description="Update metadata",
             validate_default=True,
         )
         comprehensive: bool = u.Field(
-            False,
+            default=False,
             description="Run all optimizations",
             validate_default=True,
         )
         backup: bool = u.Field(
-            True,
+            default=True,
             description="Create file backups",
             validate_default=True,
         )

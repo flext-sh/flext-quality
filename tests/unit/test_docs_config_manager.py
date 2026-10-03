@@ -99,7 +99,10 @@ class TestsFlextQualityConfigManager:
 
     @staticmethod
     def test_default_config_dir_derives_from_package_location() -> None:
-        """Omitting ``config_dir`` resolves the declared config directory near the package."""
+        """Omitting ``config_dir`` resolves the declared config directory.
+
+        The directory sits near the package.
+        """
         manager = FlextQualityConfigManager()
         tm.that(str(manager.config_dir), has="config")
 
