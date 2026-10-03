@@ -48,18 +48,6 @@ endif
 export GITHUB_TOKEN
 unexport GH_TOKEN MISE_GITHUB_TOKEN GITHUB_API_TOKEN
 
-ifeq ($(filter command line override,$(origin GEN_INIT_ONLY)),)
-ifeq ($(filter gen,$(MAKECMDGOALS)),gen)
-ifeq ($(strip $(WHAT)),init)
-GEN_INIT_ONLY := Y
-# _dispatch re-invokes this Makefile through SELF_MAKE, and a derived (non
-# command-line) variable is not inherited by that sub-make, so the bypass would
-# silently switch off exactly where the recipes run.
-export GEN_INIT_ONLY
-endif
-endif
-endif
-
 # === SECTION: project identity (managed) ===
 # Source: config:dist / config:make_profile / config:repository_root_rel / config:uv_link_mode
 PROJECT_NAME := flext-quality
@@ -1739,33 +1727,6 @@ _builtin_check_all: _builtin_require_environment
 		fi; \
 		$(PROJECT_FLEXT_INFRA) check run --repository-root "$(PROJECT_ROOT)" --gates "$$gates"
 
-
-
-_builtin_check_lint: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=lint
-
-_builtin_check_pyrefly: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=pyrefly
-
-_builtin_check_mypy: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=mypy
-
-_builtin_check_pyright: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=pyright
-
-_builtin_check_security: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=security
-
-_builtin_check_markdown: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=markdown
-
-_builtin_check_smells: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=smells
-
-_builtin_check_direnv: _builtin_require_environment
-	@$(SELF_MAKE) _builtin_check_all CHECK_GATES=direnv
-
-
 _builtin_test_all: _builtin_require_environment
 	@set -eu; \
 database="$(FLEXT_PYTEST_TESTMON_DATABASE)"; \
@@ -1912,7 +1873,7 @@ _builtin_clean_generated:
 
 
 	@set -eu; \
-	for target in "$(PROJECT_ROOT)/.test-tmp" "$(PROJECT_ROOT)/.test-runtime" "$(PROJECT_ROOT)/build" "$(PROJECT_ROOT)/dist" "$(PROJECT_ROOT)/htmlcov" "$(PROJECT_ROOT)/.reports"; do \
+	for target in "$(PROJECT_ROOT)/build" "$(PROJECT_ROOT)/dist" "$(PROJECT_ROOT)/htmlcov" "$(PROJECT_ROOT)/.reports"; do \
 		if [ -e "$$target" ]; then find "$$target" -depth -delete; \
 		elif [ -L "$$target" ]; then find "$$target" -depth -delete; fi; \
 	done

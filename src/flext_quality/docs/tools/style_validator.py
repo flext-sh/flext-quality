@@ -352,8 +352,7 @@ class FlextQualityStyleValidator:
                         if len(line) > c.Quality.STYLE_VALIDATOR_MAX_LINE_PREVIEW_LENGTH
                         else line,
                         message=(
-                            f"Line exceeds {max_length} characters ({len(line)} "
-                            f"chars)"
+                            f"Line exceeds {max_length} characters ({len(line)} chars)"
                         ),
                         severity="low",
                     ),

@@ -27,7 +27,8 @@ class FlextQualityClaudeContextClient:
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_index_call(
-        self, path: str | None = None,
+        self,
+        path: str | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call.
 
@@ -38,11 +39,16 @@ class FlextQualityClaudeContextClient:
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(
-            c.Quality.CLAUDE_CONTEXT_SERVER_NAME, "index_codebase", params,
+            c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
+            "index_codebase",
+            params,
         )
 
     def build_search_call(
-        self, query: str, *, limit: int | None = None,
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call.
 
@@ -63,7 +69,9 @@ class FlextQualityClaudeContextClient:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
         """
         return self._mcp.build_tool_call(
-            c.Quality.CLAUDE_CONTEXT_SERVER_NAME, "get_indexing_status", {},
+            c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
+            "get_indexing_status",
+            {},
         )
 
     def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
@@ -75,7 +83,10 @@ class FlextQualityClaudeContextClient:
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
     def build_search_command(
-        self, query: str, *, limit: int | None = None,
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search.
 

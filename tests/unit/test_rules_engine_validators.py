@@ -64,7 +64,8 @@ class TestsFlextQualityRulesEngine:
         tm.that(len(engine.list_rules()), eq=2)
 
     def test_load_rules_explicit_path_overrides_constructor_path(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """An explicit path argument to ``load_rules`` wins over the default."""
         other_path = tmp_path / "other.yaml"
@@ -120,7 +121,8 @@ class TestsFlextQualityRulesEngine:
         tm.that(result.value[0]["rule"], eq="no-fixme")
 
     def test_validate_passes_context_through_to_violations(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """A context mapping is attached to every violation produced."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
@@ -152,7 +154,8 @@ class TestsFlextQualityRulesEngine:
         tm.that(result.value, eq=[])
 
     def test_validate_content_lazy_loads_rules_on_first_use(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """``validate_content`` triggers a lazy ``load_rules`` when unloaded."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
@@ -168,7 +171,8 @@ class TestsFlextQualityRulesEngine:
         tm.that(result.failure, eq=True)
 
     def test_validate_reports_read_error_for_invalid_utf8_file(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """An undecodable target file surfaces as a file-read-error violation."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
@@ -241,7 +245,8 @@ class TestsFlextQualityValidators:
         validator = FlextQualityValidators.Tier()
         target = tmp_path / "random_module.py"
         result = validator.validate(
-            "from flext_quality.services import Something", file_path=target,
+            "from flext_quality.services import Something",
+            file_path=target,
         )
         tm.that(result.success, eq=True)
         tm.that(result.value, eq=[])
@@ -348,7 +353,8 @@ class TestsFlextQualityRulesLoader:
         """A rule entry without a ``name`` is rejected with its index."""
         rules_path = tmp_path / "rules.yaml"
         rules_path.write_text(
-            "rules:\n  - type: warning\n    description: no name\n", encoding="utf-8",
+            "rules:\n  - type: warning\n    description: no name\n",
+            encoding="utf-8",
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
@@ -360,7 +366,8 @@ class TestsFlextQualityRulesLoader:
         """A rule declaring an unknown ``type`` is rejected."""
         rules_path = tmp_path / "rules.yaml"
         rules_path.write_text(
-            "rules:\n  - name: bad-type\n    type: not-a-real-type\n", encoding="utf-8",
+            "rules:\n  - name: bad-type\n    type: not-a-real-type\n",
+            encoding="utf-8",
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
@@ -372,7 +379,8 @@ class TestsFlextQualityRulesLoader:
         """A minimal rule entry gets safe defaults for optional fields."""
         rules_path = tmp_path / "rules.yaml"
         rules_path.write_text(
-            "rules:\n  - name: minimal\n    type: info\n", encoding="utf-8",
+            "rules:\n  - name: minimal\n    type: info\n",
+            encoding="utf-8",
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
@@ -390,7 +398,8 @@ class TestsFlextQualityRulesLoader:
         first.write_text("rules:\n  - name: one\n    type: info\n", encoding="utf-8")
         second = tmp_path / "second.yaml"
         second.write_text(
-            "rules:\n  - name: two\n    type: warning\n", encoding="utf-8",
+            "rules:\n  - name: two\n    type: warning\n",
+            encoding="utf-8",
         )
         loader = FlextQualityRulesLoader()
         result = loader.load_multiple([first, second])

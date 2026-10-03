@@ -71,7 +71,8 @@ class TestsFlextQualityCodeExecutionBridge:
         result = bridge.build_ruff_command(tmp_path)
         tm.that(result.success, eq=True)
         tm.that(
-            result.value, eq=["ruff", "check", str(tmp_path), "--output-format=json"],
+            result.value,
+            eq=["ruff", "check", str(tmp_path), "--output-format=json"],
         )
 
     @staticmethod
@@ -121,7 +122,9 @@ class TestsFlextQualityCodeExecutionBridge:
         """A supported runtime yields a fully populated execution request."""
         bridge = FlextQualityCodeExecutionBridge(timeout_ms=5000)
         result = bridge.create_execution_request(
-            tmp_path / "x.py", "python", args=["--fast"],
+            tmp_path / "x.py",
+            "python",
+            args=["--fast"],
         )
         tm.that(result.success, eq=True)
         tm.that(result.value.runtime, eq="python")

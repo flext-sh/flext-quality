@@ -32,7 +32,8 @@ class TestsFlextQualityDocumentationNotifier:
     @staticmethod
     @pytest.mark.parametrize("password", [None, ""])
     def test_email_requires_password_before_delivery(
-        tmp_path: Path, password: str | None,
+        tmp_path: Path,
+        password: str | None,
     ) -> None:
         """Selecting email with absent credentials fails before opening SMTP."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
@@ -243,7 +244,8 @@ class TestsFlextQualityDocumentationNotifier:
         """A disabled weekly-report alert always reports success without sending."""
         config_path = tmp_path / "notify.yaml"
         config_path.write_text(
-            "alerts:\n  weekly_report:\n    enabled: false\n", encoding="utf-8",
+            "alerts:\n  weekly_report:\n    enabled: false\n",
+            encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
         tm.that(notifier.notify_weekly_report({}), eq=True)
@@ -265,7 +267,8 @@ class TestsFlextQualityDocumentationNotifier:
         """A disabled monthly-report alert always reports success without sending."""
         config_path = tmp_path / "notify.yaml"
         config_path.write_text(
-            "alerts:\n  monthly_report:\n    enabled: false\n", encoding="utf-8",
+            "alerts:\n  monthly_report:\n    enabled: false\n",
+            encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
         tm.that(notifier.notify_monthly_report({}), eq=True)
@@ -316,7 +319,8 @@ class TestsFlextQualityDocumentationNotifier:
     def test_run_execute_sends_a_test_notification(tmp_path: Path) -> None:
         """``Run.execute()`` with ``test=True`` sends a real test notification."""
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"), test=True,
+            settings_path=str(tmp_path / "absent.yaml"),
+            test=True,
         )
         result = command.execute()
         tm.that(result.success, eq=True)
@@ -332,7 +336,8 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"), audit_data=str(audit_path),
+            settings_path=str(tmp_path / "absent.yaml"),
+            audit_data=str(audit_path),
         )
         result = command.execute()
         tm.that(result.success, eq=True)
@@ -355,7 +360,8 @@ class TestsFlextQualityDocumentationNotifier:
         report_path = tmp_path / "weekly.json"
         report_path.write_text("{}", encoding="utf-8")
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"), weekly_report=str(report_path),
+            settings_path=str(tmp_path / "absent.yaml"),
+            weekly_report=str(report_path),
         )
         result = command.execute()
         tm.that(result.success, eq=True)
