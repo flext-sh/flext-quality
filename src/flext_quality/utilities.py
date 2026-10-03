@@ -51,7 +51,7 @@ class FlextQualityUtilities(u):
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
         ] = u.type_adapter(
-            t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
+            t.MappingKV[str, FlextWebTypes.JsonMapping],
         )
 
         @staticmethod
