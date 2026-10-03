@@ -70,7 +70,9 @@ class TestsFlextQualityMcpTools:
     def test_search_memory_honors_explicit_search_type_and_limit() -> None:
         """Explicit search_type and limit are threaded into the tool output."""
         output = FlextQualityMcpTools.search_memory(
-            query="find this", search_type="entities", limit=3,
+            query="find this",
+            search_type="entities",
+            limit=3,
         )
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
@@ -106,7 +108,8 @@ class TestsFlextQualityMcpTools:
     def test_execute_hook_reports_continue_for_unregistered_event() -> None:
         """execute_hook with no registered hooks continues by default."""
         output = FlextQualityMcpTools.execute_hook(
-            event="PreToolUse", input_data={"tool_name": "Edit"},
+            event="PreToolUse",
+            input_data={"tool_name": "Edit"},
         )
         tm.that(output, is_=dict)
         tm.that(output.get("continue"), eq=True)

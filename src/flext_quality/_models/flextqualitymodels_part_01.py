@@ -65,8 +65,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             min_word_count: int = _WebModels.Field(
                 description=(
-                    "Minimum number of words a documentation file must contain to "
-                    "pass."
+                    "Minimum number of words a documentation file must contain to pass."
                 ),
             )
             max_broken_links: int = _WebModels.Field(
@@ -185,8 +184,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             proper_heading_hierarchy: bool = _WebModels.Field(
                 description=(
-                    "Whether heading levels must form a proper, non-skipping "
-                    "hierarchy."
+                    "Whether heading levels must form a proper, non-skipping hierarchy."
                 ),
             )
             min_alt_text_length: int = _WebModels.Field(
@@ -315,8 +313,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             inline_code_style: str = _WebModels.Field(
                 description=(
-                    "Preferred style for inline code spans (e.g. backtick "
-                    "delimiting)."
+                    "Preferred style for inline code spans (e.g. backtick delimiting)."
                 ),
             )
             consistent_fencing: bool = _WebModels.Field(
@@ -393,14 +390,12 @@ class FlextQualityModelsPart01(_WebModels):
             )
             suggestions_count: int = _WebModels.Field(
                 description=(
-                    "Number of style improvement suggestions generated during the "
-                    "run."
+                    "Number of style improvement suggestions generated during the run."
                 ),
             )
             accessibility_issues: int = _WebModels.Field(
                 description=(
-                    "Number of accessibility-related style issues found during the "
-                    "run."
+                    "Number of accessibility-related style issues found during the run."
                 ),
             )
 
@@ -541,17 +536,15 @@ class FlextQualityModelsPart01(_WebModels):
             blocked_domains: t.StrSequence = _WebModels.Field(
                 description="Domains explicitly forbidden for external links.",
             )
-            github_links: (
-                FlextQualityModelsPart01.Quality.GithubLinkConfig
-            ) = _WebModels.Field(
-                description=(
-                    "Validation settings specific to links pointing at GitHub "
-                    "resources."
-                ),
+            github_links: FlextQualityModelsPart01.Quality.GithubLinkConfig = (
+                _WebModels.Field(
+                    description=(
+                        "Validation settings specific to links pointing at GitHub "
+                        "resources."
+                    ),
+                )
             )
-            documentation_links: (
-                FlextQualityModelsPart01.Quality.DocumentationLinkConfig
-            ) = _WebModels.Field(
+            documentation_links: FlextQualityModelsPart01.Quality.DocumentationLinkConfig = _WebModels.Field(
                 description=(
                     "Validation settings specific to internal documentation links."
                 ),
@@ -571,8 +564,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             verbose_output: bool = _WebModels.Field(
                 description=(
-                    "Whether the validation run should emit verbose diagnostic "
-                    "output."
+                    "Whether the validation run should emit verbose diagnostic output."
                 ),
             )
             save_results: bool = _WebModels.Field(
@@ -619,8 +611,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             required_sections: t.StrSequence = _WebModels.Field(
                 description=(
-                    "Section headings that must be present in every analyzed "
-                    "document."
+                    "Section headings that must be present in every analyzed document."
                 ),
             )
             min_word_count: int = _WebModels.Field(
@@ -641,8 +632,7 @@ class FlextQualityModelsPart01(_WebModels):
             )
             check_todos: bool = _WebModels.Field(
                 description=(
-                    "Whether to flag unresolved TODO markers found in document "
-                    "content."
+                    "Whether to flag unresolved TODO markers found in document content."
                 ),
             )
             check_fixmes: bool = _WebModels.Field(
@@ -697,10 +687,12 @@ class FlextQualityModelsPart01(_WebModels):
                 ),
             ]
             severity: Annotated[
-                str, _WebModels.Field(description="Severity level identifier"),
+                str,
+                _WebModels.Field(description="Severity level identifier"),
             ]
             file: Annotated[
-                str, _WebModels.Field(description="File path where issue was found"),
+                str,
+                _WebModels.Field(description="File path where issue was found"),
             ]
             line: Annotated[
                 int | None,
@@ -715,7 +707,8 @@ class FlextQualityModelsPart01(_WebModels):
                 ),
             ] = ""
             recommendation: Annotated[
-                str, _WebModels.Field(description="Recommended fix"),
+                str,
+                _WebModels.Field(description="Recommended fix"),
             ] = ""
             context: Annotated[
                 t.MappingKV[str, t.Primitives | None] | None,
@@ -735,10 +728,12 @@ class FlextQualityModelsPart01(_WebModels):
                 description="Total number of items evaluated by the validation run.",
             )
             valid_items: int = _WebModels.Field(
-                default=0, description="Number of items that passed validation.",
+                default=0,
+                description="Number of items that passed validation.",
             )
             invalid_items: int = _WebModels.Field(
-                default=0, description="Number of items that failed validation.",
+                default=0,
+                description="Number of items that failed validation.",
             )
             issues: MutableSequence[FlextQualityModelsPart01.Quality.Issue] = (
                 _WebModels.Field(
@@ -777,13 +772,16 @@ class FlextQualityModelsPart01(_WebModels):
                 description="File extension, including the leading dot (e.g. '.md').",
             )
             is_markdown: bool = _WebModels.Field(
-                default=False, description="Whether the file is a Markdown document.",
+                default=False,
+                description="Whether the file is a Markdown document.",
             )
             lines: int = _WebModels.Field(
-                default=0, description="Number of lines in the file.",
+                default=0,
+                description="Number of lines in the file.",
             )
             words: int = _WebModels.Field(
-                default=0, description="Number of words in the file.",
+                default=0,
+                description="Number of words in the file.",
             )
 
 

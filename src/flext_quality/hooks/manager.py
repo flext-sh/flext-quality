@@ -22,7 +22,8 @@ class FlextQualityHookManager:
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional settings path."""
         self._hooks: MutableMapping[
-            c.Quality.HookEvent, MutableSequence[FlextQualityBaseHook],
+            c.Quality.HookEvent,
+            MutableSequence[FlextQualityBaseHook],
         ] = {}
         self._config_path = config_path
 

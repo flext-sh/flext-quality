@@ -334,10 +334,8 @@ class FlextQualityDocumentationReporter:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: t.JsonMapping = (
-                                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                    e_raw,
-                                )
+                            error_entry: t.JsonMapping = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                                e_raw,
                             )
                         except c.EXC_TYPE_VALIDATION as exc:
                             self.logger.warning(

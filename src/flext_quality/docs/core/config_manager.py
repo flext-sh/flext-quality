@@ -140,7 +140,8 @@ _DEFAULT_VALIDATION_CONFIG: t.JsonMapping = MappingProxyType({
 
 
 def _merged_over_defaults(
-    defaults: t.JsonMapping, overrides: t.JsonMapping,
+    defaults: t.JsonMapping,
+    overrides: t.JsonMapping,
 ) -> t.JsonMapping:
     """Merge YAML overrides over the built-in default payload.
 
@@ -163,11 +164,13 @@ class FlextQualityConfigManager:
     type ConfigValue = t.Primitives | t.StrSequence
     type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
     type ConfigData = MutableMapping[
-        str, MutableMapping[str, t.Primitives | t.StrSequence],
+        str,
+        MutableMapping[str, t.Primitives | t.StrSequence],
     ]
     type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
     type RawConfigMap = t.MappingKV[
-        str, t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
+        str,
+        t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
     ]
 
     class AuditRules(m.Quality.AuditRulesConfig):
@@ -184,7 +187,10 @@ class FlextQualityConfigManager:
         )
 
         def get_threshold(
-            self, key: str, *, default: t.Primitives | None = None,
+            self,
+            key: str,
+            *,
+            default: t.Primitives | None = None,
         ) -> t.Primitives | None:
             """Get a quality threshold value.
 
@@ -218,7 +224,10 @@ class FlextQualityConfigManager:
         """Configuration for style and formatting guidelines."""
 
         def get_markdown_rule(
-            self, rule: str, *, default: t.Primitives | None = None,
+            self,
+            rule: str,
+            *,
+            default: t.Primitives | None = None,
         ) -> t.Primitives | None:
             """Get a markdown formatting rule.
 
@@ -229,7 +238,10 @@ class FlextQualityConfigManager:
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_accessibility_rule(
-            self, rule: str, *, default: t.Primitives | None = None,
+            self,
+            rule: str,
+            *,
+            default: t.Primitives | None = None,
         ) -> t.Primitives | None:
             """Get an accessibility rule.
 
@@ -259,7 +271,10 @@ class FlextQualityConfigManager:
         )
 
         def get_link_setting(
-            self, setting: str, *, default: t.Primitives | None = None,
+            self,
+            setting: str,
+            *,
+            default: t.Primitives | None = None,
         ) -> t.Primitives | None:
             """Get a link validation setting.
 
@@ -270,7 +285,10 @@ class FlextQualityConfigManager:
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
 
         def get_content_setting(
-            self, setting: str, *, default: t.Primitives | None = None,
+            self,
+            setting: str,
+            *,
+            default: t.Primitives | None = None,
         ) -> t.Primitives | None:
             """Get a content validation setting.
 
@@ -343,7 +361,8 @@ class FlextQualityConfigManager:
         """
         if self._audit_rules is None:
             data = _merged_over_defaults(
-                _DEFAULT_AUDIT_RULES, self._load_config_file("audit_rules.yaml"),
+                _DEFAULT_AUDIT_RULES,
+                self._load_config_file("audit_rules.yaml"),
             )
             self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
         return self._audit_rules
@@ -356,7 +375,8 @@ class FlextQualityConfigManager:
         """
         if self._style_guide is None:
             data = _merged_over_defaults(
-                _DEFAULT_STYLE_GUIDE, self._load_config_file("style_guide.yaml"),
+                _DEFAULT_STYLE_GUIDE,
+                self._load_config_file("style_guide.yaml"),
             )
             self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
         return self._style_guide

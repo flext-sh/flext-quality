@@ -36,7 +36,8 @@ class FlextQualityMcpClient:
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
-        self, call: m.Quality.McpToolCall,
+        self,
+        call: m.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call.
 
@@ -62,7 +63,9 @@ class FlextQualityMcpClient:
 
     @staticmethod
     def build_tool_call(
-        server: str, tool: str, params: t.JsonMapping | None = None,
+        server: str,
+        tool: str,
+        params: t.JsonMapping | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request.
 
@@ -191,7 +194,9 @@ class FlextQualityMcpClient:
         )
 
     def parse_result(
-        self, output: str, exit_code: int,
+        self,
+        output: str,
+        exit_code: int,
     ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call.
 

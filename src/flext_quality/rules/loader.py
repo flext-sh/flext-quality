@@ -63,7 +63,8 @@ class FlextQualityRulesLoader:
         return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
 
     def load_multiple(
-        self, paths: t.SequenceOf[Path],
+        self,
+        paths: t.SequenceOf[Path],
     ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files.
 
@@ -82,7 +83,8 @@ class FlextQualityRulesLoader:
 
     @staticmethod
     def _parse_rule(
-        data: t.JsonMapping, index: int,
+        data: t.JsonMapping,
+        index: int,
     ) -> p.Result[m.Quality.RuleDefinition]:
         """Parse a single rule from dict.
 

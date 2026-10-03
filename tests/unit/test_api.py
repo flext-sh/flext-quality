@@ -114,7 +114,9 @@ class TestsFlextQualityApi:
         [(True, '"continue":true'), (False, '"continue":false')],
     )
     def test_format_hook_output_encodes_continue_flag(
-        *, continue_exec: bool, expected: str,
+        *,
+        continue_exec: bool,
+        expected: str,
     ) -> None:
         """The continue flag is serialized into the JSON output string."""
         output = FlextQuality().format_hook_output(continue_exec=continue_exec).value
@@ -138,7 +140,8 @@ class TestsFlextQualityApi:
         output = (
             FlextQuality()
             .format_hook_output(
-                continue_exec=False, blocked_reason="Blocked for testing",
+                continue_exec=False,
+                blocked_reason="Blocked for testing",
             )
             .value
         )
@@ -179,7 +182,10 @@ class TestsFlextQualityApi:
             '    description: Test rule\n    pattern: "test"\n    enabled: true\n'
         )
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".yaml", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".yaml",
+            delete=False,
         ) as handle:
             handle.write(rules_yaml)
             rules_path = Path(handle.name)

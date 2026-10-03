@@ -540,8 +540,7 @@ class FlextQualityDocumentationValidator:
                             file=link.file,
                             line=link.line_number,
                             warning=(
-                                "Link text is not descriptive enough for "
-                                "accessibility"
+                                "Link text is not descriptive enough for accessibility"
                             ),
                         ),
                     )
