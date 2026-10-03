@@ -33,6 +33,8 @@ class FlextQualityUtilities(u):
     class Quality:
         """Quality-specific utilities namespace."""
 
+        DocumentationReportValue = FlextWebTypes.JsonMapping
+
         RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = (
             u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
         )
@@ -51,7 +53,7 @@ class FlextQualityUtilities(u):
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
         ] = u.type_adapter(
-            t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue],
+            t.MappingKV[str, FlextWebTypes.JsonMapping],
         )
 
         @staticmethod

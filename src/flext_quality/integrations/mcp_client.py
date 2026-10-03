@@ -19,6 +19,7 @@ from flext_quality import (
     FlextQualityModels as m,
     FlextQualityProtocols as p,
     FlextQualityTypes as t,
+    FlextQualityUtilities as u,
 )
 
 
