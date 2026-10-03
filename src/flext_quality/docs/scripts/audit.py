@@ -109,7 +109,7 @@ class FlextQualityDocumentationAuditor:
 
         """
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.config_manager = FlextQualityConfigManager(config_path)
+        self.config_manager = FlextQualityConfigManager(config_dir)
         self.audit_rules: m.Quality.AuditRulesConfig = (
             self.config_manager.resolve_audit_rules()
         )
