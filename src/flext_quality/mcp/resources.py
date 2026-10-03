@@ -55,7 +55,8 @@ class FlextQualityMcpResources:
             t
             .json_mapping_sequence_adapter()
             .dump_json(
-                [rule.model_dump() for rule in rules], indent=c.Quality.JSON_INDENT,
+                [rule.model_dump() for rule in rules],
+                indent=c.Quality.JSON_INDENT,
             )
             .decode("utf-8")
         )

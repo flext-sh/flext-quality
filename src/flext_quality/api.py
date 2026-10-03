@@ -44,7 +44,9 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         return self.fetch_status()
 
     def execute_hook(
-        self, event: str, input_data: t.JsonMapping,
+        self,
+        event: str,
+        input_data: t.JsonMapping,
     ) -> p.Result[t.JsonMapping]:
         """Execute hooks for an event.
 

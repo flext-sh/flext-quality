@@ -35,7 +35,8 @@ class FlextQualityCli(s[bool]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
-            Path, u.Field(default_factory=Path.cwd, description="Target path"),
+            Path,
+            u.Field(default_factory=Path.cwd, description="Target path"),
         ]
 
         @override
@@ -55,7 +56,8 @@ class FlextQualityCli(s[bool]):
             return self._extend(cmds)
 
         def _extend(
-            self: Self, cmds: MutableSequence[t.StrSequence],
+            self: Self,
+            cmds: MutableSequence[t.StrSequence],
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
@@ -64,7 +66,8 @@ class FlextQualityCli(s[bool]):
 
         @override
         def _extend(
-            self: Self, cmds: MutableSequence[t.StrSequence],
+            self: Self,
+            cmds: MutableSequence[t.StrSequence],
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             src = (
                 self.target_path / "src"
@@ -116,7 +119,8 @@ def main(args: t.StrSequence | None = None) -> int:
         The resulting ``int``.
     """
     app = cli.create_app_with_common_params(
-        name=FlextQualityCli.app_name, help_text=FlextQualityCli.__doc__ or "",
+        name=FlextQualityCli.app_name,
+        help_text=FlextQualityCli.__doc__ or "",
     )
     cli.register_result_routes(
         app,

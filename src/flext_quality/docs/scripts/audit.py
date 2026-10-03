@@ -35,8 +35,7 @@ _QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
 _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
 _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
 
-_AUDIT_REPORT_TEMPLATE: Final[str] = (
-"""
+_AUDIT_REPORT_TEMPLATE: Final[str] = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -94,7 +93,6 @@ _AUDIT_REPORT_TEMPLATE: Final[str] = (
         <div class="issues">
             <h2>Detailed Issues</h2>
     """
-)
 
 
 class FlextQualityDocumentationAuditor:
@@ -402,8 +400,7 @@ class FlextQualityDocumentationAuditor:
                     "file": str(file_path.relative_to(self.project_root)),
                     "issues": accessibility_issues,
                     "recommendation": (
-                        f"Address {len(accessibility_issues)} accessibility "
-                        f"issues"
+                        f"Address {len(accessibility_issues)} accessibility issues"
                     ),
                 })
             if accessibility_cfg.proper_heading_hierarchy:
