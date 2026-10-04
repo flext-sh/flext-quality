@@ -31,7 +31,9 @@
 
 <!-- TOC END -->
 
-This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python project and generating quality reports. It showcases the core functionality and basic integration patterns that form the foundation of quality analysis workflows.
+This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python
+project and generating quality reports. It showcases the core functionality and basic
+integration patterns that form the foundation of quality analysis workflows.
 
 ## Overview
 
@@ -64,7 +66,6 @@ The simple analysis example covers:
 ### Basic Execution
 
 ```bash
-
 # Analyze current directory
 python example.py
 
@@ -157,7 +158,7 @@ Entry point handling command-line interface and execution flow:
 
 The example demonstrates FLEXT Quality's comprehensive scoring system:
 
-```python notest
+```text
 # Basic analysis execution
 results = analyzer.analyze_project(
     include_security=True,  # Security vulnerability detection
@@ -178,7 +179,7 @@ metrics = QualityMetrics.from_analysis_results(results)
 
 The example shows how to process and interpret different types of quality issues:
 
-```python notest
+```text
 issues = results.get("issues", {})
 
 for category, issue_list in issues.items():
@@ -197,7 +198,7 @@ for category, issue_list in issues.items():
 
 The example uses default analysis settings, but can be customized:
 
-```python notest
+```text
 # Custom analysis configuration
 results = analyzer.analyze_project(
     include_security=True,  # Enable security analysis
@@ -256,7 +257,7 @@ The example provides contextual recommendations based on analysis results:
 
 ### Custom Analysis Backends
 
-```python notest
+```text
 # Add custom analysis configuration
 analyzer = CodeAnalyzer(project_path)
 analyzer.configure_backends({
@@ -268,7 +269,7 @@ analyzer.configure_backends({
 
 ### Integration with FLEXT Services
 
-```python notest
+```python
 from flext_observability import create_metric
 
 # Publish quality metrics to observability stack
@@ -281,7 +282,7 @@ create_metric(
 
 ### Report Generation
 
-```python notest
+```python
 from flext_quality import QualityReport
 
 # Generate detailed quality report
@@ -297,7 +298,7 @@ pdf_report = report.generate_pdf_report()
 **No Python Files Found:**
 
 ```bash
-⚠️  Warning: No Python files found in: /path/to/project
+⚠️ Warning: No Python files found in: /path/to/project
 ```
 
 - Verify the path contains `.py` files
@@ -343,7 +344,9 @@ After mastering this basic example:
 
 ## Related Resources
 
-- **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system documentation
+- **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system
+  documentation
 - **CodeAnalyzer API** - Detailed API reference (_Documentation coming soon_)
-- **Quality Metrics Guide** - Understanding quality scoring (_Documentation coming soon_)
+- **Quality Metrics Guide** - Understanding quality scoring
+  (_Documentation coming soon_)
 - **Integration Patterns** - FLEXT ecosystem integration (_Documentation coming soon_)

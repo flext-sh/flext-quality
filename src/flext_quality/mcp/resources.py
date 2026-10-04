@@ -1,4 +1,8 @@
-"""MCP resources for flext-quality."""
+"""MCP resources for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -13,7 +17,7 @@ from flext_quality import (
 )
 from flext_quality.mcp.server import FlextQualityMcpServer
 
-_mcp = FlextQualityMcpServer.get_server()
+_mcp = FlextQualityMcpServer.resolve_server()
 
 
 class FlextQualityMcpResources:
@@ -21,8 +25,12 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("settings://hooks")
     @staticmethod
-    def get_hooks_config() -> str:
-        """Get current hooks configuration."""
+    def read_hooks_config() -> str:
+        """Get current hooks configuration.
+
+        Returns:
+            The resulting ``str``.
+        """
         manager = FlextQualityHookManager()
         settings = manager.fetch_config()
         config_json: str = (
@@ -35,10 +43,14 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("settings://rules")
     @staticmethod
-    def get_rules_config() -> str:
-        """Get current rules configuration."""
+    def read_rules_config() -> str:
+        """Get current rules configuration.
+
+        Returns:
+            The resulting ``str``.
+        """
         engine = FlextQualityRulesEngine()
-        rules = engine.get_rules()
+        rules = engine.list_rules()
         rules_json: str = (
             t
             .json_mapping_sequence_adapter()
@@ -51,8 +63,12 @@ class FlextQualityMcpResources:
 
     @_mcp.resource("status://integrations")
     @staticmethod
-    def get_integrations_status() -> str:
-        """Get status of all integrations."""
+    def read_integrations_status() -> str:
+        """Get status of all integrations.
+
+        Returns:
+            The resulting ``str``.
+        """
         mem_client = FlextQualityClaudeMemClient()
         mem_health = mem_client.health_check()
         mem_status = (

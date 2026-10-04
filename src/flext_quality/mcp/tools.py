@@ -1,4 +1,8 @@
-"""MCP tools for flext-quality."""
+"""MCP tools for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -10,13 +14,12 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
-    p,
     t,
     u,
 )
 from flext_quality.mcp.server import FlextQualityMcpServer
 
-_mcp = FlextQualityMcpServer.get_server()
+_mcp = FlextQualityMcpServer.resolve_server()
 
 
 class FlextQualityMcpTools:
@@ -25,15 +28,22 @@ class FlextQualityMcpTools:
     @_mcp.tool()
     @staticmethod
     def search_memory(
-        query: str, *, search_type: str = "observations", limit: int | None = None
+        query: str,
+        *,
+        search_type: str = "observations",
+        limit: int | None = None,
     ) -> t.JsonMapping:
-        """Build command to search cross-session memory via claude-mem."""
+        """Build command to search cross-session memory via claude-mem.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         client = FlextQualityClaudeMemClient()
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         result = client.build_search_call(query=query, limit=search_limit)
         if result.failure:
             return {"error": result.error}
-        command_result = client.get_search_command(query=query, limit=search_limit)
+        command_result = client.build_search_command(query=query, limit=search_limit)
         if command_result.failure:
             return {"error": command_result.error}
         params = u.normalize_to_json_value(result.value.params)
@@ -50,13 +60,17 @@ class FlextQualityMcpTools:
     @_mcp.tool()
     @staticmethod
     def search_code(query: str, *, limit: int | None = None) -> t.JsonMapping:
-        """Build command for semantic code search via claude-context."""
+        """Build command for semantic code search via claude-context.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         client = FlextQualityClaudeContextClient()
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         result = client.build_search_call(query=query, limit=search_limit)
         if result.failure:
             return {"error": result.error}
-        command_result = client.get_search_command(query=query, limit=search_limit)
+        command_result = client.build_search_command(query=query, limit=search_limit)
         if command_result.failure:
             return {"error": command_result.error}
         params = u.normalize_to_json_value(result.value.params)
@@ -71,24 +85,31 @@ class FlextQualityMcpTools:
     @_mcp.tool()
     @staticmethod
     def execute_hook(event: str, input_data: t.JsonMapping) -> t.JsonMapping:
-        """Execute a hook manually."""
+        """Execute a hook manually.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         manager = FlextQualityHookManager()
-        result: p.Result[t.JsonMapping] = manager.execute(
-            event=event, input_data=input_data
-        )
+        result = manager.execute(event=event, input_data=input_data)
         if result.failure:
             error_msg = result.error if result.error is not None else "Unknown error"
             output: t.JsonMapping = {"error": error_msg}
             return output
-        hook_result: t.JsonMapping = result.value
-        return hook_result
+        return result.value
 
     @_mcp.tool()
     @staticmethod
     def validate_rules(
-        path: str, *, context: t.JsonMapping | None = None
+        path: str,
+        *,
+        context: t.JsonMapping | None = None,
     ) -> t.JsonMapping:
-        """Validate code against YAML rules."""
+        """Validate code against YAML rules.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         engine = FlextQualityRulesEngine()
         result = engine.validate(path=path, context=context)
         if result.failure:

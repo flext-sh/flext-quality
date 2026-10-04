@@ -10,7 +10,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import pytest
-from flext_tests._fixtures.settings import reset_settings as _shared_reset_settings
 
 from flext_quality import FlextQualitySettings
 from tests import u
@@ -18,7 +17,11 @@ from tests import u
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-reset_settings = _shared_reset_settings
+# Why: `reset_settings` is auto-registered as a pytest fixture by the
+# `flext_tests` pytest11 plugin (flext_tests.conftest_plugin ->
+# flext_tests._fixtures.settings); flext_tests no longer re-exports it at
+# its package root, so the previous local re-import/reassignment was dead
+# and broke pyrefly (flext-1wjg1.16.32). No local declaration is needed.
 
 
 @pytest.fixture

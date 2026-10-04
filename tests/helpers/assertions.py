@@ -17,12 +17,12 @@ if TYPE_CHECKING:
     from tests import t
 
 
-def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:
+def assert_is_dict(value: t.Scalar | t.ScalarMapping, _msg: str = "") -> None:
     """Assert that value is a dict."""
     tm.that(value, is_=dict)
 
 
-def assert_is_list(value: t.Scalar | t.ScalarList, msg: str = "") -> None:
+def assert_is_list(value: t.Scalar | t.ScalarList, _msg: str = "") -> None:
     """Assert that value is a list."""
     tm.that(value, is_=list)
 

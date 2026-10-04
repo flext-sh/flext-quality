@@ -10,21 +10,46 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict
+from typing import Annotated, Self
 
-from flext_cli import FlextCliConfig
+from flext_cli import FlextCliConfig, m
+
+from flext_core import FlextSettings
 
 
-class _QualityNamespace(BaseModel):
+class _QualityNamespace(m.BaseModel):
     """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
 
-    model_config = ConfigDict(extra="allow", frozen=True)
+    model_config = m.ConfigDict(extra="allow", frozen=True)
 
 
-class FlextQualityConfig(FlextCliConfig):
-    """Quality config auto-loaded model-less from ``config/*.yaml``."""
+class FlextQualityConfig(FlextSettings, FlextCliConfig):
+    """Quality config auto-loaded model-less from ``config/*.yaml``.
 
-    Quality: _QualityNamespace = _QualityNamespace()
+    MRO carries ``FlextSettings`` FIRST (ENFORCE-042); the class stays a frozen,
+    YAML-validated config singleton.
+    """
+
+    # ENFORCE-042 namespace-holder contract: ``FlextSettings`` contributes
+    # namespacing only — instance machinery stays plain object semantics so the
+    # settings singleton ``__new__`` cannot leak into the config singleton.
+    # The inherited pydantic ``__init__`` still runs the frozen, YAML-validated
+    # construction, and the inherited pydantic ``__setattr__`` keeps the frozen
+    # guard.
+    def __new__(cls, *args: object, **kwargs: object) -> Self:
+        _ = args, kwargs
+        return object.__new__(cls)
+
+    __eq__ = object.__eq__
+
+    __hash__ = object.__hash__
+
+    Quality: Annotated[
+        _QualityNamespace,
+        m.Field(
+            description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
+        ),
+    ] = _QualityNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

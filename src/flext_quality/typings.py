@@ -1,14 +1,17 @@
-"""Type definitions for flext-quality."""
+"""Type definitions for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_infra import m, t
-from flext_web import t as web_t
+from flext_web import FlextWebTypes, t
 
 
-class FlextQualityTypes(t, web_t):
+class FlextQualityTypes(FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
     class Quality:
@@ -26,24 +29,6 @@ class FlextQualityTypes(t, web_t):
             | t.MappingKV[str, t.Primitives]
             | None
         )
-
-        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
-            t.JsonMapping, config=m.ConfigDict(strict=False)
-        )
-        RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-            t.SequenceOf[t.JsonMapping]
-        ] = m.TypeAdapter(
-            t.SequenceOf[t.JsonMapping], config=m.ConfigDict(strict=False)
-        )
-        MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MutableOptionalFeatureFlagMapping
-        ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
-        STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-            t.MutableSequenceOf[t.StrMapping]
-        ] = m.TypeAdapter(t.MutableSequenceOf[t.StrMapping])
-        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MappingKV[str, DocumentationReportValue]
-        ] = m.TypeAdapter(t.MappingKV[str, DocumentationReportValue])
 
 
 t = FlextQualityTypes

@@ -1,4 +1,8 @@
-"""FastMCP server for flext-quality."""
+"""FastMCP server for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -13,8 +17,12 @@ class FlextQualityMcpServer:
     """MCP server namespace for flext-quality."""
 
     @staticmethod
-    def get_server() -> FastMCP:
-        """Get the MCP server instance."""
+    def resolve_server() -> FastMCP:
+        """Get the MCP server instance.
+
+        Returns:
+            The resulting ``FastMCP``.
+        """
         return _mcp
 
 

@@ -39,11 +39,14 @@
 
 <!-- TOC END -->
 
-Comprehensive examples demonstrating FLEXT Quality usage patterns, integration scenarios, and best practices for code quality analysis within the FLEXT ecosystem.
+Comprehensive examples demonstrating FLEXT Quality usage patterns, integration
+scenarios, and best practices for code quality analysis within the FLEXT ecosystem.
 
 ## Overview
 
-This directory contains practical examples that showcase the capabilities of FLEXT Quality, from basic analysis operations to advanced ecosystem integration scenarios. Each example includes detailed explanations, configuration files, and expected outputs.
+This directory contains practical examples that showcase the capabilities of FLEXT
+Quality, from basic analysis operations to advanced ecosystem integration scenarios.
+Each example includes detailed explanations, configuration files, and expected outputs.
 
 ## Example Categories
 
@@ -105,7 +108,7 @@ Report generation and dashboard integration examples:
 
 ### Basic Project Analysis
 
-```python notest
+```text
 # examples/basic/simple_analysis.py
 from flext_quality import CodeAnalyzer
 
@@ -128,29 +131,14 @@ print(
 
 ### FLEXT Ecosystem Integration
 
-```python notest
+````python
+from __future__ import annotations
+
+from flext_cli import u
+from flext_observability import create_metric
+
 # examples/integration/flext_ecosystem.py
 from flext_quality import QualityAPI
-from flext_core import FlextBus
-from flext_core import FlextSettings
-from flext_core import FlextConstants
-from flext_core import FlextContainer
-from flext_core import FlextContext
-from flext_core import d
-from flext_core import FlextDispatcher
-from flext_core import e
-from flext_core import h
-from flext_core import x
-from flext_core import FlextModels
-from flext_core import FlextProcessors
-from flext_core import p
-from flext_core import FlextRegistry
-from flext_core import r, p
-from flext_core import u
-from flext_core import s
-from flext_core import p, t
-from flext_core import u
-from flext_observability import create_metric
 
 # Initialize with dependency injection
 container = FlextContainer()
@@ -172,9 +160,9 @@ def analyze_with_monitoring(project_path: str):
         )
         return data
     else:
-        print(f"Analysis failed: {result.error}")
+        u.Cli.info(f"Analysis failed: {result.error}")
         return None
-```
+
 
 ### CI/CD Quality Gate
 
@@ -210,7 +198,7 @@ jobs:
         with:
           name: quality-report
           path: quality-report.json
-```
+````
 
 ## Example Structure
 
@@ -236,7 +224,6 @@ Each example directory contains:
 ### Prerequisites
 
 ```bash
-
 # Install FLEXT Quality
 pip install flext-quality
 
@@ -249,7 +236,6 @@ make install
 ### Execute Examples
 
 ```bash
-
 # Navigate to example directory
 cd examples/basic/simple_analysis
 
@@ -266,7 +252,6 @@ ls -la reports/
 ### Docker Execution
 
 ```bash
-
 # Use Docker for isolated execution
 cd examples/advanced/multi_backend
 
@@ -354,18 +339,16 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 #### **Import Errors**
 
 ```bash
-
 # Ensure FLEXT Quality is properly installed
 pip install --upgrade flext-quality
 
 # Check Python path
-python -c "import flext_quality; print(flext_quality.__version__)"
+python -c "import flext_quality; u.Cli.print(flext_quality.__version__)"
 ```
 
 #### **Configuration Issues**
 
 ```bash
-
 # Validate configuration file
 flext-quality validate-settings settings.yaml
 
@@ -376,7 +359,6 @@ flext-quality check-env
 #### **Permission Issues**
 
 ```bash
-
 # Ensure proper file permissions
 chmod +x example.py
 
@@ -394,6 +376,9 @@ ls -la /path/to/project
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../docs/README.md)** - Complete system documentation
-- **API Reference** - REST API and Python SDK documentation (_Documentation coming soon_)
-- **Integration Guide** - FLEXT ecosystem integration patterns (_Documentation coming soon_)
-- **Development Guide** - Development setup and contribution guidelines (_Documentation coming soon_)
+- **API Reference** - REST API and Python SDK documentation
+  (_Documentation coming soon_)
+- **Integration Guide** - FLEXT ecosystem integration patterns
+  (_Documentation coming soon_)
+- **Development Guide** - Development setup and contribution guidelines
+  (_Documentation coming soon_)

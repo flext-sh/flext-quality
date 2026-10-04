@@ -28,8 +28,8 @@
   - [Link & Reference Validation](#link-reference-validation)
   - [Style & Accessibility](#style-accessibility)
 - [⚙️ Configuration](#configuration)
-  - [Audit Rules (`settings/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
-  - [Style Guide (`settings/style_guide.yaml`)](#style-guide-configstyleguideyaml)
+  - [Audit Rules (`config/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
+  - [Style Guide (`config/style_guide.yaml`)](#style-guide-configstyleguideyaml)
 - [🔧 Maintenance Scripts](#maintenance-scripts)
   - [Comprehensive Audit (`scripts/audit.py`)](#comprehensive-audit-scriptsauditpy)
   - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
@@ -108,7 +108,7 @@
 - README.md demo.py scripts/ settings/ tools/ reports/
   - Configuration Validation
 - Verify configuration files exist
-- audit_rules.YAML style_guide.YAML validation_config.YAML
+- runtime_bootstrap_options
 - Test configuration loading
   - 🚀 Quick Start
     - Interactive Demo
@@ -137,8 +137,8 @@
     - Link & Reference Validation
     - Style & Accessibility
   - ⚙️ Configuration
-    - Audit Rules (`settings/audit_rules.yaml`)
-    - Style Guide (`settings/style_guide.yaml`)
+    - Audit Rules (`config/audit_rules.yaml`)
+    - Style Guide (`config/style_guide.yaml`)
   - 🔧 Maintenance Scripts
     - Comprehensive Audit (`scripts/audit.py`)
 - Full documentation quality assessment
@@ -181,7 +181,7 @@
 - Check Python dependencies
 - Verify file permissions
 - Check configuration files
-- Update timeout in settings/validation_config.YAML
+- Update timeout in config/validation_config.yaml
 - Review style guide configuration
 - Run with verbose output
   - 📚 API Reference
@@ -224,12 +224,13 @@
 
 **Version**: 1.0.0 | **Status**: Active | **Updated**: 2026-04-14
 
-Comprehensive documentation maintenance framework providing automated quality assurance, validation, optimization,
-and reporting for FLEXT Quality documentation.
+Comprehensive documentation maintenance framework providing automated quality assurance,
+validation, optimization, and reporting for FLEXT Quality documentation.
 
 ## 🎯 Purpose
 
-Maintain high-quality, accurate, and consistent documentation through automated systems that ensure:
+Maintain high-quality, accurate, and consistent documentation through automated systems
+that ensure:
 
 - Content freshness and completeness
 - Link and reference validation
@@ -295,7 +296,6 @@ graph TD
 ### Quick Installation
 
 ```bash
-
 # Install core dependencies
 pip install pyyaml requests beautifulsoup4
 
@@ -303,13 +303,12 @@ pip install pyyaml requests beautifulsoup4
 pip install aiohttp jinja2
 
 # Optional: For advanced content analysis
-pip install nltk  # For enhanced readability analysis
+pip install nltk # For enhanced readability analysis
 ```
 
 ### Directory Structure Setup
 
 ```bash
-
 # Ensure you're in the project root
 cd /path/to/flext-quality
 
@@ -322,7 +321,6 @@ ls docs/maintenance/
 ### Configuration Validation
 
 ```bash
-
 # Verify configuration files exist
 ls docs/maintenance/settings/
 
@@ -332,7 +330,7 @@ ls docs/maintenance/settings/
 python -c "
 from docs import  DocumentationAuditor
 auditor = DocumentationAuditor()
-print('✅ Configuration loaded successfully')
+u.Cli.print('✅ Configuration loaded successfully')
 "
 ```
 
@@ -341,7 +339,6 @@ print('✅ Configuration loaded successfully')
 ### Interactive Demo
 
 ```bash
-
 # Run the complete interactive demonstration
 cd docs/maintenance
 python demo.py
@@ -369,7 +366,6 @@ python scripts/report.py --format html --output ../reports/quality-report.html
 ### Automated Maintenance (CI/CD)
 
 ```bash
-
 # Add to CI/CD pipeline
 python docs/maintenance/scripts/audit.py --ci-mode --fail-on-errors
 
@@ -452,7 +448,7 @@ jobs:
 - High: ${report.metrics?.severity_breakdown?.high || 0}
 - Medium: ${report.metrics?.severity_breakdown?.medium || 0}
 
-[📄 View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`
+[📄 View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/ ...
               });
             }
 
@@ -521,17 +517,19 @@ repos:
 ### Scheduled Maintenance
 
 ```bash
-
 # Add to crontab for regular maintenance
 
 # Daily quality checks
-0 9 * * * cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py --daily --output docs/maintenance/reports/
+0 9 * * * cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py \
+    --daily --output docs/maintenance/reports/
 
 # Weekly comprehensive audit
-0 10 * * 1 cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py --comprehensive --output docs/maintenance/reports/
+0 10 * * 1 cd /path/to/flext-quality && python docs/maintenance/scripts/audit.py \
+    --comprehensive --output docs/maintenance/reports/
 
 # Monthly trend analysis and reporting
-0 11 1 * * cd /path/to/flext-quality && python docs/maintenance/scripts/report.py --monthly-trends --notify
+0 11 1 * * cd /path/to/flext-quality && python docs/maintenance/scripts/report.py \
+    --monthly-trends --notify
 ```
 
 ## 📊 Quality Metrics
@@ -559,45 +557,19 @@ repos:
 
 ## ⚙️ Configuration
 
-### Audit Rules (`settings/audit_rules.yaml`)
+### Audit Rules (`config/audit_rules.yaml`)
 
-```yaml
-quality_thresholds:
-  max_age_days: 90
-  min_word_count: 100
-  max_broken_links: 0
-
-style_rules:
-  heading_hierarchy: true
-  list_consistency: true
-  code_block_formatting: true
-
-validation_rules:
-  external_link_timeout: 10
-  retry_attempts: 3
-  check_images: true
-```
-
-### Style Guide (`settings/style_guide.yaml`)
-
-```yaml
-markdown:
-  heading_style: "atx" # # ## ### or setext
-  list_style: "dash" # dash, asterisk, or plus
-  emphasis_style: "*" # * or _
-
-accessibility:
-  require_alt_text: true
-  descriptive_links: true
-  heading_structure: true
-```
+`src/flext_quality/docs/config/audit_rules.yaml`, `style_guide.yaml`, and
+`validation_config.yaml` own the documentation rules. The public
+`FlextQualityConfigManager` validates them into the `m.Quality` models. A missing or
+partial file resolves through the canonical model defaults, and `validate_configs`
+reports every required settings file that is absent; values present on disk always win.
 
 ## 🔧 Maintenance Scripts
 
 ### Comprehensive Audit (`scripts/audit.py`)
 
 ```bash
-
 # Full documentation quality assessment
 python scripts/audit.py --comprehensive
 
@@ -611,7 +583,6 @@ python scripts/audit.py --ci-mode --fail-on-errors
 ### Link Validation (`scripts/validate.py`)
 
 ```bash
-
 # Check all external links
 python scripts/validate.py --external-links
 
@@ -625,7 +596,6 @@ python scripts/validate.py --images
 ### Content Optimization (`scripts/optimize.py`)
 
 ```bash
-
 # Auto-fix formatting issues
 python scripts/optimize.py --fix-formatting
 
@@ -639,7 +609,6 @@ python scripts/optimize.py --readability
 ### Quality Reporting (`scripts/report.py`)
 
 ```bash
-
 # Generate HTML report
 python scripts/report.py --format html --output ../reports/
 
@@ -671,7 +640,6 @@ python scripts/report.py --notify --webhook-url https://hooks.example.com
 ### Scheduled Tasks
 
 ```bash
-
 # Daily quality checks
 0 9 * * * cd /path/to/project && python docs/maintenance/scripts/audit.py --daily
 
@@ -778,7 +746,6 @@ jobs:
 **Audit Script Fails**
 
 ```bash
-
 # Check Python dependencies
 pip install pyyaml requests beautifulsoup4
 
@@ -792,16 +759,14 @@ python -c "import yaml; yaml.safe_load(open('docs/maintenance/settings/audit_rul
 **Link Validation Timeout**
 
 ```yaml
-# Update timeout in settings/validation_config.yaml
-validation:
-  link_timeout: 30 # Increase from default 10 seconds
-  retry_attempts: 5 # Increase retry attempts
+# Update timeout in config/validation_config.yaml
+link_validation:
+  timeout: 30 # Increase from the declared 10 seconds
 ```
 
 **Style Validation Errors**
 
 ```bash
-
 # Review style guide configuration
 cat docs/maintenance/settings/style_guide.yaml
 
@@ -813,7 +778,7 @@ python scripts/audit.py --style-check --verbose
 
 ### Audit Script API
 
-```python notest
+```python
 from docs import DocumentationAuditor
 
 auditor = DocumentationAuditor(config_path="docs/maintenance/settings/")
@@ -823,7 +788,7 @@ report = auditor.generate_report(format="json")
 
 ### Validation Tools
 
-```python notest
+```python
 from docs import LinkValidator
 
 validator = LinkValidator(timeout=10, retries=3)
@@ -854,8 +819,10 @@ broken_links = validator.get_broken_links()
 ### ✅ Quality Assurance
 
 - **Automated Auditing**: Comprehensive quality checks with customizable rules
-- **Multi-dimensional Analysis**: Content, style, links, accessibility, and structure validation
-- **Severity-based Reporting**: Critical, high, medium, and low priority issue classification
+- **Multi-dimensional Analysis**: Content, style, links, accessibility, and structure
+  validation
+- **Severity-based Reporting**: Critical, high, medium, and low priority issue
+  classification
 - **Trend Analysis**: Historical quality tracking and improvement measurement
 
 ### ✅ Developer Experience
@@ -900,27 +867,33 @@ broken_links = validator.get_broken_links()
 
 ### Adding Custom Rules
 
-```python notest
-
+```yaml
 # Extend audit_rules.yaml with custom checks
 custom_checks:
   - name: "company_branding"
     pattern: "\\bincorrect\\b|\\bwrong\\b"
     severity: "medium"
     message: "Use approved company terminology"
+```
 
+```python
 # Create custom validator
-from docs import  BaseValidator
+from __future__ import annotations
+
+from docs import BaseValidator
+
 
 class CustomValidator(BaseValidator):
-    def validate(self, content: str, file_path: Path) -> List[Dict]:
+    def validate(self, content: str, file_path: Path) -> list[dict]:
         # Your custom validation logic
         return issues
 ```
 
 ### Integrating New Tools
 
-```python notest
+```python
+from __future__ import annotations
+
 # Add new validation tools to the pipeline
 from docs import DocumentationAuditor
 
@@ -934,7 +907,7 @@ class ExtendedAuditor(DocumentationAuditor):
 
 ### API Integration
 
-```python notest
+```text
 # REST API for external integrations
 from docs import MaintenanceAPI
 
@@ -999,14 +972,15 @@ api.run(port=8080)
 
 **Attribution**: FLEXT Quality Documentation Maintenance System
 
-______________________________________________________________________
+---
 
 ## 🎉 Getting Started Checklist
 
 ### ✅ Installation Complete
 
 - [ ] Python 3.8+ installed
-- [ ] Dependencies installed (`pip install pyyaml requests beautifulsoup4 aiohttp jinja2`)
+- [ ] Dependencies installed
+      (`pip install pyyaml requests beautifulsoup4 aiohttp jinja2`)
 - [ ] Directory structure verified (`ls docs/maintenance/`)
 
 ### ✅ Configuration Ready
@@ -1018,7 +992,8 @@ ______________________________________________________________________
 ### ✅ First Audit Run
 
 - [ ] Demo executed (`python docs/maintenance/demo.py`)
-- [ ] Basic audit successful (`python docs/maintenance/scripts/audit.py --check-freshness`)
+- [ ] Basic audit successful
+      (`python docs/maintenance/scripts/audit.py --check-freshness`)
 - [ ] Report generated (`python docs/maintenance/scripts/report.py --format html`)
 
 ### ✅ Automation Setup
@@ -1033,8 +1008,9 @@ ______________________________________________________________________
 - [ ] Maintenance procedures documented
 - [ ] Quality standards communicated
 
-______________________________________________________________________
+---
 
-**FLEXT Quality Documentation Maintenance System** - Enterprise-grade documentation quality assurance with comprehensive automation,
-validation,
-and reporting capabilities. Ensuring documentation excellence through intelligent analysis and continuous improvement. 🚀
+**FLEXT Quality Documentation Maintenance System** - Enterprise-grade documentation
+quality assurance with comprehensive automation, validation, and reporting capabilities.
+Ensuring documentation excellence through intelligent analysis and continuous
+improvement. 🚀

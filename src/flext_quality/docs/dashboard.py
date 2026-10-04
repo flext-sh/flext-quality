@@ -2,6 +2,9 @@
 
 Real-time monitoring dashboard for documentation quality metrics.
 Provides web interface to view audit results, trends, and quality scores.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -12,9 +15,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
 
-from flask import Flask, Response, render_template_string, request
-
+from flask import Flask, Response, request
 from flext_cli import cli
+
 from flext_quality import c, m, p, r, s, t, u
 
 
@@ -38,8 +41,12 @@ class FlextQualityDocumentationDashboard:
 
         @self.app.route("/")
         def index() -> str:
-            """Serve the main dashboard page."""
-            return render_template_string(self.get_dashboard_html())
+            """Serve the main dashboard page.
+
+            Returns:
+                The resulting ``str``.
+            """
+            return self.render_dashboard_html()
 
         _ = index
 
@@ -47,8 +54,8 @@ class FlextQualityDocumentationDashboard:
         def api_metrics() -> Response:
             """Return current metrics as a JSON response."""
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_current_metrics()
+                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                    self.compute_current_metrics(),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -60,8 +67,8 @@ class FlextQualityDocumentationDashboard:
             """Return quality trends as a JSON response."""
             days = int(request.args.get("days", 30))
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
-                    self.get_quality_trends(days)
+                u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                    self.compute_quality_trends(days),
                 ).decode(),
                 mimetype="application/json",
             )
@@ -73,16 +80,20 @@ class FlextQualityDocumentationDashboard:
             """Return recent reports as a JSON response."""
             limit = int(request.args.get("limit", 10))
             return Response(
-                t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-                    self.get_recent_reports(limit)
+                u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
+                    self.fetch_recent_reports(limit),
                 ).decode(),
                 mimetype="application/json",
             )
 
         _ = api_reports
 
-    def get_current_metrics(self) -> t.JsonMapping:
-        """Get current quality metrics from latest audit."""
+    def compute_current_metrics(self) -> t.JsonMapping:
+        """Get current quality metrics from latest audit.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         latest_audit = self.reports_dir / "latest_audit.json"
 
         if not latest_audit.exists():
@@ -117,9 +128,14 @@ class FlextQualityDocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def _build_current_metrics(self, audit_payload: str) -> t.JsonMapping:
-        """Build the dashboard metrics payload from the latest audit JSON."""
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
+    @staticmethod
+    def _build_current_metrics(audit_payload: str) -> t.JsonMapping:
+        """Build the dashboard metrics payload from the latest audit JSON.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
         metrics_raw = data.get("metrics")
         metrics: t.JsonMapping = metrics_raw if isinstance(metrics_raw, Mapping) else {}
         severity_raw = metrics.get("severity_breakdown")
@@ -146,8 +162,12 @@ class FlextQualityDocumentationDashboard:
             "status": "Current",
         }
 
-    def get_quality_trends(self, days: int = 30) -> t.JsonMapping:
-        """Get quality trends over the specified number of days."""
+    def compute_quality_trends(self, days: int = 30) -> t.JsonMapping:
+        """Get quality trends over the specified number of days.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
         cutoff_date = u.now() - timedelta(days=days)
 
         trend_data: t.MutableSequenceOf[t.JsonDict] = []
@@ -159,7 +179,8 @@ class FlextQualityDocumentationDashboard:
                 trend_entry = self._load_quality_trend_entry(report_file, cutoff_date)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process trend data: %s", str(e)
+                    "Failed to process trend data: %s",
+                    str(e),
                 )
                 continue
             if trend_entry is not None:
@@ -177,26 +198,33 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_values,
         }
 
+    @staticmethod
     def _load_quality_trend_entry(
-        self, report_file: Path, cutoff_date: datetime
+        report_file: Path,
+        cutoff_date: datetime,
     ) -> t.JsonDict | None:
-        """Load one audit report trend entry when it is inside the window."""
+        """Load one audit report trend entry when it is inside the window.
+
+        Returns:
+            The resulting ``t.JsonDict | None``.
+
+        Raises:
+            ValueError: If Skipping unreadable report.
+        """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone()
+            tzinfo=u.configured_timezone(),
         )
         if report_date < cutoff_date:
             return None
         read = u.Cli.files_read_text(report_file)
         if read.failure:
-            self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
-            )
-            return None
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+            msg = f"Skipping unreadable report {report_file}: {read.error}"
+            raise ValueError(msg)
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_v = data.get("metrics")
         metrics_m: t.JsonMapping = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_v)
+            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_v)
             if isinstance(metrics_v, Mapping)
             else {}
         )
@@ -209,8 +237,12 @@ class FlextQualityDocumentationDashboard:
             "high_issues": audit_metrics.severity_breakdown.get("high", 0),
         }
 
-    def get_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
-        """Get list of recent audit reports."""
+    def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
+        """Get list of recent audit reports.
+
+        Returns:
+            The resulting ``t.SequenceOf[t.JsonMapping]``.
+        """
         reports: MutableSequence[t.JsonMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
@@ -218,7 +250,8 @@ class FlextQualityDocumentationDashboard:
                 report_summary = self._load_recent_report_summary(report_file)
             except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
-                    "Failed to process report file: %s", str(e)
+                    "Failed to process report file: %s",
+                    str(e),
                 )
                 continue
             if report_summary is not None:
@@ -228,19 +261,25 @@ class FlextQualityDocumentationDashboard:
         reports = sorted(reports, key=operator.itemgetter("date"), reverse=True)
         return reports[:limit]
 
-    def _load_recent_report_summary(self, report_file: Path) -> t.JsonMapping | None:
-        """Load one recent report summary for the dashboard list."""
+    @staticmethod
+    def _load_recent_report_summary(report_file: Path) -> t.JsonMapping | None:
+        """Load one recent report summary for the dashboard list.
+
+        Returns:
+            The resulting ``t.JsonMapping | None``.
+
+        Raises:
+            ValueError: If Skipping unreadable report.
+        """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-            tzinfo=u.configured_timezone()
+            tzinfo=u.configured_timezone(),
         )
         read = u.Cli.files_read_text(report_file)
         if read.failure:
-            self._logger_instance.warning(
-                "Skipping unreadable report", file=str(report_file)
-            )
-            return None
-        data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
+            msg = f"Skipping unreadable report {report_file}: {read.error}"
+            raise ValueError(msg)
+        data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(read.value)
         metrics_rv = data.get("metrics")
         metrics_rm: t.JsonMapping = (
             metrics_rv if isinstance(metrics_rv, Mapping) else {}
@@ -259,8 +298,13 @@ class FlextQualityDocumentationDashboard:
             "files_analyzed": r_files_analyzed,
         }
 
-    def get_dashboard_html(self) -> str:
-        """Generate the main dashboard HTML."""
+    @staticmethod
+    def render_dashboard_html() -> str:
+        """Generate the main dashboard HTML.
+
+        Returns:
+            The resulting ``str``.
+        """
         return """
 <!DOCTYPE html>
 <html lang="en">
@@ -272,7 +316,8 @@ class FlextQualityDocumentationDashboard:
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+            Roboto, sans-serif;
             background: #f5f5f5;
             color: #333;
             line-height: 1.6;
@@ -437,10 +482,14 @@ class FlextQualityDocumentationDashboard:
                 const metricsResponse = await fetch('/api/metrics');
                 const metrics = await metricsResponse.json();
 
-                document.getElementById('quality-score').textContent = metrics.quality_score;
-                document.getElementById('files-analyzed').textContent = metrics.files_analyzed;
-                document.getElementById('total-issues').textContent = metrics.total_issues;
-                document.getElementById('critical-issues').textContent = metrics.severity_breakdown.critical || 0;
+                document.getElementById('quality-score').textContent =
+                    metrics.quality_score;
+                document.getElementById('files-analyzed').textContent =
+                    metrics.files_analyzed;
+                document.getElementById('total-issues').textContent =
+                    metrics.total_issues;
+                document.getElementById('critical-issues').textContent =
+                    metrics.severity_breakdown.critical || 0;
 
                 // Update last updated time
                 const lastUpdated = new Date(metrics.timestamp);
@@ -462,7 +511,8 @@ class FlextQualityDocumentationDashboard:
 
             } catch (error) {
                 console.error('Error loading dashboard:', error);
-                document.getElementById('last-updated').textContent = 'Error loading data';
+                document.getElementById('last-updated').textContent =
+                    'Error loading data';
             }
         }
 
@@ -543,14 +593,16 @@ class FlextQualityDocumentationDashboard:
             container.innerHTML = '';
 
             if (reports.length === 0) {
-                container.innerHTML = '<div class="report-item">No recent reports found</div>';
+                container.innerHTML =
+                    '<div class="report-item">No recent reports found</div>';
                 return;
             }
 
             reports.forEach(report => {
                 const date = new Date(report.date);
                 const scoreClass = report.quality_score >= 80 ? 'score-excellent' :
-                                 report.quality_score >= 60 ? 'score-good' : 'score-poor';
+                                 report.quality_score >= 60
+                                 ? 'score-good' : 'score-poor';
 
                 const item = document.createElement('div');
                 item.className = 'report-item';
@@ -560,8 +612,10 @@ class FlextQualityDocumentationDashboard:
                         <div class="report-date">${date.toLocaleString()}</div>
                     </div>
                     <div>
-                        <span class="report-score ${scoreClass}">${report.quality_score}</span>
-                        <div style="font-size: 0.8em; color: #666;">${report.total_issues} issues</div>
+                        <span class="report-score ${scoreClass}">
+                            ${report.quality_score}</span>
+                        <div style="font-size: 0.8em; color: #666;">
+                            ${report.total_issues} issues</div>
                     </div>
                 `;
                 container.appendChild(item);
@@ -579,7 +633,11 @@ class FlextQualityDocumentationDashboard:
         """
 
     def run(
-        self, host: str = "localhost", port: int = 8080, *, debug: bool = False
+        self,
+        host: str = "localhost",
+        port: int = 8080,
+        *,
+        debug: bool = False,
     ) -> None:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
@@ -588,13 +646,19 @@ class FlextQualityDocumentationDashboard:
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
         host: str = u.Field(
-            "localhost", description="Dashboard bind host", validate_default=True
+            "localhost",
+            description="Dashboard bind host",
+            validate_default=True,
         )
         port: int = u.Field(
-            8080, description="Dashboard bind port", validate_default=True
+            8080,
+            description="Dashboard bind port",
+            validate_default=True,
         )
         debug: bool = u.Field(
-            False, description="Enable dashboard debug mode", validate_default=True
+            default=False,
+            description="Enable dashboard debug mode",
+            validate_default=True,
         )
         reports_dir: str = u.Field(
             "docs/maintenance/reports/",
@@ -604,14 +668,31 @@ class FlextQualityDocumentationDashboard:
 
         @override
         def execute(self) -> p.Result[bool]:
-            """Run the dashboard server."""
+            """Run the dashboard server.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
             dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
             dashboard.run(host=self.host, port=self.port, debug=self.debug)
             return r[bool].ok(value=True)
 
     @staticmethod
+    def _run_handler(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
+        """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly).
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
+        return params.execute()
+
+    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Run the dashboard via the canonical cli facade."""
+        """Run the dashboard via the canonical cli facade.
+
+        Returns:
+            The resulting ``int``.
+        """
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-dashboard",
@@ -620,11 +701,17 @@ class FlextQualityDocumentationDashboard:
                 name="run",
                 help_text="Start the dashboard server",
                 model_cls=FlextQualityDocumentationDashboard.Run,
-                handler=lambda params: params.execute(),
+                handler=FlextQualityDocumentationDashboard._run_handler,
             ),
         )
         return exit_code
 
 
+# Why: declare public ABI so the flext-infra lazy-init generator can derive
+# this submodule's package __init__.py exports (flext-1wjg1.16.32).
+
+
 if __name__ == "__main__":
     cli.exit(FlextQualityDocumentationDashboard.main())
+
+__all__: list[str] = ["FlextQualityDocumentationDashboard"]
