@@ -13,15 +13,10 @@ from __future__ import annotations
 from typing import Annotated, Self
 
 from flext_cli import FlextCliConfig
+
+import flext_quality._models._quality_namespace
 from flext_core import FlextSettings
-
 from flext_quality import m
-
-
-class _QualityNamespace(m.BaseModel):
-    """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
-
-    model_config = m.ConfigDict(extra="allow", frozen=True)
 
 
 class FlextQualityConfig(FlextSettings, FlextCliConfig):
