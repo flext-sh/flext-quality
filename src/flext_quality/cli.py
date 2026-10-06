@@ -55,8 +55,8 @@ class FlextQualityCli(s[bool]):
                 cmds.append(sub.value)
             return self._extend(cmds)
 
+        @staticmethod
         def _extend(
-            self: Self,
             cmds: MutableSequence[t.StrSequence],
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
