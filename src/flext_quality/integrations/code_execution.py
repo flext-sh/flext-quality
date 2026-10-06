@@ -25,46 +25,80 @@ class FlextQualityCodeExecutionBridge:
     """
 
     def __init__(
-        self, *, timeout_ms: int | None = None, working_dir: Path | None = None
+        self,
+        *,
+        timeout_ms: int | None = None,
+        working_dir: Path | None = None,
     ) -> None:
         """Initialize the code execution bridge."""
         self._timeout_ms = timeout_ms or c.Quality.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
-    def build_basedpyright_command(self, target_path: Path) -> p.Result[t.StrSequence]:
-        """Build command for basedpyright type checker."""
+    @staticmethod
+    def build_basedpyright_command(target_path: Path) -> p.Result[t.StrSequence]:
+        """Build command for basedpyright type checker.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
         return r[t.StrSequence].ok(cmd)
 
+    @staticmethod
     def build_python_command(
-        self, script_path: Path, *, args: t.StrSequence | None = None
+        script_path: Path,
+        *,
+        args: t.StrSequence | None = None,
     ) -> p.Result[t.StrSequence]:
-        """Build command for Python execution."""
+        """Build command for Python execution.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         if not script_path.exists():
             return e.fail_not_found(
-                "Script", str(script_path), result_type=r[t.StrSequence]
+                "Script",
+                str(script_path),
+                result_type=r[t.StrSequence],
             )
         cmd = ["python", str(script_path)]
         if args:
             cmd.extend(args)
         return r[t.StrSequence].ok(cmd)
 
+    @staticmethod
     def build_ruff_command(
-        self, target_path: Path, *, fix: bool = False, output_format: str = "json"
+        target_path: Path,
+        *,
+        fix: bool = False,
+        output_format: str = "json",
     ) -> p.Result[t.StrSequence]:
-        """Build command for ruff linter."""
+        """Build command for ruff linter.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
             cmd.append("--fix")
         return r[t.StrSequence].ok(cmd)
 
+    @staticmethod
     def build_typescript_command(
-        self, script_path: Path, *, args: t.StrSequence | None = None
+        script_path: Path,
+        *,
+        args: t.StrSequence | None = None,
     ) -> p.Result[t.StrSequence]:
-        """Build command for TypeScript execution via npx tsx."""
+        """Build command for TypeScript execution via npx tsx.
+
+        Returns:
+            The resulting ``p.Result[t.StrSequence]``.
+        """
         if not script_path.exists():
             return e.fail_not_found(
-                "Script", str(script_path), result_type=r[t.StrSequence]
+                "Script",
+                str(script_path),
+                result_type=r[t.StrSequence],
             )
         cmd = ["npx", "tsx", str(script_path)]
         if args:
@@ -72,9 +106,17 @@ class FlextQualityCodeExecutionBridge:
         return r[t.StrSequence].ok(cmd)
 
     def create_execution_request(
-        self, script_path: Path, runtime: str, *, args: t.StrSequence | None = None
+        self,
+        script_path: Path,
+        runtime: str,
+        *,
+        args: t.StrSequence | None = None,
     ) -> p.Result[m.Quality.ExecutionRequest]:
-        """Create an execution request for later processing."""
+        """Create an execution request for later processing.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.ExecutionRequest]``.
+        """
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
             return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
         return r[m.Quality.ExecutionRequest].ok(
@@ -83,7 +125,7 @@ class FlextQualityCodeExecutionBridge:
                 runtime=runtime,
                 args=args or [],
                 timeout_ms=self._timeout_ms,
-            )
+            ),
         )
 
     def health_check(self) -> p.Result[t.JsonMapping]:
@@ -91,6 +133,9 @@ class FlextQualityCodeExecutionBridge:
 
         Returns configuration status - actual runtime checks
         should be done via shell wrapper execution.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
         """
         return r[t.JsonMapping].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,

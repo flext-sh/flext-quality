@@ -1,4 +1,8 @@
-"""Public API facade for flext-quality."""
+"""Public API facade for flext-quality.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -16,28 +20,33 @@ from flext_quality import (
     t,
     u,
 )
-
-from ._settings import FlextQualitySettings
-from .base import FlextQualityServiceBase
+from flext_quality._settings import FlextQualitySettings
+from flext_quality.base import FlextQualityServiceBase
 
 
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
     """Coordinate quality operations through the canonical facade instance."""
 
     _hooks: FlextQualityHookManager = u.PrivateAttr(
-        default_factory=FlextQualityHookManager
+        default_factory=FlextQualityHookManager,
     )
     _rules_loader: FlextQualityRulesLoader = u.PrivateAttr(
-        default_factory=FlextQualityRulesLoader
+        default_factory=FlextQualityRulesLoader,
     )
 
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
-        """Execute the default quality runtime operation."""
+        """Execute the default quality runtime operation.
+
+        Returns:
+            The resulting ``p.Result[t.JsonMapping]``.
+        """
         return self.fetch_status()
 
     def execute_hook(
-        self, event: str, input_data: t.JsonMapping
+        self,
+        event: str,
+        input_data: t.JsonMapping,
     ) -> p.Result[t.JsonMapping]:
         """Execute hooks for an event.
 
@@ -51,20 +60,24 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         """
         return self._hooks.execute(event, input_data)
 
+    @staticmethod
     def format_hook_output(
-        self,
         *,
         continue_exec: bool = True,
         message: str | None = None,
         blocked_reason: str | None = None,
     ) -> p.Result[str]:
-        """Format hook output for Claude Code as JSON string."""
+        """Format hook output for Claude Code as JSON string.
+
+        Returns:
+            The resulting ``p.Result[str]``.
+        """
         return r[str].ok(
             u.Quality.format_hook_output(
                 continue_exec=continue_exec,
                 message=message,
                 blocked_reason=blocked_reason,
-            )
+            ),
         )
 
     def fetch_hook_config_json(self) -> p.Result[str]:
@@ -109,7 +122,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         rules_path = Path(settings.Quality.rules_dir)
         if not rules_path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Rules directory not found: {rules_path}"
+                f"Rules directory not found: {rules_path}",
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
@@ -135,7 +148,8 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
             return r[t.JsonMapping].ok({"continue": True})
         return self.execute_hook(event, input_data)
 
-    def validate_configuration(self) -> p.Result[bool]:
+    @staticmethod
+    def validate_configuration() -> p.Result[bool]:
         """Validate the current configuration.
 
         Threshold invariants are enforced at settings construction time, so a

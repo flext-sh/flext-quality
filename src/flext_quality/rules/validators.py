@@ -1,4 +1,8 @@
-"""Rule validators for specific validation types."""
+"""Rule validators for specific validation types.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -35,9 +39,15 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: t.Cli.TextPath | None = None
+            self,
+            content: str,
+            file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Validate content against patterns."""
+            """Validate content against patterns.
+
+            Returns:
+                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            """
             path_value = Path(file_path) if isinstance(file_path, str) else file_path
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(path_value) if path_value else "<string>"
@@ -86,9 +96,15 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: t.Cli.TextPath | None = None
+            self,
+            content: str,
+            file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Validate tier violations."""
+            """Validate tier violations.
+
+            Returns:
+                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            """
             path_value = Path(file_path) if isinstance(file_path, str) else file_path
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(path_value) if path_value else "<string>"
@@ -109,8 +125,13 @@ class FlextQualityValidators:
                     })
             return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
-        def _get_file_tier(self, path: Path) -> int | None:
-            """Determine file tier from path."""
+        @staticmethod
+        def _get_file_tier(path: Path) -> int | None:
+            """Determine file tier from path.
+
+            Returns:
+                The resulting ``int | None``.
+            """
             name = path.name
             if name in {"constants.py", "typings.py", "protocols.py"}:
                 return 0
@@ -131,11 +152,19 @@ class FlextQualityValidators:
             self._register_defaults()
 
         def all(self) -> t.SequenceOf[p.Quality.ValidatorBase]:
-            """Get all registered validators."""
+            """Get all registered validators.
+
+            Returns:
+                The resulting ``t.SequenceOf[p.Quality.ValidatorBase]``.
+            """
             return list(self._validators.values())
 
         def get(self, name: str) -> p.Quality.ValidatorBase | None:
-            """Get validator by name."""
+            """Get validator by name.
+
+            Returns:
+                The resulting ``p.Quality.ValidatorBase | None``.
+            """
             return self._validators.get(name)
 
         def register(self, validator: p.Quality.ValidatorBase) -> None:
@@ -143,9 +172,15 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self, content: str, file_path: Path | None = None
+            self,
+            content: str,
+            file_path: Path | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Run all validators."""
+            """Run all validators.
+
+            Returns:
+                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            """
             all_violations: MutableSequence[t.JsonMapping] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)

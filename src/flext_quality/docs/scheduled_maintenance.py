@@ -2,6 +2,9 @@
 
 Automated scheduled maintenance system for regular documentation quality checks,
 optimizations, and reporting. Designed to run as a cron job or scheduled task.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -54,24 +57,41 @@ class FlextQualityScheduledMaintenance:
 
     @staticmethod
     def _as_str(value: t.JsonValue | None, default: str) -> str:
-        """Normalize unknown settings values to string."""
+        """Normalize unknown settings values to string.
+
+        Returns:
+            The resulting ``str``.
+        """
         return value if isinstance(value, str) else default
 
     @staticmethod
     def _as_bool(value: t.JsonValue | None, /, *, default: bool) -> bool:
-        """Normalize unknown settings values to bool."""
+        """Normalize unknown settings values to bool.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return value if isinstance(value, bool) else default
 
     @staticmethod
     def _as_int(value: t.JsonValue | None, default: int) -> int:
-        """Normalize unknown settings values to int."""
+        """Normalize unknown settings values to int.
+
+        Returns:
+            The resulting ``int``.
+        """
         return value if isinstance(value, int) else default
 
     @staticmethod
     def _as_str_list(
-        value: t.JsonValue | None, default: t.StrSequence
+        value: t.JsonValue | None,
+        default: t.StrSequence,
     ) -> t.StrSequence:
-        """Normalize unknown settings values to t.StrSequence."""
+        """Normalize unknown settings values to t.StrSequence.
+
+        Returns:
+            The resulting ``t.StrSequence``.
+        """
         if isinstance(value, list):
             return default
         return default
@@ -92,11 +112,15 @@ class FlextQualityScheduledMaintenance:
 
         # Initialize results tracking
         self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
-            start_time=u.now().isoformat()
+            start_time=u.now().isoformat(),
         )
 
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
-        """Load maintenance schedule configuration, returning the merged config."""
+        """Load maintenance schedule configuration, returning the merged config.
+
+        Returns:
+            The resulting ``m.Quality.MaintenanceConfig``.
+        """
         default_config = self.build_default_config()
         resolved_config_path = (
             Path(config_path)
@@ -110,18 +134,27 @@ class FlextQualityScheduledMaintenance:
         return default_config
 
     def _merge_config(
-        self, base: m.Quality.MaintenanceConfig, overrides: t.JsonMapping
+        self,
+        base: m.Quality.MaintenanceConfig,
+        overrides: t.JsonMapping,
     ) -> m.Quality.MaintenanceConfig:
-        """Merge external settings mapping into default typed self.settings."""
+        """Merge external settings mapping into default typed self.settings.
+
+        Returns:
+            The resulting ``m.Quality.MaintenanceConfig``.
+        """
         merged = base.model_dump()
         merged["enabled"] = self._as_bool(
-            overrides.get("enabled"), default=base.enabled
+            overrides.get("enabled"),
+            default=base.enabled,
         )
         merged["reports_dir"] = self._as_str(
-            overrides.get("reports_dir"), base.reports_dir
+            overrides.get("reports_dir"),
+            base.reports_dir,
         )
         merged["backup_dir"] = self._as_str(
-            overrides.get("backup_dir"), base.backup_dir
+            overrides.get("backup_dir"),
+            base.backup_dir,
         )
 
         schedules_raw = overrides.get("schedules")
@@ -134,11 +167,13 @@ class FlextQualityScheduledMaintenance:
                     current = schedules[key]
                     updated = {
                         "enabled": self._as_bool(
-                            value.get("enabled"), default=current["enabled"]
+                            value.get("enabled"),
+                            default=current["enabled"],
                         ),
                         "time": self._as_str(value.get("time"), current["time"]),
                         "tasks": self._as_str_list(
-                            value.get("tasks"), current["tasks"]
+                            value.get("tasks"),
+                            current["tasks"],
                         ),
                         "day": self._as_str(value.get("day"), current.get("day") or "")
                         or None,
@@ -154,13 +189,16 @@ class FlextQualityScheduledMaintenance:
                     current = tasks[key]
                     tasks[key] = {
                         "description": self._as_str(
-                            value.get("description"), current["description"]
+                            value.get("description"),
+                            current["description"],
                         ),
                         "command": self._as_str(
-                            value.get("command"), current["command"]
+                            value.get("command"),
+                            current["command"],
                         ),
                         "timeout": self._as_int(
-                            value.get("timeout"), current["timeout"]
+                            value.get("timeout"),
+                            current["timeout"],
                         ),
                     }
             merged["tasks"] = tasks
@@ -170,13 +208,16 @@ class FlextQualityScheduledMaintenance:
             err_cfg = base.error_handling
             merged["error_handling"] = {
                 "max_retries": self._as_int(
-                    error_handling_raw.get("max_retries"), err_cfg.max_retries
+                    error_handling_raw.get("max_retries"),
+                    err_cfg.max_retries,
                 ),
                 "retry_delay": self._as_int(
-                    error_handling_raw.get("retry_delay"), err_cfg.retry_delay
+                    error_handling_raw.get("retry_delay"),
+                    err_cfg.retry_delay,
                 ),
                 "fail_fast": self._as_bool(
-                    error_handling_raw.get("fail_fast"), default=err_cfg.fail_fast
+                    error_handling_raw.get("fail_fast"),
+                    default=err_cfg.fail_fast,
                 ),
                 "notify_on_failure": self._as_bool(
                     error_handling_raw.get("notify_on_failure"),
@@ -189,14 +230,17 @@ class FlextQualityScheduledMaintenance:
             log_cfg = base.logging
             merged["logging"] = {
                 "enabled": self._as_bool(
-                    logging_raw.get("enabled"), default=log_cfg.enabled
+                    logging_raw.get("enabled"),
+                    default=log_cfg.enabled,
                 ),
                 "log_file": self._as_str(logging_raw.get("log_file"), log_cfg.log_file),
                 "max_log_size": self._as_str(
-                    logging_raw.get("max_log_size"), log_cfg.max_log_size
+                    logging_raw.get("max_log_size"),
+                    log_cfg.max_log_size,
                 ),
                 "retention_days": self._as_int(
-                    logging_raw.get("retention_days"), log_cfg.retention_days
+                    logging_raw.get("retention_days"),
+                    log_cfg.retention_days,
                 ),
             }
 
@@ -206,7 +250,11 @@ class FlextQualityScheduledMaintenance:
         return config
 
     def build_default_config(self) -> m.Quality.MaintenanceConfig:
-        """Default maintenance configuration."""
+        """Default maintenance configuration.
+
+        Returns:
+            The resulting ``m.Quality.MaintenanceConfig``.
+        """
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
@@ -250,52 +298,84 @@ class FlextQualityScheduledMaintenance:
             "tasks": {
                 "audit_quick": {
                     "description": "Quick daily audit for critical issues",
-                    "command": f"python -m flext_quality.docs.scripts.audit --check-freshness --check-completeness --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.audit "
+                        f"--check-freshness --check-completeness --output "
+                        f"{reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "audit_comprehensive": {
                     "description": "Full comprehensive audit",
-                    "command": f"python -m flext_quality.docs.scripts.audit --comprehensive --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.audit "
+                        f"--comprehensive --output {reports_dir}"
+                    ),
                     "timeout": 600,
                 },
                 "validate_links": {
                     "description": "Validate all links and references",
-                    "command": f"python -m flext_quality.docs.scripts.validate --external-links --internal-links --images --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.validate "
+                        f"--external-links --internal-links --images "
+                        f"--output {reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "check_critical": {
                     "description": "Check for critical issues and send alerts",
-                    "command": f"python -m flext_quality.docs.notifications --audit-data {latest_audit_report}",
+                    "command": (
+                        f"python -m flext_quality.docs.notifications "
+                        f"--audit-data {latest_audit_report}"
+                    ),
                     "timeout": 60,
                 },
                 "optimize_formatting": {
                     "description": "Auto-fix formatting issues",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --fix-formatting --backup --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--fix-formatting --backup --output {reports_dir}"
+                    ),
                     "timeout": 300,
                 },
                 "optimize_full": {
                     "description": "Full optimization suite",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --comprehensive --backup --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--comprehensive --backup --output {reports_dir}"
+                    ),
                     "timeout": 600,
                 },
                 "update_toc": {
                     "description": "Update table of contents",
-                    "command": f"python -m flext_quality.docs.scripts.optimize --update-toc --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.optimize "
+                        f"--update-toc --output {reports_dir}"
+                    ),
                     "timeout": 180,
                 },
                 "generate_report": {
                     "description": "Generate quality report",
-                    "command": f"python -m flext_quality.docs.scripts.report --format html --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.report "
+                        f"--format html --output {reports_dir}"
+                    ),
                     "timeout": 120,
                 },
                 "generate_monthly_report": {
                     "description": "Generate comprehensive monthly report",
-                    "command": f"python -m flext_quality.docs.scripts.report --monthly-trends --format html --output {reports_dir}",
+                    "command": (
+                        f"python -m flext_quality.docs.scripts.report "
+                        f"--monthly-trends --format html --output {reports_dir}"
+                    ),
                     "timeout": 180,
                 },
                 "notify_weekly": {
                     "description": "Send weekly notification",
-                    "command": f"python -m flext_quality.docs.notifications --weekly-report {latest_audit_report}",
+                    "command": (
+                        f"python -m flext_quality.docs.notifications "
+                        f"--weekly-report {latest_audit_report}"
+                    ),
                     "timeout": 60,
                 },
                 "cleanup_old_reports": {
@@ -320,29 +400,53 @@ class FlextQualityScheduledMaintenance:
         return config
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
-        """Extract task name list from settings for a schedule key."""
+        """Extract task name list from settings for a schedule key.
+
+        Returns:
+            The resulting ``t.StrSequence``.
+        """
         schedules = self.settings.schedules
         schedule_entry = schedules.get(schedule_key)
         return schedule_entry.tasks if schedule_entry else []
 
     def run_daily_audit(self) -> bool:
-        """Run daily audit tasks."""
+        """Run daily audit tasks.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return self.run_tasks(self._get_task_names("daily_audit"))
 
     def run_daily_optimize(self) -> bool:
-        """Run daily optimization tasks."""
+        """Run daily optimization tasks.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return self.run_tasks(self._get_task_names("daily_optimize"))
 
     def run_weekly_comprehensive(self) -> bool:
-        """Run weekly comprehensive maintenance."""
+        """Run weekly comprehensive maintenance.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return self.run_tasks(self._get_task_names("weekly_comprehensive"))
 
     def run_monthly_deep_clean(self) -> bool:
-        """Run monthly deep cleaning maintenance."""
+        """Run monthly deep cleaning maintenance.
+
+        Returns:
+            The resulting ``bool``.
+        """
         return self.run_tasks(self._get_task_names("monthly_deep_clean"))
 
     def run_tasks(self, task_names: t.StrSequence) -> bool:
-        """Run a list of maintenance tasks."""
+        """Run a list of maintenance tasks.
+
+        Returns:
+            The resulting ``bool``.
+        """
         success = True
 
         for task_name in task_names:
@@ -360,21 +464,34 @@ class FlextQualityScheduledMaintenance:
         return success
 
     def fail_step(self, message: str) -> bool:
-        """Record a step failure message and report the step as failed."""
+        """Record a step failure message and report the step as failed.
+
+        Returns:
+            The resulting ``bool``.
+        """
         self.results.errors.append(message)
         return False
 
     def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
-        """Run a single maintenance task using appropriate Python libraries."""
+        """Run a single maintenance task using appropriate Python libraries.
+
+        Returns:
+            The resulting ``bool``.
+        """
         try:
             return self._run_single_task_unchecked(task_config)
         except (OSError, RuntimeError, ValueError, KeyError) as e:
             return self.fail_step(f"Task error: {task_config.description} - {e!s}")
 
     def _run_single_task_unchecked(
-        self, task_config: m.Quality.ScheduleTaskConfig
+        self,
+        task_config: m.Quality.ScheduleTaskConfig,
     ) -> bool:
-        """Run a single task after exception boundary setup."""
+        """Run a single task after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         command = task_config.command
         description = task_config.description
         timeout = task_config.timeout
@@ -387,15 +504,23 @@ class FlextQualityScheduledMaintenance:
         if handler:
             return handler(cmd_parts, timeout, description)
         self.results.warnings.append(
-            f"Unsupported command: {cmd_name} in task: {description}. "
-            "Please install appropriate Python libraries or configure supported commands."
+            (
+                f"Unsupported command: {cmd_name} in task: {description}. "
+                "Please install appropriate Python libraries or configure "
+                "supported commands."
+            ),
         )
         return False
 
     def _get_command_handler(
-        self, cmd_name: str
+        self,
+        cmd_name: str,
     ) -> Callable[[t.StrSequence, int, str], bool] | None:
-        """Get handler for command type."""
+        """Get handler for command type.
+
+        Returns:
+            The resulting ``Callable[[t.StrSequence, int, str], bool] | None``.
+        """
         handlers: t.MappingKV[str, Callable[[t.StrSequence, int, str], bool]] = {
             "python": self._handle_python_command,
             "pytest": self._handle_pytest_command,
@@ -404,31 +529,47 @@ class FlextQualityScheduledMaintenance:
             "echo": self._handle_echo_command,
         }
         handler: Callable[[t.StrSequence, int, str], bool] | None = handlers.get(
-            cmd_name
+            cmd_name,
         )
         return handler
 
     def _handle_python_command(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle python -m commands."""
+        """Handle python -m commands.
+
+        Returns:
+            The resulting ``bool``.
+        """
         try:
             return self._handle_python_command_unchecked(
-                cmd_parts, timeout, description
+                cmd_parts,
+                timeout,
+                description,
             )
         except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
             return self.fail_step(f"Python command failed in {description}: {e!s}")
 
     def _handle_python_command_unchecked(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle python commands after exception boundary setup."""
+        """Handle python commands after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if (
             len(cmd_parts) < c.Quality.SCHEDULED_MAINTENANCE_MIN_PYTHON_ARGS
             or cmd_parts[1] != "-m"
         ):
             self.results.warnings.append(
-                f"Invalid python command format in task: {description}"
+                f"Invalid python command format in task: {description}",
             )
             return False
         module_name = (
@@ -449,20 +590,36 @@ class FlextQualityScheduledMaintenance:
         return self._run_with_timeout(run_module, timeout, description)
 
     def _handle_pytest_command(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle pytest commands."""
+        """Handle pytest commands.
+
+        Returns:
+            The resulting ``bool``.
+        """
         try:
             return self._handle_pytest_command_unchecked(
-                cmd_parts, timeout, description
+                cmd_parts,
+                timeout,
+                description,
             )
         except (RuntimeError, OSError, ImportError) as e:
             return self.fail_step(f"pytest command failed in {description}: {e!s}")
 
     def _handle_pytest_command_unchecked(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle pytest commands after exception boundary setup."""
+        """Handle pytest commands after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         pytest_args = cmd_parts[1:] if cmd_parts[0] == "pytest" else cmd_parts
 
         def run_tests() -> None:
@@ -474,10 +631,18 @@ class FlextQualityScheduledMaintenance:
         return self._run_with_timeout(run_tests, timeout, description)
 
     def _handle_make_command(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle make commands."""
-        # Note: timeout parameter reserved for future make execution timeout implementation
+        """Handle make commands.
+
+        Returns:
+            The resulting ``bool``.
+        """
+        # Note: timeout parameter reserved for future make execution timeout
+        # implementation
         _ = timeout  # Reserved for future use
 
         try:
@@ -486,9 +651,15 @@ class FlextQualityScheduledMaintenance:
             return self.fail_step(f"Make command failed in {description}: {e!s}")
 
     def _handle_make_command_unchecked(
-        self, cmd_parts: t.StrSequence, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        description: str,
     ) -> bool:
-        """Handle make commands after exception boundary setup."""
+        """Handle make commands after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         makefile = self.project_root / "Makefile"
         if not makefile.exists():
             self.results.warnings.append(f"Makefile not found for task: {description}")
@@ -498,27 +669,44 @@ class FlextQualityScheduledMaintenance:
         if not targets:
             targets = ["default"]
         self.results.warnings.append(
-            f"Make command '{' '.join(cmd_parts)}' requires make tool. "
-            f"For task: {description}, consider specifying the actual command directly."
+            (
+                f"Make command '{' '.join(cmd_parts)}' requires make tool. "
+                f"For task: {description}, consider specifying the actual "
+                "command directly."
+            ),
         )
         return False
 
     def _handle_git_command(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle git commands through the flext-cli process facade."""
+        """Handle git commands through the flext-cli process facade.
+
+        Returns:
+            The resulting ``bool``.
+        """
         try:
             return self._handle_git_command_unchecked(cmd_parts, timeout, description)
         except c.EXC_OS_RUNTIME_VALUE as e:
             return self.fail_step(f"Git command failed in {description}: {e!s}")
 
     def _handle_git_command_unchecked(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle git commands after exception boundary setup."""
+        """Handle git commands after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         if len(cmd_parts) < c.Quality.SCHEDULED_MAINTENANCE_MIN_GIT_ARGS:
             self.results.warnings.append(
-                f"Invalid git command format in task: {description}"
+                f"Invalid git command format in task: {description}",
             )
             return False
         argv = tuple(cmd_parts)
@@ -537,10 +725,18 @@ class FlextQualityScheduledMaintenance:
         return self._run_with_timeout(run_git_command, timeout, description)
 
     def _handle_echo_command(
-        self, cmd_parts: t.StrSequence, timeout: int, description: str
+        self,
+        cmd_parts: t.StrSequence,
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Handle echo commands."""
-        # Note: timeout parameter reserved for future echo execution timeout implementation
+        """Handle echo commands.
+
+        Returns:
+            The resulting ``bool``.
+        """
+        # Note: timeout parameter reserved for future echo execution timeout
+        # implementation
         _ = timeout  # Reserved for future use
 
         try:
@@ -552,18 +748,32 @@ class FlextQualityScheduledMaintenance:
             return True
 
     def _run_with_timeout(
-        self, func: Callable[[], None], timeout: int, description: str
+        self,
+        func: Callable[[], None],
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Run a function with timeout using threading."""
+        """Run a function with timeout using threading.
+
+        Returns:
+            The resulting ``bool``.
+        """
         try:
             return self._run_with_timeout_unchecked(func, timeout, description)
         except c.EXC_OS_RUNTIME_VALUE as e:
             return self.fail_step(f"Task execution error in {description}: {e!s}")
 
     def _run_with_timeout_unchecked(
-        self, func: Callable[[], None], timeout: int, description: str
+        self,
+        func: Callable[[], None],
+        timeout: int,
+        description: str,
     ) -> bool:
-        """Run a function with timeout after exception boundary setup."""
+        """Run a function with timeout after exception boundary setup.
+
+        Returns:
+            The resulting ``bool``.
+        """
         success = False
         task_error: Exception | None = None
 
@@ -599,7 +809,7 @@ class FlextQualityScheduledMaintenance:
         # Daily audit
         if schedules["daily_audit"].enabled:
             daily_audit_job: schedule.Job = schedule.every().day.at(
-                schedules["daily_audit"].time
+                schedules["daily_audit"].time,
             )
             daily_audit_do = getattr(daily_audit_job, "do", None)
             if callable(daily_audit_do):
@@ -608,7 +818,7 @@ class FlextQualityScheduledMaintenance:
         # Daily optimization
         if schedules["daily_optimize"].enabled:
             daily_optimize_job: schedule.Job = schedule.every().day.at(
-                schedules["daily_optimize"].time
+                schedules["daily_optimize"].time,
             )
             daily_optimize_do = getattr(daily_optimize_job, "do", None)
             if callable(daily_optimize_do):
@@ -621,7 +831,7 @@ class FlextQualityScheduledMaintenance:
 
             if isinstance(day, str):
                 getattr(schedule.every(), day).at(time_str).do(
-                    self.run_weekly_comprehensive
+                    self.run_weekly_comprehensive,
                 )
 
         # Monthly deep clean
@@ -649,7 +859,11 @@ class FlextQualityScheduledMaintenance:
             self.save_results()
 
     def run_manual(self, task_type: str) -> bool:
-        """Run maintenance tasks manually."""
+        """Run maintenance tasks manually.
+
+        Returns:
+            The resulting ``bool``.
+        """
         task_map = {
             "daily": self.run_daily_audit,
             "optimize": self.run_daily_optimize,
@@ -676,7 +890,7 @@ class FlextQualityScheduledMaintenance:
             (
                 datetime.fromisoformat(self.results.end_time)
                 - datetime.fromisoformat(self.results.start_time)
-            ).total_seconds()
+            ).total_seconds(),
         )
 
         results_file = (
@@ -685,14 +899,16 @@ class FlextQualityScheduledMaintenance:
         )
 
         _ = u.Cli.json_write(
-            results_file, self.results, options=m.Cli.JsonWriteOptions(indent=2)
+            results_file,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
         ).unwrap()
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
         DEFAULT_CONFIG: ClassVar[str] = str(
-            Path(__file__).resolve().parent / "settings" / "schedule_config.yaml"
+            Path(__file__).resolve().parent / "settings" / "schedule_config.yaml",
         )
 
         settings_path: Annotated[
@@ -701,25 +917,35 @@ class FlextQualityScheduledMaintenance:
                 default=str(
                     Path(__file__).resolve().parent
                     / "settings"
-                    / "schedule_config.yaml"
+                    / "schedule_config.yaml",
                 ),
                 alias="settings",
                 description="Scheduled maintenance settings file",
             ),
         ]
         daemon: bool = u.Field(
-            False, description="Run scheduler daemon", validate_default=True
+            default=False,
+            description="Run scheduler daemon",
+            validate_default=True,
         )
         manual: str | None = u.Field(
-            None, description="Run one maintenance task", validate_default=True
+            None,
+            description="Run one maintenance task",
+            validate_default=True,
         )
         list_schedules: bool = u.Field(
-            False, description="List configured schedules", validate_default=True
+            default=False,
+            description="List configured schedules",
+            validate_default=True,
         )
 
         @override
         def execute(self) -> p.Result[bool]:
-            """Dispatch to the appropriate maintenance action."""
+            """Dispatch to the appropriate maintenance action.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
             maintenance = FlextQualityScheduledMaintenance(self.settings_path)
             if self.list_schedules:
                 for _schedule_config in maintenance.settings.schedules.values():
@@ -735,17 +961,25 @@ class FlextQualityScheduledMaintenance:
                     else r[bool].fail(f"Manual task '{self.manual}' failed")
                 )
             return r[bool].fail(
-                "No action selected (use --daemon, --manual or --list-schedules)"
+                "No action selected (use --daemon, --manual or --list-schedules)",
             )
 
     @staticmethod
     def _run_handler(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
-        """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly)."""
+        """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly).
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+        """
         return params.execute()
 
     @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
-        """Run scheduled maintenance via the canonical cli facade."""
+        """Run scheduled maintenance via the canonical cli facade.
+
+        Returns:
+            The resulting ``int``.
+        """
         exit_code: int = u.Quality.execute_result_command(
             args=args,
             app_name="flext-quality-scheduled-maintenance",
@@ -753,7 +987,8 @@ class FlextQualityScheduledMaintenance:
             route=m.Cli.ResultCommandRoute(
                 name="run",
                 help_text=(
-                    "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
+                    "Run scheduled maintenance (use --daemon, --manual or "
+                    "--list-schedules)"
                 ),
                 model_cls=FlextQualityScheduledMaintenance.Run,
                 handler=FlextQualityScheduledMaintenance._run_handler,
@@ -764,8 +999,9 @@ class FlextQualityScheduledMaintenance:
 
 # Why: declare public ABI so the flext-infra lazy-init generator can derive
 # this submodule's package __init__.py exports (flext-1wjg1.16.32).
-__all__: list[str] = ["FlextQualityScheduledMaintenance"]
 
 
 if __name__ == "__main__":
     cli.exit(FlextQualityScheduledMaintenance.main())
+
+__all__: list[str] = ["FlextQualityScheduledMaintenance"]

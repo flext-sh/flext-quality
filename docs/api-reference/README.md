@@ -30,6 +30,6 @@ This section is generated from public exports and real docstrings.
 - Primary facades: `FlextQuality`, `FlextQualityBaseHook`,
   `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
   `FlextQualityCodeExecutionBridge` (+26 more)
-- Generated module pages: `35`
+- Generated module pages: `8`
 
 Back to [project docs](../index.md).

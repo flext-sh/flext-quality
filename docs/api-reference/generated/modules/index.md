@@ -2,12 +2,17 @@
 
 <!-- TOC START -->
 
-- No sections found
-
 <!-- TOC END -->
 
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 These pages are generated from public modules and their docstrings.
 
-_No public modules discovered._
+- [flext_quality.api](api.md)
+- [flext_quality.base](base.md)
+- [flext_quality.cli](cli.md)
+- [flext_quality.constants](constants.md)
+- [flext_quality.models](models.md)
+- [flext_quality.protocols](protocols.md)
+- [flext_quality.typings](typings.md)
+- [flext_quality.utilities](utilities.md)

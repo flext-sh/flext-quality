@@ -1,0 +1,13 @@
+rules:
+  - id: quality-document-runtime-dependencies
+    description: Keep the package scope guide aligned with the generated runtime profile.
+    include: [AGENTS.md]
+    find: '^\*\*Package:\*\* `flext_quality` · deps: `flext-api`, `flext-cli`, `flext-core`,\n`flext-infra`, `flext-web`$'
+    replace: '**Package:** `flext_quality` · deps: `flext-api`, `flext-cli`, `flext-core`, `flext-web`'
+    flags: [MULTILINE]
+  - id: quality-document-infra-development-tool
+    description: Explain the remaining development-only Infra dependency.
+    include: [AGENTS.md]
+    find: '^One of the few packages that legitimately depends on `flext-infra`\.$'
+    replace: 'Code generation and project checks consume `flext-infra` as a development tool.'
+    flags: [MULTILINE]

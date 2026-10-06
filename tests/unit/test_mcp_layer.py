@@ -4,6 +4,9 @@ The configured FastMCP decorator mode returns the original underlying
 function from ``@_mcp.tool()``/``@_mcp.resource(...)`` (registration happens
 as a side effect), so each tool/resource is exercised by calling the class
 attribute directly — the real production callable, never a mock.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -32,13 +35,15 @@ _MCP_CLI_AVAILABLE = shutil.which("mcp-cli") is not None
 class TestsFlextQualityMcpServer:
     """Contract tests for the shared FastMCP server singleton."""
 
-    def test_get_server_returns_the_same_instance(self) -> None:
+    @staticmethod
+    def test_get_server_returns_the_same_instance() -> None:
         """Repeated lookups return the identical FastMCP server instance."""
         first = FlextQualityMcpServer.resolve_server()
         second = FlextQualityMcpServer.resolve_server()
         tm.that(first is second, eq=True)
 
-    def test_get_server_exposes_configured_name(self) -> None:
+    @staticmethod
+    def test_get_server_exposes_configured_name() -> None:
         """The server carries the configured flext-quality identity."""
         server = FlextQualityMcpServer.resolve_server()
         tm.that(server.name, eq="flext-quality")
@@ -47,7 +52,8 @@ class TestsFlextQualityMcpServer:
 class TestsFlextQualityMcpTools:
     """Contract tests for MCP tool functions registered on the shared server."""
 
-    def test_search_memory_builds_command_payload(self) -> None:
+    @staticmethod
+    def test_search_memory_builds_command_payload() -> None:
         """search_memory returns a command payload for the memory client."""
         output = FlextQualityMcpTools.search_memory(query="find this")
         tm.that(output, is_=dict)
@@ -60,10 +66,13 @@ class TestsFlextQualityMcpTools:
         assert isinstance(params, dict)
         tm.that(params.get("search_type"), eq="observations")
 
-    def test_search_memory_honors_explicit_search_type_and_limit(self) -> None:
+    @staticmethod
+    def test_search_memory_honors_explicit_search_type_and_limit() -> None:
         """Explicit search_type and limit are threaded into the tool output."""
         output = FlextQualityMcpTools.search_memory(
-            query="find this", search_type="entities", limit=3
+            query="find this",
+            search_type="entities",
+            limit=3,
         )
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
@@ -73,7 +82,8 @@ class TestsFlextQualityMcpTools:
         tm.that(params.get("search_type"), eq="entities")
         tm.that(params.get("limit"), eq=3)
 
-    def test_search_code_builds_command_payload(self) -> None:
+    @staticmethod
+    def test_search_code_builds_command_payload() -> None:
         """search_code returns a command payload for the claude-context client."""
         output = FlextQualityMcpTools.search_code(query="def foo")
         tm.that(output, is_=dict)
@@ -83,7 +93,8 @@ class TestsFlextQualityMcpTools:
         tm.that(output.get("server"), eq="claude-context")
         tm.that(output, has="command")
 
-    def test_search_code_honors_explicit_limit(self) -> None:
+    @staticmethod
+    def test_search_code_honors_explicit_limit() -> None:
         """An explicit limit is threaded into the search_code tool output."""
         output = FlextQualityMcpTools.search_code(query="def foo", limit=7)
         if not _MCP_CLI_AVAILABLE:
@@ -93,21 +104,25 @@ class TestsFlextQualityMcpTools:
         assert isinstance(params, dict)
         tm.that(params.get("limit"), eq=7)
 
-    def test_execute_hook_reports_continue_for_unregistered_event(self) -> None:
+    @staticmethod
+    def test_execute_hook_reports_continue_for_unregistered_event() -> None:
         """execute_hook with no registered hooks continues by default."""
         output = FlextQualityMcpTools.execute_hook(
-            event="PreToolUse", input_data={"tool_name": "Edit"}
+            event="PreToolUse",
+            input_data={"tool_name": "Edit"},
         )
         tm.that(output, is_=dict)
         tm.that(output.get("continue"), eq=True)
 
-    def test_execute_hook_reports_error_for_unknown_event(self) -> None:
+    @staticmethod
+    def test_execute_hook_reports_error_for_unknown_event() -> None:
         """execute_hook surfaces an error payload for an unknown event name."""
         output = FlextQualityMcpTools.execute_hook(event="NotARealEvent", input_data={})
         tm.that(output, has="error")
 
+    @staticmethod
     def test_validate_rules_reports_violations_for_a_real_path(
-        self, tmp_path: Path
+        tmp_path: Path,
     ) -> None:
         """validate_rules runs the real rules engine against a target path.
 
@@ -125,19 +140,22 @@ class TestsFlextQualityMcpTools:
 class TestsFlextQualityMcpResources:
     """Contract tests for MCP resource functions registered on the server."""
 
-    def test_get_hooks_config_returns_json_object(self) -> None:
+    @staticmethod
+    def test_get_hooks_config_returns_json_object() -> None:
         """read_hooks_config renders the hook manager's empty config as JSON."""
         output = FlextQualityMcpResources.read_hooks_config()
         tm.that(output, is_=str)
         tm.that(output.strip(), eq="{}")
 
-    def test_get_rules_config_returns_json_array(self) -> None:
+    @staticmethod
+    def test_get_rules_config_returns_json_array() -> None:
         """read_rules_config renders the (empty, unloaded) rule set as JSON."""
         output = FlextQualityMcpResources.read_rules_config()
         tm.that(output, is_=str)
         tm.that(output.strip(), eq="[]")
 
-    def test_get_integrations_status_reports_both_clients(self) -> None:
+    @staticmethod
+    def test_get_integrations_status_reports_both_clients() -> None:
         """read_integrations_status reports health for both MCP integrations."""
         output = FlextQualityMcpResources.read_integrations_status()
         tm.that(output, is_=str)

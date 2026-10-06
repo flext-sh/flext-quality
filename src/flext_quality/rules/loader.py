@@ -1,4 +1,8 @@
-"""Rules loader for YAML rule definitions."""
+"""Rules loader for YAML rule definitions.
+
+Copyright (c) 2026 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -15,19 +19,23 @@ class FlextQualityRulesLoader:
     """Loads rules from YAML files."""
 
     def load(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
-        """Load rules from YAML file."""
+        """Load rules from YAML file.
+
+        Returns:
+            The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
+        """
         if not path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Rules file not found: {path}"
+                f"Rules file not found: {path}",
             )
         yaml_result = u.Cli.yaml_safe_load(path)
         if yaml_result.failure:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Failed to parse YAML: {yaml_result.error}"
+                f"Failed to parse YAML: {yaml_result.error}",
             )
         parsed = yaml_result.value
         validations: list[tuple[bool, str]] = [
-            (not isinstance(parsed, dict), "Invalid YAML: expected dict at root")
+            (not isinstance(parsed, dict), "Invalid YAML: expected dict at root"),
         ]
         for failed, msg in validations:
             if failed:
@@ -36,17 +44,17 @@ class FlextQualityRulesLoader:
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                "Invalid YAML: 'rules' must be a list"
+                "Invalid YAML: 'rules' must be a list",
             )
         rules_data: t.SequenceOf[t.JsonMapping] = (
-            t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
-                rules_data_val
+            u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+                rules_data_val,
             )
         )
         rules: MutableSequence[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_data):
             rule_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
-                dict(rule_data)
+                dict(rule_data),
             )
             result = self._parse_rule(rule_dict, idx)
             if result.failure:
@@ -55,23 +63,34 @@ class FlextQualityRulesLoader:
         return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
 
     def load_multiple(
-        self, paths: t.SequenceOf[Path]
+        self,
+        paths: t.SequenceOf[Path],
     ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
-        """Load rules from multiple YAML files."""
+        """Load rules from multiple YAML files.
+
+        Returns:
+            The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
+        """
         all_rules: MutableSequence[m.Quality.RuleDefinition] = []
         for path in paths:
             result = self.load(path)
             if result.failure:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
-                    f"Error loading {path}: {result.error}"
+                    f"Error loading {path}: {result.error}",
                 )
             all_rules.extend(result.value)
         return r[Sequence[m.Quality.RuleDefinition]].ok(all_rules)
 
+    @staticmethod
     def _parse_rule(
-        self, data: t.JsonMapping, index: int
+        data: t.JsonMapping,
+        index: int,
     ) -> p.Result[m.Quality.RuleDefinition]:
-        """Parse a single rule from dict."""
+        """Parse a single rule from dict.
+
+        Returns:
+            The resulting ``p.Result[m.Quality.RuleDefinition]``.
+        """
         name = data.get("name")
         rule_type_str = data.get("type")
         validations: list[tuple[bool, str]] = [
@@ -86,7 +105,7 @@ class FlextQualityRulesLoader:
         except ValueError:
             valid_types = [m.value for m in c.Quality.RuleType.__members__.values()]
             return r[m.Quality.RuleDefinition].fail(
-                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}"
+                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}",
             )
         description = data.get("description", "")
         action = data.get("action", "warn")
