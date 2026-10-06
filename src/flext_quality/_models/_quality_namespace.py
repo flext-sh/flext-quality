@@ -11,3 +11,15 @@ class _QualityNamespace(m.BaseModel):
     """
 
     model_config = m.ConfigDict(extra="allow", frozen=True)
+
+
+def quality_namespace() -> _QualityNamespace:
+    """Build the open, frozen ``Quality`` config namespace instance.
+
+    Returns:
+        The resulting ``_QualityNamespace``.
+    """
+    return _QualityNamespace()
+
+
+__all__: list[str] = ["_QualityNamespace", "quality_namespace"]

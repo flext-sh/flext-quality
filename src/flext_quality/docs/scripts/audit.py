@@ -807,10 +807,21 @@ class FlextQualityDocumentationAuditor:
         }.items():
             html = html.replace(f"${name}", str(value))
         for issue in self.results.issues:
-            severity_class = f"severity-{issue.get('severity', 'info')}"
-            type_str = str(issue.get("type", ""))
-            sev_str = str(issue.get("severity", ""))
-            html += f"""
+            html += FlextQualityDocumentationAuditor._render_issue_row(issue)
+        html += "\n    </div>\n</body>\n</html>\n"
+        return html
+
+    @staticmethod
+    def _render_issue_row(issue: t.JsonMapping) -> str:
+        """Render one audit issue as an HTML block.
+
+        Returns:
+            The resulting ``str``.
+        """
+        severity_class = f"severity-{issue.get('severity', 'info')}"
+        type_str = str(issue.get("type", ""))
+        sev_str = str(issue.get("severity", ""))
+        html = f"""
                     <div class="issue {severity_class}">
                         <h4>{type_str.replace("_", " ").title()}
                         ({sev_str.upper()})</h4>
@@ -818,19 +829,18 @@ class FlextQualityDocumentationAuditor:
                         <p><strong>Recommendation:</strong>
                         {issue.get("recommendation", "N/A")}</p>
             """
-            if "age_days" in issue:
-                html += f"<p><strong>Age:</strong> {issue['age_days']} days</p>"
-            if "word_count" in issue:
-                html += f"<p><strong>Word Count:</strong> {issue['word_count']}</p>"
-            if "status_code" in issue:
-                html += f"<p><strong>Status Code:</strong> {issue['status_code']}</p>"
-            if "url" in issue:
-                html += (
-                    "<p><strong>URL:</strong> "
-                    f"<a href='{issue['url']}'>{issue['url']}</a></p>"
-                )
-            html += "</div>"
-        html += "\n    </div>\n</body>\n</html>\n"
+        if "age_days" in issue:
+            html += f"<p><strong>Age:</strong> {issue['age_days']} days</p>"
+        if "word_count" in issue:
+            html += f"<p><strong>Word Count:</strong> {issue['word_count']}</p>"
+        if "status_code" in issue:
+            html += f"<p><strong>Status Code:</strong> {issue['status_code']}</p>"
+        if "url" in issue:
+            html += (
+                "<p><strong>URL:</strong> "
+                f"<a href='{issue['url']}'>{issue['url']}</a></p>"
+            )
+        html += "</div>"
         return html
 
     @staticmethod

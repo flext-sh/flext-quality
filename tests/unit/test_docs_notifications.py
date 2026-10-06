@@ -283,6 +283,10 @@ class TestsFlextQualityDocumentationNotifier:
         tm.that(notifier.notify_monthly_report({}), eq=True)
         tm.that(notifier.results.notifications_sent, eq=1)
 
+
+class TestsFlextQualityDocumentationNotifierDelivery:
+    """Delivery and CLI-run contract tests for the notification system."""
+
     @staticmethod
     def test_send_notification_slack_rejects_non_allowlisted_target(
         tmp_path: Path,

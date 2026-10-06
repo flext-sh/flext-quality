@@ -201,60 +201,99 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``FlextQualityDocumentationReporter.SummaryMetrics``.
         """
-        overall_score = 0
-        total_issues = 0
-        files_analyzed = 0
-        links_checked = 0
-        optimizations_applied = 0
-        quality_trend = "unknown"
-
-        if self.audit_data and isinstance(self.audit_data, dict):
-            metrics = self.audit_data.get("metrics")
-            if isinstance(metrics, dict):
-                score = metrics.get("quality_score", 0)
-                if isinstance(score, int):
-                    overall_score = score
-            issues = self.audit_data.get("issues")
-            if isinstance(issues, list):
-                total_issues += len(issues)
-            files_analyzed_raw = self.audit_data.get("files_analyzed", 0)
-            if isinstance(files_analyzed_raw, int):
-                files_analyzed = max(files_analyzed, files_analyzed_raw)
-        if self.validation_data and isinstance(self.validation_data, dict):
-            link_validation = self.validation_data.get("link_validation")
-            if isinstance(link_validation, dict):
-                links_checked_raw = link_validation.get("links_checked", 0)
-                if isinstance(links_checked_raw, int):
-                    links_checked = links_checked_raw
-                errors = link_validation.get("errors")
-                if isinstance(errors, list):
-                    total_issues += len(errors)
-            content_validation = self.validation_data.get("content_validation")
-            if isinstance(content_validation, dict):
-                content_issues = content_validation.get("content_issues")
-                if isinstance(content_issues, list):
-                    total_issues += len(content_issues)
-        if self.optimization_data and isinstance(self.optimization_data, dict):
-            changes_made = self.optimization_data.get("changes_made", 0)
-            if isinstance(changes_made, int):
-                optimizations_applied = changes_made
-        if overall_score >= _QUALITY_SCORE_EXCELLENT:
-            quality_trend = "excellent"
-        elif overall_score >= _QUALITY_SCORE_GOOD:
-            quality_trend = "good"
-        elif overall_score >= _QUALITY_SCORE_ACCEPTABLE:
-            quality_trend = "needs_improvement"
-        else:
-            quality_trend = "critical"
+        overall_score, audit_issues = self._audit_summary_counts()
+        links_checked, validation_issues = self._validation_summary_counts()
+        optimizations_applied = self._optimization_summary_count()
+        total_issues = audit_issues + validation_issues
 
         return FlextQualityDocumentationReporter.SummaryMetrics(
             overall_score=overall_score,
             total_issues=total_issues,
-            files_analyzed=files_analyzed,
+            files_analyzed=self._files_analyzed_count(),
             links_checked=links_checked,
             optimizations_applied=optimizations_applied,
-            quality_trend=quality_trend,
+            quality_trend=self._quality_trend(overall_score),
         )
+
+    def _audit_summary_counts(self) -> tuple[int, int]:
+        """Extract the audit quality score and issue count.
+
+        Returns:
+            The resulting ``tuple[int, int]``.
+        """
+        if not self.audit_data or not isinstance(self.audit_data, dict):
+            return (0, 0)
+        score = 0
+        metrics = self.audit_data.get("metrics")
+        if isinstance(metrics, dict):
+            score_raw = metrics.get("quality_score", 0)
+            if isinstance(score_raw, int):
+                score = score_raw
+        issues = self.audit_data.get("issues")
+        issue_count = len(issues) if isinstance(issues, list) else 0
+        return (score, issue_count)
+
+    def _validation_summary_counts(self) -> tuple[int, int]:
+        """Extract the link-check count and validation issue count.
+
+        Returns:
+            The resulting ``tuple[int, int]``.
+        """
+        if not self.validation_data or not isinstance(self.validation_data, dict):
+            return (0, 0)
+        links_checked = 0
+        issue_count = 0
+        link_validation = self.validation_data.get("link_validation")
+        if isinstance(link_validation, dict):
+            links_checked_raw = link_validation.get("links_checked", 0)
+            if isinstance(links_checked_raw, int):
+                links_checked = links_checked_raw
+            errors = link_validation.get("errors")
+            if isinstance(errors, list):
+                issue_count += len(errors)
+        content_validation = self.validation_data.get("content_validation")
+        if isinstance(content_validation, dict):
+            content_issues = content_validation.get("content_issues")
+            if isinstance(content_issues, list):
+                issue_count += len(content_issues)
+        return (links_checked, issue_count)
+
+    def _optimization_summary_count(self) -> int:
+        """Extract the applied optimization change count.
+
+        Returns:
+            The resulting ``int``.
+        """
+        if not self.optimization_data or not isinstance(self.optimization_data, dict):
+            return 0
+        changes_made = self.optimization_data.get("changes_made", 0)
+        return changes_made if isinstance(changes_made, int) else 0
+
+    def _files_analyzed_count(self) -> int:
+        """Extract the analyzed file count from audit data.
+
+        Returns:
+            The resulting ``int``.
+        """
+        if not self.audit_data or not isinstance(self.audit_data, dict):
+            return 0
+        files_analyzed_raw = self.audit_data.get("files_analyzed", 0)
+        return files_analyzed_raw if isinstance(files_analyzed_raw, int) else 0
+
+    @staticmethod
+    def _quality_trend(overall_score: int) -> str:
+        """Classify an overall quality score into a trend label.
+
+        Returns:
+            The resulting ``str``.
+        """
+        if overall_score >= _QUALITY_SCORE_EXCELLENT:
+            return "excellent"
+        if overall_score >= _QUALITY_SCORE_GOOD:
+            return "good"
+        if overall_score >= _QUALITY_SCORE_ACCEPTABLE:
+            return "needs_improvement"
+        return "critical"
 
     @staticmethod
     def _analyze_trends() -> FlextQualityDocumentationReporter.TrendData | None:
@@ -277,120 +316,10 @@ class FlextQualityDocumentationReporter:
         recommendations: MutableSequence[
             FlextQualityDocumentationReporter.Recommendation
         ] = []
-        if self.audit_data and isinstance(self.audit_data, dict):
-            audit_issues = self.audit_data.get("issues")
-            if isinstance(audit_issues, list):
-                critical_issues: MutableSequence[Mapping[str, t.Primitives]] = [
-                    i
-                    for i in audit_issues
-                    if isinstance(i, dict) and i.get("severity") == "critical"
-                ]
-                if critical_issues:
-                    recommendations.append(
-                        FlextQualityDocumentationReporter.Recommendation(
-                            priority="critical",
-                            category="immediate_fixes",
-                            title=f"Fix {len(critical_issues)} Critical Issues",
-                            description=(
-                                "Address critical documentation issues immediately"
-                            ),
-                            actions=[
-                                "Review critical issues in audit report",
-                                "Prioritize fixes",
-                                "Re-run audit after fixes",
-                            ],
-                        ),
-                    )
-                outdated: MutableSequence[Mapping[str, t.Primitives]] = [
-                    i
-                    for i in audit_issues
-                    if isinstance(i, dict) and i.get("type") == "outdated_content"
-                ]
-                if outdated:
-                    recommendations.append(
-                        FlextQualityDocumentationReporter.Recommendation(
-                            priority="high",
-                            category="content_freshness",
-                            title=f"Update {len(outdated)} Outdated Documents",
-                            description=(
-                                "Review and update documentation that hasn't been "
-                                "modified recently"
-                            ),
-                            actions=[
-                                "Identify documents needing updates",
-                                "Review content accuracy",
-                                "Update timestamps and version info",
-                            ],
-                        ),
-                    )
-        if self.validation_data and isinstance(self.validation_data, dict):
-            link_validation = self.validation_data.get("link_validation")
-            if isinstance(link_validation, dict):
-                validation_errors_raw = link_validation.get("errors")
-                if not isinstance(validation_errors_raw, list):
-                    return recommendations
-                validation_errors_list: t.JsonList = list(validation_errors_raw)
-                if validation_errors_list:
-                    broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
-                    for e_raw in validation_errors_list:
-                        try:
-                            error_entry: t.JsonMapping = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                e_raw,
-                            )
-                        except c.EXC_TYPE_VALIDATION as exc:
-                            self.logger.warning(
-                                "Skipping unparsable validation error entry %s: %s",
-                                e_raw,
-                                exc,
-                            )
-                            continue
-                        error_type = error_entry.get("type")
-                        if error_type in {
-                            "broken_external_link",
-                            "broken_internal_link",
-                        }:
-                            normalized: t.MappingKV[str, t.Primitives] = {
-                                key: value
-                                for key, value in error_entry.items()
-                                if isinstance(value, c.PRIMITIVES_TYPES)
-                            }
-                            if normalized:
-                                broken_links.append(normalized)
-                    if broken_links:
-                        recommendations.append(
-                            FlextQualityDocumentationReporter.Recommendation(
-                                priority="high",
-                                category="link_maintenance",
-                                title=f"Fix {len(broken_links)} Broken Links",
-                                description=(
-                                    "Repair or remove broken internal and external "
-                                    "links"
-                                ),
-                                actions=[
-                                    "Review broken link report",
-                                    "Update or remove invalid URLs",
-                                    "Test links after fixes",
-                                ],
-                            ),
-                        )
-        if self.optimization_data and isinstance(self.optimization_data, dict):
-            optimizations = self.optimization_data.get("optimizations")
-            if not optimizations or (
-                isinstance(optimizations, list) and not optimizations
-            ):
-                recommendations.append(
-                    FlextQualityDocumentationReporter.Recommendation(
-                        priority="medium",
-                        category="automation_setup",
-                        title="Set Up Automated Optimization",
-                        description="Configure automated formatting and style fixes",
-                        actions=[
-                            "Set up pre-commit hooks",
-                            "Configure CI/CD optimization",
-                            "Schedule regular optimization runs",
-                        ],
-                    ),
-                )
+        self._append_audit_recommendations(recommendations)
+        if self._append_link_recommendations(recommendations):
+            return recommendations
+        self._append_optimization_recommendations(recommendations)
         if not recommendations:
             recommendations.append(
                 FlextQualityDocumentationReporter.Recommendation(
@@ -408,6 +337,159 @@ class FlextQualityDocumentationReporter:
                 ),
             )
         return recommendations
+
+    def _append_audit_recommendations(
+        self,
+        recommendations: MutableSequence[
+            FlextQualityDocumentationReporter.Recommendation
+        ],
+    ) -> None:
+        """Append audit-driven recommendations for critical and outdated issues."""
+        if not self.audit_data or not isinstance(self.audit_data, dict):
+            return
+        audit_issues = self.audit_data.get("issues")
+        if not isinstance(audit_issues, list):
+            return
+        critical_issues: MutableSequence[Mapping[str, t.Primitives]] = [
+            i
+            for i in audit_issues
+            if isinstance(i, dict) and i.get("severity") == "critical"
+        ]
+        if critical_issues:
+            recommendations.append(
+                FlextQualityDocumentationReporter.Recommendation(
+                    priority="critical",
+                    category="immediate_fixes",
+                    title=f"Fix {len(critical_issues)} Critical Issues",
+                    description=("Address critical documentation issues immediately"),
+                    actions=[
+                        "Review critical issues in audit report",
+                        "Prioritize fixes",
+                        "Re-run audit after fixes",
+                    ],
+                ),
+            )
+        outdated: MutableSequence[Mapping[str, t.Primitives]] = [
+            i
+            for i in audit_issues
+            if isinstance(i, dict) and i.get("type") == "outdated_content"
+        ]
+        if outdated:
+            recommendations.append(
+                FlextQualityDocumentationReporter.Recommendation(
+                    priority="high",
+                    category="content_freshness",
+                    title=f"Update {len(outdated)} Outdated Documents",
+                    description=(
+                        "Review and update documentation that hasn't been "
+                        "modified recently"
+                    ),
+                    actions=[
+                        "Identify documents needing updates",
+                        "Review content accuracy",
+                        "Update timestamps and version info",
+                    ],
+                ),
+            )
+
+    def _append_link_recommendations(
+        self,
+        recommendations: MutableSequence[
+            FlextQualityDocumentationReporter.Recommendation
+        ],
+    ) -> bool:
+        """Append a link-maintenance recommendation for collected broken links.
+
+        Returns:
+            The resulting ``bool``: ``True`` when recommendation collection
+            must abort early (malformed link-validation errors payload).
+        """
+        if not self.validation_data or not isinstance(self.validation_data, dict):
+            return False
+        link_validation = self.validation_data.get("link_validation")
+        if not isinstance(link_validation, dict):
+            return False
+        validation_errors_raw = link_validation.get("errors")
+        if not isinstance(validation_errors_raw, list):
+            return True
+        broken_links = self._collect_broken_link_entries(validation_errors_raw)
+        if not broken_links:
+            return False
+        recommendations.append(
+            FlextQualityDocumentationReporter.Recommendation(
+                priority="high",
+                category="link_maintenance",
+                title=f"Fix {len(broken_links)} Broken Links",
+                description=("Repair or remove broken internal and external links"),
+                actions=[
+                    "Review broken link report",
+                    "Update or remove invalid URLs",
+                    "Test links after fixes",
+                ],
+            ),
+        )
+        return False
+
+    def _collect_broken_link_entries(
+        self,
+        validation_errors_raw: list[t.JsonValue],
+    ) -> MutableSequence[Mapping[str, t.Primitives]]:
+        """Normalize link-validation error entries into broken-link mappings.
+
+        Returns:
+            The resulting ``MutableSequence[Mapping[str, t.Primitives]]``.
+        """
+        broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
+        for e_raw in validation_errors_raw:
+            try:
+                error_entry: t.JsonMapping = (
+                    u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(e_raw)
+                )
+            except c.EXC_TYPE_VALIDATION as exc:
+                self.logger.warning(
+                    "Skipping unparsable validation error entry %s: %s",
+                    e_raw,
+                    exc,
+                )
+                continue
+            error_type = error_entry.get("type")
+            if error_type in {
+                "broken_external_link",
+                "broken_internal_link",
+            }:
+                normalized: t.MappingKV[str, t.Primitives] = {
+                    key: value
+                    for key, value in error_entry.items()
+                    if isinstance(value, c.PRIMITIVES_TYPES)
+                }
+                if normalized:
+                    broken_links.append(normalized)
+        return broken_links
+
+    def _append_optimization_recommendations(
+        self,
+        recommendations: MutableSequence[
+            FlextQualityDocumentationReporter.Recommendation
+        ],
+    ) -> None:
+        """Append an automation-setup recommendation when optimizations are missing."""
+        if not self.optimization_data or not isinstance(self.optimization_data, dict):
+            return
+        optimizations = self.optimization_data.get("optimizations")
+        if not optimizations or (isinstance(optimizations, list) and not optimizations):
+            recommendations.append(
+                FlextQualityDocumentationReporter.Recommendation(
+                    priority="medium",
+                    category="automation_setup",
+                    title="Set Up Automated Optimization",
+                    description="Configure automated formatting and style fixes",
+                    actions=[
+                        "Set up pre-commit hooks",
+                        "Configure CI/CD optimization",
+                        "Schedule regular optimization runs",
+                    ],
+                ),
+            )
 
     def _generate_html_report(
         self,
@@ -676,47 +758,29 @@ class FlextQualityDocumentationReporter:
             FlextQualityDocumentationReporter.TrendEntry
         ] = []
         for report in reports:
-            date_val_raw = report.get("date")
-            if date_val_raw is None:
-                date_val_raw = report.get("timestamp", u.now())
-            date_val = date_val_raw if isinstance(date_val_raw, datetime) else u.now()
-            if "metrics" in report:
-                metrics = report.get("metrics")
-                if isinstance(metrics, dict):
-                    quality_score = metrics.get("quality_score")
-                    issues = report.get("issues")
-                    if isinstance(quality_score, int) and isinstance(issues, list):
-                        audit_trends.append(
-                            FlextQualityDocumentationReporter.TrendEntry(
-                                date=date_val,
-                                quality_score=quality_score,
-                                total_issues=len(issues),
-                            ),
-                        )
-            if "link_validation" in report:
-                link_validation = report.get("link_validation")
-                if isinstance(link_validation, dict):
-                    links_checked = link_validation.get("links_checked", 0)
-                    broken_links = link_validation.get("broken_links", 0)
-                    if isinstance(links_checked, int) and isinstance(broken_links, int):
-                        validation_trends.append(
-                            FlextQualityDocumentationReporter.TrendEntry(
-                                date=date_val,
-                                links_checked=links_checked,
-                                broken_links=broken_links,
-                            ),
-                        )
-            if "changes_made" in report:
-                changes_made = report.get("changes_made")
-                files_processed = report.get("files_processed", 0)
-                if isinstance(changes_made, int) and isinstance(files_processed, int):
-                    optimization_trends.append(
-                        FlextQualityDocumentationReporter.TrendEntry(
-                            date=date_val,
-                            changes_made=changes_made,
-                            files_processed=files_processed,
-                        ),
-                    )
+            date_val = FlextQualityDocumentationReporter._report_date(report)
+            audit_entry = FlextQualityDocumentationReporter._audit_trend_entry(
+                report,
+                date_val,
+            )
+            if audit_entry is not None:
+                audit_trends.append(audit_entry)
+            validation_entry = (
+                FlextQualityDocumentationReporter._validation_trend_entry(
+                    report,
+                    date_val,
+                )
+            )
+            if validation_entry is not None:
+                validation_trends.append(validation_entry)
+            optimization_entry = (
+                FlextQualityDocumentationReporter._optimization_trend_entry(
+                    report,
+                    date_val,
+                )
+            )
+            if optimization_entry is not None:
+                optimization_trends.append(optimization_entry)
 
         def _trend_entry_date(
             entry: FlextQualityDocumentationReporter.TrendEntry,
@@ -735,69 +799,90 @@ class FlextQualityDocumentationReporter:
         )
 
     @staticmethod
-    def _generate_trend_report(
-        trend_data: FlextQualityDocumentationReporter.TrendData | t.StrMapping,
-        days: int,
-    ) -> str:
-        """Generate trend analysis report.
+    def _report_date(
+        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+    ) -> datetime:
+        """Extract the report date, falling back to the current time.
 
         Returns:
-            The resulting ``str``.
+            The resulting ``datetime``.
         """
-        md = [
-            f"# Documentation Quality Trends - Last {days} Days",
-            "",
-            f"Generated: {u.now().isoformat()}",
-            "",
-        ]
-        if isinstance(trend_data, dict) and "error" in trend_data:
-            error_val = trend_data.get("error")
-            if isinstance(error_val, str):
-                md.extend([f"**Error:** {error_val}", ""])
-            return "\n".join(md)
-        if isinstance(trend_data, dict):
-            return "\n".join(md)
-        # trend_data is TrendData BaseModel
-        if not isinstance(trend_data, FlextQualityDocumentationReporter.TrendData):
-            return "\n".join(md)
-        typed_trend_data: FlextQualityDocumentationReporter.TrendData = trend_data
-        if typed_trend_data.audit_trends:
-            md.extend(["## Quality Score Trends", ""])
-            md.extend((
-                "| Date | Quality Score | Issues |",
-                "|------|---------------|--------|",
-            ))
-            for trend in typed_trend_data.audit_trends[-10:]:
-                date_str = trend.date.strftime("%Y-%m-%d")
-                md.append(
-                    f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |",
-                )
-            md.append("")
-        if typed_trend_data.validation_trends:
-            md.extend(["## Link Validation Trends", ""])
-            md.extend((
-                "| Date | Links Checked | Broken Links |",
-                "|------|---------------|--------------|",
-            ))
-            for trend in typed_trend_data.validation_trends[-10:]:
-                date_str = trend.date.strftime("%Y-%m-%d")
-                md.append(
-                    f"| {date_str} | {trend.links_checked} | {trend.broken_links} |",
-                )
-            md.append("")
-        if typed_trend_data.optimization_trends:
-            md.extend(["## Optimization Trends", ""])
-            md.extend((
-                "| Date | Files Processed | Changes Made |",
-                "|------|-----------------|--------------|",
-            ))
-            for trend in typed_trend_data.optimization_trends[-10:]:
-                date_str = trend.date.strftime("%Y-%m-%d")
-                md.append(
-                    f"| {date_str} | {trend.files_processed} | {trend.changes_made} |",
-                )
-            md.append("")
-        return "\n".join(md)
+        date_val_raw = report.get("date")
+        if date_val_raw is None:
+            date_val_raw = report.get("timestamp", u.now())
+        return date_val_raw if isinstance(date_val_raw, datetime) else u.now()
+
+    @staticmethod
+    def _audit_trend_entry(
+        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        date_val: datetime,
+    ) -> FlextQualityDocumentationReporter.TrendEntry | None:
+        """Build the audit trend entry for one historical report.
+
+        Returns:
+            The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+        """
+        if "metrics" not in report:
+            return None
+        metrics = report.get("metrics")
+        if not isinstance(metrics, dict):
+            return None
+        quality_score = metrics.get("quality_score")
+        issues = report.get("issues")
+        if not (isinstance(quality_score, int) and isinstance(issues, list)):
+            return None
+        return FlextQualityDocumentationReporter.TrendEntry(
+            date=date_val,
+            quality_score=quality_score,
+            total_issues=len(issues),
+        )
+
+    @staticmethod
+    def _validation_trend_entry(
+        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        date_val: datetime,
+    ) -> FlextQualityDocumentationReporter.TrendEntry | None:
+        """Build the link-validation trend entry for one historical report.
+
+        Returns:
+            The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+        """
+        if "link_validation" not in report:
+            return None
+        link_validation = report.get("link_validation")
+        if not isinstance(link_validation, dict):
+            return None
+        links_checked = link_validation.get("links_checked", 0)
+        broken_links = link_validation.get("broken_links", 0)
+        if not (isinstance(links_checked, int) and isinstance(broken_links, int)):
+            return None
+        return FlextQualityDocumentationReporter.TrendEntry(
+            date=date_val,
+            links_checked=links_checked,
+            broken_links=broken_links,
+        )
+
+    @staticmethod
+    def _optimization_trend_entry(
+        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        date_val: datetime,
+    ) -> FlextQualityDocumentationReporter.TrendEntry | None:
+        """Build the optimization trend entry for one historical report.
+
+        Returns:
+            The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+        """
+        if "changes_made" not in report:
+            return None
+        changes_made = report.get("changes_made")
+        files_processed = report.get("files_processed", 0)
+        if not (isinstance(changes_made, int) and isinstance(files_processed, int)):
+            return None
+        return FlextQualityDocumentationReporter.TrendEntry(
+            date=date_val,
+            changes_made=changes_made,
+            files_processed=files_processed,
+        )
 
     def save_report(
         self,

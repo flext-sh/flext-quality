@@ -143,6 +143,10 @@ class TestsFlextQualityIntegrations:
         tm.that(result.success, eq=True)
         tm.that(result.value.data, eq={"raw": "plain text output"})
 
+
+class TestsFlextQualityClaudeContextIntegrations:
+    """Contract tests for the ``FlextQualityClaudeContextClient`` integration."""
+
     # -- FlextQualityClaudeContextClient -----------------------------------
 
     @staticmethod
@@ -206,6 +210,10 @@ class TestsFlextQualityIntegrations:
         client = FlextQualityClaudeContextClient()
         result = client.health_check()
         tm.that(result.value.get("server"), eq="claude-context")
+
+
+class TestsFlextQualityClaudeMemIntegrations:
+    """Contract tests for the ``FlextQualityClaudeMemClient`` integration."""
 
     # -- FlextQualityClaudeMemClient ----------------------------------------
 

@@ -33,6 +33,9 @@ class FlextQualityConstantsValues:
         THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
         "Maximum broken links to show."
 
+        THRESHOLD_MAX_CRITICAL_ISSUES_TO_SHOW: Final[int] = 5
+        "Maximum critical issues to show in a notification."
+
         # ===== Quality Thresholds =====
         THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
         "Minimum headings for table of contents."

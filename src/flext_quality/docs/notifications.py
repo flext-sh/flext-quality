@@ -13,7 +13,7 @@ from __future__ import annotations
 import ipaddress
 import smtplib
 import socket
-from collections.abc import Mapping, MutableSequence
+from collections.abc import Callable, Mapping, MutableSequence
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -579,51 +579,96 @@ Timestamp: {u.now().isoformat()}
         response.raise_for_status()
 
     @staticmethod
+    def _relaxed_mapping(value: t.JsonValue) -> t.JsonMapping:
+        """Coerce an untrusted JSON value into a relaxed JSON mapping.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
+        if isinstance(value, Mapping):
+            return u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(value)
+        return {}
+
+    @staticmethod
+    def _severity_breakdown(severity: t.JsonMapping) -> t.MutableIntMapping:
+        """Normalize the severity breakdown counts from audit metrics.
+
+        Returns:
+            The resulting ``t.MutableIntMapping``.
+        """
+        breakdown: t.MutableIntMapping = {}
+        for key_name in ("critical", "high", "medium", "low"):
+            kv = severity.get(key_name, 0)
+            breakdown[key_name] = kv if isinstance(kv, int) else 0
+        return breakdown
+
+    @staticmethod
+    def _critical_issue_sample(
+        issues_val: t.JsonValue,
+    ) -> MutableSequence[t.JsonMapping]:
+        """Collect up to five critical issues from the raw audit issues list.
+
+        Returns:
+            The resulting ``MutableSequence[t.JsonMapping]``.
+        """
+        critical_issues: MutableSequence[t.JsonMapping] = []
+        if not isinstance(issues_val, list):
+            return critical_issues
+        issues_seq: t.SequenceOf[t.JsonMapping] = (
+            u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+                issues_val,
+            )
+        )
+        for i_m in issues_seq:
+            sev = i_m.get("severity")
+            if sev == c.Quality.NotificationPriority.CRITICAL.value:
+                critical_issues.append(i_m)
+                if (
+                    len(
+                        critical_issues,
+                    )
+                    >= c.Quality.THRESHOLD_MAX_CRITICAL_ISSUES_TO_SHOW
+                ):
+                    break
+        return critical_issues
+
+    @staticmethod
+    def _int_of(value: t.JsonValue) -> int:
+        """Coerce an untrusted JSON value into a non-negative int (default 0).
+
+        Returns:
+            The resulting ``int``.
+        """
+        return value if isinstance(value, int) else 0
+
+    @staticmethod
     def _format_critical_issues_message(audit_data: t.JsonMapping) -> str:
         """Format message for critical issues notification.
 
         Returns:
             The resulting ``str``.
         """
-        metrics_val = audit_data.get("metrics")
-        metrics: t.JsonMapping = (
-            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
-            if isinstance(metrics_val, Mapping)
-            else {}
+        metrics = FlextQualityDocumentationNotifier._relaxed_mapping(
+            audit_data.get("metrics"),
         )
-        severity_val = metrics.get("severity_breakdown")
-        severity: t.JsonMapping = (
-            u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
-            if isinstance(severity_val, Mapping)
-            else {}
+        severity = FlextQualityDocumentationNotifier._relaxed_mapping(
+            metrics.get("severity_breakdown"),
         )
-        severity_breakdown: t.MutableIntMapping = {}
-        for key_name in ("critical", "high", "medium", "low"):
-            kv = severity.get(key_name, 0)
-            severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
-
-        issues_val = audit_data.get("issues")
-        critical_issues: MutableSequence[t.JsonMapping] = []
-        if isinstance(issues_val, list):
-            issues_seq: t.SequenceOf[t.JsonMapping] = (
-                u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
-                    issues_val,
-                )
-            )
-            for i_m in issues_seq:
-                sev = i_m.get("severity")
-                if sev == c.Quality.NotificationPriority.CRITICAL.value:
-                    critical_issues.append(i_m)
-                    max_critical_issues = 5
-                    if len(critical_issues) >= max_critical_issues:
-                        break
-
-        qs_v = metrics.get("quality_score", 0)
-        quality_score: int = qs_v if isinstance(qs_v, int) else 0
-        fa_v = audit_data.get("files_analyzed", 0)
-        files_analyzed: int = fa_v if isinstance(fa_v, int) else 0
-        ti_v = metrics.get("total_issues", 0)
-        total_issues: int = ti_v if isinstance(ti_v, int) else 0
+        severity_breakdown = FlextQualityDocumentationNotifier._severity_breakdown(
+            severity,
+        )
+        critical_issues = FlextQualityDocumentationNotifier._critical_issue_sample(
+            audit_data.get("issues"),
+        )
+        quality_score: int = FlextQualityDocumentationNotifier._int_of(
+            metrics.get("quality_score", 0),
+        )
+        files_analyzed: int = FlextQualityDocumentationNotifier._int_of(
+            audit_data.get("files_analyzed", 0),
+        )
+        total_issues: int = FlextQualityDocumentationNotifier._int_of(
+            metrics.get("total_issues", 0),
+        )
 
         message = f"""
 CRITICAL DOCUMENTATION ISSUES DETECTED
@@ -764,60 +809,106 @@ Found {len(broken_links)} broken links that need attention:
             """
             notifier = FlextQualityDocumentationNotifier(self.settings_path)
             if self.test:
-                notifier.send_notification(
-                    "Test Notification",
-                    (
-                        "This is a test notification from the FLEXT Quality "
-                        "Documentation System.\n\nIf you received this, the "
-                        "notification system is working correctly."
-                    ),
-                    c.Quality.NotificationPriority.INFO.value,
-                )
-                return r[bool].ok(value=True)
+                return self._execute_test(notifier)
             if self.audit_data:
-                audit_read = u.Cli.files_read_text(Path(self.audit_data))
-                if audit_read.failure:
-                    return r[bool].from_failure(audit_read)
-                audit_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    audit_read.value,
-                )
-                _ = notifier.notify_critical_issues(audit_data)
-                issues_raw = audit_data.get("issues")
-                broken_links: MutableSequence[t.JsonValue] = []
-                if isinstance(issues_raw, (list, tuple)):
-                    issues_seq: t.SequenceOf[t.JsonValue] = issues_raw
-                    for i_raw in issues_seq:
-                        if isinstance(i_raw, Mapping):
-                            type_val = i_raw.get("type", "")
-                            if "broken" in str(type_val).lower():
-                                broken_links.append(dict(i_raw))
-                if broken_links:
-                    _ = notifier.notify_broken_links(broken_links)
-                return r[bool].ok(value=True)
+                return self._execute_audit(notifier)
             if self.weekly_report:
-                weekly_read = u.Cli.files_read_text(Path(self.weekly_report))
-                if weekly_read.failure:
-                    return r[bool].from_failure(weekly_read)
-                report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    weekly_read.value,
+                return self._execute_report(
+                    Path(self.weekly_report),
+                    notifier.notify_weekly_report,
                 )
-                _ = notifier.notify_weekly_report(report_data)
-                return r[bool].ok(value=True)
             if self.monthly_report:
-                monthly_read = u.Cli.files_read_text(Path(self.monthly_report))
-                if monthly_read.failure:
-                    return r[bool].from_failure(monthly_read)
-                report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    monthly_read.value,
+                return self._execute_report(
+                    Path(self.monthly_report),
+                    notifier.notify_monthly_report,
                 )
-                _ = notifier.notify_monthly_report(report_data)
-                return r[bool].ok(value=True)
             return r[bool].fail(
                 (
                     "No action selected (use --test, --audit-data, --weekly-report or "
                     "--monthly-report)"
                 ),
             )
+
+        @staticmethod
+        def _execute_test(
+            notifier: FlextQualityDocumentationNotifier,
+        ) -> p.Result[bool]:
+            """Send the built-in test notification.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
+            notifier.send_notification(
+                "Test Notification",
+                (
+                    "This is a test notification from the FLEXT Quality "
+                    "Documentation System.\n\nIf you received this, the "
+                    "notification system is working correctly."
+                ),
+                c.Quality.NotificationPriority.INFO.value,
+            )
+            return r[bool].ok(value=True)
+
+        def _execute_audit(
+            self,
+            notifier: FlextQualityDocumentationNotifier,
+        ) -> p.Result[bool]:
+            """Run the audit-data notification pipeline.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
+            audit_read = u.Cli.files_read_text(Path(self.audit_data))
+            if audit_read.failure:
+                return r[bool].from_failure(audit_read)
+            audit_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                audit_read.value,
+            )
+            _ = notifier.notify_critical_issues(audit_data)
+            broken_links = self._collect_broken_links(audit_data)
+            if broken_links:
+                _ = notifier.notify_broken_links(broken_links)
+            return r[bool].ok(value=True)
+
+        @staticmethod
+        def _collect_broken_links(
+            audit_data: t.JsonMapping,
+        ) -> MutableSequence[t.JsonValue]:
+            """Collect broken-link issues from audit data.
+
+            Returns:
+                The resulting ``MutableSequence[t.JsonValue]``.
+            """
+            broken_links: MutableSequence[t.JsonValue] = []
+            issues_raw = audit_data.get("issues")
+            if not isinstance(issues_raw, (list, tuple)):
+                return broken_links
+            issues_seq: t.SequenceOf[t.JsonValue] = issues_raw
+            for i_raw in issues_seq:
+                if isinstance(i_raw, Mapping):
+                    type_val = i_raw.get("type", "")
+                    if "broken" in str(type_val).lower():
+                        broken_links.append(dict(i_raw))
+            return broken_links
+
+        @staticmethod
+        def _execute_report(
+            report_path: Path,
+            notify: Callable[[t.JsonMapping], bool],
+        ) -> p.Result[bool]:
+            """Load a report JSON file and dispatch its notification.
+
+            Returns:
+                The resulting ``p.Result[bool]``.
+            """
+            report_read = u.Cli.files_read_text(report_path)
+            if report_read.failure:
+                return r[bool].from_failure(report_read)
+            report_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                report_read.value,
+            )
+            _ = notify(report_data)
+            return r[bool].ok(value=True)
 
     @staticmethod
     def _run_handler(params: FlextQualityDocumentationNotifier.Run) -> p.Result[bool]:

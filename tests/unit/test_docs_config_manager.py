@@ -16,6 +16,8 @@ from flext_tests import tm
 
 from flext_quality import FlextQualityConfigManager, t, u
 
+_MIN_EXPECTED_MISSING_FILE_ISSUES = 3
+
 
 class TestsFlextQualityConfigManager:
     """Contract tests for the documentation configuration manager."""
@@ -79,7 +81,7 @@ class TestsFlextQualityConfigManager:
         """Validation reports every required settings file that is absent."""
         manager = FlextQualityConfigManager(tmp_path)
         issues = manager.validate_configs()
-        tm.that(len(issues) >= 3, eq=True)
+        tm.that(len(issues) >= _MIN_EXPECTED_MISSING_FILE_ISSUES, eq=True)
         tm.that(any("audit_rules.yaml" in issue for issue in issues), eq=True)
 
     @staticmethod
