@@ -11,11 +11,12 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import MutableMapping, MutableSequence
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 from flext_web import FlextWebModels as _WebModels
 
-from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
+if TYPE_CHECKING:
+    from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
 
 
 class FlextQualityModelsPart01(_WebModels):
