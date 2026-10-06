@@ -10,7 +10,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_core import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality.docs import core, scripts, tools
@@ -44,26 +44,23 @@ __all__: tuple[str, ...] = (
     "tools",
 )
 
-_LAZY_IMPORTS = MappingProxyType(
-    build_lazy_import_map(
-        MappingProxyType({
-            ".core": ("core",),
-            ".core.config_manager": ("FlextQualityConfigManager",),
-            ".dashboard": ("FlextQualityDocumentationDashboard",),
-            ".notifications": ("FlextQualityDocumentationNotifier",),
-            ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
-            ".scripts": ("scripts",),
-            ".scripts.audit": ("FlextQualityDocumentationAuditor",),
-            ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
-            ".scripts.report": ("FlextQualityDocumentationReporter",),
-            ".scripts.validate": ("FlextQualityDocumentationValidator",),
-            ".tools": ("tools",),
-            ".tools.link_checker": ("FlextQualityLinkChecker",),
-            ".tools.style_validator": ("FlextQualityStyleValidator",),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
-    ),
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "FlextQualityConfigManager": ".core.config_manager",
+        "FlextQualityDocumentationAuditor": ".scripts.audit",
+        "FlextQualityDocumentationDashboard": ".dashboard",
+        "FlextQualityDocumentationNotifier": ".notifications",
+        "FlextQualityDocumentationOptimizer": ".scripts.optimize",
+        "FlextQualityDocumentationReporter": ".scripts.report",
+        "FlextQualityDocumentationValidator": ".scripts.validate",
+        "FlextQualityLinkChecker": ".tools.link_checker",
+        "FlextQualityScheduledMaintenance": ".scheduled_maintenance",
+        "FlextQualityStyleValidator": ".tools.style_validator",
+        "core": ".core",
+        "scripts": ".scripts",
+        "tools": ".tools",
+    }),
+    public_exports=__all__,
 )
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
