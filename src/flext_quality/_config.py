@@ -16,7 +16,7 @@ from flext_cli import FlextCliConfig
 
 from flext_core import FlextSettings
 from flext_quality import m
-from flext_quality._models._quality_namespace import _QualityNamespace
+from flext_quality._models import QualityNamespace
 
 
 class FlextQualityConfig(FlextSettings, FlextCliConfig):
@@ -41,11 +41,11 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     __hash__ = object.__hash__
 
     Quality: Annotated[
-        _QualityNamespace,
+        QualityNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = _QualityNamespace()
+    ] = QualityNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

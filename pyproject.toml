@@ -402,6 +402,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 extend-exclude = [
+  "**/.archive/**",
   "**/.agents/aihub-hooks/**",
   "**/.claude/aihub-hooks/**",
   "**/.codex/aihub-hooks/**",
