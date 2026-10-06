@@ -46,11 +46,11 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     __hash__ = object.__hash__
 
     Quality: Annotated[
-        _QualityNamespace,
+        flext_quality._models._quality_namespace._QualityNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = _QualityNamespace()
+    ] = flext_quality._models._quality_namespace._QualityNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

@@ -10,7 +10,7 @@ from __future__ import annotations
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from flext_core import build_lazy_import_map, install_lazy_exports
+from flext_core import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality.integrations.claude_context import (
@@ -30,17 +30,14 @@ __all__: tuple[str, ...] = (
     "FlextQualityMcpClient",
 )
 
-_LAZY_IMPORTS = MappingProxyType(
-    build_lazy_import_map(
-        MappingProxyType({
-            ".claude_context": ("FlextQualityClaudeContextClient",),
-            ".claude_mem": ("FlextQualityClaudeMemClient",),
-            ".code_execution": ("FlextQualityCodeExecutionBridge",),
-            ".mcp_client": ("FlextQualityMcpClient",),
-        }),
-        alias_groups=MappingProxyType({}),
-        sort_keys=False,
-    ),
+install_lazy_exports(
+    __name__,
+    globals(),
+    MappingProxyType({
+        "FlextQualityClaudeContextClient": ".claude_context",
+        "FlextQualityClaudeMemClient": ".claude_mem",
+        "FlextQualityCodeExecutionBridge": ".code_execution",
+        "FlextQualityMcpClient": ".mcp_client",
+    }),
+    public_exports=__all__,
 )
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, public_exports=__all__)
