@@ -14,14 +14,9 @@ from typing import Annotated, Self
 
 from flext_cli import FlextCliConfig
 
+import flext_quality._models._quality_namespace
 from flext_core import FlextSettings
 from flext_quality import m
-
-
-class _QualityNamespace(m.BaseModel):
-    """Open, frozen namespace exposing every ``config/*.yaml`` domain model-less."""
-
-    model_config = m.ConfigDict(extra="allow", frozen=True)
 
 
 class FlextQualityConfig(FlextSettings, FlextCliConfig):
@@ -46,11 +41,11 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     __hash__ = object.__hash__
 
     Quality: Annotated[
-        _QualityNamespace,
+        flext_quality._models._quality_namespace._QualityNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = _QualityNamespace()
+    ] = flext_quality._models._quality_namespace._QualityNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

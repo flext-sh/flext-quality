@@ -10,13 +10,12 @@
 
 <!-- AIHUB-AGENTS-SCOPE-LOCAL-BEGIN -->
 
-**Package:** `flext_quality` · deps: `flext-api`, `flext-cli`, `flext-core`,
-`flext-infra`, `flext-web`
+**Package:** `flext_quality` · deps: `flext-api`, `flext-cli`, `flext-core`, `flext-web`
 
 ## Overview
 
 Unified orchestration platform for Claude Code / agent tooling and quality workflows.
-One of the few packages that legitimately depends on `flext-infra`.
+Code generation and project checks consume `flext-infra` as a development tool.
 
 ## Structure
 
