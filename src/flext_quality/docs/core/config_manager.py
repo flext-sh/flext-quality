@@ -177,13 +177,18 @@ class FlextQualityConfigManager:
         """Configuration for audit rules and thresholds."""
 
         link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=lambda: MappingProxyType({}),
+            description="Link-check rules and thresholds for the documentation audit.",
         )
         style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=lambda: MappingProxyType({}),
+            description="Style-check rules and thresholds for the documentation audit.",
         )
         accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
+            u.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Accessibility-check rules and thresholds for the audit.",
+            )
         )
 
         def get_threshold(
@@ -255,19 +260,30 @@ class FlextQualityConfigManager:
         """Configuration for validation operations."""
 
         content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=lambda: MappingProxyType({}),
+            description="Content validation options and their configured values.",
         )
         image_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=dict,
+            default_factory=lambda: MappingProxyType({}),
+            description="Image validation options and their configured values.",
         )
         accessibility_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
+            u.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Accessibility validation options and their values.",
+            )
         )
         security_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
+            u.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Security validation options and their configured values.",
+            )
         )
         performance_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
-            u.Field(default_factory=dict)
+            u.Field(
+                default_factory=lambda: MappingProxyType({}),
+                description="Performance validation options and their values.",
+            )
         )
 
         def get_link_setting(

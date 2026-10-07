@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import MutableMapping, MutableSequence
+from types import MappingProxyType
 from typing import TYPE_CHECKING, Annotated
 
 from flext_web import FlextWebModels as _WebModels
@@ -33,7 +34,7 @@ class FlextQualityModelsPart01(_WebModels):
                 description="Total number of documentation issues found by the audit.",
             )
             severity_breakdown: t.MutableIntMapping = _WebModels.Field(
-                default_factory=dict,
+                default_factory=lambda: MappingProxyType[str, int]({}),
                 description=(
                     "Count of issues found for each severity level (e.g. critical, "
                     "high, medium, low)."

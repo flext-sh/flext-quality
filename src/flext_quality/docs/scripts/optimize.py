@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Final, override
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
+from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
@@ -554,20 +555,17 @@ class FlextQualityDocumentationOptimizer:
         output_dir = Path(output_path)
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"optimization_report_{timestamp}.json"
-        filepath = output_dir / filename
         report_content = self.generate_report("json")
-        report_write = u.Cli.atomic_write_text_file(filepath, report_content)
-        if report_write.failure:
-            return r[str].from_failure(report_write)
-        latest_file = output_dir / "latest_optimization.json"
-        latest_write = u.Cli.json_write(
-            latest_file,
+        written = FlextQualityDocumentationReporter.write_report_and_latest(
+            output_dir,
+            filename,
+            "latest_optimization.json",
+            report_content,
             self.results,
-            options=m.Cli.JsonWriteOptions(indent=2),
         )
-        if latest_write.failure:
-            return r[str].from_failure(latest_write)
-        return r[str].ok(str(filepath))
+        if written.failure:
+            return r[str].from_failure(written)
+        return r[str].ok(written.value)
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""

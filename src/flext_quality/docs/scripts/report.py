@@ -129,6 +129,33 @@ class FlextQualityDocumentationReporter:
         self.reports_dir.mkdir(parents=True, exist_ok=True)
         self.load_latest_reports()
 
+    @staticmethod
+    def write_report_and_latest(
+        output_dir: Path,
+        filename: str,
+        latest_filename: str,
+        report_content: str,
+        results: t.MappingKV[str, u.Quality.DocumentationReportValue],
+    ) -> p.Result[str]:
+        """Write the timestamped report plus the latest pointer for one lane.
+
+        Returns:
+            The resulting ``p.Result[str]`` carrying the written report path.
+
+        """
+        filepath = output_dir / filename
+        report_write = u.Cli.atomic_write_text_file(filepath, report_content)
+        if report_write.failure:
+            return r[str].from_failure(report_write)
+        latest_write = u.Cli.json_write(
+            output_dir / latest_filename,
+            results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        )
+        if latest_write.failure:
+            return r[str].from_failure(latest_write)
+        return r[str].ok(str(filepath))
+
     def load_latest_reports(self) -> None:
         """Load the most recent audit, validation, and optimization reports."""
         self.audit_data = self._load_json_report("latest_audit.json")
