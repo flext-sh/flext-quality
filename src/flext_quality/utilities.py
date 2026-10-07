@@ -11,7 +11,7 @@ import sys
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
-from flext_web import FlextWebTypes, FlextWebUtilities as u
+from flext_web import FlextWebUtilities as u, t as web_t
 
 from flext_core import FlextResult as r
 from flext_quality import (
@@ -28,12 +28,12 @@ if TYPE_CHECKING:
 class FlextQualityUtilities(u):
     """Namespace for flext-quality utilities."""
 
-    DocumentationReportValue = FlextWebTypes.JsonMapping
+    DocumentationReportValue = web_t.JsonMapping
 
     class Quality:
         """Quality-specific utilities namespace."""
 
-        DocumentationReportValue = FlextWebTypes.JsonMapping
+        DocumentationReportValue = web_t.JsonMapping
 
         RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = (
             u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
@@ -53,7 +53,7 @@ class FlextQualityUtilities(u):
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
         ] = u.type_adapter(
-            t.MappingKV[str, FlextWebTypes.JsonMapping],
+            t.MappingKV[str, web_t.JsonMapping],
         )
 
         @staticmethod
