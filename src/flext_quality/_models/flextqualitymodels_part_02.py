@@ -577,8 +577,12 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                     "Detailed results for links that produced a non-fatal warning."
                 ),
             )
-            performance: FlextQualityModelsPart02.Quality.LinkPerformanceMetrics = _WebModels.Field(
-                description="Measured timing performance of the link validation run.",
+            performance: FlextQualityModelsPart02.Quality.LinkPerformanceMetrics = (
+                _WebModels.Field(
+                    description=(
+                        "Measured timing performance of the link validation run."
+                    ),
+                )
             )
 
         class ContentValidatorResults(_WebModels.ManagedModel):
@@ -665,10 +669,12 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
         class AuditRulesConfig(_WebModels.FlexibleInternalModel):
             """Configuration for audit rules and thresholds."""
 
-            quality_thresholds: FlextQualityModelsPart02.Quality.QualityThresholdsConfig = _WebModels.Field(
-                description=(
-                    "Threshold limits applied when auditing documentation quality."
-                ),
+            quality_thresholds: _Part02.Quality.QualityThresholdsConfig = (
+                _WebModels.Field(
+                    description=(
+                        "Threshold limits applied when auditing documentation quality."
+                    ),
+                )
             )
             content_checks: FlextQualityModelsPart02.Quality.ContentChecksConfig = (
                 _WebModels.Field(
@@ -840,5 +846,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 ),
             )
 
+
+_Part02 = FlextQualityModelsPart02
 
 __all__: list[str] = ["FlextQualityModelsPart02"]

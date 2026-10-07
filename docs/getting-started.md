@@ -160,7 +160,7 @@ from flext_quality import FlextQualityCodeAnalyzer, FlextQualityService
 
 
 # Option 1: Service Layer Approach
-def service_analysis():
+def service_analysis() -> None:
     service = FlextQualityService()
 
     # Create project with quality thresholds
@@ -179,7 +179,7 @@ def service_analysis():
 
 
 # Option 2: Direct Analysis Engine
-def direct_analysis():
+def direct_analysis() -> None:
     # Analyze project directly
     analyzer = FlextQualityCodeAnalyzer("./src")
 
@@ -202,7 +202,7 @@ def direct_analysis():
 
 
 # Run both approaches
-run(service_analysis())
+service_analysis()
 direct_analysis()
 ```
 

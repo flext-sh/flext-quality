@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_web import FlextWebTypes, t
+from flext_web import FlextWebTypes, t as web_t
 
 
 class FlextQualityTypes(FlextWebTypes):
@@ -18,15 +18,17 @@ class FlextQualityTypes(FlextWebTypes):
         """Quality-specific types namespace (project slot)."""
 
         type RuleResult = tuple[bool, str | None]
-        type GenericItem = t.JsonValue | t.MappingKV[str, t.Primitives | None]
+        type GenericItem = (
+            web_t.JsonValue | web_t.MappingKV[str, web_t.Primitives | None]
+        )
         type DocumentationReportValue = (
             str
             | int
             | float
             | bool
-            | t.StrSequence
-            | t.SequenceOf[Mapping[str, t.Primitives]]
-            | t.MappingKV[str, t.Primitives]
+            | web_t.StrSequence
+            | web_t.SequenceOf[Mapping[str, web_t.Primitives]]
+            | web_t.MappingKV[str, web_t.Primitives]
             | None
         )
 

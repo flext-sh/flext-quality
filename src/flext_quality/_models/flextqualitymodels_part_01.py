@@ -545,10 +545,12 @@ class FlextQualityModelsPart01(_WebModels):
                     ),
                 )
             )
-            documentation_links: FlextQualityModelsPart01.Quality.DocumentationLinkConfig = _WebModels.Field(
-                description=(
-                    "Validation settings specific to internal documentation links."
-                ),
+            documentation_links: _Part01.Quality.DocumentationLinkConfig = (
+                _WebModels.Field(
+                    description=(
+                        "Validation settings specific to internal documentation links."
+                    ),
+                )
             )
 
         class ValidationRunConfig(_WebModels.ManagedModel):
@@ -785,5 +787,7 @@ class FlextQualityModelsPart01(_WebModels):
                 description="Number of words in the file.",
             )
 
+
+_Part01 = FlextQualityModelsPart01
 
 __all__: list[str] = ["FlextQualityModelsPart01"]

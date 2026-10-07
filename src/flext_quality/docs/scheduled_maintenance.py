@@ -258,7 +258,7 @@ class FlextQualityScheduledMaintenance:
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config: m.Quality.MaintenanceConfig = m.Quality.MaintenanceConfig.model_validate({
+        config_payload: dict[str, t.JsonValue] = {
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -396,7 +396,10 @@ class FlextQualityScheduledMaintenance:
                 "max_log_size": "10MB",
                 "retention_days": 30,
             },
-        })
+        }
+        config: m.Quality.MaintenanceConfig = (
+            m.Quality.MaintenanceConfig.model_validate(config_payload)
+        )
         return config
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:

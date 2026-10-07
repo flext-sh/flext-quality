@@ -292,7 +292,7 @@ padrão.
 
 **Local**: `src/flext_quality/docs/scripts/optimize.py:252` · **Effort**: 6min
 
-> Define a constant instead of duplicating this literal "[learn more](\1)" 3 times.
+> Define a constant instead of duplicating this literal `[learn more](\1)` 3 times.
 
 ```text
       248

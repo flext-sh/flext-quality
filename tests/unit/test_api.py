@@ -106,72 +106,6 @@ class TestsFlextQualityApi:
                 "Quality": {"max_function_length": 500, "max_class_length": 100},
             })
 
-    # -- hook output formatting ------------------------------------------
-
-    @staticmethod
-    @pytest.mark.parametrize(
-        ("continue_exec", "expected"),
-        [(True, '"continue":true'), (False, '"continue":false')],
-    )
-    def test_format_hook_output_encodes_continue_flag(
-        *,
-        continue_exec: bool,
-        expected: str,
-    ) -> None:
-        """The continue flag is serialized into the JSON output string."""
-        output = FlextQuality().format_hook_output(continue_exec=continue_exec).value
-        tm.that(output, is_=str)
-        tm.that(output, has=expected)
-
-    @staticmethod
-    def test_format_hook_output_includes_message() -> None:
-        """A provided message is embedded in the formatted output."""
-        output = (
-            FlextQuality()
-            .format_hook_output(continue_exec=True, message="Test message")
-            .value
-        )
-        tm.that(output, has='"continue":true')
-        tm.that(output, has="Test message")
-
-    @staticmethod
-    def test_format_hook_output_includes_blocked_reason() -> None:
-        """A blocked reason is emitted with continue disabled."""
-        output = (
-            FlextQuality()
-            .format_hook_output(
-                continue_exec=False,
-                blocked_reason="Blocked for testing",
-            )
-            .value
-        )
-        tm.that(output, has='"continue":false')
-        tm.that(output, has="Blocked for testing")
-
-    @staticmethod
-    def test_fetch_hook_config_json_returns_empty_object() -> None:
-        """With no hooks configured the config JSON is an empty object."""
-        result = FlextQuality().fetch_hook_config_json()
-        tm.that(result.success, eq=True)
-        tm.that(result.value, is_=str)
-        tm.that(result.value, eq="{}")
-
-    # -- hook execution ---------------------------------------------------
-
-    @staticmethod
-    def test_execute_hook_succeeds_for_known_event() -> None:
-        """A known event with no registered hooks continues execution."""
-        result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
-        tm.that(result.success, eq=True)
-        tm.that(result.value.get("continue"), eq=True)
-
-    @staticmethod
-    def test_execute_hook_fails_for_unknown_event() -> None:
-        """An unknown event name yields a failure describing the problem."""
-        result = FlextQuality().execute_hook("UnknownEvent", {})
-        tm.that(result.failure, eq=True)
-        tm.that(result.error or "", has="Unknown event")
-
     # -- rule loading -----------------------------------------------------
 
     @staticmethod
@@ -240,6 +174,77 @@ class TestsFlextQualityApi:
         service.settings.Quality.rules_dir = "/nonexistent/rules/dir"
         result = service.load_rules_from_config()
         tm.that(result.failure, eq=True)
+
+
+class TestsFlextQualityApiHooks:
+    """Behavioral contract for FlextQuality hook integration points."""
+
+    # -- hook output formatting ------------------------------------------
+
+    @staticmethod
+    @pytest.mark.parametrize(
+        ("continue_exec", "expected"),
+        [(True, '"continue":true'), (False, '"continue":false')],
+    )
+    def test_format_hook_output_encodes_continue_flag(
+        *,
+        continue_exec: bool,
+        expected: str,
+    ) -> None:
+        """The continue flag is serialized into the JSON output string."""
+        output = FlextQuality().format_hook_output(continue_exec=continue_exec).value
+        tm.that(output, is_=str)
+        tm.that(output, has=expected)
+
+    @staticmethod
+    def test_format_hook_output_includes_message() -> None:
+        """A provided message is embedded in the formatted output."""
+        output = (
+            FlextQuality()
+            .format_hook_output(continue_exec=True, message="Test message")
+            .value
+        )
+        tm.that(output, has='"continue":true')
+        tm.that(output, has="Test message")
+
+    @staticmethod
+    def test_format_hook_output_includes_blocked_reason() -> None:
+        """A blocked reason is emitted with continue disabled."""
+        output = (
+            FlextQuality()
+            .format_hook_output(
+                continue_exec=False,
+                blocked_reason="Blocked for testing",
+            )
+            .value
+        )
+        tm.that(output, has='"continue":false')
+        tm.that(output, has="Blocked for testing")
+
+    @staticmethod
+    def test_fetch_hook_config_json_returns_empty_object() -> None:
+        """With no hooks configured the config JSON is an empty object."""
+        result = FlextQuality().fetch_hook_config_json()
+        tm.that(result.success, eq=True)
+        tm.that(result.value, is_=str)
+        tm.that(result.value, eq="{}")
+
+    # -- hook execution ---------------------------------------------------
+
+    @staticmethod
+    def test_execute_hook_succeeds_for_known_event() -> None:
+        """A known event with no registered hooks continues execution."""
+        result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
+        tm.that(result.success, eq=True)
+        tm.that(result.value.get("continue"), eq=True)
+
+    @staticmethod
+    def test_execute_hook_fails_for_unknown_event() -> None:
+        """An unknown event name yields a failure describing the problem."""
+        result = FlextQuality().execute_hook("UnknownEvent", {})
+        tm.that(result.failure, eq=True)
+        tm.that(result.error or "", has="Unknown event")
+
         tm.that((result.error or "").lower(), has="not found")
 
     # -- stdin hook processing (external boundary: sys.stdin) ------------
