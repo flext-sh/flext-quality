@@ -33,7 +33,7 @@ class TestsFlextQualityApi:
     @pytest.fixture
     def _restore_settings() -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
-        settings = FlextQuality().settings
+        settings = FlextQualitySettings.fetch_global()
         rules_dir = settings.Quality.rules_dir
         max_function_length = settings.Quality.max_function_length
         max_class_length = settings.Quality.max_class_length
@@ -143,7 +143,7 @@ class TestsFlextQualityApi:
         """A configured but empty rules directory yields an empty rule list."""
         service = FlextQuality()
         with tempfile.TemporaryDirectory() as tmpdir:
-            service.settings.Quality.rules_dir = tmpdir
+            FlextQualitySettings.fetch_global().Quality.rules_dir = tmpdir
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=0)
@@ -162,7 +162,7 @@ class TestsFlextQualityApi:
                 "\nrules:\n  - name: rule-two\n    type: blocking\n"
                 '    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
-            service.settings.Quality.rules_dir = str(rules_dir)
+            FlextQualitySettings.fetch_global().Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
         tm.that(result.success, eq=True)
         tm.that(len(result.value), eq=2)
@@ -171,7 +171,9 @@ class TestsFlextQualityApi:
     def test_load_rules_from_config_fails_for_missing_directory() -> None:
         """A configured rules directory that does not exist yields a failure."""
         service = FlextQuality()
-        service.settings.Quality.rules_dir = "/nonexistent/rules/dir"
+        FlextQualitySettings.fetch_global().Quality.rules_dir = (
+            "/nonexistent/rules/dir"
+        )
         result = service.load_rules_from_config()
         tm.that(result.failure, eq=True)
 

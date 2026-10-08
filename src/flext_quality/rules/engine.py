@@ -143,8 +143,10 @@ class FlextQualityRulesEngine:
             The resulting ``p.Result[t.SequenceOf[Path]]``.
         """
         if path.is_file():
-            return [path] if path.suffix == ".py" else []
-        return list(u.Cli.files_matching(path, includes=["*.py"]).value)
+            return r[t.SequenceOf[Path]].ok([path] if path.suffix == ".py" else [])
+        return r[t.SequenceOf[Path]].ok(
+            list(u.Cli.files_matching(path, includes=["*.py"]).value),
+        )
 
     @staticmethod
     def _rule_type_to_severity(rule_type: c.Quality.RuleType) -> str:
