@@ -739,22 +739,22 @@ class FlextQualityModelsPart01(_WebModels):
             )
             issues: MutableSequence[FlextQualityModelsPart01.Quality.Issue] = (
                 _WebModels.Field(
-                    default_factory=list,
+                    default_factory=list["FlextQualityModelsPart01.Quality.Issue"],
                     description="Issues found during the validation run.",
                 )
             )
             warnings: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description=(
                     "Non-fatal warning messages produced during the validation run."
                 ),
             )
             errors: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description="Fatal error messages produced during the validation run.",
             )
             metadata: MutableMapping[str, t.Primitives] = _WebModels.Field(
-                default_factory=dict,
+                default_factory=dict[str, t.Primitives],
                 description="Additional metadata describing the validation run.",
             )
 
