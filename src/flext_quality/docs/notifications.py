@@ -133,8 +133,7 @@ class FlextQualityDocumentationNotifier:
         self._apply_email_config(cfg, loaded)
         self._apply_slack_config(cfg, loaded)
         self._apply_webhook_config(cfg, loaded)
-        self._apply_enabled_flag(cfg, loaded)
-        return cfg
+        return self._apply_enabled_flag(cfg, loaded)
 
     @staticmethod
     def _apply_channel_toggles(
@@ -240,11 +239,16 @@ class FlextQualityDocumentationNotifier:
     def _apply_enabled_flag(
         cfg: FlextQualityDocumentationNotifier._NotifierConfig,
         loaded: t.JsonMapping,
-    ) -> None:
-        """Apply the global notifier enabled flag from the user mapping."""
+    ) -> FlextQualityDocumentationNotifier._NotifierConfig:
+        """Apply the global notifier enabled flag from the user mapping.
+
+        Returns:
+            The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
+        """
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
-            cfg.enabled = enabled_val
+            return cfg.model_validate({**cfg.model_dump(), "enabled": enabled_val})
+        return cfg
 
     @staticmethod
     def build_default_config() -> FlextQualityDocumentationNotifier._NotifierConfig:
