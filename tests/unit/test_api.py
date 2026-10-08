@@ -243,9 +243,7 @@ class TestsFlextQualityApiHooks:
         """An unknown event name yields a failure describing the problem."""
         result = FlextQuality().execute_hook("UnknownEvent", {})
         tm.that(result.failure, eq=True)
-        tm.that(result.error or "", has="Unknown event")
-
-        tm.that((result.error or "").lower(), has="not found")
+        tm.that(result.error or "", has="Unknown event: UnknownEvent")
 
     # -- stdin hook processing (external boundary: sys.stdin) ------------
 
