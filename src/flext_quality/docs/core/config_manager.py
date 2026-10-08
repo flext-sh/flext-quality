@@ -176,17 +176,17 @@ class FlextQualityConfigManager:
     class AuditRules(m.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
-        link_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=lambda: MappingProxyType({}),
+        link_checks: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+            default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
             description="Link-check rules and thresholds for the documentation audit.",
         )
-        style_checks: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=lambda: MappingProxyType({}),
+        style_checks: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+            default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
             description="Style-check rules and thresholds for the documentation audit.",
         )
-        accessibility_checks: MutableMapping[str, t.Primitives | t.StrSequence] = (
+        accessibility_checks: Mapping[str, t.Primitives | t.StrSequence] = (
             u.Field(
-                default_factory=lambda: MappingProxyType({}),
+                default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
                 description="Accessibility-check rules and thresholds for the audit.",
             )
         )
@@ -259,29 +259,29 @@ class FlextQualityConfigManager:
     class ValidationSettings(m.Quality.ValidationConfig):
         """Configuration for validation operations."""
 
-        content_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=lambda: MappingProxyType({}),
+        content_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+            default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
             description="Content validation options and their configured values.",
         )
-        image_validation: MutableMapping[str, t.Primitives | t.StrSequence] = u.Field(
-            default_factory=lambda: MappingProxyType({}),
+        image_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+            default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
             description="Image validation options and their configured values.",
         )
-        accessibility_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
+        accessibility_validation: Mapping[str, t.Primitives | t.StrSequence] = (
             u.Field(
-                default_factory=lambda: MappingProxyType({}),
+                default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
                 description="Accessibility validation options and their values.",
             )
         )
-        security_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
+        security_validation: Mapping[str, t.Primitives | t.StrSequence] = (
             u.Field(
-                default_factory=lambda: MappingProxyType({}),
+                default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
                 description="Security validation options and their configured values.",
             )
         )
-        performance_validation: MutableMapping[str, t.Primitives | t.StrSequence] = (
+        performance_validation: Mapping[str, t.Primitives | t.StrSequence] = (
             u.Field(
-                default_factory=lambda: MappingProxyType({}),
+                default_factory=lambda: MappingProxyType[str, t.Primitives | t.StrSequence]({}),
                 description="Performance validation options and their values.",
             )
         )

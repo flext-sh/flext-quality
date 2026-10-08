@@ -135,7 +135,7 @@ class FlextQualityDocumentationReporter:
         filename: str,
         latest_filename: str,
         report_content: str,
-        results: t.MappingKV[str, u.Quality.DocumentationReportValue],
+        results: t.JsonPayload,
     ) -> p.Result[str]:
         """Write the timestamped report plus the latest pointer for one lane.
 
@@ -675,8 +675,14 @@ class FlextQualityDocumentationReporter:
             return None
         files_processed_raw = optimization_data.get("files_processed", 0)
         changes_made_raw = optimization_data.get("changes_made", 0)
-        backups_created_raw = optimization_data.get("backups_created", [])
-        optimizations_raw = optimization_data.get("optimizations", [])
+        backups_created_raw: t.JsonValue = optimization_data.get(
+            "backups_created",
+            [],
+        )
+        optimizations_raw: t.JsonValue = optimization_data.get(
+            "optimizations",
+            [],
+        )
         return FlextQualityDocumentationReporter.OptimizationSummary(
             files_processed=files_processed_raw
             if isinstance(files_processed_raw, int)
@@ -728,7 +734,9 @@ class FlextQualityDocumentationReporter:
             if report_data_dict is not None:
                 recent_reports.append(report_data_dict)
         trend_data = self._analyze_trend_data(recent_reports)
-        return self._generate_trend_report(trend_data, days)
+        if isinstance(trend_data, FlextQualityDocumentationReporter.TrendData):
+            return trend_data.model_dump_json(indent=2)
+        return "; ".join(f"{key}={value}" for key, value in trend_data.items())
 
     @staticmethod
     def _load_recent_report(
