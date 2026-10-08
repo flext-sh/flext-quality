@@ -813,7 +813,12 @@ class FlextQualityDocumentationAuditor:
         return html
 
     @staticmethod
-    def _render_issue_row(issue: t.JsonMapping) -> str:
+    def _render_issue_row(
+        issue: t.MutableMappingKV[
+            str,
+            t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
+        ],
+    ) -> str:
         """Render one audit issue as an HTML block.
 
         Returns:

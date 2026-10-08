@@ -123,7 +123,10 @@ class FlextQualityDocumentationNotifier:
             timestamp=u.now().isoformat(),
         )
 
-    def _load_user_config(self, loaded: t.JsonMapping) -> _NotifierConfig:
+    def _load_user_config(
+        self,
+        loaded: t.JsonMapping,
+    ) -> FlextQualityDocumentationNotifier._NotifierConfig:
         cfg = self.build_default_config()
         self._apply_channel_toggles(cfg, loaded)
         self._apply_alerts_config(cfg, loaded)
@@ -135,7 +138,7 @@ class FlextQualityDocumentationNotifier:
 
     @staticmethod
     def _apply_channel_toggles(
-        cfg: _NotifierConfig,
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
         loaded: t.JsonMapping,
     ) -> None:
         """Apply per-channel enabled toggles from the user mapping."""
@@ -151,7 +154,10 @@ class FlextQualityDocumentationNotifier:
                     channel_cfg.enabled = enabled
 
     @staticmethod
-    def _apply_alerts_config(cfg: _NotifierConfig, loaded: t.JsonMapping) -> None:
+    def _apply_alerts_config(
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
+        loaded: t.JsonMapping,
+    ) -> None:
         """Apply alert thresholds and toggles from the user mapping."""
         alerts = loaded.get("alerts")
         if not isinstance(alerts, dict):
@@ -175,7 +181,10 @@ class FlextQualityDocumentationNotifier:
                     toggle_cfg.enabled = enabled
 
     @staticmethod
-    def _apply_email_config(cfg: _NotifierConfig, loaded: t.JsonMapping) -> None:
+    def _apply_email_config(
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
+        loaded: t.JsonMapping,
+    ) -> None:
         """Apply email relay settings from the user mapping."""
         email = loaded.get("email")
         if not isinstance(email, dict):
@@ -194,7 +203,10 @@ class FlextQualityDocumentationNotifier:
             ]
 
     @staticmethod
-    def _apply_slack_config(cfg: _NotifierConfig, loaded: t.JsonMapping) -> None:
+    def _apply_slack_config(
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
+        loaded: t.JsonMapping,
+    ) -> None:
         """Apply Slack delivery settings from the user mapping."""
         slack = loaded.get("slack")
         if not isinstance(slack, dict):
@@ -206,7 +218,7 @@ class FlextQualityDocumentationNotifier:
 
     @staticmethod
     def _apply_webhook_config(
-        cfg: _NotifierConfig,
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
         loaded: t.JsonMapping,
     ) -> None:
         """Apply generic webhook settings from the user mapping."""
@@ -225,18 +237,21 @@ class FlextQualityDocumentationNotifier:
             cfg.webhook.headers = str_headers
 
     @staticmethod
-    def _apply_enabled_flag(cfg: _NotifierConfig, loaded: t.JsonMapping) -> None:
+    def _apply_enabled_flag(
+        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
+        loaded: t.JsonMapping,
+    ) -> None:
         """Apply the global notifier enabled flag from the user mapping."""
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
             cfg.enabled = enabled_val
 
     @staticmethod
-    def build_default_config() -> _NotifierConfig:
+    def build_default_config() -> FlextQualityDocumentationNotifier._NotifierConfig:
         """Default notification configuration.
 
         Returns:
-            The resulting ``_NotifierConfig``.
+            The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
         """
         return FlextQualityDocumentationNotifier._NotifierConfig(
             enabled=True,
@@ -810,8 +825,9 @@ Found {len(broken_links)} broken links that need attention:
             notifier = FlextQualityDocumentationNotifier(self.settings_path)
             if self.test:
                 return self._execute_test(notifier)
-            if self.audit_data:
-                return self._execute_audit(notifier)
+            audit_data_path = self.audit_data
+            if audit_data_path:
+                return self._execute_audit(notifier, Path(audit_data_path))
             if self.weekly_report:
                 return self._execute_report(
                     Path(self.weekly_report),
@@ -852,13 +868,14 @@ Found {len(broken_links)} broken links that need attention:
         def _execute_audit(
             self,
             notifier: FlextQualityDocumentationNotifier,
+            audit_path: Path,
         ) -> p.Result[bool]:
             """Run the audit-data notification pipeline.
 
             Returns:
                 The resulting ``p.Result[bool]``.
             """
-            audit_read = u.Cli.files_read_text(Path(self.audit_data))
+            audit_read = u.Cli.files_read_text(audit_path)
             if audit_read.failure:
                 return r[bool].from_failure(audit_read)
             audit_data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
