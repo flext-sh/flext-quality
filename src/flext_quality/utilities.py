@@ -12,7 +12,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
-from flext_web import FlextWebUtilities as u, t as web_t
+from flext_web import FlextWebUtilities, t as web_t
 
 from flext_core import FlextResult as r
 from flext_quality import (
@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
-class FlextQualityUtilities(u):
+class FlextQualityUtilities(FlextWebUtilities):
     """Namespace for flext-quality utilities."""
 
     DocumentationReportValue = web_t.JsonMapping
@@ -34,33 +34,33 @@ class FlextQualityUtilities(u):
     class Quality:
         """Quality-specific utilities namespace."""
 
-        DocumentationReportValue = web_t.JsonMapping
+        type DocumentationReportValue = web_t.JsonMapping
 
         # Resolved generics, not bare PEP 695 aliases: the adapter form must be
         # a checker-visible type expression (bare aliases evaluate to
         # TypeAliasType objects, which the adapter form rejects). Concrete
         # generics only; runtime objects identical to the unwrapped aliases.
         RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.JsonValue]] = (
-            u.type_adapter(
+            FlextWebUtilities.type_adapter(
                 Mapping[str, t.JsonValue],
                 config=m.ConfigDict(strict=False),
             )
         )
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
             Sequence[Mapping[str, t.JsonValue]]
-        ] = u.type_adapter(
+        ] = FlextWebUtilities.type_adapter(
             Sequence[Mapping[str, t.JsonValue]],
             config=m.ConfigDict(strict=False),
         )
         MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
             MutableMapping[str, str | bool | None]
-        ] = u.type_adapter(MutableMapping[str, str | bool | None])
+        ] = FlextWebUtilities.type_adapter(MutableMapping[str, str | bool | None])
         STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
             MutableSequence[Mapping[str, str]]
-        ] = u.type_adapter(MutableSequence[Mapping[str, str]])
+        ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            Mapping[str, Mapping[str, t.JsonValue]]
-        ] = u.type_adapter(
+            t.MappingKV[str, DocumentationReportValue]
+        ] = FlextWebUtilities.type_adapter(
             Mapping[str, Mapping[str, t.JsonValue]],
         )
 
