@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import MutableSequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
@@ -15,8 +16,6 @@ from flext_cli import cli
 from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
 
 if TYPE_CHECKING:
-    from collections.abc import MutableSequence
-
     from flext_quality.base import FlextQualityServiceBase
 
 
