@@ -161,7 +161,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 str,
                 FlextQualityModelsPart02.Quality.ScheduleEntry,
             ] = _WebModels.Field(
-                default_factory=dict,
+                default_factory=dict[str, "FlextQualityModelsPart02.Quality.ScheduleEntry"],
                 description=(
                     "Named schedule entries controlling when maintenance tasks run."
                 ),
@@ -170,7 +170,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 str,
                 FlextQualityModelsPart02.Quality.ScheduleTaskConfig,
             ] = _WebModels.Field(
-                default_factory=dict,
+                default_factory=dict[str, "FlextQualityModelsPart02.Quality.ScheduleTaskConfig"],
                 description=(
                     "Named task definitions available to be run by schedule entries."
                 ),
@@ -200,11 +200,11 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 description="Number of scheduled tasks that completed successfully.",
             )
             errors: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description="Error messages produced by failed scheduled tasks.",
             )
             warnings: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description=(
                     "Warning messages produced during the scheduled maintenance run."
                 ),
@@ -356,7 +356,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             recommendations: MutableSequence[
                 FlextQualityModelsPart02.Quality.AuditRecommendation
             ] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list["FlextQualityModelsPart02.Quality.AuditRecommendation"],
                 description="Recommendations generated from the audit's findings.",
             )
 
@@ -566,13 +566,13 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             errors: MutableSequence[
                 FlextQualityModelsPart02.Quality.LinkCheckResult
             ] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list["FlextQualityModelsPart02.Quality.LinkCheckResult"],
                 description="Detailed results for links that failed validation.",
             )
             warnings_list: MutableSequence[
                 FlextQualityModelsPart02.Quality.LinkCheckResult
             ] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list["FlextQualityModelsPart02.Quality.LinkCheckResult"],
                 description=(
                     "Detailed results for links that produced a non-fatal warning."
                 ),
@@ -600,11 +600,11 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             content_issues: MutableSequence[
                 FlextQualityModelsPart02.Quality.ContentIssue
             ] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list["FlextQualityModelsPart02.Quality.ContentIssue"],
                 description="Content issues found across all checked files.",
             )
             quality_metrics: t.MutableScalarMapping = _WebModels.Field(
-                default_factory=dict,
+                default_factory=dict[str, t.Scalar],
                 description=(
                     "Aggregate scalar quality metrics computed from the checked "
                     "content."
@@ -659,7 +659,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 description="Number of notifications successfully sent.",
             )
             errors: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description="Error messages produced while sending notifications.",
             )
             timestamp: str = _WebModels.Field(
@@ -761,7 +761,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 ),
             )
             backups_created: MutableSequence[str] = _WebModels.Field(
-                default_factory=list,
+                default_factory=list[str],
                 description=(
                     "Paths of backup files created before modifying documentation."
                 ),

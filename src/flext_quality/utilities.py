@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
@@ -35,25 +36,32 @@ class FlextQualityUtilities(u):
 
         DocumentationReportValue = web_t.JsonMapping
 
-        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = (
-            u.type_adapter(t.JsonMapping, config=m.ConfigDict(strict=False))
+        # Resolved generics, not bare PEP 695 aliases: the adapter form must be
+        # a checker-visible type expression (bare aliases evaluate to
+        # TypeAliasType objects, which the adapter form rejects). Concrete
+        # generics only; runtime objects identical to the unwrapped aliases.
+        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.JsonValue]] = (
+            u.type_adapter(
+                Mapping[str, t.JsonValue],
+                config=m.ConfigDict(strict=False),
+            )
         )
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-            t.SequenceOf[t.JsonMapping]
+            Sequence[Mapping[str, t.JsonValue]]
         ] = u.type_adapter(
-            t.SequenceOf[t.JsonMapping],
+            Sequence[Mapping[str, t.JsonValue]],
             config=m.ConfigDict(strict=False),
         )
         MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MutableOptionalFeatureFlagMapping
-        ] = u.type_adapter(t.MutableOptionalFeatureFlagMapping)
+            MutableMapping[str, str | bool | None]
+        ] = u.type_adapter(MutableMapping[str, str | bool | None])
         STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-            t.MutableSequenceOf[t.StrMapping]
-        ] = u.type_adapter(t.MutableSequenceOf[t.StrMapping])
+            MutableSequence[Mapping[str, str]]
+        ] = u.type_adapter(MutableSequence[Mapping[str, str]])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MappingKV[str, FlextQualityUtilities.DocumentationReportValue]
+            Mapping[str, Mapping[str, t.JsonValue]]
         ] = u.type_adapter(
-            t.MappingKV[str, web_t.JsonMapping],
+            Mapping[str, Mapping[str, t.JsonValue]],
         )
 
         @staticmethod

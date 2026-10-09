@@ -17,6 +17,8 @@ from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
+    from flext_quality.base import FlextQualityServiceBase
+
 
 class FlextQualityCli(s[bool]):
     """FLEXT Quality analysis toolkit."""
@@ -55,8 +57,8 @@ class FlextQualityCli(s[bool]):
                 cmds.append(sub.value)
             return self._extend(cmds)
 
-        @staticmethod
         def _extend(
+            self,
             cmds: MutableSequence[t.StrSequence],
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
@@ -85,7 +87,12 @@ class FlextQualityCli(s[bool]):
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
     COMMANDS: ClassVar[
-        t.SequenceOf[type[s[t.JsonMapping] | s[t.SequenceOf[t.StrSequence]]]]
+        t.SequenceOf[
+            type[
+                FlextQualityServiceBase[t.JsonMapping]
+                | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]]
+            ]
+        ]
     ] = (Status, Check, Validate)
 
     @override
@@ -101,7 +108,8 @@ class FlextQualityCli(s[bool]):
 # Why: both lanes replaced the lambda handler with a named typed function so
 # pyrefly can infer the route handler signature; the lane name `_invoke` is kept.
 def _invoke(
-    params: s[t.JsonMapping] | s[t.SequenceOf[t.StrSequence]],
+    params: FlextQualityServiceBase[t.JsonMapping]
+    | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]],
 ) -> p.Result[t.JsonMapping] | p.Result[t.SequenceOf[t.StrSequence]]:
     """Execute a registered service instance for its declarative CLI route.
 
