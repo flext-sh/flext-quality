@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, ClassVar, Self, override
+from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
 from flext_cli import cli
 
@@ -48,18 +48,29 @@ class FlextQualityCli(s[bool]):
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.StrSequence]]``.
             """
+            built = self._analysis_commands()
+            if built.failure:
+                return r[t.SequenceOf[t.StrSequence]].fail(built.error)
+            return self._extend(built.value)
+
+        def _analysis_commands(self) -> p.Result[MutableSequence[t.StrSequence]]:
+            """Build the static-analysis command sequence for the target path.
+
+            Returns:
+                The resulting ``p.Result[MutableSequence[t.StrSequence]]``.
+            """
             bridge = FlextQualityCodeExecutionBridge()
             cmds: MutableSequence[t.StrSequence] = []
             for build in (bridge.build_ruff_command, bridge.build_basedpyright_command):
                 sub = build(self.target_path)
                 if sub.failure:
-                    return r[t.SequenceOf[t.StrSequence]].fail(sub.error)
+                    return r[MutableSequence[t.StrSequence]].fail(sub.error)
                 cmds.append(sub.value)
-            return self._extend(cmds)
+            return r[MutableSequence[t.StrSequence]].ok(cmds)
 
+        @staticmethod
         def _extend(
-            self,
-            cmds: MutableSequence[t.StrSequence],
+            cmds: t.SequenceOf[t.StrSequence],
         ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
@@ -67,10 +78,11 @@ class FlextQualityCli(s[bool]):
         """Run full validation (lint + type + security + tests) on --target."""
 
         @override
-        def _extend(
-            self: Self,
-            cmds: MutableSequence[t.StrSequence],
-        ) -> p.Result[t.SequenceOf[t.StrSequence]]:
+        def _analysis_commands(self) -> p.Result[MutableSequence[t.StrSequence]]:
+            built = super()._analysis_commands()
+            if built.failure:
+                return built
+            cmds = built.value
             src = (
                 self.target_path / "src"
                 if (self.target_path / "src").exists()
@@ -84,7 +96,7 @@ class FlextQualityCli(s[bool]):
                 "--cov-report=term-missing",
             ])
             cmds.append(["python", "-m", "coverage", "report"])
-            return r[t.SequenceOf[t.StrSequence]].ok(cmds)
+            return r[MutableSequence[t.StrSequence]].ok(cmds)
 
     COMMANDS: ClassVar[
         t.SequenceOf[

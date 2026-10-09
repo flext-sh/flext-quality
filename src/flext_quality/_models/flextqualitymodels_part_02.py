@@ -161,7 +161,9 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 str,
                 FlextQualityModelsPart02.Quality.ScheduleEntry,
             ] = _WebModels.Field(
-                default_factory=dict[str, "FlextQualityModelsPart02.Quality.ScheduleEntry"],
+                default_factory=dict[
+                    str, "FlextQualityModelsPart02.Quality.ScheduleEntry"
+                ],
                 description=(
                     "Named schedule entries controlling when maintenance tasks run."
                 ),
@@ -170,7 +172,9 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 str,
                 FlextQualityModelsPart02.Quality.ScheduleTaskConfig,
             ] = _WebModels.Field(
-                default_factory=dict[str, "FlextQualityModelsPart02.Quality.ScheduleTaskConfig"],
+                default_factory=dict[
+                    str, "FlextQualityModelsPart02.Quality.ScheduleTaskConfig"
+                ],
                 description=(
                     "Named task definitions available to be run by schedule entries."
                 ),
@@ -356,7 +360,9 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             recommendations: MutableSequence[
                 FlextQualityModelsPart02.Quality.AuditRecommendation
             ] = _WebModels.Field(
-                default_factory=list["FlextQualityModelsPart02.Quality.AuditRecommendation"],
+                default_factory=list[
+                    "FlextQualityModelsPart02.Quality.AuditRecommendation"
+                ],
                 description="Recommendations generated from the audit's findings.",
             )
 
@@ -566,13 +572,17 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             errors: MutableSequence[
                 FlextQualityModelsPart02.Quality.LinkCheckResult
             ] = _WebModels.Field(
-                default_factory=list["FlextQualityModelsPart02.Quality.LinkCheckResult"],
+                default_factory=list[
+                    "FlextQualityModelsPart02.Quality.LinkCheckResult"
+                ],
                 description="Detailed results for links that failed validation.",
             )
             warnings_list: MutableSequence[
                 FlextQualityModelsPart02.Quality.LinkCheckResult
             ] = _WebModels.Field(
-                default_factory=list["FlextQualityModelsPart02.Quality.LinkCheckResult"],
+                default_factory=list[
+                    "FlextQualityModelsPart02.Quality.LinkCheckResult"
+                ],
                 description=(
                     "Detailed results for links that produced a non-fatal warning."
                 ),
