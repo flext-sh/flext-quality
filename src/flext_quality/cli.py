@@ -98,11 +98,9 @@ class FlextQualityCli(s[bool]):
             return r[MutableSequence[t.StrSequence]].ok(cmds)
 
     COMMANDS: ClassVar[
-        t.SequenceOf[
-            type[
-                FlextQualityServiceBase[t.JsonMapping]
-                | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]]
-            ]
+        tuple[
+            type[Status] | type[Check] | type[Validate],
+            ...,
         ]
     ] = (Status, Check, Validate)
 
