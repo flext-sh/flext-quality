@@ -862,7 +862,7 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _report_date(
-        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        report: Mapping[str, object],
     ) -> datetime:
         """Extract the report date, falling back to the current time.
 
@@ -876,7 +876,7 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _audit_trend_entry(
-        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        report: Mapping[str, object],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the audit trend entry for one historical report.
@@ -901,7 +901,7 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _validation_trend_entry(
-        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        report: Mapping[str, object],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the link-validation trend entry for one historical report.
@@ -926,7 +926,7 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _optimization_trend_entry(
-        report: Mapping[str, u.Quality.DocumentationReportValue | datetime],
+        report: Mapping[str, object],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the optimization trend entry for one historical report.
