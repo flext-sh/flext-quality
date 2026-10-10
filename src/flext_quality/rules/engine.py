@@ -172,7 +172,7 @@ class FlextQualityRulesEngine:
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
         """
-        validation_context = t.json_dict_adapter().validate_python(context or {})
+        validation_context = u.json_dict_adapter().validate_python(context or {})
         read = u.Cli.files_read_text(file_path)
         if read.failure:
             return [

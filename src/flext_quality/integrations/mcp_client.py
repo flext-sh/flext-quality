@@ -47,7 +47,7 @@ class FlextQualityMcpClient:
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
-        params_json = t.json_mapping_adapter().dump_json(call.params).decode("utf-8")
+        params_json = u.json_mapping_adapter().dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
@@ -72,7 +72,7 @@ class FlextQualityMcpClient:
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
         """
-        call_params = t.json_dict_adapter().validate_python(params or {})
+        call_params = u.json_dict_adapter().validate_python(params or {})
         return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
                 "server": server,
@@ -156,14 +156,14 @@ class FlextQualityMcpClient:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
         """
         try:
-            parsed_list: t.JsonList = t.json_list_adapter().validate_json(output)
+            parsed_list: t.JsonList = u.json_list_adapter().validate_json(output)
         except ValueError:
             return self._build_raw_result(output)
         coerced_data: MutableSequence[t.StrMapping] = []
         for item in parsed_list:
             if isinstance(item, Mapping):
                 validated_item: t.JsonMapping = (
-                    t.json_mapping_adapter().validate_python(item)
+                    u.json_mapping_adapter().validate_python(item)
                 )
                 coerced_data.append({
                     key: str(value) for key, value in validated_item.items()
@@ -212,7 +212,7 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(output)
+            parsed: t.JsonMapping = u.json_mapping_adapter().validate_json(output)
             return self._build_object_result(parsed)
         except ValueError:
             return self._build_list_result(output)
