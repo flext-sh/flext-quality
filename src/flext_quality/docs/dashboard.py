@@ -189,7 +189,7 @@ class FlextQualityDocumentationDashboard:
         # Sort by date
         trend_data = sorted(trend_data, key=operator.itemgetter("date"))
         trend_values: t.JsonValueList = [
-            t.json_value_adapter().validate_python(entry) for entry in trend_data
+            u.json_value_adapter().validate_python(entry) for entry in trend_data
         ]
 
         return {

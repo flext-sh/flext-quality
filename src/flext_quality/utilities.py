@@ -12,7 +12,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
-from flext_web import FlextWebUtilities, t as web_t
+from flext_web import FlextWebUtilities, t as web_t, u
 
 from flext_core import FlextResult as r
 from flext_quality import (
@@ -152,14 +152,14 @@ class FlextQualityUtilities(FlextWebUtilities):
             """
             if not isinstance(parsed, dict):
                 return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
-            parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
+            parsed_dict: t.JsonMapping = u.json_mapping_adapter().validate_python(
                 parsed,
             )
             raw_rules_val = parsed_dict.get("rules", [])
             if not isinstance(raw_rules_val, list):
                 return r[t.SequenceOf[t.JsonMapping]].fail("Expected rules list")
             rules: t.SequenceOf[t.JsonMapping] = [
-                t.json_mapping_adapter().validate_python(item)
+                u.json_mapping_adapter().validate_python(item)
                 for item in raw_rules_val
                 if isinstance(item, dict)
             ]
@@ -195,7 +195,7 @@ class FlextQualityUtilities(FlextWebUtilities):
                 The resulting ``p.Result[t.JsonMapping]``.
             """
             try:
-                parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(raw)
+                parsed: t.JsonMapping = u.json_mapping_adapter().validate_json(raw)
                 coerced_input: t.JsonMapping = parsed
                 return r[t.JsonMapping].ok(coerced_input)
             except ValueError as e:
