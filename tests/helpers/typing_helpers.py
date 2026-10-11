@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, TypeIs
 
-from flext_tests import tm
+from tests import tm
 
 if TYPE_CHECKING:
     from tests import t

@@ -12,15 +12,9 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING
 
 from flext_cli import cli
-from flext_web import FlextWebUtilities, t as web_t, u
+from flext_web import FlextWebUtilities
 
-from flext_core import FlextResult as r
-from flext_quality import (
-    FlextQualityConstants as c,
-    FlextQualityModels as m,
-    FlextQualityProtocols as p,
-    FlextQualityTypes as t,
-)
+from flext_quality import c, m, p, r, t
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -29,12 +23,8 @@ if TYPE_CHECKING:
 class FlextQualityUtilities(FlextWebUtilities):
     """Namespace for flext-quality utilities."""
 
-    DocumentationReportValue = web_t.JsonMapping
-
     class Quality:
         """Quality-specific utilities namespace."""
-
-        type DocumentationReportValue = web_t.JsonMapping
 
         # Resolved generics, not bare PEP 695 aliases: the adapter form must be
         # a checker-visible type expression (bare aliases evaluate to
@@ -58,10 +48,10 @@ class FlextQualityUtilities(FlextWebUtilities):
         STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
             MutableSequence[Mapping[str, str]]
         ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
-        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            t.MappingKV[str, DocumentationReportValue]
-        ] = FlextWebUtilities.type_adapter(
-            Mapping[str, Mapping[str, t.JsonValue]],
+        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[t.MappingKV[str, t.JsonMapping]] = (
+            FlextWebUtilities.type_adapter(
+                Mapping[str, Mapping[str, t.JsonValue]],
+            )
         )
 
         @staticmethod

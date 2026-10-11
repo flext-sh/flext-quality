@@ -12,9 +12,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar, override
 
 import pytest
-from flext_tests import tm
 
 from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r, t
+from tests import tm
 
 if TYPE_CHECKING:
     from flext_quality import p

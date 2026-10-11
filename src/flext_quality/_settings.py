@@ -28,13 +28,13 @@ class FlextQualitySettings(FlextSettings):
     class _Quality(m.BaseModel):
         """Namespaced quality settings (hooks, rules, MCP, thresholds)."""
 
-        hook_timeout_ms: Annotated[int, m.Field(default=5000, ge=100, le=60000)]
-        rule_timeout_seconds: Annotated[int, m.Field(default=30, ge=1, le=3600)]
-        cache_enabled: Annotated[bool, m.Field(default=True)]
-        mcp_server_port: Annotated[int, m.Field(default=3100, ge=1, le=65535)]
-        rules_dir: Annotated[str, m.Field(default="rules")]
-        max_function_length: Annotated[int, m.Field(default=50)]
-        max_class_length: Annotated[int, m.Field(default=200)]
+        hook_timeout_ms: Annotated[int, m.Field(ge=100, le=60000)] = 5000
+        rule_timeout_seconds: Annotated[int, m.Field(ge=1, le=3600)] = 30
+        cache_enabled: bool = True
+        mcp_server_port: Annotated[int, m.Field(ge=1, le=65535)] = 3100
+        rules_dir: str = "rules"
+        max_function_length: int = 50
+        max_class_length: int = 200
 
         @u.model_validator(mode="after")
         def _validate_thresholds(self) -> FlextQualitySettings._Quality:
