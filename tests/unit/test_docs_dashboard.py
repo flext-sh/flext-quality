@@ -12,10 +12,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_tests import tm
-
 from flext_quality import FlextQualityDocumentationDashboard
-from tests import t, u
+from tests import t, tm, u
 
 if TYPE_CHECKING:
     from pathlib import Path

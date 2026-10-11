@@ -18,10 +18,9 @@ from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from flext_tests import tm
 
 from flext_quality import FlextQuality, FlextQualitySettings, p, quality, t
-from tests import m
+from tests import m, tm
 
 
 class TestsFlextQualityApi:

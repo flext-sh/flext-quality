@@ -11,13 +11,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import tm
-
 from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
     FlextQualityMcpClient,
 )
+from tests import tm
 
 
 class TestsFlextQualityIntegrations:
