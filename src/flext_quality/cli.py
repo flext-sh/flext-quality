@@ -99,7 +99,7 @@ class FlextQualityCli(s[bool]):
 
     COMMANDS: ClassVar[
         tuple[
-            type[Status] | type[Check] | type[Validate],
+            type[Status | Check | Validate],
             ...,
         ]
     ] = (Status, Check, Validate)
