@@ -10,18 +10,11 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import override
 
-from flext_quality import (
-    FlextQualityHookManager,
-    FlextQualityRulesLoader,
-    c,
-    m,
-    p,
-    r,
-    t,
-    u,
-)
+from flext_quality import c, m, p, r, t, u
 from flext_quality._settings import FlextQualitySettings
 from flext_quality.base import FlextQualityServiceBase
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.rules import FlextQualityRulesLoader
 
 
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):

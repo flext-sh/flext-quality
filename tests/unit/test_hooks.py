@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, ClassVar, override
 
 import pytest
 
-from flext_quality import FlextQualityBaseHook, FlextQualityHookManager, c, r, t
+from flext_quality import c, r, t
+from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
 from tests import tm
 
 if TYPE_CHECKING:
