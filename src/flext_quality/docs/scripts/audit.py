@@ -30,14 +30,18 @@ from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
 
-_FRESHNESS_AGE_HIGH_DAYS: Final[int] = 180
-_QUALITY_SCORE_CRITICAL_THRESHOLD: Final[int] = 50
-_QUALITY_SCORE_HIGH_THRESHOLD: Final[int] = 75
-_QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
-_QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
-_QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
 
-_AUDIT_REPORT_TEMPLATE: Final[str] = """
+class FlextQualityDocumentationAuditor:
+    """Main documentation audit and quality assurance system."""
+
+    _FRESHNESS_AGE_HIGH_DAYS: Final[int] = 180
+    _QUALITY_SCORE_CRITICAL_THRESHOLD: Final[int] = 50
+    _QUALITY_SCORE_HIGH_THRESHOLD: Final[int] = 75
+    _QUALITY_SCORE_HIGH_COLOR_THRESHOLD: Final[int] = 80
+    _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD: Final[int] = 60
+    _QUALITY_SCORE_CI_THRESHOLD: Final[int] = 70
+
+    _AUDIT_REPORT_TEMPLATE: Final[str] = """
     <!DOCTYPE html>
     <html>
     <head>
@@ -95,10 +99,6 @@ _AUDIT_REPORT_TEMPLATE: Final[str] = """
         <div class="issues">
             <h2>Detailed Issues</h2>
     """
-
-
-class FlextQualityDocumentationAuditor:
-    """Main documentation audit and quality assurance system."""
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the auditor from the validated documentation configuration.
@@ -244,7 +244,9 @@ class FlextQualityDocumentationAuditor:
         outdated_indicators = self._check_outdated_indicators(content)
         return {
             "type": "outdated_content",
-            "severity": "high" if age_days > _FRESHNESS_AGE_HIGH_DAYS else "medium",
+            "severity": "high"
+            if age_days > FlextQualityDocumentationAuditor._FRESHNESS_AGE_HIGH_DAYS
+            else "medium",
             "file": str(file_path.relative_to(self.project_root)),
             "age_days": age_days,
             "last_modified": mtime.isoformat(),
@@ -673,7 +675,10 @@ class FlextQualityDocumentationAuditor:
         issues = self.results.issues
         recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
-        if quality_score < _QUALITY_SCORE_CRITICAL_THRESHOLD:
+        if (
+            quality_score
+            < FlextQualityDocumentationAuditor._QUALITY_SCORE_CRITICAL_THRESHOLD
+        ):
             recommendations.append(
                 m.Quality.AuditRecommendation(
                     priority="critical",
@@ -688,7 +693,10 @@ class FlextQualityDocumentationAuditor:
                     ],
                 ),
             )
-        elif quality_score < _QUALITY_SCORE_HIGH_THRESHOLD:
+        elif (
+            quality_score
+            < FlextQualityDocumentationAuditor._QUALITY_SCORE_HIGH_THRESHOLD
+        ):
             recommendations.append(
                 m.Quality.AuditRecommendation(
                     priority="high",
@@ -794,7 +802,7 @@ class FlextQualityDocumentationAuditor:
         files_analyzed = metrics.files_analyzed
         generated_at = self.results.timestamp
         score_color = self._get_score_color(quality_score)
-        html = _AUDIT_REPORT_TEMPLATE
+        html = FlextQualityDocumentationAuditor._AUDIT_REPORT_TEMPLATE
         for name, value in {
             "generated_at": generated_at,
             "files_analyzed": files_analyzed,
@@ -857,9 +865,15 @@ class FlextQualityDocumentationAuditor:
         Returns:
             The resulting ``str``.
         """
-        if score >= _QUALITY_SCORE_HIGH_COLOR_THRESHOLD:
+        if (
+            score
+            >= FlextQualityDocumentationAuditor._QUALITY_SCORE_HIGH_COLOR_THRESHOLD
+        ):
             return "#28a745"
-        if score >= _QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD:
+        if (
+            score
+            >= FlextQualityDocumentationAuditor._QUALITY_SCORE_MEDIUM_COLOR_THRESHOLD
+        ):
             return "#ffc107"
         return "#dc3545"
 
@@ -999,7 +1013,11 @@ class FlextQualityDocumentationAuditor:
                 severity_breakdown = metrics.severity_breakdown
                 if severity_breakdown["critical"] + severity_breakdown["high"] > 0:
                     return True
-            return self.ci_mode and metrics.quality_score < _QUALITY_SCORE_CI_THRESHOLD
+            return (
+                self.ci_mode
+                and metrics.quality_score
+                < FlextQualityDocumentationAuditor._QUALITY_SCORE_CI_THRESHOLD
+            )
 
     @staticmethod
     def _run_handler(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:

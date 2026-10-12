@@ -37,7 +37,10 @@ class FlextQualityConstants(FlextWebConstants):
         threshold = c.Quality.THRESHOLD_DEFAULT_LINES
     """
 
-    class Quality(FlextQualityConstantsValues.Quality):
+    class Quality(
+        FlextQualityConstantsValues.Quality,
+        FlextQualityConstantsValues,
+    ):
         """Quality-specific constants namespace."""
 
         class LinkCheckerDemo(FlextQualityConstantsValues.LinkCheckerDemo):

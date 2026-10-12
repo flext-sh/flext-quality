@@ -26,11 +26,11 @@ from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 if TYPE_CHECKING:
     from collections.abc import MutableSequence
 
-_MAX_TOC_HEADING_LEVEL: Final[int] = 3
-
 
 class FlextQualityDocumentationOptimizer:
     """Documentation optimization and enhancement system."""
+
+    _MAX_TOC_HEADING_LEVEL: Final[int] = 3
 
     def __init__(self, *, backup: bool = True) -> None:
         """Initialize the documentation optimizer.
@@ -208,7 +208,7 @@ class FlextQualityDocumentationOptimizer:
                 level = len(match.group(1))
                 title = match.group(2)
                 anchor = self._heading_to_anchor(title)
-                if level <= _MAX_TOC_HEADING_LEVEL:
+                if level <= FlextQualityDocumentationOptimizer._MAX_TOC_HEADING_LEVEL:
                     indent = "  " * (level - 1)
                     toc_lines.append(f"{indent}- [{title}](#{anchor})")
         return toc_lines

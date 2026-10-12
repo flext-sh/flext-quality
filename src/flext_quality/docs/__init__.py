@@ -14,7 +14,7 @@ from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality.docs import core, scripts, tools
-    from flext_quality.docs.core.config_manager import FlextQualityConfigManager
+    from flext_quality.docs.core.maintenance import FlextQualityConfigManager
     from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
     from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
     from flext_quality.docs.scheduled_maintenance import (
@@ -48,7 +48,7 @@ install_lazy_exports(
     __name__,
     globals(),
     MappingProxyType({
-        "FlextQualityConfigManager": ".core.config_manager",
+        "FlextQualityConfigManager": ".core.maintenance",
         "FlextQualityDocumentationAuditor": ".scripts.audit",
         "FlextQualityDocumentationDashboard": ".dashboard",
         "FlextQualityDocumentationNotifier": ".notifications",

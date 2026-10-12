@@ -25,15 +25,15 @@ from flext_quality import c, m, p, r, s, t, u
 if TYPE_CHECKING:
     from collections.abc import Mapping, MutableSequence
 
-_QUALITY_SCORE_EXCELLENT: Final[int] = 80
-_QUALITY_SCORE_GOOD: Final[int] = 60
-_QUALITY_SCORE_ACCEPTABLE: Final[int] = 40
-_TEMPLATES_DIR: Final[Path] = Path(__file__).parent / "templates"
-_HTML_REPORT_TEMPLATE_NAME: Final[str] = "report.html.j2"
-
 
 class FlextQualityDocumentationReporter:
     """Documentation quality reporting and analytics system."""
+
+    _QUALITY_SCORE_EXCELLENT: Final[int] = 80
+    _QUALITY_SCORE_GOOD: Final[int] = 60
+    _QUALITY_SCORE_ACCEPTABLE: Final[int] = 40
+    _TEMPLATES_DIR: Final[Path] = Path(__file__).parent / "templates"
+    _HTML_REPORT_TEMPLATE_NAME: Final[str] = "report.html.j2"
 
     logger = u.fetch_logger(__name__)
 
@@ -314,11 +314,11 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``str``.
         """
-        if overall_score >= _QUALITY_SCORE_EXCELLENT:
+        if overall_score >= FlextQualityDocumentationReporter._QUALITY_SCORE_EXCELLENT:
             return "excellent"
-        if overall_score >= _QUALITY_SCORE_GOOD:
+        if overall_score >= FlextQualityDocumentationReporter._QUALITY_SCORE_GOOD:
             return "good"
-        if overall_score >= _QUALITY_SCORE_ACCEPTABLE:
+        if overall_score >= FlextQualityDocumentationReporter._QUALITY_SCORE_ACCEPTABLE:
             return "needs_improvement"
         return "critical"
 
@@ -565,8 +565,12 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        environment = cli_u.Cli.template_environment(_TEMPLATES_DIR)
-        template = environment.get_template(_HTML_REPORT_TEMPLATE_NAME)
+        environment = cli_u.Cli.template_environment(
+            FlextQualityDocumentationReporter._TEMPLATES_DIR,
+        )
+        template = environment.get_template(
+            FlextQualityDocumentationReporter._HTML_REPORT_TEMPLATE_NAME,
+        )
         return template.render(**template_data)
 
     @staticmethod
@@ -862,7 +866,10 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _report_date(
-        report: Mapping[str, object],
+        report: Mapping[
+            str,
+            t.Quality.DocumentationReportValue | t.JsonValue | datetime,
+        ],
     ) -> datetime:
         """Extract the report date, falling back to the current time.
 
@@ -876,7 +883,10 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _audit_trend_entry(
-        report: Mapping[str, object],
+        report: Mapping[
+            str,
+            t.Quality.DocumentationReportValue | t.JsonValue | datetime,
+        ],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the audit trend entry for one historical report.
@@ -901,7 +911,10 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _validation_trend_entry(
-        report: Mapping[str, object],
+        report: Mapping[
+            str,
+            t.Quality.DocumentationReportValue | t.JsonValue | datetime,
+        ],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the link-validation trend entry for one historical report.
@@ -926,7 +939,10 @@ class FlextQualityDocumentationReporter:
 
     @staticmethod
     def _optimization_trend_entry(
-        report: Mapping[str, object],
+        report: Mapping[
+            str,
+            t.Quality.DocumentationReportValue | t.JsonValue | datetime,
+        ],
         date_val: datetime,
     ) -> FlextQualityDocumentationReporter.TrendEntry | None:
         """Build the optimization trend entry for one historical report.

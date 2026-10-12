@@ -184,6 +184,26 @@ class FlextQualityLinkChecker:
         )
         return result
 
+    def _record_batch_performance(
+        self,
+        results: t.SequenceOf[m.Quality.LinkCheckResult],
+        start_time: float,
+    ) -> t.SequenceOf[m.Quality.LinkCheckResult]:
+        """Record batch timing metrics and return the results unchanged.
+
+        Returns:
+            The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+        """
+        self.results.performance.total_time = time.time() - start_time
+        valid_times: t.SequenceOf[float] = [
+            r.response_time for r in results if r.response_time is not None and r.valid
+        ]
+        if valid_times:
+            self.results.performance.average_response_time = sum(valid_times) / len(
+                valid_times,
+            )
+        return results
+
     async def check_links_batch_async(
         self,
         links: t.SequenceOf[m.Quality.LinkRecord],
@@ -211,18 +231,7 @@ class FlextQualityLinkChecker:
 
         results = await asyncio.gather(*tasks)
 
-        self.results.performance.total_time = time.time() - start_time
-
-        valid_times: t.SequenceOf[float] = [
-            r.response_time for r in results if r.response_time is not None and r.valid
-        ]
-
-        if valid_times:
-            self.results.performance.average_response_time = sum(valid_times) / len(
-                valid_times,
-            )
-
-        return results
+        return self._record_batch_performance(results, start_time)
 
     def check_links_batch_sync(
         self,
@@ -245,18 +254,7 @@ class FlextQualityLinkChecker:
         ) as executor:
             results = list(executor.map(check_single, links))
 
-        self.results.performance.total_time = time.time() - start_time
-
-        valid_times: t.SequenceOf[float] = [
-            r.response_time for r in results if r.response_time is not None and r.valid
-        ]
-
-        if valid_times:
-            self.results.performance.average_response_time = sum(valid_times) / len(
-                valid_times,
-            )
-
-        return results
+        return self._record_batch_performance(results, start_time)
 
     async def validate_links(
         self,

@@ -258,7 +258,7 @@ class FlextQualityScheduledMaintenance:
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
         latest_audit_report = str(self._docs_reports_dir() / "latest_audit.json")
-        config_payload: dict[str, t.JsonValue] = {
+        config_payload: t.JsonDict = {
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
