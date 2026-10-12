@@ -17,7 +17,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from flext_quality import FlextQualityDocumentationNotifier
+from flext_quality.docs import FlextQualityDocumentationNotifier
 from tests import tm
 
 if TYPE_CHECKING:

@@ -16,7 +16,7 @@ from flext_cli import FlextCliConfig
 
 from flext_core import FlextSettings
 from flext_quality import m
-from flext_quality._models import FlextQualityNamespace
+from flext_quality._models._quality_namespace import FlextQualityNamespace
 
 
 class FlextQualityConfig(FlextSettings, FlextCliConfig):

@@ -13,7 +13,8 @@ from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
 from flext_cli import cli
 
-from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
+from flext_quality import m, p, quality, r, s, t, u
+from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
     from flext_quality.base import FlextQualityServiceBase

@@ -14,7 +14,8 @@ import sys
 from collections.abc import MutableSequence
 from pathlib import Path
 
-from flext_quality import FlextQualityConfigManager, c, m, t, u
+from flext_quality import c, m, t, u
+from flext_quality.docs.core.config_manager import FlextQualityConfigManager
 
 
 class FlextQualityStyleValidator:

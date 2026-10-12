@@ -8,16 +8,12 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_quality import (
-    FlextQualityClaudeContextClient,
-    FlextQualityClaudeMemClient,
-    FlextQualityHookManager,
-    FlextQualityRulesEngine,
-    c,
-    t,
-    u,
-)
+from flext_quality import c, t, u
+from flext_quality.hooks.manager import FlextQualityHookManager
+from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
+from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
 from flext_quality.mcp.server import FlextQualityMcpServer
+from flext_quality.rules.engine import FlextQualityRulesEngine
 
 _mcp = FlextQualityMcpServer.resolve_server()
 
