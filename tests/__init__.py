@@ -15,7 +15,6 @@ from flext_core.lazy import install_lazy_exports
 if TYPE_CHECKING:
     from flext_tests import api, d, e, h, r, td, tf, tk, tm, x
 
-    from tests import helpers, unit
     from tests.base import TestsFlextQualityServiceBase, s
     from tests.constants import TestsFlextQualityConstants, c
     from tests.models import TestsFlextQualityModels, m
@@ -38,7 +37,6 @@ __all__: tuple[str, ...] = (
     "d",
     "e",
     "h",
-    "helpers",
     "m",
     "p",
     "r",
@@ -68,7 +66,6 @@ install_lazy_exports(
         "d": "flext_tests",
         "e": "flext_tests",
         "h": "flext_tests",
-        "helpers": ".helpers",
         "m": ".models",
         "p": ".protocols",
         "r": "flext_tests",
@@ -79,7 +76,6 @@ install_lazy_exports(
         "tk": "flext_tests",
         "tm": "flext_tests",
         "u": ".utilities",
-        "unit": ".unit",
         "x": "flext_tests",
     }),
     public_exports=__all__,
