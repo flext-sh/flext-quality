@@ -13,13 +13,14 @@ import shutil
 from collections.abc import Mapping, MutableSequence
 from typing import final
 
-from flext_core import e, r
 from flext_quality import (
     FlextQualityConstants as c,
     FlextQualityModels as m,
     FlextQualityProtocols as p,
     FlextQualityTypes as t,
     FlextQualityUtilities as u,
+    e,
+    r,
 )
 
 

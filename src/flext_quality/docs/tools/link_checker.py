@@ -20,7 +20,7 @@ import requests
 from aiohttp import ClientSession, ClientTimeout
 
 from flext_quality import c, m, t, u
-from flext_quality.docs.core.config_manager import FlextQualityConfigManager
+from flext_quality.docs.core import FlextQualityConfigManager
 
 
 class FlextQualityLinkChecker:

@@ -23,7 +23,7 @@ from typing import Annotated
 from flext_web import FlextWebModels as _WebModels
 
 from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
-from flext_quality._models.flextqualitymodels_part_01 import FlextQualityModelsPart01
+from flext_quality._models import FlextQualityModelsPart01
 
 
 class FlextQualityModelsPart02(FlextQualityModelsPart01):

@@ -24,8 +24,8 @@ import requests
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
-from flext_quality.docs.core.config_manager import FlextQualityConfigManager
-from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
+from flext_quality.docs.core import FlextQualityConfigManager
+from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence

@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from flext_quality import c, m, p, r, t, u
-from flext_quality.rules.loader import FlextQualityRulesLoader
+from flext_quality.rules import FlextQualityRulesLoader
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence

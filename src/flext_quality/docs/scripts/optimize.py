@@ -21,7 +21,7 @@ from typing import TYPE_CHECKING, Final, override
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
-from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
+from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 
 if TYPE_CHECKING:
     from collections.abc import MutableSequence

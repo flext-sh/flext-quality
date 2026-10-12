@@ -9,17 +9,19 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_quality import c, t, u
-from flext_quality.hooks.manager import FlextQualityHookManager
-from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
-from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
-from flext_quality.mcp.server import FlextQualityMcpServer
-from flext_quality.rules.engine import FlextQualityRulesEngine
-
-_mcp = FlextQualityMcpServer.resolve_server()
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.integrations import (
+    FlextQualityClaudeContextClient,
+    FlextQualityClaudeMemClient,
+)
+from flext_quality.mcp import FlextQualityMcpServer
+from flext_quality.rules import FlextQualityRulesEngine
 
 
 class FlextQualityMcpTools:
     """MCP tools namespace for flext-quality."""
+
+    _mcp = FlextQualityMcpServer.resolve_server()
 
     @_mcp.tool()
     @staticmethod

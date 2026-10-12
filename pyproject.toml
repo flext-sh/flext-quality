@@ -198,10 +198,6 @@ follow_imports = "normal"
 module = ["rope.*"]
 follow_untyped_imports = true
 
-[[tool.mypy.overrides]]
-module = ["flext_quality.base"]
-disable_error_code = ["misc", "no-redef", "assignment"]
-
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
@@ -462,8 +458,9 @@ notice-rgx = "Copyright \\(c\\) \\d{4} \\S[^\\n]*\\. All rights reserved\\."
 [tool.ruff.lint.flake8-type-checking]
 runtime-evaluated-base-classes = [
   "flext_cli.FlextCliConfig",
+  "flext_core.FlextService",
   "flext_core.FlextSettings",
-  "flext_core.s",
+  "flext_core.m.BaseModel",
   "flext_quality.FlextQualitySettings",
   "flext_quality.base.FlextQualityServiceBase",
   "flext_quality.cli.Check",
@@ -476,6 +473,7 @@ runtime-evaluated-base-classes = [
   "flext_tests.FlextTestsSettings",
   "flext_web.FlextWebModels.FlexibleInternalModel",
   "flext_web.FlextWebModels.ManagedModel",
+  "flext_web.m.BaseModel",
   "pydantic.BaseModel",
 ]
 

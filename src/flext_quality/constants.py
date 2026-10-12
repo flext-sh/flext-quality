@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 
 from flext_web import FlextWebConstants
 
-from flext_quality._constants.values import FlextQualityConstantsValues
+from flext_quality._constants import FlextQualityConstantsValues
 
 if TYPE_CHECKING:
     from flext_quality import t

@@ -13,12 +13,11 @@ from typing import TYPE_CHECKING, ClassVar, override
 
 import pytest
 
-from flext_quality import c, r, t
 from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-from tests import tm
+from tests import c, r, t, tm
 
 if TYPE_CHECKING:
-    from flext_quality import p
+    from tests import p
 
 
 class _AlwaysRunHook(FlextQualityBaseHook):

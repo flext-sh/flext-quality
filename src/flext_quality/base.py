@@ -8,11 +8,11 @@ from __future__ import annotations
 
 from abc import ABC
 
-from flext_core import s
+from flext_core import FlextService
 from flext_quality import t
 
 
-class FlextQualityServiceBase[TResult = t.JsonDict](s[TResult], ABC):
+class FlextQualityServiceBase[TResult = t.JsonDict](FlextService[TResult], ABC):
     """Base class for flext-quality services with typed settings access.
 
     Generic over the service result type so consumers can specialize:

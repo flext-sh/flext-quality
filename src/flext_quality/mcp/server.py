@@ -10,11 +10,11 @@ from fastmcp import FastMCP
 
 from flext_quality import c
 
-_mcp = FastMCP(name=c.Quality.MCP_SERVER_NAME, version=c.Quality.MCP_SERVER_VERSION)
-
 
 class FlextQualityMcpServer:
     """MCP server namespace for flext-quality."""
+
+    _mcp = FastMCP(name=c.Quality.MCP_SERVER_NAME, version=c.Quality.MCP_SERVER_VERSION)
 
     @staticmethod
     def resolve_server() -> FastMCP:
@@ -23,7 +23,7 @@ class FlextQualityMcpServer:
         Returns:
             The resulting ``FastMCP``.
         """
-        return _mcp
+        return FlextQualityMcpServer._mcp
 
 
 __all__: list[str] = ["FlextQualityMcpServer"]

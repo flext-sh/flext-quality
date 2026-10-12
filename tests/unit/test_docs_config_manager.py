@@ -12,9 +12,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_quality import t, u
-from flext_quality.docs import FlextQualityConfigManager
-from tests import tm
+from flext_quality.docs.core import FlextQualityConfigManager
+from tests import t, tm, u
 
 _MIN_EXPECTED_MISSING_FILE_ISSUES = 3
 
