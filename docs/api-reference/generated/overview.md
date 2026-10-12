@@ -18,15 +18,14 @@
   Python Modules, Typing :: Typed
 - Project class: `domain`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
-- Main facades: `FlextQuality`, `FlextQualityBaseHook`,
-  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
-  `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`
-  (+24 more)
+- Main facades: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
+  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols`,
+  `FlextQualityServiceBase`, `FlextQualitySettings` (+3 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `FlextQuality`, `FlextQualityBaseHook`,
-  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
-  `FlextQualityCodeExecutionBridge`, `FlextQualityConfig`, `FlextQualityConfigManager`,
-  `FlextQualityConstants`, `FlextQualityDocumentationAuditor` (+26 more)
+- Public symbol exports: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
+  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols`,
+  `FlextQualityServiceBase`, `FlextQualitySettings`, `FlextQualityTypes`,
+  `FlextQualityUtilities` (+5 more)
 - Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
 - Generated module pages: `8`
 

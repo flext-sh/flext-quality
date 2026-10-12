@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_quality import (
+from flext_quality.rules import (
     FlextQualityRulesEngine,
     FlextQualityRulesLoader,
     FlextQualityValidators,

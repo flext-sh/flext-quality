@@ -55,9 +55,9 @@ verification).
 - Parent FLEXT chain: read this project's `pyproject.toml` `dependencies` array filtered
   by `flext-*`. The FLEXT cascade is encoded in the inheritance lists of the facade
   classes listed under Module Map above.
-- Public extensions exposed by this project: `FlextQuality`, `FlextQualityBaseHook`,
-  `FlextQualityClaudeContextClient`, `FlextQualityClaudeMemClient`, `FlextQualityCli`,
-  `FlextQualityCodeExecutionBridge` (+26 more).
+- Public extensions exposed by this project: `FlextQuality`, `FlextQualityCli`,
+  `FlextQualityConfig`, `FlextQualityConstants`, `FlextQualityModels`,
+  `FlextQualityProtocols` (+5 more).
 - Library abstraction boundaries: see AGENTS.md §2.7.
 
 ## Quality Gates

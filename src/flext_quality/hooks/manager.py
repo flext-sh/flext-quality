@@ -9,7 +9,8 @@ from __future__ import annotations
 from collections.abc import MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING, final
 
-from flext_quality import FlextQualityBaseHook, c, p, r, t, u
+from flext_quality import c, p, r, t, u
+from flext_quality.hooks import FlextQualityBaseHook
 
 if TYPE_CHECKING:
     from pathlib import Path

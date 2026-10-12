@@ -11,7 +11,8 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_quality import FlextQualityMcpClient, c, m, p, t
+from flext_quality import c, m, p, t
+from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 
 @final

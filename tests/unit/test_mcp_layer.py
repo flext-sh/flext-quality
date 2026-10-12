@@ -14,7 +14,7 @@ from __future__ import annotations
 import shutil
 from typing import TYPE_CHECKING
 
-from flext_quality import (
+from flext_quality.mcp import (
     FlextQualityMcpResources,
     FlextQualityMcpServer,
     FlextQualityMcpTools,

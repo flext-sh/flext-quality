@@ -19,7 +19,8 @@ from urllib.robotparser import RobotFileParser
 import requests
 from aiohttp import ClientSession, ClientTimeout
 
-from flext_quality import FlextQualityConfigManager, c, m, t, u
+from flext_quality import c, m, t, u
+from flext_quality.docs.core.config_manager import FlextQualityConfigManager
 
 
 class FlextQualityLinkChecker:

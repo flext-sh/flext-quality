@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_quality import FlextQualityCodeExecutionBridge
+from flext_quality.integrations import FlextQualityCodeExecutionBridge
 from tests import tm
 
 if TYPE_CHECKING:
