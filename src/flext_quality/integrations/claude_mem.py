@@ -11,8 +11,6 @@ from __future__ import annotations
 
 from typing import final
 
-# claude-mem provides cross-session memory search and observation storage.
-
 from flext_quality import c, m, p, t
 from flext_quality.integrations import FlextQualityMcpClient
 
