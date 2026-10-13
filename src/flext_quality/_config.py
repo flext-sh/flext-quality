@@ -26,11 +26,11 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     """
 
     Quality: Annotated[
-        FlextQualityModelsBase.ConfigNamespace,
+        FlextQualityModelsBase.QualityConfigNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = FlextQualityModelsBase.ConfigNamespace()
+    ] = FlextQualityModelsBase.QualityConfigNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

@@ -12,7 +12,7 @@ from flext_web import FlextWebModels as _WebModels, m, t
 class FlextQualityModelsBase:
     """Base models for flext-quality."""
 
-    class ConfigNamespace(m.BaseModel):
+    class QualityConfigNamespace(m.BaseModel):
         """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
 
         model_config = m.ConfigDict(extra="allow", frozen=True)

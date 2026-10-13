@@ -91,7 +91,7 @@ class FlextQualityDocumentationNotifier:
 
     class _WebhookConfig(m.BaseModel):
         url: str
-        headers: t.StrMapping = u.Field(default_factory=dict[str, str])
+        headers: t.StrMapping = u.Field(default_factory=t.StrDict)
         timeout: int
 
     class _ChannelsConfig(m.BaseModel):
