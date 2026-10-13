@@ -14,15 +14,16 @@ from typing import Annotated
 
 from flext_cli import FlextCliConfig, m
 
-from flext_core import FlextSettings
 from flext_quality._models.base import FlextQualityModelsBase
 
 
-class FlextQualityConfig(FlextSettings, FlextCliConfig):
+class FlextQualityConfig(FlextCliConfig):
     """Quality config auto-loaded model-less from ``config/*.yaml``.
 
-    MRO carries ``FlextSettings`` FIRST (ENFORCE-042); the class stays a frozen,
-    YAML-validated config singleton.
+    The fleet-converged config inherits only the declared frozen config
+    capability base (``config_bases`` precedence: meltano -> cli -> core); the
+    adjustable runtime settings keep their own independent ``_settings.py``
+    lifecycle.
     """
 
     Quality: Annotated[

@@ -1,8 +1,9 @@
 """Quality domain models for flext-quality (part 2 of 2).
 
-Pydantic-2 models for the documentation quality domain, split across
-package parts to honor the fleet per-module LOC ceiling; the public
-``flext_quality.models`` facade composes both parts through MRO.
+Pydantic-2 models for the documentation scheduling, maintenance, link,
+content, notification, and execution domain. Split across package parts to
+honor the fleet per-module LOC ceiling; the public ``flext_quality.models``
+facade composes both parts through MRO.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
