@@ -22,8 +22,8 @@ from typing import Annotated
 
 from flext_web import FlextWebModels as _WebModels
 
-from flext_quality import FlextQualityConstants as c, FlextQualityTypes as t
-from flext_quality._models.flextqualitymodels_part_01 import FlextQualityModelsPart01
+from flext_quality import c, t
+from flext_quality._models import FlextQualityModelsPart01
 
 
 class FlextQualityModelsPart02(FlextQualityModelsPart01):
@@ -674,81 +674,6 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             )
             timestamp: str = _WebModels.Field(
                 description="Timestamp at which the notification run was executed.",
-            )
-
-        class AuditRulesConfig(_WebModels.FlexibleInternalModel):
-            """Configuration for audit rules and thresholds."""
-
-            quality_thresholds: _Part02.Quality.QualityThresholdsConfig = (
-                _WebModels.Field(
-                    description=(
-                        "Threshold limits applied when auditing documentation quality."
-                    ),
-                )
-            )
-            content_checks: FlextQualityModelsPart02.Quality.ContentChecksConfig = (
-                _WebModels.Field(
-                    description=(
-                        "Toggles controlling which content checks are performed during "
-                        "the audit."
-                    ),
-                )
-            )
-            severity_levels: FlextQualityModelsPart02.Quality.SeverityLevelsConfig = (
-                _WebModels.Field(
-                    description=(
-                        "Mapping of issue type identifiers to severity level "
-                        "categorization."
-                    ),
-                )
-            )
-
-        class StyleGuideConfig(_WebModels.FlexibleInternalModel):
-            """Configuration for style guide rules."""
-
-            markdown: FlextQualityModelsPart02.Quality.MarkdownStyleConfig = (
-                _WebModels.Field(description="Preferred Markdown style conventions.")
-            )
-            accessibility: FlextQualityModelsPart02.Quality.AccessibilityConfig = (
-                _WebModels.Field(
-                    description=(
-                        "Accessibility requirements applied by the style guide."
-                    ),
-                )
-            )
-            formatting: FlextQualityModelsPart02.Quality.FormattingConfig = (
-                _WebModels.Field(
-                    description="Formatting standards applied by the style guide.",
-                )
-            )
-            headings: FlextQualityModelsPart02.Quality.HeadingsConfig = (
-                _WebModels.Field(
-                    description="Heading hierarchy policy applied by the style guide.",
-                )
-            )
-            code: FlextQualityModelsPart02.Quality.CodeStyleConfig = _WebModels.Field(
-                description="Code block style policy applied by the style guide.",
-            )
-
-        class ValidationConfig(_WebModels.FlexibleInternalModel):
-            """Configuration for validation settings."""
-
-            validation: FlextQualityModelsPart02.Quality.ValidationRunConfig = (
-                _WebModels.Field(
-                    description="Execution limits applied to validation runs.",
-                )
-            )
-            link_validation: FlextQualityModelsPart02.Quality.LinkValidationConfig = (
-                _WebModels.Field(
-                    description="Settings controlling how links are validated.",
-                )
-            )
-            content_analysis: FlextQualityModelsPart02.Quality.ContentAnalysisConfig = (
-                _WebModels.Field(
-                    description=(
-                        "Settings controlling how document content is analyzed."
-                    ),
-                )
             )
 
         class OptimizerResults(_WebModels.ManagedModel):

@@ -29,13 +29,13 @@ from flext_quality import c, m, p, r, s, t, u
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
 
-_MIN_LINK_TEXT_LENGTH: Final[int] = 3
-_MIN_WORD_COUNT: Final[int] = 50
-_MIN_READABILITY_SCORE: Final[int] = 60
-
 
 class FlextQualityDocumentationValidator:
     """Coordinator facade composing link + content validators with CLI surface."""
+
+    _MIN_LINK_TEXT_LENGTH: Final[int] = 3
+    _MIN_WORD_COUNT: Final[int] = 50
+    _MIN_READABILITY_SCORE: Final[int] = 60
 
     class LinkValidator:
         """Advanced link validation and checking system."""
@@ -531,7 +531,13 @@ class FlextQualityDocumentationValidator:
             ]
             for link in links:
                 text = link.text.lower().strip()
-                if text in poor_link_texts or len(text) < _MIN_LINK_TEXT_LENGTH:
+                if (
+                    text in poor_link_texts
+                    or len(
+                        text,
+                    )
+                    < FlextQualityDocumentationValidator._MIN_LINK_TEXT_LENGTH
+                ):
                     self.results.warnings_list.append(
                         m.Quality.LinkCheckResult(
                             type="poor_link_text",
@@ -695,7 +701,10 @@ class FlextQualityDocumentationValidator:
                 content = read.value
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 metrics = self._calculate_content_metrics(content)
-                if metrics.word_count < _MIN_WORD_COUNT:
+                if (
+                    metrics.word_count
+                    < FlextQualityDocumentationValidator._MIN_WORD_COUNT
+                ):
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="insufficient_content",
@@ -704,7 +713,10 @@ class FlextQualityDocumentationValidator:
                             warning="Document appears to be too short",
                         ),
                     )
-                if metrics.readability_score < _MIN_READABILITY_SCORE:
+                if (
+                    metrics.readability_score
+                    < FlextQualityDocumentationValidator._MIN_READABILITY_SCORE
+                ):
                     self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="readability_issue",

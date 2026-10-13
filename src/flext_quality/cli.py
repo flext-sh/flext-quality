@@ -14,10 +14,10 @@ from typing import TYPE_CHECKING, Annotated, ClassVar, override
 from flext_cli import cli
 
 from flext_quality import m, p, quality, r, s, t, u
-from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
+from flext_quality.integrations import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
-    from flext_quality.base import FlextQualityServiceBase
+    from flext_quality import FlextQualityServiceBase
 
 
 class FlextQualityCli(s[bool]):
@@ -51,7 +51,7 @@ class FlextQualityCli(s[bool]):
             built = self._analysis_commands()
             if built.failure:
                 return r[t.SequenceOf[t.StrSequence]].fail(built.error)
-            return self._extend(built.value)
+            return r[t.SequenceOf[t.StrSequence]].ok(built.value)
 
         def _analysis_commands(self) -> p.Result[MutableSequence[t.StrSequence]]:
             """Build the static-analysis command sequence for the target path.
@@ -67,12 +67,6 @@ class FlextQualityCli(s[bool]):
                     return r[MutableSequence[t.StrSequence]].fail(sub.error)
                 cmds.append(sub.value)
             return r[MutableSequence[t.StrSequence]].ok(cmds)
-
-        @staticmethod
-        def _extend(
-            cmds: t.SequenceOf[t.StrSequence],
-        ) -> p.Result[t.SequenceOf[t.StrSequence]]:
-            return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
     class Validate(Check):
         """Run full validation (lint + type + security + tests) on --target."""
@@ -114,20 +108,18 @@ class FlextQualityCli(s[bool]):
         """
         return r[bool].ok(value=True)
 
+    @staticmethod
+    def invoke(
+        params: FlextQualityServiceBase[t.JsonMapping]
+        | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]],
+    ) -> p.Result[t.JsonMapping] | p.Result[t.SequenceOf[t.StrSequence]]:
+        """Execute a registered service instance for its declarative CLI route.
 
-# Why: both lanes replaced the lambda handler with a named typed function so
-# pyrefly can infer the route handler signature; the lane name `_invoke` is kept.
-def _invoke(
-    params: FlextQualityServiceBase[t.JsonMapping]
-    | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]],
-) -> p.Result[t.JsonMapping] | p.Result[t.SequenceOf[t.StrSequence]]:
-    """Execute a registered service instance for its declarative CLI route.
-
-    Returns:
-        The resulting ``p.Result[t.JsonMapping] |
-            p.Result[t.SequenceOf[t.StrSequence]]``.
-    """
-    return params.execute()
+        Returns:
+            The resulting ``p.Result[t.JsonMapping] |
+                p.Result[t.SequenceOf[t.StrSequence]]``.
+        """
+        return params.execute()
 
 
 def main(args: t.StrSequence | None = None) -> int:
@@ -147,7 +139,7 @@ def main(args: t.StrSequence | None = None) -> int:
                 name=svc.__name__.lower(),
                 help_text=svc.__doc__ or "",
                 model_cls=svc,
-                handler=_invoke,
+                handler=FlextQualityCli.invoke,
             )
             for svc in FlextQualityCli.COMMANDS
         ],

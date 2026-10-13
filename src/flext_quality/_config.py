@@ -10,12 +10,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Annotated, Self
+from typing import Annotated
 
 from flext_cli import FlextCliConfig, m
 
 from flext_core import FlextSettings
-from flext_quality._models._quality_namespace import FlextQualityNamespace
+from flext_quality._models.base import FlextQualityModelsBase
 
 
 class FlextQualityConfig(FlextSettings, FlextCliConfig):
@@ -25,38 +25,12 @@ class FlextQualityConfig(FlextSettings, FlextCliConfig):
     YAML-validated config singleton.
     """
 
-    # ENFORCE-042 namespace-holder contract: ``FlextSettings`` contributes
-    # namespacing only — instance machinery stays plain object semantics so the
-    # settings singleton ``__new__`` cannot leak into the config singleton.
-    # The inherited pydantic ``__init__`` still runs the frozen, YAML-validated
-    # construction, and the inherited pydantic ``__setattr__`` keeps the frozen
-    # guard.
-    def __new__(cls, *args: object, **kwargs: object) -> Self:
-        _ = args, kwargs
-        return object.__new__(cls)
-
-    def __eq__(self, other: object) -> bool:
-        """Identity equality per the frozen-config singleton contract.
-
-        Returns:
-            The resulting ``bool``.
-        """
-        return object.__eq__(self, other)
-
-    def __hash__(self) -> int:
-        """Identity hash per the frozen-config singleton contract.
-
-        Returns:
-            The resulting ``int``.
-        """
-        return object.__hash__(self)
-
     Quality: Annotated[
-        FlextQualityNamespace,
+        FlextQualityModelsBase.QualityConfigNamespace,
         m.Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = FlextQualityNamespace()
+    ] = FlextQualityModelsBase.QualityConfigNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

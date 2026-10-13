@@ -13,56 +13,11 @@ from typing import TYPE_CHECKING, ClassVar, override
 
 import pytest
 
-from flext_quality import c, r, t
 from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-from tests import tm
+from tests import c, r, t, tm
 
 if TYPE_CHECKING:
-    from flext_quality import p
-
-
-class _AlwaysRunHook(FlextQualityBaseHook):
-    """Hook with no matcher — runs for every input."""
-
-    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
-
-    @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r[t.JsonMapping].ok({
-            "continue": True,
-            "seen": input_data.get("tool_name"),
-        })
-
-
-class _MatcherHook(FlextQualityBaseHook):
-    """Hook that only runs for matching tool names."""
-
-    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
-    matcher: ClassVar[t.StrSequence | None] = ("Edit", "Write*")
-
-    @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r[t.JsonMapping].ok({"continue": True})
-
-
-class _BlockingHook(FlextQualityBaseHook):
-    """Hook that halts the chain by returning ``continue: False``."""
-
-    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
-
-    @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r[t.JsonMapping].ok({"continue": False, "reason": "blocked"})
-
-
-class _FailingHook(FlextQualityBaseHook):
-    """Hook whose execution reports a failure result."""
-
-    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
-
-    @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        return r[t.JsonMapping].fail("boom")
+    from tests import p
 
 
 class TestsFlextQualityBaseHook:
@@ -199,3 +154,47 @@ class TestsFlextQualityHookManager:
         entries = config.get("PreToolUse")
         assert isinstance(entries, list)
         tm.that(len(entries), eq=2)
+
+
+class _AlwaysRunHook(FlextQualityBaseHook):
+    """Hook with no matcher — runs for every input."""
+
+    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
+
+    @override
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        return r[t.JsonMapping].ok({
+            "continue": True,
+            "seen": input_data.get("tool_name"),
+        })
+
+
+class _MatcherHook(FlextQualityBaseHook):
+    """Hook that only runs for matching tool names."""
+
+    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
+    matcher: ClassVar[t.StrSequence | None] = ("Edit", "Write*")
+
+    @override
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        return r[t.JsonMapping].ok({"continue": True})
+
+
+class _BlockingHook(FlextQualityBaseHook):
+    """Hook that halts the chain by returning ``continue: False``."""
+
+    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
+
+    @override
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        return r[t.JsonMapping].ok({"continue": False, "reason": "blocked"})
+
+
+class _FailingHook(FlextQualityBaseHook):
+    """Hook whose execution reports a failure result."""
+
+    event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
+
+    @override
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        return r[t.JsonMapping].fail("boom")

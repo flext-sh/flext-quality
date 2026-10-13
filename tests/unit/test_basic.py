@@ -9,8 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from flext_quality import FlextQuality, FlextQualityConfig, c, config, quality
-from tests import tm
+from flext_quality import FlextQuality, FlextQualityConfig, config, quality
+from tests import c, tm
 
 
 class TestsFlextQualityBasic:

@@ -23,7 +23,7 @@ from tests import tm
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_quality import t
+    from tests import t
 
 
 class TestsFlextQualityDocumentationNotifier:

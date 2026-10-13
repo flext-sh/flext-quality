@@ -25,35 +25,39 @@ from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
 
-_WEBHOOK_SECURE_SCHEMES: Final[frozenset[str]] = frozenset({"https"})
-_SLACK_WEBHOOK_HOSTS: Final[frozenset[str]] = frozenset({"hooks.slack.com"})
-
-
-def _validate_outbound_webhook(url: str, allowed_hosts: frozenset[str]) -> None:
-    """Fail closed unless the webhook is an allowlisted public HTTPS host.
-
-    Resolves the host and rejects any non-global address so a forged target
-    cannot redirect a server-side request at internal, loopback, or
-    link-local services.
-
-    Raises:
-        ValueError: If webhook target is not allowlisted; or if webhook host resolves to
-            a non-public address.
-    """
-    parsed = urlparse(url)
-    host = parsed.hostname or ""
-    if parsed.scheme not in _WEBHOOK_SECURE_SCHEMES or host not in allowed_hosts:
-        msg = f"webhook target is not allowlisted: {url}"
-        raise ValueError(msg)
-    for *_, sockaddr in socket.getaddrinfo(host, 443):
-        address = ipaddress.ip_address(sockaddr[0])
-        if not address.is_global:
-            msg = f"webhook host resolves to a non-public address: {host}"
-            raise ValueError(msg)
-
 
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
+
+    _WEBHOOK_SECURE_SCHEMES: Final[frozenset[str]] = frozenset({"https"})
+    _SLACK_WEBHOOK_HOSTS: Final[frozenset[str]] = frozenset({"hooks.slack.com"})
+
+    @staticmethod
+    def _validate_outbound_webhook(url: str, allowed_hosts: frozenset[str]) -> None:
+        """Fail closed unless the webhook is an allowlisted public HTTPS host.
+
+        Resolves the host and rejects any non-global address so a forged target
+        cannot redirect a server-side request at internal, loopback, or
+        link-local services.
+
+        Raises:
+            ValueError: If webhook target is not allowlisted; or if webhook host
+                resolves to a non-public address.
+        """
+        parsed = urlparse(url)
+        host = parsed.hostname or ""
+        if (
+            parsed.scheme
+            not in FlextQualityDocumentationNotifier._WEBHOOK_SECURE_SCHEMES
+            or host not in allowed_hosts
+        ):
+            msg = f"webhook target is not allowlisted: {url}"
+            raise ValueError(msg)
+        for *_, sockaddr in socket.getaddrinfo(host, 443):
+            address = ipaddress.ip_address(sockaddr[0])
+            if not address.is_global:
+                msg = f"webhook host resolves to a non-public address: {host}"
+                raise ValueError(msg)
 
     class _ChannelConfig(m.BaseModel):
         enabled: bool
@@ -87,7 +91,7 @@ class FlextQualityDocumentationNotifier:
 
     class _WebhookConfig(m.BaseModel):
         url: str
-        headers: t.StrMapping = u.Field(default_factory=dict[str, str])
+        headers: t.StrMapping = u.Field(default_factory=t.StrDict)
         timeout: int
 
     class _ChannelsConfig(m.BaseModel):
@@ -555,7 +559,10 @@ Timestamp: {u.now().isoformat()}
             ],
         }
 
-        _validate_outbound_webhook(slack_config.webhook_url, _SLACK_WEBHOOK_HOSTS)
+        FlextQualityDocumentationNotifier._validate_outbound_webhook(
+            slack_config.webhook_url,
+            FlextQualityDocumentationNotifier._SLACK_WEBHOOK_HOSTS,
+        )
         response = requests.post(
             slack_config.webhook_url,
             json=payload,

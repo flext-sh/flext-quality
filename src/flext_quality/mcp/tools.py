@@ -9,17 +9,50 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_quality import c, t, u
-from flext_quality.hooks.manager import FlextQualityHookManager
-from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
-from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
-from flext_quality.mcp.server import FlextQualityMcpServer
-from flext_quality.rules.engine import FlextQualityRulesEngine
-
-_mcp = FlextQualityMcpServer.resolve_server()
+from flext_quality.hooks import FlextQualityHookManager
+from flext_quality.integrations import (
+    FlextQualityClaudeContextClient,
+    FlextQualityClaudeMemClient,
+)
+from flext_quality.mcp import FlextQualityMcpServer
+from flext_quality.rules import FlextQualityRulesEngine
 
 
 class FlextQualityMcpTools:
     """MCP tools namespace for flext-quality."""
+
+    _mcp = FlextQualityMcpServer.resolve_server()
+
+    @staticmethod
+    def _build_search_payload(
+        client: FlextQualityClaudeContextClient | FlextQualityClaudeMemClient,
+        query: str,
+        *,
+        limit: int,
+        search_type: str | None = None,
+    ) -> t.JsonMapping:
+        """Assemble the normalized search tool call and command payload.
+
+        Returns:
+            The resulting ``t.JsonMapping``.
+        """
+        result = client.build_search_call(query=query, limit=limit)
+        if result.failure:
+            return {"error": result.error}
+        command_result = client.build_search_command(query=query, limit=limit)
+        if command_result.failure:
+            return {"error": command_result.error}
+        params = u.normalize_to_json_value(result.value.params)
+        params_map: t.JsonMapping = params if isinstance(params, Mapping) else {}
+        params_payload: t.JsonDict = dict(params_map)
+        if search_type is not None:
+            params_payload["search_type"] = search_type
+        return {
+            "server": result.value.server,
+            "tool": result.value.tool,
+            "params": params_payload,
+            "command": u.normalize_to_json_value(command_result.value),
+        }
 
     @_mcp.tool()
     @staticmethod
@@ -34,24 +67,12 @@ class FlextQualityMcpTools:
         Returns:
             The resulting ``t.JsonMapping``.
         """
-        client = FlextQualityClaudeMemClient()
-        search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
-        result = client.build_search_call(query=query, limit=search_limit)
-        if result.failure:
-            return {"error": result.error}
-        command_result = client.build_search_command(query=query, limit=search_limit)
-        if command_result.failure:
-            return {"error": command_result.error}
-        params = u.normalize_to_json_value(result.value.params)
-        command = u.normalize_to_json_value(command_result.value)
-        return {
-            "server": result.value.server,
-            "tool": result.value.tool,
-            "params": {**params, "search_type": search_type}
-            if isinstance(params, Mapping)
-            else {"search_type": search_type},
-            "command": command,
-        }
+        return FlextQualityMcpTools._build_search_payload(
+            FlextQualityClaudeMemClient(),
+            query,
+            limit=limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT,
+            search_type=search_type,
+        )
 
     @_mcp.tool()
     @staticmethod
@@ -61,22 +82,11 @@ class FlextQualityMcpTools:
         Returns:
             The resulting ``t.JsonMapping``.
         """
-        client = FlextQualityClaudeContextClient()
-        search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
-        result = client.build_search_call(query=query, limit=search_limit)
-        if result.failure:
-            return {"error": result.error}
-        command_result = client.build_search_command(query=query, limit=search_limit)
-        if command_result.failure:
-            return {"error": command_result.error}
-        params = u.normalize_to_json_value(result.value.params)
-        command = u.normalize_to_json_value(command_result.value)
-        return {
-            "server": result.value.server,
-            "tool": result.value.tool,
-            "params": params if isinstance(params, Mapping) else {},
-            "command": command,
-        }
+        return FlextQualityMcpTools._build_search_payload(
+            FlextQualityClaudeContextClient(),
+            query,
+            limit=limit or c.Quality.DEFAULT_SEARCH_LIMIT,
+        )
 
     @_mcp.tool()
     @staticmethod

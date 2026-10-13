@@ -1002,7 +1002,7 @@ padrão.
        32
        33          @staticmethod
        34          def _empty_dict_str_str() -> t.StrMapping:
->>>    35              return dict[str, str]()
+>>>    35              return t.StrDict()
        36
        37          @staticmethod
        38          def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:

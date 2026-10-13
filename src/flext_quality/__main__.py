@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from flext_cli import cli
 
-from flext_quality.cli import main
+from flext_quality import main
 
 if __name__ == "__main__":
     cli.exit(main())
