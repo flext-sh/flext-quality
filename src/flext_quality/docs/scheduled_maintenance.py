@@ -122,6 +122,10 @@ class FlextQualityScheduledMaintenance:
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
         """Load maintenance schedule configuration, returning the merged config.
 
+        Args:
+            config_path: Optional path to a configuration file merged over the
+                defaults.
+
         Returns:
             The resulting ``m.Quality.MaintenanceConfig``.
 
@@ -459,6 +463,9 @@ class FlextQualityScheduledMaintenance:
     def run_tasks(self, task_names: t.StrSequence) -> bool:
         """Run a list of maintenance tasks.
 
+        Args:
+            task_names: Names of the maintenance tasks to run.
+
         Returns:
             The resulting ``bool``.
 
@@ -482,6 +489,9 @@ class FlextQualityScheduledMaintenance:
     def fail_step(self, message: str) -> bool:
         """Record a step failure message and report the step as failed.
 
+        Args:
+            message: Failure description recorded in the results.
+
         Returns:
             The resulting ``bool``.
 
@@ -491,6 +501,9 @@ class FlextQualityScheduledMaintenance:
 
     def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries.
+
+        Args:
+            task_config: Configuration of the task to run.
 
         Returns:
             The resulting ``bool``.
@@ -892,6 +905,9 @@ class FlextQualityScheduledMaintenance:
     def run_manual(self, task_type: str) -> bool:
         """Run maintenance tasks manually.
 
+        Args:
+            task_type: Schedule type selecting the tasks to run.
+
         Returns:
             The resulting ``bool``.
 
@@ -1011,8 +1027,12 @@ class FlextQualityScheduledMaintenance:
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

@@ -897,6 +897,10 @@ class FlextQualityDocumentationAuditor:
     ) -> p.Result[str]:
         """Save audit report to file.
 
+        Args:
+            output_format: Format for the saved report.
+            output_path: Directory the report file is written to.
+
         Returns:
             The resulting ``p.Result[str]``.
 
@@ -1048,8 +1052,12 @@ class FlextQualityDocumentationAuditor:
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

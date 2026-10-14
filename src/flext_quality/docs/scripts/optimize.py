@@ -52,6 +52,9 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues.
 
+        Args:
+            doc_files: Documentation files reformatted in place.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
 
@@ -147,6 +150,9 @@ class FlextQualityDocumentationOptimizer:
         doc_files: t.SequenceOf[Path],
     ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents.
+
+        Args:
+            doc_files: Documentation files whose tables of contents refresh.
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
@@ -288,6 +294,9 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation.
 
+        Args:
+            doc_files: Documentation files enhanced in place.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
 
@@ -367,6 +376,9 @@ class FlextQualityDocumentationOptimizer:
         doc_files: t.SequenceOf[Path],
     ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability.
+
+        Args:
+            doc_files: Documentation files restructured in place.
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
@@ -450,6 +462,9 @@ class FlextQualityDocumentationOptimizer:
         doc_files: t.SequenceOf[Path],
     ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps.
+
+        Args:
+            doc_files: Documentation files whose frontmatter refreshes.
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
@@ -555,6 +570,9 @@ class FlextQualityDocumentationOptimizer:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report.
 
+        Args:
+            report_format: Format for the generated report.
+
         Returns:
             The resulting ``str``.
 
@@ -571,6 +589,9 @@ class FlextQualityDocumentationOptimizer:
         output_path: str = "docs/maintenance/reports/",
     ) -> p.Result[str]:
         """Save optimization report.
+
+        Args:
+            output_path: Directory the report file is written to.
 
         Returns:
             The resulting ``p.Result[str]``.
@@ -715,8 +736,12 @@ class FlextQualityDocumentationOptimizer:
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

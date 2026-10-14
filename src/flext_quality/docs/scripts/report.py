@@ -194,6 +194,10 @@ class FlextQualityDocumentationReporter:
     ) -> str:
         """Generate comprehensive quality report.
 
+        Args:
+            report_format: Format for the generated report.
+            include_trends: Whether trend analytics are embedded.
+
         Returns:
             The resulting ``str``.
 
@@ -761,6 +765,9 @@ class FlextQualityDocumentationReporter:
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period.
 
+        Args:
+            days: Number of days covered by the trend window.
+
         Returns:
             The resulting ``str``.
 
@@ -997,6 +1004,11 @@ class FlextQualityDocumentationReporter:
     ) -> p.Result[Path]:
         """Save report to file.
 
+        Args:
+            content: Report body written to the file.
+            filename: Name of the report file.
+            report_format: Format of the saved report.
+
         Returns:
             The resulting ``p.Result[Path]``.
 
@@ -1116,8 +1128,12 @@ class FlextQualityDocumentationReporter:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

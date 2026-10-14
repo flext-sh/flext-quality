@@ -568,7 +568,10 @@ class FlextQualityDocumentationValidator:
             return self.results
 
         def generate_report(self, report_format: str = "json") -> str:
-            """Generate validation report.
+            """Generate validation report in the requested format.
+
+            Args:
+                report_format: Format for the generated report.
 
             Returns:
                 The resulting ``str``.
@@ -586,6 +589,9 @@ class FlextQualityDocumentationValidator:
             output_path: str = "docs/maintenance/reports/",
         ) -> p.Result[Path]:
             """Save validation report.
+
+            Args:
+                output_path: Directory the report file is written to.
 
             Returns:
                 The resulting ``p.Result[Path]``.
@@ -968,8 +974,12 @@ class FlextQualityDocumentationValidator:
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation validation via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

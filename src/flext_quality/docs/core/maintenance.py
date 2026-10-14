@@ -207,7 +207,11 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a quality threshold value.
+            """Return a quality threshold value.
+
+            Args:
+                key: Threshold key to look up.
+                default: Value returned when the key is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
@@ -217,7 +221,11 @@ class FlextQualityConfigManager:
             return threshold if isinstance(threshold, c.PRIMITIVES_TYPES) else default
 
         def is_check_enabled(self, check_type: str, check_name: str) -> bool:
-            """Check if a specific audit check is enabled.
+            """Return whether a specific audit check is enabled.
+
+            Args:
+                check_type: Audit section owning the check.
+                check_name: Name of the check within the section.
 
             Returns:
                 The resulting ``bool``.
@@ -246,7 +254,11 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a markdown formatting rule.
+            """Return a markdown formatting rule.
+
+            Args:
+                rule: Markdown rule key to look up.
+                default: Value returned when the rule is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
@@ -261,7 +273,11 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get an accessibility rule.
+            """Return an accessibility rule.
+
+            Args:
+                rule: Accessibility rule key to look up.
+                default: Value returned when the rule is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
@@ -310,7 +326,11 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a link validation setting.
+            """Return a link validation setting.
+
+            Args:
+                setting: Link setting key to look up.
+                default: Value returned when the setting is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
@@ -325,7 +345,11 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a content validation setting.
+            """Return a content validation setting.
+
+            Args:
+                setting: Content setting key to look up.
+                default: Value returned when the setting is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
