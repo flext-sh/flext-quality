@@ -33,6 +33,12 @@ class FlextQualityMcpTools:
     ) -> t.JsonMapping:
         """Assemble the normalized search tool call and command payload.
 
+        Args:
+            client: Integration client providing the search call builders.
+            query: Search query text.
+            limit: Maximum number of results requested.
+            search_type: Optional search type inserted into the params.
+
         Returns:
             The resulting ``t.JsonMapping``.
 
@@ -65,6 +71,11 @@ class FlextQualityMcpTools:
     ) -> t.JsonMapping:
         """Build command to search cross-session memory via claude-mem.
 
+        Args:
+            query: Search query text.
+            search_type: Search type selecting the memory index.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``t.JsonMapping``.
 
@@ -81,6 +92,10 @@ class FlextQualityMcpTools:
     def search_code(query: str, *, limit: int | None = None) -> t.JsonMapping:
         """Build command for semantic code search via claude-context.
 
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``t.JsonMapping``.
 
@@ -95,6 +110,10 @@ class FlextQualityMcpTools:
     @staticmethod
     def execute_hook(event: str, input_data: t.JsonMapping) -> t.JsonMapping:
         """Execute a hook manually.
+
+        Args:
+            event: Hook event name to dispatch.
+            input_data: Hook input payload forwarded to the hooks.
 
         Returns:
             The resulting ``t.JsonMapping``.
@@ -116,6 +135,10 @@ class FlextQualityMcpTools:
         context: t.JsonMapping | None = None,
     ) -> t.JsonMapping:
         """Validate code against YAML rules.
+
+        Args:
+            path: File or directory path to validate.
+            context: Optional validation context attached to violations.
 
         Returns:
             The resulting ``t.JsonMapping``.

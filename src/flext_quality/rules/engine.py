@@ -20,13 +20,19 @@ class FlextQualityRulesEngine:
     """Engine for YAML-based declarative rules validation."""
 
     def __init__(self, rules_path: Path | None = None) -> None:
-        """Initialize rules engine."""
+        """Initialize the rules engine.
+
+        Args:
+            rules_path: Optional default path to the rules YAML file loaded
+                when no explicit path is given.
+
+        """
         self._rules_path: Path | None = rules_path
         self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
     def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
-        """Get loaded rules.
+        """Return the loaded rules.
 
         Returns:
             The resulting ``MutableSequence[m.Quality.RuleDefinition]``.
@@ -35,7 +41,11 @@ class FlextQualityRulesEngine:
         return list(self._rules)
 
     def load_rules(self, rules_path: Path | None = None) -> p.Result[int]:
-        """Load rules from YAML file.
+        """Load rules from a YAML file.
+
+        Args:
+            rules_path: Optional path overriding the engine's configured
+                rules path.
 
         Returns:
             The resulting ``p.Result[int]``.
@@ -58,6 +68,10 @@ class FlextQualityRulesEngine:
         context: t.JsonMapping | None = None,
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate code against loaded rules.
+
+        Args:
+            path: File or directory path to validate.
+            context: Optional validation context attached to violations.
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
@@ -84,7 +98,11 @@ class FlextQualityRulesEngine:
         content: str,
         filename: str = "<string>",
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-        """Validate content string against loaded rules.
+        """Validate a content string against loaded rules.
+
+        Args:
+            content: Text content checked against each enabled rule.
+            filename: Display name used in violation entries.
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
@@ -109,6 +127,11 @@ class FlextQualityRulesEngine:
         filename: str,
     ) -> t.SequenceOf[t.JsonMapping]:
         """Check a single rule against content.
+
+        Args:
+            rule: Rule definition whose pattern is matched per line.
+            content: Text content checked by the rule.
+            filename: Display name used in violation entries.
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
@@ -159,6 +182,9 @@ class FlextQualityRulesEngine:
     def _rule_type_to_severity(rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity.
 
+        Args:
+            rule_type: Rule type mapped to its severity.
+
         Returns:
             The resulting ``str``.
 
@@ -176,6 +202,10 @@ class FlextQualityRulesEngine:
         context: t.JsonMapping,
     ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules.
+
+        Args:
+            file_path: File read and checked by every enabled rule.
+            context: Validation context attached to violations.
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.

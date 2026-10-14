@@ -118,6 +118,9 @@ class FlextQualityCli(s[bool]):
     ) -> p.Result[t.JsonMapping] | p.Result[t.SequenceOf[t.StrSequence]]:
         """Execute a registered service instance for its declarative CLI route.
 
+        Args:
+            params: Service instance whose declarative route is invoked.
+
         Returns:
             The resulting ``p.Result[t.JsonMapping] |
                 p.Result[t.SequenceOf[t.StrSequence]]``.
@@ -127,10 +130,13 @@ class FlextQualityCli(s[bool]):
 
 
 def main(args: t.StrSequence | None = None) -> int:
-    """flext-quality CLI entry point.
+    """Run the flext-quality CLI entry point.
+
+    Args:
+        args: Command-line arguments; defaults to ``sys.argv[1:]`` when ``None``.
 
     Returns:
-        The resulting ``int``.
+        The process exit code.
 
     """
     app = cli.create_app_with_common_params(

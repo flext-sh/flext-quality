@@ -19,7 +19,10 @@ class FlextQualityRulesLoader:
     """Loads rules from YAML files."""
 
     def load(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
-        """Load rules from YAML file.
+        """Load rules from a YAML file.
+
+        Args:
+            path: Path to the YAML file holding the rule definitions.
 
         Returns:
             The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
@@ -69,6 +72,9 @@ class FlextQualityRulesLoader:
     ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files.
 
+        Args:
+            paths: Paths to the YAML files holding rule definitions.
+
         Returns:
             The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
 
@@ -88,7 +94,11 @@ class FlextQualityRulesLoader:
         data: t.JsonMapping,
         index: int,
     ) -> p.Result[m.Quality.RuleDefinition]:
-        """Parse a single rule from dict.
+        """Parse a single rule from a mapping.
+
+        Args:
+            data: Raw rule mapping with ``name`` and ``type`` keys.
+            index: Position of the rule in the source file, used in errors.
 
         Returns:
             The resulting ``p.Result[m.Quality.RuleDefinition]``.

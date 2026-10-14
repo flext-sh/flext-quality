@@ -315,6 +315,9 @@ class FlextQualityDocumentationNotifier:
     def notify_critical_issues(self, audit_data: t.JsonMapping) -> bool:
         """Send notification for critical documentation issues.
 
+        Args:
+            audit_data: Audit payload whose critical issues are reported.
+
         Returns:
             The resulting ``bool``.
 
@@ -355,6 +358,10 @@ class FlextQualityDocumentationNotifier:
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops.
 
+        Args:
+            current_score: Latest documentation quality score.
+            previous_score: Score of the previous audit run.
+
         Returns:
             The resulting ``bool``.
 
@@ -388,6 +395,9 @@ Please review recent changes and address any identified issues.
     def notify_broken_links(self, broken_links: t.JsonList) -> bool:
         """Send notification for broken links.
 
+        Args:
+            broken_links: Broken link entries collected by the audit.
+
         Returns:
             The resulting ``bool``.
 
@@ -411,6 +421,9 @@ Please review recent changes and address any identified issues.
     def notify_weekly_report(self, report_data: t.JsonMapping) -> bool:
         """Send weekly quality report notification.
 
+        Args:
+            report_data: Report payload summarized in the notification.
+
         Returns:
             The resulting ``bool``.
 
@@ -428,6 +441,9 @@ Please review recent changes and address any identified issues.
 
     def notify_monthly_report(self, report_data: t.JsonMapping) -> bool:
         """Send monthly comprehensive report notification.
+
+        Args:
+            report_data: Report payload summarized in the notification.
 
         Returns:
             The resulting ``bool``.
@@ -451,6 +467,11 @@ Please review recent changes and address any identified issues.
         priority: str = c.Quality.NotificationPriority.INFO.value,
     ) -> bool:
         """Send notification through all enabled channels.
+
+        Args:
+            title: Notification title.
+            message: Notification body text.
+            priority: Notification priority level.
 
         Returns:
             The resulting ``bool``.
@@ -975,8 +996,12 @@ Found {len(broken_links)} broken links that need attention:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the notification system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

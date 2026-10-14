@@ -30,13 +30,24 @@ class FlextQualityCodeExecutionBridge:
         timeout_ms: int | None = None,
         working_dir: Path | None = None,
     ) -> None:
-        """Initialize the code execution bridge."""
+        """Initialize the code execution bridge.
+
+        Args:
+            timeout_ms: Optional execution timeout in milliseconds; defaults
+                to the configured integration timeout.
+            working_dir: Optional working directory for executions; defaults
+                to the current directory.
+
+        """
         self._timeout_ms = timeout_ms or c.Quality.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
     @staticmethod
     def build_basedpyright_command(target_path: Path) -> p.Result[t.StrSequence]:
         """Build command for basedpyright type checker.
+
+        Args:
+            target_path: Path checked by basedpyright.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -52,6 +63,10 @@ class FlextQualityCodeExecutionBridge:
         args: t.StrSequence | None = None,
     ) -> p.Result[t.StrSequence]:
         """Build command for Python execution.
+
+        Args:
+            script_path: Path of the Python script to execute.
+            args: Optional arguments appended to the command.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -77,6 +92,11 @@ class FlextQualityCodeExecutionBridge:
     ) -> p.Result[t.StrSequence]:
         """Build command for ruff linter.
 
+        Args:
+            target_path: Path checked by ruff.
+            fix: Whether ruff applies its fixes.
+            output_format: Output format requested from ruff.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
 
@@ -93,6 +113,10 @@ class FlextQualityCodeExecutionBridge:
         args: t.StrSequence | None = None,
     ) -> p.Result[t.StrSequence]:
         """Build command for TypeScript execution via npx tsx.
+
+        Args:
+            script_path: Path of the TypeScript script to execute.
+            args: Optional arguments appended to the command.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -117,6 +141,12 @@ class FlextQualityCodeExecutionBridge:
         args: t.StrSequence | None = None,
     ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing.
+
+        Args:
+            script_path: Path of the script to execute.
+            runtime: Runtime identifier (``python``, ``typescript``, ``ruff``,
+                or ``basedpyright``).
+            args: Optional arguments appended to the request.
 
         Returns:
             The resulting ``p.Result[m.Quality.ExecutionRequest]``.

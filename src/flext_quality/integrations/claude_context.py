@@ -24,7 +24,13 @@ class FlextQualityClaudeContextClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the Claude Context client."""
+        """Initialize the Claude Context client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured integration timeout.
+
+        """
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_index_call(
@@ -32,6 +38,9 @@ class FlextQualityClaudeContextClient:
         path: str | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call.
+
+        Args:
+            path: Optional codebase path indexed by the tool.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
@@ -53,6 +62,10 @@ class FlextQualityClaudeContextClient:
         limit: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call.
+
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
@@ -81,6 +94,9 @@ class FlextQualityClaudeContextClient:
     def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing.
 
+        Args:
+            path: Optional codebase path indexed by the command.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
 
@@ -94,6 +110,10 @@ class FlextQualityClaudeContextClient:
         limit: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search.
+
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.

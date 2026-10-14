@@ -49,14 +49,14 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         event: str,
         input_data: t.JsonMapping,
     ) -> p.Result[t.JsonMapping]:
-        """Execute hooks for an event.
+        """Execute hooks registered for an event.
 
         Args:
-            event: Hook event name (e.g., "PreToolUse")
-            input_data: Hook input data
+            event: Hook event name (for example ``"PreToolUse"``).
+            input_data: Hook input payload forwarded to the registered hooks.
 
         Returns:
-            r[t.JsonMapping]: Hook execution result or error
+            The hook execution result, or a failure result.
 
         """
         return self._hooks.execute(event, input_data)
@@ -69,6 +69,11 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         blocked_reason: str | None = None,
     ) -> p.Result[str]:
         """Format hook output for Claude Code as JSON string.
+
+        Args:
+            continue_exec: Whether Claude Code may continue after the hook.
+            message: Optional message surfaced to the model.
+            blocked_reason: Optional reason emitted when the hook blocks.
 
         Returns:
             The resulting ``p.Result[str]``.
@@ -105,19 +110,19 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         """Load rules from a YAML file.
 
         Args:
-            path: Path to rules YAML file
+            path: Path to the rules YAML file.
 
         Returns:
-            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
+            The rule definitions, or a failure result.
 
         """
         return self._rules_loader.load(path)
 
     def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
-        """Load rules from configured rules directory.
+        """Load rules from the configured rules directory.
 
         Returns:
-            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
+            The rule definitions, or a failure result.
 
         """
         settings = FlextQualitySettings.fetch_global()
@@ -135,7 +140,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         """Process hook input from stdin (for Claude Code hooks).
 
         Returns:
-            r[t.JsonMapping]: Hook execution result or error
+            The hook execution result, or a failure result.
 
         """
         stdin_result = u.Quality.read_stdin()
@@ -158,7 +163,8 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         constructed settings instance is always valid.
 
         Returns:
-            r[bool]: Success or validation error
+            Successful result when the configuration is valid; a failure result
+            otherwise.
 
         """
         return r[bool].ok(value=True)

@@ -25,7 +25,12 @@ class FlextQualityDocumentationDashboard:
     """Documentation health monitoring dashboard."""
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
-        """Initialize documentation dashboard with reports directory."""
+        """Initialize documentation dashboard with reports directory.
+
+        Args:
+            reports_dir: Directory scanned for documentation reports.
+
+        """
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
         self._logger_instance: p.Logger = u.fetch_logger(__name__)
@@ -166,7 +171,10 @@ class FlextQualityDocumentationDashboard:
         }
 
     def compute_quality_trends(self, days: int = 30) -> t.JsonMapping:
-        """Get quality trends over the specified number of days.
+        """Return quality trends over the specified number of days.
+
+        Args:
+            days: Number of days covered by the trend window.
 
         Returns:
             The resulting ``t.JsonMapping``.
@@ -243,7 +251,10 @@ class FlextQualityDocumentationDashboard:
         }
 
     def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
-        """Get list of recent audit reports.
+        """Return the list of recent audit reports.
+
+        Args:
+            limit: Maximum number of reports returned.
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
@@ -647,7 +658,14 @@ class FlextQualityDocumentationDashboard:
         *,
         debug: bool = False,
     ) -> None:
-        """Run the dashboard server."""
+        """Run the dashboard server.
+
+        Args:
+            host: Bind host of the dashboard server.
+            port: Bind port of the dashboard server.
+            debug: Enable Flask debug mode.
+
+        """
         self.app.run(host=host, port=port, debug=debug)
 
     class Run(s[bool]):
@@ -700,8 +718,12 @@ class FlextQualityDocumentationDashboard:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the dashboard via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
 
         """
         exit_code: int = u.Quality.execute_result_command(

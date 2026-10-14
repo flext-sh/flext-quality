@@ -24,7 +24,12 @@ class FlextQualityValidators:
         """Validates content against regex patterns."""
 
         def __init__(self, patterns: t.StrMapping) -> None:
-            """Initialize with patterns."""
+            """Initialize with the patterns to enforce.
+
+            Args:
+                patterns: Mapping of pattern names to regex sources.
+
+            """
             self._patterns = patterns
             self._compiled: MutableMapping[str, t.RegexPattern] = {
                 pname: u.Quality.compile_pattern(pattern)
@@ -44,6 +49,10 @@ class FlextQualityValidators:
             file_path: t.Cli.TextPath | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns.
+
+            Args:
+                content: Text content scanned line by line.
+                file_path: Optional source path recorded in violations.
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
@@ -103,6 +112,10 @@ class FlextQualityValidators:
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations.
 
+            Args:
+                content: Text content scanned line by line.
+                file_path: Optional source path determining the file's tier.
+
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
 
@@ -131,6 +144,9 @@ class FlextQualityValidators:
         def _get_file_tier(path: Path) -> int | None:
             """Determine file tier from path.
 
+            Args:
+                path: Source path classified into its architecture tier.
+
             Returns:
                 The resulting ``int | None``.
 
@@ -155,7 +171,7 @@ class FlextQualityValidators:
             self._register_defaults()
 
         def all(self) -> t.SequenceOf[p.Quality.ValidatorBase]:
-            """Get all registered validators.
+            """Return all registered validators.
 
             Returns:
                 The resulting ``t.SequenceOf[p.Quality.ValidatorBase]``.
@@ -164,7 +180,10 @@ class FlextQualityValidators:
             return list(self._validators.values())
 
         def get(self, name: str) -> p.Quality.ValidatorBase | None:
-            """Get validator by name.
+            """Return the validator registered under a name.
+
+            Args:
+                name: Registered validator name to look up.
 
             Returns:
                 The resulting ``p.Quality.ValidatorBase | None``.
@@ -173,7 +192,12 @@ class FlextQualityValidators:
             return self._validators.get(name)
 
         def register(self, validator: p.Quality.ValidatorBase) -> None:
-            """Register a validator."""
+            """Register a validator under its name.
+
+            Args:
+                validator: Validator instance registered by its ``name``.
+
+            """
             self._validators[validator.name] = validator
 
         def validate_all(
@@ -182,6 +206,10 @@ class FlextQualityValidators:
             file_path: Path | None = None,
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators.
+
+            Args:
+                content: Text content passed to every validator.
+                file_path: Optional source path passed to every validator.
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.

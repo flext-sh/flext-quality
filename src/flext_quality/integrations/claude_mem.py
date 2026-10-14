@@ -24,7 +24,13 @@ class FlextQualityClaudeMemClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the Claude Mem client."""
+        """Initialize the Claude Mem client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured integration timeout.
+
+        """
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_get_observations_call(
@@ -32,6 +38,9 @@ class FlextQualityClaudeMemClient:
         ids: t.SequenceOf[int],
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call.
+
+        Args:
+            ids: Observation identifiers fetched by the tool.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
@@ -52,6 +61,10 @@ class FlextQualityClaudeMemClient:
         limit: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call.
+
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
@@ -75,6 +88,13 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a timeline tool call.
 
+        Args:
+            anchor: Observation identifier anchoring the timeline.
+            depth_before: Number of observations before the anchor; defaults
+                to the configured depth.
+            depth_after: Number of observations after the anchor; defaults to
+                the configured depth.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
 
@@ -94,6 +114,9 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations.
 
+        Args:
+            ids: Observation identifiers fetched by the command.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
 
@@ -109,6 +132,10 @@ class FlextQualityClaudeMemClient:
         limit: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search.
+
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -127,6 +154,13 @@ class FlextQualityClaudeMemClient:
         depth_after: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for timeline query.
+
+        Args:
+            anchor: Observation identifier anchoring the timeline.
+            depth_before: Number of observations before the anchor; defaults
+                to the configured depth.
+            depth_after: Number of observations after the anchor; defaults to
+                the configured depth.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.

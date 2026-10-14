@@ -25,7 +25,13 @@ class FlextQualityMcpClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the MCP client."""
+        """Initialize the MCP client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured MCP timeout.
+
+        """
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
@@ -33,6 +39,9 @@ class FlextQualityMcpClient:
         call: m.Quality.McpToolCall,
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call.
+
+        Args:
+            call: Tool call converted into the command invocation.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -46,6 +55,10 @@ class FlextQualityMcpClient:
 
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
         """Build the mcp-cli info command for a tool.
+
+        Args:
+            server: MCP server exposing the tool.
+            tool: Tool whose info is requested.
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
@@ -63,6 +76,11 @@ class FlextQualityMcpClient:
         params: t.JsonMapping | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request.
+
+        Args:
+            server: MCP server exposing the tool.
+            tool: Tool invoked by the request.
+            params: Optional parameters passed to the tool.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
@@ -99,6 +117,9 @@ class FlextQualityMcpClient:
 
     def build_server_health_result(self, server_name: str) -> p.Result[t.JsonMapping]:
         """Build a normalized health result for a named MCP server.
+
+        Args:
+            server_name: MCP server whose health is reported.
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
@@ -201,6 +222,10 @@ class FlextQualityMcpClient:
         exit_code: int,
     ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call.
+
+        Args:
+            output: Raw command output.
+            exit_code: Process exit code of the command.
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.

@@ -20,14 +20,23 @@ class FlextQualityBaseHook:
     matcher: ClassVar[t.StrSequence | None] = None
 
     def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        """Execute the hook logic."""
+        """Execute the hook logic.
+
+        Args:
+            input_data: Hook input payload carrying the tool event data.
+
+        """
         raise NotImplementedError
 
     def should_run(self, input_data: t.JsonMapping) -> bool:
-        """Check if hook should run for this input.
+        """Check if the hook should run for this input.
+
+        Args:
+            input_data: Hook input payload whose ``tool_name`` is matched
+                against the hook's matcher patterns.
 
         Returns:
-            The resulting ``bool``.
+            ``True`` when the hook applies to the input.
 
         """
         if self.matcher is None:
@@ -39,8 +48,12 @@ class FlextQualityBaseHook:
     def _match_pattern(pattern: str, value: str) -> bool:
         """Match pattern against value (supports wildcards).
 
+        Args:
+            pattern: Glob pattern supporting ``*`` wildcards.
+            value: Value matched against the pattern.
+
         Returns:
-            The resulting ``bool``.
+            ``True`` when the value matches the pattern.
 
         """
         return fnmatch.fnmatch(value, pattern)

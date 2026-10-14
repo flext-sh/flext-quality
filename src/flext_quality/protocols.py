@@ -55,7 +55,13 @@ class FlextQualityProtocols(FlextWebProtocols):
                 content: str,
                 file_path: t.Cli.TextPath | None = None,
             ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-                """Validate content and return violations."""
+                """Validate content and return violations.
+
+                Args:
+                    content: Text content checked by the validator.
+                    file_path: Optional source path recorded in violations.
+
+                """
                 ...
 
         @runtime_checkable
@@ -66,11 +72,21 @@ class FlextQualityProtocols(FlextWebProtocols):
             matcher: ClassVar[t.StrSequence | None]
 
             def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-                """Execute the hook logic."""
+                """Execute the hook logic.
+
+                Args:
+                    input_data: Hook input payload carrying the event data.
+
+                """
                 ...
 
             def should_run(self, input_data: t.JsonMapping) -> bool:
-                """Check if hook should run for this input."""
+                """Check if the hook should run for this input.
+
+                Args:
+                    input_data: Hook input payload evaluated by the hook.
+
+                """
                 ...
 
         @runtime_checkable
@@ -83,11 +99,22 @@ class FlextQualityProtocols(FlextWebProtocols):
                 *,
                 default: str | float | bool | None = None,
             ) -> t.Primitives | None:
-                """Get a configuration value."""
+                """Return a configuration value.
+
+                Args:
+                    key: Configuration key to look up.
+                    default: Value returned when the key is absent.
+
+                """
                 ...
 
             def __getitem__(self, key: str) -> None:
-                """Get a configuration value with bracket notation."""
+                """Return a configuration value with bracket notation.
+
+                Args:
+                    key: Configuration key to look up.
+
+                """
                 ...
 
         @runtime_checkable
@@ -98,11 +125,21 @@ class FlextQualityProtocols(FlextWebProtocols):
             matcher: t.StrSequence | None
 
             def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-                """Execute the hook logic."""
+                """Execute the hook logic.
+
+                Args:
+                    input_data: Hook input payload carrying the event data.
+
+                """
                 ...
 
             def should_run(self, input_data: t.JsonMapping) -> bool:
-                """Check if hook should run for this input."""
+                """Check if the hook should run for this input.
+
+                Args:
+                    input_data: Hook input payload evaluated by the hook.
+
+                """
                 ...
 
         @runtime_checkable
@@ -116,7 +153,13 @@ class FlextQualityProtocols(FlextWebProtocols):
                 settings: t.JsonMapping,
                 context: t.JsonMapping,
             ) -> p.Result[t.Quality.RuleResult]:
-                """Validate according to rule."""
+                """Validate according to the rule type.
+
+                Args:
+                    settings: Rule settings configuring the validation.
+                    context: Validation context for the rule.
+
+                """
                 ...
 
         @runtime_checkable
@@ -143,7 +186,12 @@ class FlextQualityProtocols(FlextWebProtocols):
             description: str
 
             def execute(self, params: t.JsonMapping) -> p.Result[t.JsonMapping]:
-                """Execute MCP tool."""
+                """Execute the MCP tool.
+
+                Args:
+                    params: Parameters passed to the tool.
+
+                """
                 ...
 
 
