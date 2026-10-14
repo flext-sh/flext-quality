@@ -23,6 +23,7 @@ class FlextQualityRulesLoader:
 
         Returns:
             The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
+
         """
         if not path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
@@ -70,6 +71,7 @@ class FlextQualityRulesLoader:
 
         Returns:
             The resulting ``p.Result[Sequence[m.Quality.RuleDefinition]]``.
+
         """
         all_rules: MutableSequence[m.Quality.RuleDefinition] = []
         for path in paths:
@@ -90,6 +92,7 @@ class FlextQualityRulesLoader:
 
         Returns:
             The resulting ``p.Result[m.Quality.RuleDefinition]``.
+
         """
         name = data.get("name")
         rule_type_str = data.get("type")

@@ -40,6 +40,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self.fetch_status()
 
@@ -71,6 +72,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         return r[str].ok(
             u.Quality.format_hook_output(

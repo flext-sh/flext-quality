@@ -28,6 +28,7 @@ class FlextQualityBaseHook:
 
         Returns:
             The resulting ``bool``.
+
         """
         if self.matcher is None:
             return True
@@ -40,6 +41,7 @@ class FlextQualityBaseHook:
 
         Returns:
             The resulting ``bool``.
+
         """
         return fnmatch.fnmatch(value, pattern)
 

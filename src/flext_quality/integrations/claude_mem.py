@@ -35,6 +35,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
@@ -54,6 +55,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         # Why: mro-4p0t — bind JsonMapping for build_tool_call params.
@@ -75,6 +77,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
@@ -93,6 +96,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         return self.build_get_observations_call(ids).flat_map(
             self._mcp.build_call_command,
@@ -108,6 +112,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -125,6 +130,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
@@ -139,6 +145,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self._mcp.build_server_health_result(c.Quality.CLAUDE_MEM_SERVER_NAME)
 

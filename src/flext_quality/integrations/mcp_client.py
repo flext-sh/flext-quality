@@ -36,6 +36,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
@@ -48,6 +49,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
@@ -64,6 +66,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         call_params = u.json_dict_adapter().validate_python(params or {})
         return r[m.Quality.McpToolCall].ok(
@@ -79,6 +82,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         available = self.mcp_cli_available()
         status = (
@@ -98,6 +102,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         mcp_health = self.health_check()
         if mcp_health.failure:
@@ -121,6 +126,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``bool``.
+
         """
         return shutil.which("mcp-cli") is not None
 
@@ -132,6 +138,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
         return r[m.Quality.McpToolResult].ok(
@@ -147,6 +154,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         try:
             parsed_list: t.JsonList = u.json_list_adapter().validate_json(output)
@@ -181,6 +189,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult(success=True, data={"raw": output}, error=None),
@@ -195,6 +204,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         if exit_code != 0:
             return r[m.Quality.McpToolResult].ok(

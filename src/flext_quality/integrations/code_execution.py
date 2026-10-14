@@ -40,6 +40,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
         return r[t.StrSequence].ok(cmd)
@@ -54,6 +55,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not script_path.exists():
             return e.fail_not_found(
@@ -77,6 +79,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
@@ -93,6 +96,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not script_path.exists():
             return e.fail_not_found(
@@ -116,6 +120,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[m.Quality.ExecutionRequest]``.
+
         """
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
             return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
@@ -136,6 +141,7 @@ class FlextQualityCodeExecutionBridge:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return r[t.JsonMapping].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,

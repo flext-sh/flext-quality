@@ -154,6 +154,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         merged: t.JsonDict = dict(defaults)
         for key, value in overrides.items():
@@ -210,6 +211,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             threshold = getattr(self.quality_thresholds, key, default)
             return threshold if isinstance(threshold, c.PRIMITIVES_TYPES) else default
@@ -219,6 +221,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``bool``.
+
             """
             check_value = False
             match check_type:
@@ -247,6 +250,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.markdown, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -261,6 +265,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.accessibility, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -309,6 +314,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.link_validation, setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -323,6 +329,7 @@ class FlextQualityConfigManager:
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = self.content_validation.get(setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -335,6 +342,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``FlextQualityConfigManager.ConfigSection``.
+
         """
         if not isinstance(value, Mapping):
             return {}
@@ -355,6 +363,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``FlextQualityConfigManager.ConfigData``.
+
         """
         if not isinstance(value, Mapping):
             return {}
@@ -387,6 +396,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.AuditRulesConfig``.
+
         """
         if self._audit_rules is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -401,6 +411,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.StyleGuideConfig``.
+
         """
         if self._style_guide is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -415,6 +426,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.ValidationConfig``.
+
         """
         if self._validation_config is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -433,6 +445,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         config_path = self.config_dir / filename
         loaded = u.Cli.yaml_safe_load(config_path)
@@ -449,6 +462,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         # Check required settings files exist
         required_files = [

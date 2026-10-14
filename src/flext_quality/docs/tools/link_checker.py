@@ -48,6 +48,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.LinkRecord]``.
+
         """
         all_links: MutableSequence[m.Quality.LinkRecord] = []
 
@@ -97,6 +98,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``str``.
+
         """
         if url.startswith(("http://", "https://")):
             return "external"
@@ -120,6 +122,7 @@ class FlextQualityLinkChecker:
 
         Raises:
             RuntimeError: If Link checker session is not initialized.
+
         """
         start_time = time.time()
         if self.session is None:
@@ -159,6 +162,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``m.Quality.LinkCheckResult``.
+
         """
         start_time = time.time()
         response = requests.head(
@@ -193,6 +197,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+
         """
         self.results.performance.total_time = time.time() - start_time
         valid_times: t.SequenceOf[float] = [
@@ -212,6 +217,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+
         """
         start_time = time.time()
 
@@ -241,6 +247,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.LinkCheckResult]``.
+
         """
         start_time = time.time()
 
@@ -266,6 +273,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``m.Quality.LinkValidatorResults``.
+
         """
         self.results.links_checked = len(links)
 
@@ -294,6 +302,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``bool``.
+
         """
         rp = RobotFileParser()
         rp.set_url(f"https://{domain}/robots.txt")
@@ -308,6 +317,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         github_links: t.SequenceOf[t.JsonMapping] = [
             link
@@ -331,6 +341,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``bool``.
+
         """
         parsed = urlparse(url)
 
@@ -362,6 +373,7 @@ class FlextQualityLinkChecker:
 
         Raises:
             ValueError: If Unsupported report format.
+
         """
         if report_format == "summary":
             return self._generate_summary_report()
@@ -375,6 +387,7 @@ class FlextQualityLinkChecker:
 
         Returns:
             The resulting ``str``.
+
         """
         r = self.results
 
@@ -422,6 +435,7 @@ Broken Links:
 
         Returns:
             The resulting ``pathlib.Path``.
+
         """
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"link_validation_{timestamp}.json"
@@ -442,6 +456,7 @@ Broken Links:
 
         Returns:
             The resulting ``m.Quality.LinkValidatorResults``.
+
         """
         checker = FlextQualityLinkChecker(config_dir)
         return asyncio.run(checker.validate_links(links, use_async=False))
@@ -482,6 +497,7 @@ Broken Links:
 
         Returns:
             The resulting ``int``.
+
         """
         asyncio.run(FlextQualityLinkChecker.run_demo())
         return 0

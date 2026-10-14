@@ -33,6 +33,7 @@ class FlextQualityHookManager:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         try:
             hook_event = c.Quality.HookEvent(event)
@@ -55,6 +56,7 @@ class FlextQualityHookManager:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         config: t.JsonDict = {}
         for event, hooks in self._hooks.items():
@@ -75,6 +77,7 @@ class FlextQualityHookManager:
 
         Returns:
             The resulting ``str``.
+
         """
         config_json: str = (
             t
@@ -89,6 +92,7 @@ class FlextQualityHookManager:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         event = hook.event
         if event not in self._hooks:

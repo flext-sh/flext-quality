@@ -35,6 +35,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         params: t.MutableJsonMapping = {}
         if path:
@@ -55,6 +56,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
@@ -68,6 +70,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         return self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
@@ -80,6 +83,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
@@ -93,6 +97,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -104,6 +109,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self._mcp.build_server_health_result(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,

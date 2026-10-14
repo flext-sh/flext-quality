@@ -66,6 +66,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``t.RegexPattern``.
+
             """
             flags = re.NOFLAG
             for enabled, flag in (
@@ -83,6 +84,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``str``.
+
             """
             return re.escape(text)
 
@@ -98,6 +100,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``int``.
+
             """
             app = cli.create_app_with_common_params(name=app_name, help_text=app_help)
             cli.register_result_routes(app, [route])
@@ -119,6 +122,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``str``.
+
             """
             output: t.MutableOptionalFeatureFlagMapping = {"continue": continue_exec}
             if message:
@@ -139,6 +143,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
             """
             if not isinstance(parsed, dict):
                 return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
@@ -161,6 +166,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
             """
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
@@ -183,6 +189,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[t.JsonMapping]``.
+
             """
             try:
                 parsed: t.JsonMapping = u.json_mapping_adapter().validate_json(raw)
@@ -197,6 +204,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[str]``.
+
             """
             return u.try_(sys.stdin.read, catch=Exception).map_error(
                 lambda e: f"Failed to read stdin: {e}",
@@ -211,6 +219,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[str]``.
+
             """
             timeout_secs = int(timeout_ms / c.Quality.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)

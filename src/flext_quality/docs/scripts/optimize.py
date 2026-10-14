@@ -54,6 +54,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -95,6 +96,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         fixed_lines = [line.rstrip() for line in lines]
@@ -106,6 +108,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -115,6 +118,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         fixed_lines: MutableSequence[str] = []
@@ -134,6 +138,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -145,6 +150,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -179,6 +185,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``tuple[int, int]``.
+
         """
         toc_start = -1
         toc_end = -1
@@ -200,6 +207,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``MutableSequence[str]``.
+
         """
         toc_lines: MutableSequence[str] = []
         for line in lines:
@@ -219,6 +227,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         return ["## Table of Contents", "", *headings, "", "---", ""]
 
@@ -228,6 +237,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``int``.
+
         """
         insert_pos = 0
         for i, line in enumerate(lines):
@@ -246,6 +256,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         toc_start, toc_end = self._find_existing_toc(lines)
@@ -264,6 +275,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         anchor = heading.lower()
         anchor = u.Quality.compile_pattern(r"[^\\w\\s-]").sub("", anchor)
@@ -278,6 +290,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -316,6 +329,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         pattern = "!\\[\\]\\(([^)]+)\\)"
         matches = u.Quality.compile_pattern(pattern).findall(content)
@@ -333,6 +347,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         improvements = {
             "\\[here\\]\\(([^)]+)\\)": "[learn more](\\1)",
@@ -355,6 +370,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -394,6 +410,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -403,6 +420,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -412,6 +430,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         enhanced_lines: MutableSequence[str] = []
@@ -434,6 +453,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -481,6 +501,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         if lines[0] == "---":
@@ -518,6 +539,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
@@ -535,6 +557,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         report_text: str = (
             self.results.model_dump_json(indent=2)
@@ -551,6 +574,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         output_dir = Path(output_path)
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
@@ -626,6 +650,7 @@ class FlextQualityDocumentationOptimizer:
 
             Returns:
                 The resulting ``t.SequenceOf[Path]``.
+
             """
             project_root = Path(__file__).parent.parent.parent.parent
             if self.files:
@@ -649,6 +674,7 @@ class FlextQualityDocumentationOptimizer:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             optimizer = FlextQualityDocumentationOptimizer(backup=self.backup)
             run_any = False
@@ -681,6 +707,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -690,6 +717,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``int``.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

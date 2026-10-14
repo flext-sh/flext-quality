@@ -30,6 +30,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``MutableSequence[m.Quality.RuleDefinition]``.
+
         """
         return list(self._rules)
 
@@ -38,6 +39,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``p.Result[int]``.
+
         """
         path = rules_path or self._rules_path
         if path is None:
@@ -59,6 +61,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
         """
         if not self._loaded:
             load_result = self.load_rules()
@@ -85,6 +88,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
         """
         if not self._loaded:
             load_result = self.load_rules()
@@ -108,6 +112,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
@@ -142,6 +147,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[Path]]``.
+
         """
         if path.is_file():
             return r[t.SequenceOf[Path]].ok([path] if path.suffix == ".py" else [])
@@ -155,6 +161,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``str``.
+
         """
         mapping = {
             c.Quality.RuleType.BLOCKING: c.Quality.Severity.ERROR,
@@ -172,6 +179,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         validation_context = u.json_dict_adapter().validate_python(context or {})
         read = u.Cli.files_read_text(file_path)

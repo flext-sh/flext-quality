@@ -45,6 +45,7 @@ class FlextQualityDocumentationDashboard:
 
             Returns:
                 The resulting ``str``.
+
             """
             return self.render_dashboard_html()
 
@@ -93,6 +94,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -134,6 +136,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
         metrics_raw = data.get("metrics")
@@ -167,6 +170,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         cutoff_date = u.now() - timedelta(days=days)
 
@@ -210,6 +214,7 @@ class FlextQualityDocumentationDashboard:
 
         Raises:
             ValueError: If Skipping unreadable report.
+
         """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
@@ -242,6 +247,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         reports: MutableSequence[t.JsonMapping] = []
 
@@ -270,6 +276,7 @@ class FlextQualityDocumentationDashboard:
 
         Raises:
             ValueError: If Skipping unreadable report.
+
         """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
@@ -304,6 +311,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``str``.
+
         """
         return """
 <!DOCTYPE html>
@@ -672,6 +680,7 @@ class FlextQualityDocumentationDashboard:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
             dashboard.run(host=self.host, port=self.port, debug=self.debug)
@@ -683,6 +692,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -692,6 +702,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``int``.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

@@ -47,6 +47,7 @@ class FlextQualityCli(s[bool]):
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.StrSequence]]``.
+
             """
             built = self._analysis_commands()
             if built.failure:
@@ -58,6 +59,7 @@ class FlextQualityCli(s[bool]):
 
             Returns:
                 The resulting ``p.Result[MutableSequence[t.StrSequence]]``.
+
             """
             bridge = FlextQualityCodeExecutionBridge()
             cmds: MutableSequence[t.StrSequence] = []
@@ -105,6 +107,7 @@ class FlextQualityCli(s[bool]):
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return r[bool].ok(value=True)
 
@@ -118,6 +121,7 @@ class FlextQualityCli(s[bool]):
         Returns:
             The resulting ``p.Result[t.JsonMapping] |
                 p.Result[t.SequenceOf[t.StrSequence]]``.
+
         """
         return params.execute()
 
@@ -127,6 +131,7 @@ def main(args: t.StrSequence | None = None) -> int:
 
     Returns:
         The resulting ``int``.
+
     """
     app = cli.create_app_with_common_params(
         name=FlextQualityCli.app_name,

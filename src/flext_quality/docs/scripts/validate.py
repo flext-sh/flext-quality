@@ -67,6 +67,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``t.SequenceOf[m.Quality.LinkRecord]``.
+
             """
             all_links: MutableSequence[m.Quality.LinkRecord] = []
             for file_path in doc_files:
@@ -145,6 +146,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``str``.
+
             """
             # NOTE (multi-agent, mro-f8vk / kimi): match-with-guards was
             # non-exhaustive by construction (reportMatchNotExhaustive); the
@@ -168,6 +170,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``int | None``.
+
             """
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
@@ -185,6 +188,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkValidatorResults``.
+
             """
             external_links = [link for link in links if link.type == "external"]
             if not external_links:
@@ -219,6 +223,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``requests.Response``.
+
             """
             headers = {"User-Agent": self.user_agent}
             if method == FlextApiConstants.Api.Method.HEAD:
@@ -241,6 +246,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``bool``.
+
             """
             return status_code in {405, 406, 409, 410, 500, 502, 503}
 
@@ -253,6 +259,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkCheckResult | None``.
+
             """
             result: m.Quality.LinkCheckResult | None = None
             base_result = m.Quality.LinkCheckResult(
@@ -290,6 +297,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkCheckResult``.
+
             """
             response = self._make_http_request(link.url)
             if response.status_code < HTTPStatus.BAD_REQUEST:
@@ -328,6 +336,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkCheckResult``.
+
             """
             _ = verbose
             for attempt in range(self.retries):
@@ -354,6 +363,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkValidatorResults``.
+
             """
             internal_links = [
                 link for link in links if link.type in {"internal", "reference"}
@@ -410,6 +420,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkValidatorResults``.
+
             """
             images = [link for link in links if link.type == "image"]
             for image in images:
@@ -448,6 +459,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkValidatorResults``.
+
             """
             anchor_links = [link for link in links if link.type == "anchor"]
             file_anchors: MutableMapping[str, set[str]] = {}
@@ -500,6 +512,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``str``.
+
             """
             anchor = heading.lower()
             anchor = u.Quality.compile_pattern(r"[^\\w\\s-]").sub("", anchor)
@@ -514,6 +527,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.LinkValidatorResults``.
+
             """
             poor_link_texts = [
                 "here",
@@ -558,6 +572,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``str``.
+
             """
             report_text: str = (
                 self.results.model_dump_json(indent=2)
@@ -574,6 +589,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``p.Result[Path]``.
+
             """
             output_dir = Path(output_path)
             timestamp = u.now().strftime("%Y%m%d_%H%M%S")
@@ -611,6 +627,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.ContentValidatorResults``.
+
             """
             for file_path in doc_files:
                 file_rel_path = str(file_path)
@@ -643,6 +660,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``t.SequenceOf[m.Quality.ContentIssue]``.
+
             """
             issues: MutableSequence[m.Quality.ContentIssue] = []
             lines = content.split("\n")
@@ -685,6 +703,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.ContentValidatorResults``.
+
             """
             for file_path in doc_files:
                 file_rel_path = str(file_path)
@@ -734,6 +753,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``m.Quality.ContentMetrics``.
+
             """
             words = u.Quality.compile_pattern(r"\\b\\w+\\b").findall(content)
             sentences = u.Quality.compile_pattern(r"[.!?]+").split(content)
@@ -772,6 +792,7 @@ class FlextQualityDocumentationValidator:
 
         Returns:
             The resulting ``t.SequenceOf[Path]``.
+
         """
         project_root = Path(__file__).parent.parent.parent.parent
         doc_files: MutableSequence[Path] = []
@@ -906,6 +927,7 @@ class FlextQualityDocumentationValidator:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             doc_files = FlextQualityDocumentationValidator.discover_validation_files()
             link_validator = FlextQualityDocumentationValidator.LinkValidator(
@@ -938,6 +960,7 @@ class FlextQualityDocumentationValidator:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -947,6 +970,7 @@ class FlextQualityDocumentationValidator:
 
         Returns:
             The resulting ``int``.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

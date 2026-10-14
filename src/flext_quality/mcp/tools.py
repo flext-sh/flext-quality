@@ -35,6 +35,7 @@ class FlextQualityMcpTools:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         result = client.build_search_call(query=query, limit=limit)
         if result.failure:
@@ -66,6 +67,7 @@ class FlextQualityMcpTools:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         return FlextQualityMcpTools._build_search_payload(
             FlextQualityClaudeMemClient(),
@@ -81,6 +83,7 @@ class FlextQualityMcpTools:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         return FlextQualityMcpTools._build_search_payload(
             FlextQualityClaudeContextClient(),
@@ -95,6 +98,7 @@ class FlextQualityMcpTools:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         manager = FlextQualityHookManager()
         result = manager.execute(event=event, input_data=input_data)
@@ -115,6 +119,7 @@ class FlextQualityMcpTools:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         engine = FlextQualityRulesEngine()
         result = engine.validate(path=path, context=context)
