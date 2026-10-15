@@ -9,3 +9,6 @@ from __future__ import annotations
 
 class FlextQualityConstantsBase:
     """Base constants for flext-quality."""
+
+
+__all__: list[str] = ["FlextQualityConstantsBase"]
