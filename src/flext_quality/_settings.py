@@ -44,6 +44,7 @@ class FlextQualitySettings(FlextSettings):
 
             Raises:
                 ValueError: If max_function_length.
+
             """
             if self.max_function_length > self.max_class_length:
                 msg = (

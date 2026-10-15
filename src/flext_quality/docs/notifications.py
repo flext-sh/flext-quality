@@ -43,6 +43,7 @@ class FlextQualityDocumentationNotifier:
         Raises:
             ValueError: If webhook target is not allowlisted; or if webhook host
                 resolves to a non-public address.
+
         """
         parsed = urlparse(url)
         host = parsed.hostname or ""
@@ -248,6 +249,7 @@ class FlextQualityDocumentationNotifier:
 
         Returns:
             The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
+
         """
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
@@ -260,6 +262,7 @@ class FlextQualityDocumentationNotifier:
 
         Returns:
             The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
+
         """
         return FlextQualityDocumentationNotifier._NotifierConfig(
             enabled=True,
@@ -312,8 +315,12 @@ class FlextQualityDocumentationNotifier:
     def notify_critical_issues(self, audit_data: t.JsonMapping) -> bool:
         """Send notification for critical documentation issues.
 
+        Args:
+            audit_data: Audit payload whose critical issues are reported.
+
         Returns:
             The resulting ``bool``.
+
         """
         if not self.config.alerts.critical_issues.enabled:
             return True
@@ -351,8 +358,13 @@ class FlextQualityDocumentationNotifier:
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops.
 
+        Args:
+            current_score: Latest documentation quality score.
+            previous_score: Score of the previous audit run.
+
         Returns:
             The resulting ``bool``.
+
         """
         if not self.config.alerts.quality_drop.enabled:
             return True
@@ -383,8 +395,12 @@ Please review recent changes and address any identified issues.
     def notify_broken_links(self, broken_links: t.JsonList) -> bool:
         """Send notification for broken links.
 
+        Args:
+            broken_links: Broken link entries collected by the audit.
+
         Returns:
             The resulting ``bool``.
+
         """
         if not self.config.alerts.broken_links.enabled:
             return True
@@ -405,8 +421,12 @@ Please review recent changes and address any identified issues.
     def notify_weekly_report(self, report_data: t.JsonMapping) -> bool:
         """Send weekly quality report notification.
 
+        Args:
+            report_data: Report payload summarized in the notification.
+
         Returns:
             The resulting ``bool``.
+
         """
         if not self.config.alerts.weekly_report.enabled:
             return True
@@ -422,8 +442,12 @@ Please review recent changes and address any identified issues.
     def notify_monthly_report(self, report_data: t.JsonMapping) -> bool:
         """Send monthly comprehensive report notification.
 
+        Args:
+            report_data: Report payload summarized in the notification.
+
         Returns:
             The resulting ``bool``.
+
         """
         if not self.config.alerts.monthly_report.enabled:
             return True
@@ -444,8 +468,14 @@ Please review recent changes and address any identified issues.
     ) -> bool:
         """Send notification through all enabled channels.
 
+        Args:
+            title: Notification title.
+            message: Notification body text.
+            priority: Notification priority level.
+
         Returns:
             The resulting ``bool``.
+
         """
         success = True
 
@@ -497,6 +527,7 @@ Please review recent changes and address any identified issues.
 
         Raises:
             ValueError: If Email notification requires a non-empty SMTP password.
+
         """
         email_config = self.config.email
         password = email_config.password
@@ -610,6 +641,7 @@ Timestamp: {u.now().isoformat()}
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         if isinstance(value, Mapping):
             return u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(value)
@@ -621,6 +653,7 @@ Timestamp: {u.now().isoformat()}
 
         Returns:
             The resulting ``t.MutableIntMapping``.
+
         """
         breakdown: t.MutableIntMapping = {}
         for key_name in ("critical", "high", "medium", "low"):
@@ -636,6 +669,7 @@ Timestamp: {u.now().isoformat()}
 
         Returns:
             The resulting ``MutableSequence[t.JsonMapping]``.
+
         """
         critical_issues: MutableSequence[t.JsonMapping] = []
         if not isinstance(issues_val, list):
@@ -664,6 +698,7 @@ Timestamp: {u.now().isoformat()}
 
         Returns:
             The resulting ``int``.
+
         """
         return value if isinstance(value, int) else 0
 
@@ -673,6 +708,7 @@ Timestamp: {u.now().isoformat()}
 
         Returns:
             The resulting ``str``.
+
         """
         metrics = FlextQualityDocumentationNotifier._relaxed_mapping(
             audit_data.get("metrics"),
@@ -733,6 +769,7 @@ Top Critical Issues:
 
         Returns:
             The resulting ``str``.
+
         """
         message = f"""
 BROKEN LINKS DETECTED
@@ -773,6 +810,7 @@ Found {len(broken_links)} broken links that need attention:
 
         Returns:
             The resulting ``str``.
+
         """
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
@@ -787,6 +825,7 @@ Found {len(broken_links)} broken links that need attention:
 
         Returns:
             The resulting ``str``.
+
         """
         # Implementation would depend on monthly report data structure
         return (
@@ -832,6 +871,7 @@ Found {len(broken_links)} broken links that need attention:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             notifier = FlextQualityDocumentationNotifier(self.settings_path)
             if self.test:
@@ -864,6 +904,7 @@ Found {len(broken_links)} broken links that need attention:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             notifier.send_notification(
                 "Test Notification",
@@ -885,6 +926,7 @@ Found {len(broken_links)} broken links that need attention:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             audit_read = u.Cli.files_read_text(audit_path)
             if audit_read.failure:
@@ -906,6 +948,7 @@ Found {len(broken_links)} broken links that need attention:
 
             Returns:
                 The resulting ``MutableSequence[t.JsonValue]``.
+
             """
             broken_links: MutableSequence[t.JsonValue] = []
             issues_raw = audit_data.get("issues")
@@ -928,6 +971,7 @@ Found {len(broken_links)} broken links that need attention:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             report_read = u.Cli.files_read_text(report_path)
             if report_read.failure:
@@ -944,6 +988,7 @@ Found {len(broken_links)} broken links that need attention:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -951,8 +996,13 @@ Found {len(broken_links)} broken links that need attention:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the notification system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

@@ -46,8 +46,12 @@ class FlextQualityStyleValidator:
     def validate_file(self, file_path: Path) -> m.Quality.StyleFileResults:
         """Validate a single documentation file.
 
+        Args:
+            file_path: Documentation file checked against the style rules.
+
         Returns:
             The resulting ``m.Quality.StyleFileResults``.
+
         """
         content = u.Cli.files_read_text(file_path).value
         filename = str(file_path)
@@ -89,6 +93,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -134,6 +139,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -191,6 +197,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -233,6 +240,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -285,6 +293,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         issues: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -329,6 +338,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -366,6 +376,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+
         """
         violations: MutableSequence[m.Quality.StyleIssue] = []
 
@@ -407,6 +418,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         suggestions: MutableSequence[str] = []
 
@@ -446,8 +458,12 @@ class FlextQualityStyleValidator:
     ) -> m.Quality.StyleValidationResults:
         """Validate multiple files and aggregate results.
 
+        Args:
+            file_paths: Documentation files checked against the style rules.
+
         Returns:
             The resulting ``m.Quality.StyleValidationResults``.
+
         """
         for file_path in file_paths:
             self.validate_file(file_path)
@@ -476,11 +492,15 @@ class FlextQualityStyleValidator:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report.
 
+        Args:
+            output_format: Format for the generated report.
+
         Returns:
             The resulting ``str``.
 
         Raises:
-            ValueError: If Unsupported report format.
+            ValueError: If the report format is unsupported.
+
         """
         if output_format == "summary":
             return self._generate_summary_report()
@@ -494,6 +514,7 @@ class FlextQualityStyleValidator:
 
         Returns:
             The resulting ``str``.
+
         """
         summary = self.results.summary
 
@@ -543,8 +564,13 @@ Top Issues:
     ) -> m.Quality.StyleFileResults:
         """Validate a single file.
 
+        Args:
+            file_path: Path of the file checked against the style rules.
+            config_dir: Optional configuration directory for the rules.
+
         Returns:
             The resulting ``m.Quality.StyleFileResults``.
+
         """
         validator = FlextQualityStyleValidator(config_dir)
         return validator.validate_file(Path(file_path))
@@ -556,8 +582,13 @@ Top Issues:
     ) -> m.Quality.StyleValidationResults:
         """Validate multiple files.
 
+        Args:
+            file_paths: Paths of the files checked against the style rules.
+            config_dir: Optional configuration directory for the rules.
+
         Returns:
             The resulting ``m.Quality.StyleValidationResults``.
+
         """
         validator = FlextQualityStyleValidator(config_dir)
         paths = [Path(fp) for fp in file_paths]
@@ -569,6 +600,7 @@ Top Issues:
 
         Returns:
             The resulting ``int``.
+
         """
         if len(sys.argv) < c.Quality.STYLE_VALIDATOR_MIN_COMMAND_LINE_ARGS:
             return 1

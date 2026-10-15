@@ -25,7 +25,13 @@ class FlextQualityMcpClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the MCP client."""
+        """Initialize the MCP client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured MCP timeout.
+
+        """
         self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
@@ -34,8 +40,12 @@ class FlextQualityMcpClient:
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call.
 
+        Args:
+            call: Tool call converted into the command invocation.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
@@ -46,8 +56,13 @@ class FlextQualityMcpClient:
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
         """Build the mcp-cli info command for a tool.
 
+        Args:
+            server: MCP server exposing the tool.
+            tool: Tool whose info is requested.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
@@ -62,8 +77,14 @@ class FlextQualityMcpClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request.
 
+        Args:
+            server: MCP server exposing the tool.
+            tool: Tool invoked by the request.
+            params: Optional parameters passed to the tool.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         call_params = u.json_dict_adapter().validate_python(params or {})
         return r[m.Quality.McpToolCall].ok(
@@ -79,6 +100,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         available = self.mcp_cli_available()
         status = (
@@ -96,8 +118,12 @@ class FlextQualityMcpClient:
     def build_server_health_result(self, server_name: str) -> p.Result[t.JsonMapping]:
         """Build a normalized health result for a named MCP server.
 
+        Args:
+            server_name: MCP server whose health is reported.
+
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         mcp_health = self.health_check()
         if mcp_health.failure:
@@ -121,6 +147,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``bool``.
+
         """
         return shutil.which("mcp-cli") is not None
 
@@ -132,6 +159,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
         return r[m.Quality.McpToolResult].ok(
@@ -147,6 +175,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         try:
             parsed_list: t.JsonList = u.json_list_adapter().validate_json(output)
@@ -181,6 +210,7 @@ class FlextQualityMcpClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult(success=True, data={"raw": output}, error=None),
@@ -193,8 +223,13 @@ class FlextQualityMcpClient:
     ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call.
 
+        Args:
+            output: Raw command output.
+            exit_code: Process exit code of the command.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
+
         """
         if exit_code != 0:
             return r[m.Quality.McpToolResult].ok(

@@ -64,8 +64,15 @@ class FlextQualityUtilities(FlextWebUtilities):
         ) -> t.RegexPattern:
             """Compile a runtime-supplied regex pattern for quality tooling.
 
+            Args:
+                pattern: Regular expression source to compile.
+                ignorecase: Enable case-insensitive matching.
+                multiline: Enable multi-line mode (``^``/``$`` match per line).
+                dotall: Enable dot-all mode (``.`` matches newlines).
+
             Returns:
                 The resulting ``t.RegexPattern``.
+
             """
             flags = re.NOFLAG
             for enabled, flag in (
@@ -83,6 +90,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``str``.
+
             """
             return re.escape(text)
 
@@ -96,8 +104,16 @@ class FlextQualityUtilities(FlextWebUtilities):
         ) -> int:
             """Execute a single result-command Typer application.
 
+            Args:
+                args: Command-line arguments for the application; defaults to
+                    ``sys.argv[1:]`` when ``None``.
+                app_name: Display name of the Typer application.
+                app_help: Help text of the Typer application.
+                route: Result-command route registered on the application.
+
             Returns:
-                The resulting ``int``.
+                The process exit code.
+
             """
             app = cli.create_app_with_common_params(name=app_name, help_text=app_help)
             cli.register_result_routes(app, [route])
@@ -117,8 +133,14 @@ class FlextQualityUtilities(FlextWebUtilities):
         ) -> str:
             """Format hook output JSON.
 
+            Args:
+                continue_exec: Whether execution may continue after the hook.
+                message: Optional message surfaced to the model.
+                blocked_reason: Optional reason emitted when the hook blocks.
+
             Returns:
                 The resulting ``str``.
+
             """
             output: t.MutableOptionalFeatureFlagMapping = {"continue": continue_exec}
             if message:
@@ -137,8 +159,12 @@ class FlextQualityUtilities(FlextWebUtilities):
         ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate and extract the rules list from parsed YAML.
 
+            Args:
+                parsed: Parsed YAML mapping expected to carry a ``rules`` list.
+
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
             """
             if not isinstance(parsed, dict):
                 return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
@@ -157,10 +183,14 @@ class FlextQualityUtilities(FlextWebUtilities):
 
         @staticmethod
         def load_yaml_rules(path: Path) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-            """Load rules from YAML file.
+            """Load rules from a YAML file.
+
+            Args:
+                path: Path to the YAML file holding the rule definitions.
 
             Returns:
                 The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
             """
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
@@ -181,8 +211,12 @@ class FlextQualityUtilities(FlextWebUtilities):
         def parse_hook_input(raw: str) -> p.Result[t.JsonMapping]:
             """Parse hook input JSON.
 
+            Args:
+                raw: Raw JSON text describing the hook event.
+
             Returns:
                 The resulting ``p.Result[t.JsonMapping]``.
+
             """
             try:
                 parsed: t.JsonMapping = u.json_mapping_adapter().validate_json(raw)
@@ -197,6 +231,7 @@ class FlextQualityUtilities(FlextWebUtilities):
 
             Returns:
                 The resulting ``p.Result[str]``.
+
             """
             return u.try_(sys.stdin.read, catch=Exception).map_error(
                 lambda e: f"Failed to read stdin: {e}",
@@ -209,8 +244,14 @@ class FlextQualityUtilities(FlextWebUtilities):
         ) -> p.Result[str]:
             """Run a shell command with timeout.
 
+            Args:
+                cmd: Command and arguments to execute.
+                timeout_ms: Maximum wall-clock time for the command in
+                    milliseconds.
+
             Returns:
                 The resulting ``p.Result[str]``.
+
             """
             timeout_secs = int(timeout_ms / c.Quality.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)

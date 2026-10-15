@@ -11,8 +11,6 @@ from __future__ import annotations
 
 from typing import final
 
-# claude-mem provides cross-session memory search and observation storage.
-
 from flext_quality import c, m, p, t
 from flext_quality.integrations import FlextQualityMcpClient
 
@@ -26,7 +24,13 @@ class FlextQualityClaudeMemClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the Claude Mem client."""
+        """Initialize the Claude Mem client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured integration timeout.
+
+        """
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_get_observations_call(
@@ -35,8 +39,12 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call.
 
+        Args:
+            ids: Observation identifiers fetched by the tool.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
@@ -54,8 +62,13 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call.
 
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         # Why: mro-4p0t — bind JsonMapping for build_tool_call params.
@@ -75,8 +88,16 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a timeline tool call.
 
+        Args:
+            anchor: Observation identifier anchoring the timeline.
+            depth_before: Number of observations before the anchor; defaults
+                to the configured depth.
+            depth_after: Number of observations after the anchor; defaults to
+                the configured depth.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
@@ -93,8 +114,12 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations.
 
+        Args:
+            ids: Observation identifiers fetched by the command.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         return self.build_get_observations_call(ids).flat_map(
             self._mcp.build_call_command,
@@ -108,8 +133,13 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search.
 
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -125,8 +155,16 @@ class FlextQualityClaudeMemClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for timeline query.
 
+        Args:
+            anchor: Observation identifier anchoring the timeline.
+            depth_before: Number of observations before the anchor; defaults
+                to the configured depth.
+            depth_after: Number of observations after the anchor; defaults to
+                the configured depth.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
@@ -141,6 +179,7 @@ class FlextQualityClaudeMemClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self._mcp.build_server_health_result(c.Quality.CLAUDE_MEM_SERVER_NAME)
 

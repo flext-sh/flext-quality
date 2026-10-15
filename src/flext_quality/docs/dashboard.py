@@ -25,7 +25,12 @@ class FlextQualityDocumentationDashboard:
     """Documentation health monitoring dashboard."""
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
-        """Initialize documentation dashboard with reports directory."""
+        """Initialize documentation dashboard with reports directory.
+
+        Args:
+            reports_dir: Directory scanned for documentation reports.
+
+        """
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
         self._logger_instance: p.Logger = u.fetch_logger(__name__)
@@ -45,6 +50,7 @@ class FlextQualityDocumentationDashboard:
 
             Returns:
                 The resulting ``str``.
+
             """
             return self.render_dashboard_html()
 
@@ -93,6 +99,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -134,6 +141,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         data = u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(audit_payload)
         metrics_raw = data.get("metrics")
@@ -163,10 +171,14 @@ class FlextQualityDocumentationDashboard:
         }
 
     def compute_quality_trends(self, days: int = 30) -> t.JsonMapping:
-        """Get quality trends over the specified number of days.
+        """Return quality trends over the specified number of days.
+
+        Args:
+            days: Number of days covered by the trend window.
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         cutoff_date = u.now() - timedelta(days=days)
 
@@ -210,6 +222,7 @@ class FlextQualityDocumentationDashboard:
 
         Raises:
             ValueError: If Skipping unreadable report.
+
         """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
@@ -238,10 +251,14 @@ class FlextQualityDocumentationDashboard:
         }
 
     def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
-        """Get list of recent audit reports.
+        """Return the list of recent audit reports.
+
+        Args:
+            limit: Maximum number of reports returned.
 
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         reports: MutableSequence[t.JsonMapping] = []
 
@@ -270,6 +287,7 @@ class FlextQualityDocumentationDashboard:
 
         Raises:
             ValueError: If Skipping unreadable report.
+
         """
         date_str = report_file.stem.replace("audit_report_", "").replace("_", " ")
         report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
@@ -304,6 +322,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``str``.
+
         """
         return """
 <!DOCTYPE html>
@@ -639,7 +658,14 @@ class FlextQualityDocumentationDashboard:
         *,
         debug: bool = False,
     ) -> None:
-        """Run the dashboard server."""
+        """Run the dashboard server.
+
+        Args:
+            host: Bind host of the dashboard server.
+            port: Bind port of the dashboard server.
+            debug: Enable Flask debug mode.
+
+        """
         self.app.run(host=host, port=port, debug=debug)
 
     class Run(s[bool]):
@@ -672,6 +698,7 @@ class FlextQualityDocumentationDashboard:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
             dashboard.run(host=self.host, port=self.port, debug=self.debug)
@@ -683,6 +710,7 @@ class FlextQualityDocumentationDashboard:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -690,8 +718,13 @@ class FlextQualityDocumentationDashboard:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the dashboard via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

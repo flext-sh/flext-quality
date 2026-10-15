@@ -28,6 +28,7 @@ class FlextQualityMcpResources:
 
         Returns:
             The resulting ``str``.
+
         """
         manager = FlextQualityHookManager()
         settings = manager.fetch_config()
@@ -46,6 +47,7 @@ class FlextQualityMcpResources:
 
         Returns:
             The resulting ``str``.
+
         """
         engine = FlextQualityRulesEngine()
         rules = engine.list_rules()
@@ -67,6 +69,7 @@ class FlextQualityMcpResources:
 
         Returns:
             The resulting ``str``.
+
         """
         mem_client = FlextQualityClaudeMemClient()
         mem_health = mem_client.health_check()

@@ -129,6 +129,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``t.SequenceOf[Path]``.
+
         """
         doc_files: MutableSequence[Path] = []
         patterns = [
@@ -152,6 +153,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``bool``.
+
         """
         ignored_patterns = [
             ".git",
@@ -171,6 +173,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``m.Quality.AuditorResults``.
+
         """
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)
@@ -227,6 +230,7 @@ class FlextQualityDocumentationAuditor:
         Returns:
             The resulting ``MutableMapping[str, str | int | float | bool | t.StrSequence
                 | t.SequenceOf[t.StrMapping] | None] | None``.
+
         """
         mtime = u.from_timestamp(file_path.stat().st_mtime)
         if mtime >= cutoff_date:
@@ -262,6 +266,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``MutableSequence[str]``.
+
         """
         indicators: MutableSequence[str] = []
         if u.Quality.compile_pattern(
@@ -354,6 +359,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         missing: t.StrSequence = [
             section
@@ -423,6 +429,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``MutableSequence[str]``.
+
         """
         issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
@@ -458,6 +465,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``MutableSequence[t.StrMapping]``.
+
         """
         issues: MutableSequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
@@ -494,6 +502,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         headings = u.Quality.compile_pattern(r"^(#+)\\s+(.+)$", multiline=True).findall(
             content,
@@ -773,6 +782,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``str``.
+
         """
         _ = output_path
         if output_format == "html":
@@ -789,6 +799,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``str``.
+
         """
         metrics = self.results.metrics
         severity_breakdown = metrics.severity_breakdown
@@ -832,6 +843,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``str``.
+
         """
         severity_class = f"severity-{issue.get('severity', 'info')}"
         type_str = str(issue.get("type", ""))
@@ -864,6 +876,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``str``.
+
         """
         if (
             score
@@ -884,8 +897,13 @@ class FlextQualityDocumentationAuditor:
     ) -> p.Result[str]:
         """Save audit report to file.
 
+        Args:
+            output_format: Format for the saved report.
+            output_path: Directory the report file is written to.
+
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         output_dir = Path(output_path)
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
@@ -968,6 +986,7 @@ class FlextQualityDocumentationAuditor:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             auditor = FlextQualityDocumentationAuditor(self.config_dir)
             try:
@@ -1025,6 +1044,7 @@ class FlextQualityDocumentationAuditor:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -1032,8 +1052,13 @@ class FlextQualityDocumentationAuditor:
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

@@ -22,6 +22,7 @@ class FlextQualityMcpServer:
 
         Returns:
             The resulting ``FastMCP``.
+
         """
         return FlextQualityMcpServer._mcp
 

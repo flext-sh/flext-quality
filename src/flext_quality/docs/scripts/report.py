@@ -171,6 +171,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``t.MappingKV[str, t.Quality.DocumentationReportValue] |
                 None``.
+
         """
         filepath = self.reports_dir / filename
         read = u.Cli.files_read_text(filepath)
@@ -193,11 +194,16 @@ class FlextQualityDocumentationReporter:
     ) -> str:
         """Generate comprehensive quality report.
 
+        Args:
+            report_format: Format for the generated report.
+            include_trends: Whether trend analytics are embedded.
+
         Returns:
             The resulting ``str``.
 
         Raises:
             ValueError: If Unsupported format.
+
         """
         report_data = FlextQualityDocumentationReporter.ReportData(
             timestamp=u.now().isoformat(),
@@ -227,6 +233,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.SummaryMetrics``.
+
         """
         overall_score, audit_issues = self._audit_summary_counts()
         links_checked, validation_issues = self._validation_summary_counts()
@@ -247,6 +254,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``tuple[int, int]``.
+
         """
         if not self.audit_data or not isinstance(self.audit_data, dict):
             return (0, 0)
@@ -265,6 +273,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``tuple[int, int]``.
+
         """
         if not self.validation_data or not isinstance(self.validation_data, dict):
             return (0, 0)
@@ -290,6 +299,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``int``.
+
         """
         if not self.optimization_data or not isinstance(self.optimization_data, dict):
             return 0
@@ -301,6 +311,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``int``.
+
         """
         if not self.audit_data or not isinstance(self.audit_data, dict):
             return 0
@@ -313,6 +324,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``str``.
+
         """
         if overall_score >= FlextQualityDocumentationReporter._QUALITY_SCORE_EXCELLENT:
             return "excellent"
@@ -328,6 +340,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.TrendData | None``.
+
         """
         return None
 
@@ -339,6 +352,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting
                 ``MutableSequence[FlextQualityDocumentationReporter.Recommendation]``.
+
         """
         recommendations: MutableSequence[
             FlextQualityDocumentationReporter.Recommendation
@@ -380,6 +394,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting matching issue record mappings.
+
         """
         return [
             entry
@@ -455,6 +470,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``bool``: ``True`` when recommendation collection
             must abort early (malformed link-validation errors payload).
+
         """
         if not self.validation_data or not isinstance(self.validation_data, dict):
             return False
@@ -490,6 +506,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``MutableSequence[Mapping[str, t.Primitives]]``.
+
         """
         broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
         for e_raw in validation_errors_raw:
@@ -551,6 +568,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``str``.
+
         """
         timestamp = datetime.fromisoformat(data.timestamp).strftime("%Y-%m-%d %H:%M:%S")
         template_data = {
@@ -581,6 +599,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``str``.
+
         """
         md = [f"# {data.title}", "", f"**Generated:** {data.timestamp}", ""]
         summary = data.summary
@@ -618,6 +637,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.AuditSummary | None``.
+
         """
         if not audit_data or not isinstance(audit_data, dict):
             return None
@@ -678,6 +698,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``FlextQualityDocumentationReporter.ValidationSummary |
                 None``.
+
         """
         if not validation_data or not isinstance(validation_data, dict):
             return None
@@ -707,6 +728,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``FlextQualityDocumentationReporter.OptimizationSummary |
                 None``.
+
         """
         if not optimization_data or not isinstance(optimization_data, dict):
             return None
@@ -735,6 +757,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``t.StrMapping | None``.
+
         """
         _ = data
         return None
@@ -742,8 +765,12 @@ class FlextQualityDocumentationReporter:
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period.
 
+        Args:
+            days: Number of days covered by the trend window.
+
         Returns:
             The resulting ``str``.
+
         """
         report_files = list(self.reports_dir.glob("*.json"))
         recent_reports: MutableSequence[
@@ -782,6 +809,7 @@ class FlextQualityDocumentationReporter:
 
         Raises:
             ValueError: If unreadable report.
+
         """
         date_str = report_file.name.split("_")[1]
         report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
@@ -813,6 +841,7 @@ class FlextQualityDocumentationReporter:
         Returns:
             The resulting ``FlextQualityDocumentationReporter.TrendData |
                 t.StrMapping``.
+
         """
         if not reports:
             return {"error": "No historical data available"}
@@ -855,6 +884,7 @@ class FlextQualityDocumentationReporter:
 
             Returns:
                 The resulting ``datetime``.
+
             """
             return entry.date
 
@@ -875,6 +905,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``datetime``.
+
         """
         date_val_raw = report.get("date")
         if date_val_raw is None:
@@ -893,6 +924,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+
         """
         if "metrics" not in report:
             return None
@@ -921,6 +953,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+
         """
         if "link_validation" not in report:
             return None
@@ -949,6 +982,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``FlextQualityDocumentationReporter.TrendEntry | None``.
+
         """
         if "changes_made" not in report:
             return None
@@ -970,8 +1004,14 @@ class FlextQualityDocumentationReporter:
     ) -> p.Result[Path]:
         """Save report to file.
 
+        Args:
+            content: Report body written to the file.
+            filename: Name of the report file.
+            report_format: Format of the saved report.
+
         Returns:
             The resulting ``p.Result[Path]``.
+
         """
         filepath = self.reports_dir / f"{filename}.{report_format}"
         write = u.Cli.atomic_write_text_file(filepath, content)
@@ -1037,6 +1077,7 @@ class FlextQualityDocumentationReporter:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             reporter = FlextQualityDocumentationReporter(self.output)
             if self.monthly_trends:
@@ -1079,6 +1120,7 @@ class FlextQualityDocumentationReporter:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -1086,8 +1128,13 @@ class FlextQualityDocumentationReporter:
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

@@ -9,6 +9,7 @@ from __future__ import annotations
 from abc import ABC
 
 from flext_core import FlextService
+
 from flext_quality import t
 
 

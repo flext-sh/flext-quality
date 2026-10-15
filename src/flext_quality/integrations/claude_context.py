@@ -11,8 +11,6 @@ from __future__ import annotations
 
 from typing import final
 
-# claude-context provides semantic code search and codebase indexing.
-
 from flext_quality import c, m, p, t
 from flext_quality.integrations import FlextQualityMcpClient
 
@@ -26,7 +24,13 @@ class FlextQualityClaudeContextClient:
     """
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
-        """Initialize the Claude Context client."""
+        """Initialize the Claude Context client.
+
+        Args:
+            timeout_ms: Optional command timeout in milliseconds; defaults to
+                the configured integration timeout.
+
+        """
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_index_call(
@@ -35,8 +39,12 @@ class FlextQualityClaudeContextClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call.
 
+        Args:
+            path: Optional codebase path indexed by the tool.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         params: t.MutableJsonMapping = {}
         if path:
@@ -55,8 +63,13 @@ class FlextQualityClaudeContextClient:
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call.
 
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
@@ -70,6 +83,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[m.Quality.McpToolCall]``.
+
         """
         return self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
@@ -80,8 +94,12 @@ class FlextQualityClaudeContextClient:
     def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing.
 
+        Args:
+            path: Optional codebase path indexed by the command.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
@@ -93,8 +111,13 @@ class FlextQualityClaudeContextClient:
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search.
 
+        Args:
+            query: Search query text.
+            limit: Maximum number of results; defaults to the configured limit.
+
         Returns:
             The resulting ``p.Result[t.StrSequence]``.
+
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -106,6 +129,7 @@ class FlextQualityClaudeContextClient:
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         return self._mcp.build_server_health_result(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,

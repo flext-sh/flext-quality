@@ -21,7 +21,12 @@ class FlextQualityHookManager:
     """Manages hook lifecycle and execution."""
 
     def __init__(self, config_path: Path | None = None) -> None:
-        """Initialize hook manager with optional settings path."""
+        """Initialize hook manager with optional settings path.
+
+        Args:
+            config_path: Optional path to the hooks configuration file.
+
+        """
         self._hooks: MutableMapping[
             c.Quality.HookEvent,
             MutableSequence[FlextQualityBaseHook],
@@ -29,10 +34,15 @@ class FlextQualityHookManager:
         self._config_path = config_path
 
     def execute(self, event: str, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
-        """Execute all hooks for an event.
+        """Execute all hooks registered for an event.
+
+        Args:
+            event: Hook event name (a ``c.Quality.HookEvent`` value).
+            input_data: Hook input payload forwarded to each hook.
 
         Returns:
             The resulting ``p.Result[t.JsonMapping]``.
+
         """
         try:
             hook_event = c.Quality.HookEvent(event)
@@ -51,10 +61,11 @@ class FlextQualityHookManager:
         return r[t.JsonMapping].ok({"continue": True})
 
     def fetch_config(self) -> t.JsonMapping:
-        """Get hooks configuration as dict.
+        """Return the hooks configuration as a mapping.
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         config: t.JsonDict = {}
         for event, hooks in self._hooks.items():
@@ -71,10 +82,11 @@ class FlextQualityHookManager:
         return config
 
     def fetch_config_json(self) -> str:
-        """Get hooks configuration as JSON.
+        """Return the hooks configuration as a JSON string.
 
         Returns:
             The resulting ``str``.
+
         """
         config_json: str = (
             t
@@ -85,10 +97,14 @@ class FlextQualityHookManager:
         return config_json
 
     def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
-        """Register a hook.
+        """Register a hook for its event.
+
+        Args:
+            hook: Hook instance registered under its ``event``.
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         event = hook.event
         if event not in self._hooks:

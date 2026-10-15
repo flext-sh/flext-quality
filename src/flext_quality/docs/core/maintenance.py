@@ -154,6 +154,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         merged: t.JsonDict = dict(defaults)
         for key, value in overrides.items():
@@ -206,19 +207,29 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a quality threshold value.
+            """Return a quality threshold value.
+
+            Args:
+                key: Threshold key to look up.
+                default: Value returned when the key is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             threshold = getattr(self.quality_thresholds, key, default)
             return threshold if isinstance(threshold, c.PRIMITIVES_TYPES) else default
 
         def is_check_enabled(self, check_type: str, check_name: str) -> bool:
-            """Check if a specific audit check is enabled.
+            """Return whether a specific audit check is enabled.
+
+            Args:
+                check_type: Audit section owning the check.
+                check_name: Name of the check within the section.
 
             Returns:
                 The resulting ``bool``.
+
             """
             check_value = False
             match check_type:
@@ -243,10 +254,15 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a markdown formatting rule.
+            """Return a markdown formatting rule.
+
+            Args:
+                rule: Markdown rule key to look up.
+                default: Value returned when the rule is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.markdown, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -257,10 +273,15 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get an accessibility rule.
+            """Return an accessibility rule.
+
+            Args:
+                rule: Accessibility rule key to look up.
+                default: Value returned when the rule is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.accessibility, rule, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -305,10 +326,15 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a link validation setting.
+            """Return a link validation setting.
+
+            Args:
+                setting: Link setting key to look up.
+                default: Value returned when the setting is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = getattr(self.link_validation, setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -319,10 +345,15 @@ class FlextQualityConfigManager:
             *,
             default: t.Primitives | None = None,
         ) -> t.Primitives | None:
-            """Get a content validation setting.
+            """Return a content validation setting.
+
+            Args:
+                setting: Content setting key to look up.
+                default: Value returned when the setting is absent.
 
             Returns:
                 The resulting ``t.Primitives | None``.
+
             """
             value = self.content_validation.get(setting, default)
             return value if isinstance(value, c.PRIMITIVES_TYPES) else default
@@ -335,6 +366,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``FlextQualityConfigManager.ConfigSection``.
+
         """
         if not isinstance(value, Mapping):
             return {}
@@ -355,6 +387,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``FlextQualityConfigManager.ConfigData``.
+
         """
         if not isinstance(value, Mapping):
             return {}
@@ -387,6 +420,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.AuditRulesConfig``.
+
         """
         if self._audit_rules is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -401,6 +435,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.StyleGuideConfig``.
+
         """
         if self._style_guide is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -415,6 +450,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``m.Quality.ValidationConfig``.
+
         """
         if self._validation_config is None:
             data = FlextQualityConfigManager._merged_over_defaults(
@@ -433,6 +469,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.JsonMapping``.
+
         """
         config_path = self.config_dir / filename
         loaded = u.Cli.yaml_safe_load(config_path)
@@ -449,6 +486,7 @@ class FlextQualityConfigManager:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         # Check required settings files exist
         required_files = [

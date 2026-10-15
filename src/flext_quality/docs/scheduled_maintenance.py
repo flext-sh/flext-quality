@@ -61,6 +61,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``str``.
+
         """
         return value if isinstance(value, str) else default
 
@@ -70,6 +71,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         return value if isinstance(value, bool) else default
 
@@ -79,6 +81,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``int``.
+
         """
         return value if isinstance(value, int) else default
 
@@ -91,6 +94,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         if isinstance(value, list):
             return default
@@ -118,8 +122,13 @@ class FlextQualityScheduledMaintenance:
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
         """Load maintenance schedule configuration, returning the merged config.
 
+        Args:
+            config_path: Optional path to a configuration file merged over the
+                defaults.
+
         Returns:
             The resulting ``m.Quality.MaintenanceConfig``.
+
         """
         default_config = self.build_default_config()
         resolved_config_path = (
@@ -142,6 +151,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``m.Quality.MaintenanceConfig``.
+
         """
         merged = base.model_dump()
         merged["enabled"] = self._as_bool(
@@ -254,6 +264,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``m.Quality.MaintenanceConfig``.
+
         """
         reports_dir = str(self._docs_reports_dir())
         backup_dir = str(self._docs_backups_dir())
@@ -407,6 +418,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         schedules = self.settings.schedules
         schedule_entry = schedules.get(schedule_key)
@@ -417,6 +429,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         return self.run_tasks(self._get_task_names("daily_audit"))
 
@@ -425,6 +438,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         return self.run_tasks(self._get_task_names("daily_optimize"))
 
@@ -433,6 +447,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         return self.run_tasks(self._get_task_names("weekly_comprehensive"))
 
@@ -441,14 +456,19 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         return self.run_tasks(self._get_task_names("monthly_deep_clean"))
 
     def run_tasks(self, task_names: t.StrSequence) -> bool:
         """Run a list of maintenance tasks.
 
+        Args:
+            task_names: Names of the maintenance tasks to run.
+
         Returns:
             The resulting ``bool``.
+
         """
         success = True
 
@@ -469,8 +489,12 @@ class FlextQualityScheduledMaintenance:
     def fail_step(self, message: str) -> bool:
         """Record a step failure message and report the step as failed.
 
+        Args:
+            message: Failure description recorded in the results.
+
         Returns:
             The resulting ``bool``.
+
         """
         self.results.errors.append(message)
         return False
@@ -478,8 +502,12 @@ class FlextQualityScheduledMaintenance:
     def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries.
 
+        Args:
+            task_config: Configuration of the task to run.
+
         Returns:
             The resulting ``bool``.
+
         """
         try:
             return self._run_single_task_unchecked(task_config)
@@ -494,6 +522,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         command = task_config.command
         description = task_config.description
@@ -523,6 +552,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``Callable[[t.StrSequence, int, str], bool] | None``.
+
         """
         handlers: t.MappingKV[str, Callable[[t.StrSequence, int, str], bool]] = {
             "python": self._handle_python_command,
@@ -546,6 +576,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         try:
             return self._handle_python_command_unchecked(
@@ -566,6 +597,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         if (
             len(cmd_parts) < c.Quality.SCHEDULED_MAINTENANCE_MIN_PYTHON_ARGS
@@ -602,6 +634,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         try:
             return self._handle_pytest_command_unchecked(
@@ -622,6 +655,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         pytest_args = cmd_parts[1:] if cmd_parts[0] == "pytest" else cmd_parts
 
@@ -643,6 +677,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         # Note: timeout parameter reserved for future make execution timeout
         # implementation
@@ -662,6 +697,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         makefile = self.project_root / "Makefile"
         if not makefile.exists():
@@ -690,6 +726,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         try:
             return self._handle_git_command_unchecked(cmd_parts, timeout, description)
@@ -706,6 +743,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         if len(cmd_parts) < c.Quality.SCHEDULED_MAINTENANCE_MIN_GIT_ARGS:
             self.results.warnings.append(
@@ -737,6 +775,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         # Note: timeout parameter reserved for future echo execution timeout
         # implementation
@@ -760,6 +799,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         try:
             return self._run_with_timeout_unchecked(func, timeout, description)
@@ -776,6 +816,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``bool``.
+
         """
         success = False
         task_error: Exception | None = None
@@ -864,8 +905,12 @@ class FlextQualityScheduledMaintenance:
     def run_manual(self, task_type: str) -> bool:
         """Run maintenance tasks manually.
 
+        Args:
+            task_type: Schedule type selecting the tasks to run.
+
         Returns:
             The resulting ``bool``.
+
         """
         task_map = {
             "daily": self.run_daily_audit,
@@ -948,6 +993,7 @@ class FlextQualityScheduledMaintenance:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             maintenance = FlextQualityScheduledMaintenance(self.settings_path)
             if self.list_schedules:
@@ -973,6 +1019,7 @@ class FlextQualityScheduledMaintenance:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -980,8 +1027,13 @@ class FlextQualityScheduledMaintenance:
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,

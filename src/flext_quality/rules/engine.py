@@ -20,24 +20,36 @@ class FlextQualityRulesEngine:
     """Engine for YAML-based declarative rules validation."""
 
     def __init__(self, rules_path: Path | None = None) -> None:
-        """Initialize rules engine."""
+        """Initialize the rules engine.
+
+        Args:
+            rules_path: Optional default path to the rules YAML file loaded
+                when no explicit path is given.
+
+        """
         self._rules_path: Path | None = rules_path
         self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
     def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
-        """Get loaded rules.
+        """Return the loaded rules.
 
         Returns:
             The resulting ``MutableSequence[m.Quality.RuleDefinition]``.
+
         """
         return list(self._rules)
 
     def load_rules(self, rules_path: Path | None = None) -> p.Result[int]:
-        """Load rules from YAML file.
+        """Load rules from a YAML file.
+
+        Args:
+            rules_path: Optional path overriding the engine's configured
+                rules path.
 
         Returns:
             The resulting ``p.Result[int]``.
+
         """
         path = rules_path or self._rules_path
         if path is None:
@@ -57,8 +69,13 @@ class FlextQualityRulesEngine:
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
         """Validate code against loaded rules.
 
+        Args:
+            path: File or directory path to validate.
+            context: Optional validation context attached to violations.
+
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
         """
         if not self._loaded:
             load_result = self.load_rules()
@@ -81,10 +98,15 @@ class FlextQualityRulesEngine:
         content: str,
         filename: str = "<string>",
     ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
-        """Validate content string against loaded rules.
+        """Validate a content string against loaded rules.
+
+        Args:
+            content: Text content checked against each enabled rule.
+            filename: Display name used in violation entries.
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+
         """
         if not self._loaded:
             load_result = self.load_rules()
@@ -106,8 +128,14 @@ class FlextQualityRulesEngine:
     ) -> t.SequenceOf[t.JsonMapping]:
         """Check a single rule against content.
 
+        Args:
+            rule: Rule definition whose pattern is matched per line.
+            content: Text content checked by the rule.
+            filename: Display name used in violation entries.
+
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
@@ -142,6 +170,7 @@ class FlextQualityRulesEngine:
 
         Returns:
             The resulting ``p.Result[t.SequenceOf[Path]]``.
+
         """
         if path.is_file():
             return r[t.SequenceOf[Path]].ok([path] if path.suffix == ".py" else [])
@@ -153,8 +182,12 @@ class FlextQualityRulesEngine:
     def _rule_type_to_severity(rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity.
 
+        Args:
+            rule_type: Rule type mapped to its severity.
+
         Returns:
             The resulting ``str``.
+
         """
         mapping = {
             c.Quality.RuleType.BLOCKING: c.Quality.Severity.ERROR,
@@ -170,8 +203,13 @@ class FlextQualityRulesEngine:
     ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules.
 
+        Args:
+            file_path: File read and checked by every enabled rule.
+            context: Validation context attached to violations.
+
         Returns:
             The resulting ``t.SequenceOf[t.JsonMapping]``.
+
         """
         validation_context = u.json_dict_adapter().validate_python(context or {})
         read = u.Cli.files_read_text(file_path)

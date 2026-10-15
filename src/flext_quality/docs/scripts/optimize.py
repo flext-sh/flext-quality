@@ -52,8 +52,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues.
 
+        Args:
+            doc_files: Documentation files reformatted in place.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -95,6 +99,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         fixed_lines = [line.rstrip() for line in lines]
@@ -106,6 +111,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -115,6 +121,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         fixed_lines: MutableSequence[str] = []
@@ -134,6 +141,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -143,8 +151,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents.
 
+        Args:
+            doc_files: Documentation files whose tables of contents refresh.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -179,6 +191,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``tuple[int, int]``.
+
         """
         toc_start = -1
         toc_end = -1
@@ -200,6 +213,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``MutableSequence[str]``.
+
         """
         toc_lines: MutableSequence[str] = []
         for line in lines:
@@ -219,6 +233,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``t.StrSequence``.
+
         """
         return ["## Table of Contents", "", *headings, "", "---", ""]
 
@@ -228,6 +243,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``int``.
+
         """
         insert_pos = 0
         for i, line in enumerate(lines):
@@ -246,6 +262,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         toc_start, toc_end = self._find_existing_toc(lines)
@@ -264,6 +281,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         anchor = heading.lower()
         anchor = u.Quality.compile_pattern(r"[^\\w\\s-]").sub("", anchor)
@@ -276,8 +294,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation.
 
+        Args:
+            doc_files: Documentation files enhanced in place.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -316,6 +338,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         pattern = "!\\[\\]\\(([^)]+)\\)"
         matches = u.Quality.compile_pattern(pattern).findall(content)
@@ -333,6 +356,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         improvements = {
             "\\[here\\]\\(([^)]+)\\)": "[learn more](\\1)",
@@ -353,8 +377,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability.
 
+        Args:
+            doc_files: Documentation files restructured in place.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -394,6 +422,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -403,6 +432,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         return content
 
@@ -412,6 +442,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         enhanced_lines: MutableSequence[str] = []
@@ -432,8 +463,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps.
 
+        Args:
+            doc_files: Documentation files whose frontmatter refreshes.
+
         Returns:
             The resulting ``m.Quality.OptimizerResults``.
+
         """
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
@@ -481,6 +516,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``str``.
+
         """
         lines = content.split("\n")
         if lines[0] == "---":
@@ -518,6 +554,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
@@ -533,8 +570,12 @@ class FlextQualityDocumentationOptimizer:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report.
 
+        Args:
+            report_format: Format for the generated report.
+
         Returns:
             The resulting ``str``.
+
         """
         report_text: str = (
             self.results.model_dump_json(indent=2)
@@ -549,8 +590,12 @@ class FlextQualityDocumentationOptimizer:
     ) -> p.Result[str]:
         """Save optimization report.
 
+        Args:
+            output_path: Directory the report file is written to.
+
         Returns:
             The resulting ``p.Result[str]``.
+
         """
         output_dir = Path(output_path)
         timestamp = u.now().strftime("%Y%m%d_%H%M%S")
@@ -626,6 +671,7 @@ class FlextQualityDocumentationOptimizer:
 
             Returns:
                 The resulting ``t.SequenceOf[Path]``.
+
             """
             project_root = Path(__file__).parent.parent.parent.parent
             if self.files:
@@ -649,6 +695,7 @@ class FlextQualityDocumentationOptimizer:
 
             Returns:
                 The resulting ``p.Result[bool]``.
+
             """
             optimizer = FlextQualityDocumentationOptimizer(backup=self.backup)
             run_any = False
@@ -681,6 +728,7 @@ class FlextQualityDocumentationOptimizer:
 
         Returns:
             The resulting ``p.Result[bool]``.
+
         """
         return params.execute()
 
@@ -688,8 +736,13 @@ class FlextQualityDocumentationOptimizer:
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade.
 
+        Args:
+            args: Command-line arguments; defaults to ``sys.argv[1:]`` when
+                ``None``.
+
         Returns:
-            The resulting ``int``.
+            The process exit code.
+
         """
         exit_code: int = u.Quality.execute_result_command(
             args=args,
