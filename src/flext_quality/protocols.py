@@ -10,17 +10,7 @@ from typing import Protocol, runtime_checkable
 
 from flext_web import FlextWebProtocols
 
-from flext_quality._protocols.quality import (
-    FlextQualityProtocolsArgumentOptionSpec,
-    FlextQualityProtocolsArgumentParserSpec,
-    FlextQualityProtocolsBaseHook,
-    FlextQualityProtocolsDocsConfig,
-    FlextQualityProtocolsHookImpl,
-    FlextQualityProtocolsIntegrationClient,
-    FlextQualityProtocolsMcpTool,
-    FlextQualityProtocolsRuleValidator,
-    FlextQualityProtocolsValidatorBase,
-)
+from flext_quality._protocols.quality import FlextQualityProtocolsQuality
 
 
 class FlextQualityProtocols(FlextWebProtocols):
@@ -30,15 +20,15 @@ class FlextQualityProtocols(FlextWebProtocols):
     class Quality(Protocol):
         """Quality-specific protocols namespace."""
 
-        ArgumentOptionSpec = FlextQualityProtocolsArgumentOptionSpec
-        ArgumentParserSpec = FlextQualityProtocolsArgumentParserSpec
-        ValidatorBase = FlextQualityProtocolsValidatorBase
-        HookImpl = FlextQualityProtocolsHookImpl
-        DocsConfig = FlextQualityProtocolsDocsConfig
-        BaseHook = FlextQualityProtocolsBaseHook
-        RuleValidator = FlextQualityProtocolsRuleValidator
-        IntegrationClient = FlextQualityProtocolsIntegrationClient
-        McpTool = FlextQualityProtocolsMcpTool
+        ArgumentOptionSpec = FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentOptionSpec
+        ArgumentParserSpec = FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentParserSpec
+        ValidatorBase = FlextQualityProtocolsQuality.FlextQualityProtocolsValidatorBase
+        HookImpl = FlextQualityProtocolsQuality.FlextQualityProtocolsHookImpl
+        DocsConfig = FlextQualityProtocolsQuality.FlextQualityProtocolsDocsConfig
+        BaseHook = FlextQualityProtocolsQuality.FlextQualityProtocolsBaseHook
+        RuleValidator = FlextQualityProtocolsQuality.FlextQualityProtocolsRuleValidator
+        IntegrationClient = FlextQualityProtocolsQuality.FlextQualityProtocolsIntegrationClient
+        McpTool = FlextQualityProtocolsQuality.FlextQualityProtocolsMcpTool
 
 
 p = FlextQualityProtocols
