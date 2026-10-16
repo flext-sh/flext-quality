@@ -13,12 +13,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum, auto, unique
 from typing import TYPE_CHECKING
 
 from flext_web import FlextWebConstants
 
 from flext_quality._constants import FlextQualityConstantsValues
+from flext_quality._constants.enums import FlextQualityConstantsEnums
 
 if TYPE_CHECKING:
     from flext_quality import t
@@ -38,6 +38,7 @@ class FlextQualityConstants(FlextWebConstants):
     """
 
     class Quality(
+        FlextQualityConstantsEnums,
         FlextQualityConstantsValues.Quality,
         FlextQualityConstantsValues,
     ):
@@ -45,67 +46,6 @@ class FlextQualityConstants(FlextWebConstants):
 
         class LinkCheckerDemo(FlextQualityConstantsValues.LinkCheckerDemo):
             """Demo link fixtures for the documentation link checker."""
-
-        @unique
-        class HookEvent(StrEnum):
-            """Claude Code hook events."""
-
-            PRE_TOOL_USE = "PreToolUse"
-            STOP = "Stop"
-
-        @unique
-        class RuleType(StrEnum):
-            """Rule types for validation."""
-
-            BLOCKING = "blocking"
-            WARNING = "warning"
-            INFO = "info"
-
-        @unique
-        class Severity(StrEnum):
-            """Rule severity levels."""
-
-            ERROR = "error"
-            WARNING = "warning"
-            INFO = "info"
-
-        @unique
-        class RuleResult(StrEnum):
-            """Rule evaluation results."""
-
-            PASS = auto()
-            FAIL = "fail"
-            SKIP = "skip"
-
-        @unique
-        class IntegrationStatus(StrEnum):
-            """External integration status."""
-
-            CONNECTED = "connected"
-            DISCONNECTED = "disconnected"
-            ERROR = "error"
-
-        @unique
-        class NotificationPriority(StrEnum):
-            """Notification priority levels for quality alerts."""
-
-            CRITICAL = "critical"
-            WARNING = "warning"
-            INFO = "info"
-
-        @unique
-        class ArgumentAction(StrEnum):
-            """Supported argparse actions for quality tooling."""
-
-            STORE_TRUE = "store_true"
-            STORE_FALSE = "store_false"
-
-        @unique
-        class ArgumentValueType(StrEnum):
-            """Supported argparse value coercions for quality tooling."""
-
-            STRING = "str"
-            INTEGER = "int"
 
 
 c = FlextQualityConstants
