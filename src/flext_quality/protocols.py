@@ -20,14 +20,20 @@ class FlextQualityProtocols(FlextWebProtocols):
     class Quality(Protocol):
         """Quality-specific protocols namespace."""
 
-        ArgumentOptionSpec = FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentOptionSpec
-        ArgumentParserSpec = FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentParserSpec
+        ArgumentOptionSpec = (
+            FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentOptionSpec
+        )
+        ArgumentParserSpec = (
+            FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentParserSpec
+        )
         ValidatorBase = FlextQualityProtocolsQuality.FlextQualityProtocolsValidatorBase
         HookImpl = FlextQualityProtocolsQuality.FlextQualityProtocolsHookImpl
         DocsConfig = FlextQualityProtocolsQuality.FlextQualityProtocolsDocsConfig
         BaseHook = FlextQualityProtocolsQuality.FlextQualityProtocolsBaseHook
         RuleValidator = FlextQualityProtocolsQuality.FlextQualityProtocolsRuleValidator
-        IntegrationClient = FlextQualityProtocolsQuality.FlextQualityProtocolsIntegrationClient
+        IntegrationClient = (
+            FlextQualityProtocolsQuality.FlextQualityProtocolsIntegrationClient
+        )
         McpTool = FlextQualityProtocolsQuality.FlextQualityProtocolsMcpTool
 
 
