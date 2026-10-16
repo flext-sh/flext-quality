@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Pydantic models for flext-quality.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -6,9 +7,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality._models.base import FlextQualityModelsBase
-from flext_quality._models.flextqualitymodels_part_01 import FlextQualityModelsPart01
-from flext_quality._models.flextqualitymodels_part_02 import FlextQualityModelsPart02
+from flext_quality._models import (
+    FlextQualityModelsBase,
+    FlextQualityModelsPart01,
+    FlextQualityModelsPart02,
+)
 
 
 class FlextQualityModels(
