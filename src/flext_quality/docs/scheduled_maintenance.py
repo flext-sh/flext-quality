@@ -584,7 +584,7 @@ class FlextQualityScheduledMaintenance:
                 timeout,
                 description,
             )
-        except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
+        except (ImportError, RuntimeError, OSError) as e:
             return self.fail_step(f"Python command failed in {description}: {e!s}")
 
     def _handle_python_command_unchecked(
