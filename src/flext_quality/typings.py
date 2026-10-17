@@ -6,7 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import FlextWebTypes, t as web_t
+from flext_web import FlextWebTypes
+
+from flext_quality._typings.quality import FlextQualityTypingsQuality
 
 
 class FlextQualityTypes(FlextWebTypes):
@@ -15,11 +17,9 @@ class FlextQualityTypes(FlextWebTypes):
     class Quality:
         """Quality-specific types namespace (project slot)."""
 
-        type RuleResult = tuple[bool, str | None]
-        type GenericItem = (
-            web_t.JsonValue | web_t.MappingKV[str, web_t.Primitives | None]
-        )
-        type DocumentationReportValue = web_t.JsonMapping
+        RuleResult = FlextQualityTypingsQuality.RuleResult
+        GenericItem = FlextQualityTypingsQuality.GenericItem
+        DocumentationReportValue = FlextQualityTypingsQuality.DocumentationReportValue
 
 
 t = FlextQualityTypes
