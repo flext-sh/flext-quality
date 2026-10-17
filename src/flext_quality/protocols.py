@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Protocols for flext-quality.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -10,7 +11,7 @@ from typing import Protocol, runtime_checkable
 
 from flext_web import FlextWebProtocols
 
-from flext_quality._protocols.quality import FlextQualityProtocolsQuality
+from flext_quality._protocols import FlextQualityProtocolsQuality
 
 
 class FlextQualityProtocols(FlextWebProtocols):

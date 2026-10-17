@@ -21,6 +21,7 @@ if TYPE_CHECKING:
         FlextQualityProtocolsHookImpl,
         FlextQualityProtocolsIntegrationClient,
         FlextQualityProtocolsMcpTool,
+        FlextQualityProtocolsQuality,
         FlextQualityProtocolsRuleValidator,
         FlextQualityProtocolsValidatorBase,
     )
@@ -34,6 +35,7 @@ __all__: tuple[str, ...] = (
     "FlextQualityProtocolsHookImpl",
     "FlextQualityProtocolsIntegrationClient",
     "FlextQualityProtocolsMcpTool",
+    "FlextQualityProtocolsQuality",
     "FlextQualityProtocolsRuleValidator",
     "FlextQualityProtocolsValidatorBase",
 )
@@ -49,6 +51,7 @@ install_lazy_exports(
         "FlextQualityProtocolsHookImpl": ".quality",
         "FlextQualityProtocolsIntegrationClient": ".quality",
         "FlextQualityProtocolsMcpTool": ".quality",
+        "FlextQualityProtocolsQuality": ".quality",
         "FlextQualityProtocolsRuleValidator": ".quality",
         "FlextQualityProtocolsValidatorBase": ".quality",
     }),

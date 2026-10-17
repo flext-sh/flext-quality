@@ -17,7 +17,13 @@ from flext_quality.__version__ import __version__
 if TYPE_CHECKING:
     from flext_web import d, e, h, r, x
 
-    from flext_quality import _constants, _models, docs, hooks, integrations, mcp, rules
+    from flext_quality import (
+        docs as docs,
+        hooks as hooks,
+        integrations as integrations,
+        mcp as mcp,
+        rules as rules,
+    )
     from flext_quality.__version__ import (
         FlextQualityVersion,
         __author__,
@@ -60,8 +66,6 @@ __all__: tuple[str, ...] = (
     "__url__",
     "__version__",
     "__version_info__",
-    "_constants",
-    "_models",
     "c",
     "config",
     "d",
@@ -106,8 +110,6 @@ install_lazy_exports(
         "__title__": ".__version__",
         "__url__": ".__version__",
         "__version_info__": ".__version__",
-        "_constants": "._constants",
-        "_models": "._models",
         "c": ".constants",
         "config": "._config",
         "d": "flext_web",

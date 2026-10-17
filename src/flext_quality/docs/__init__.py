@@ -13,19 +13,23 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs import core, scripts, tools
-    from flext_quality.docs.core.maintenance import FlextQualityConfigManager
+    from flext_quality.docs import core as core, scripts as scripts, tools as tools
+    from flext_quality.docs.core import FlextQualityConfigManager
     from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
     from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
     from flext_quality.docs.scheduled_maintenance import (
         FlextQualityScheduledMaintenance,
     )
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-    from flext_quality.docs.scripts.optimize import FlextQualityDocumentationOptimizer
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
-    from flext_quality.docs.scripts.validate import FlextQualityDocumentationValidator
-    from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
-    from flext_quality.docs.tools.style_validator import FlextQualityStyleValidator
+    from flext_quality.docs.scripts import (
+        FlextQualityDocumentationAuditor,
+        FlextQualityDocumentationOptimizer,
+        FlextQualityDocumentationReporter,
+        FlextQualityDocumentationValidator,
+    )
+    from flext_quality.docs.tools import (
+        FlextQualityLinkChecker,
+        FlextQualityStyleValidator,
+    )
 
 
 __all__: tuple[str, ...] = (

@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Utility functions for flext-quality.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -8,7 +9,7 @@ from __future__ import annotations
 
 from flext_web import FlextWebUtilities
 
-from flext_quality._utilities.quality import FlextQualityUtilitiesQuality
+from flext_quality._utilities import FlextQualityUtilitiesQuality
 
 
 class FlextQualityUtilities(FlextWebUtilities):
