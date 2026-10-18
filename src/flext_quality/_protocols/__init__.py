@@ -13,44 +13,14 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality._protocols.quality import (
-        FlextQualityProtocolsArgumentOptionSpec,
-        FlextQualityProtocolsArgumentParserSpec,
-        FlextQualityProtocolsBaseHook,
-        FlextQualityProtocolsDocsConfig,
-        FlextQualityProtocolsHookImpl,
-        FlextQualityProtocolsIntegrationClient,
-        FlextQualityProtocolsMcpTool,
-        FlextQualityProtocolsRuleValidator,
-        FlextQualityProtocolsValidatorBase,
-    )
+    from flext_quality._protocols.quality import FlextQualityProtocolsQuality
 
 
-__all__: tuple[str, ...] = (
-    "FlextQualityProtocolsArgumentOptionSpec",
-    "FlextQualityProtocolsArgumentParserSpec",
-    "FlextQualityProtocolsBaseHook",
-    "FlextQualityProtocolsDocsConfig",
-    "FlextQualityProtocolsHookImpl",
-    "FlextQualityProtocolsIntegrationClient",
-    "FlextQualityProtocolsMcpTool",
-    "FlextQualityProtocolsRuleValidator",
-    "FlextQualityProtocolsValidatorBase",
-)
+__all__: tuple[str, ...] = ("FlextQualityProtocolsQuality",)
 
 install_lazy_exports(
     __name__,
     globals(),
-    MappingProxyType({
-        "FlextQualityProtocolsArgumentOptionSpec": ".quality",
-        "FlextQualityProtocolsArgumentParserSpec": ".quality",
-        "FlextQualityProtocolsBaseHook": ".quality",
-        "FlextQualityProtocolsDocsConfig": ".quality",
-        "FlextQualityProtocolsHookImpl": ".quality",
-        "FlextQualityProtocolsIntegrationClient": ".quality",
-        "FlextQualityProtocolsMcpTool": ".quality",
-        "FlextQualityProtocolsRuleValidator": ".quality",
-        "FlextQualityProtocolsValidatorBase": ".quality",
-    }),
+    MappingProxyType({"FlextQualityProtocolsQuality": ".quality"}),
     public_exports=__all__,
 )
