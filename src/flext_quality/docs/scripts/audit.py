@@ -923,49 +923,49 @@ class FlextQualityDocumentationAuditor:
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation audit."""
 
-        comprehensive: bool = u.Field(
+        comprehensive: bool = m.Field(
             default=False,
             description="Run all audit checks",
             validate_default=True,
         )
-        check_freshness: bool = u.Field(
+        check_freshness: bool = m.Field(
             default=False,
             description="Check content freshness",
             validate_default=True,
         )
-        check_completeness: bool = u.Field(
+        check_completeness: bool = m.Field(
             default=False,
             description="Check documentation completeness",
             validate_default=True,
         )
-        check_consistency: bool = u.Field(
+        check_consistency: bool = m.Field(
             default=False,
             description="Check content consistency",
             validate_default=True,
         )
-        check_links: bool = u.Field(
+        check_links: bool = m.Field(
             default=False,
             description="Check documentation links",
             validate_default=True,
         )
-        ci_mode: bool = u.Field(
+        ci_mode: bool = m.Field(
             default=False,
             description="Enable CI mode",
             validate_default=True,
         )
-        fail_on_errors: bool = u.Field(
+        fail_on_errors: bool = m.Field(
             default=False,
             description="Fail when audit errors are present",
             validate_default=True,
         )
-        output: str = u.Field(
+        output: str = m.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
             description="Audit report output directory",
             validate_default=True,
         )
         output_format: Annotated[
             str,
-            u.Field(
+            m.Field(
                 alias="format",
                 description="Audit report format",
                 validate_default=True,
@@ -973,7 +973,7 @@ class FlextQualityDocumentationAuditor:
         ] = "json"
         config_dir: Annotated[
             str | None,
-            u.Field(
+            m.Field(
                 alias="config",
                 description="Audit configuration directory",
                 validate_default=True,

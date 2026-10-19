@@ -83,7 +83,7 @@ class FlextQualityDocumentationNotifier:
         username: str
         password: str | None
         from_address: str
-        to_addresses: t.StrSequence = u.Field(default_factory=tuple)
+        to_addresses: t.StrSequence = m.Field(default_factory=tuple)
 
     class _SlackConfig(m.BaseModel):
         webhook_url: str
@@ -92,7 +92,7 @@ class FlextQualityDocumentationNotifier:
 
     class _WebhookConfig(m.BaseModel):
         url: str
-        headers: t.StrMapping = u.Field(default_factory=dict[str, str])
+        headers: t.StrMapping = m.Field(default_factory=dict[str, str])
         timeout: int
 
     class _ChannelsConfig(m.BaseModel):
@@ -838,28 +838,28 @@ Found {len(broken_links)} broken links that need attention:
 
         settings_path: Annotated[
             str,
-            u.Field(
+            m.Field(
                 alias="settings",
                 description="Notification settings file",
                 validate_default=True,
             ),
         ] = "docs/maintenance/settings/notification_config.yaml"
-        test: bool = u.Field(
+        test: bool = m.Field(
             default=False,
             description="Send a test notification",
             validate_default=True,
         )
-        audit_data: str | None = u.Field(
+        audit_data: str | None = m.Field(
             None,
             description="Audit data JSON file",
             validate_default=True,
         )
-        weekly_report: str | None = u.Field(
+        weekly_report: str | None = m.Field(
             None,
             description="Weekly report JSON file",
             validate_default=True,
         )
-        monthly_report: str | None = u.Field(
+        monthly_report: str | None = m.Field(
             None,
             description="Monthly report JSON file",
             validate_default=True,

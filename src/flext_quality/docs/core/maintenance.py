@@ -182,19 +182,19 @@ class FlextQualityConfigManager:
     class AuditRules(m.Quality.AuditRulesConfig):
         """Configuration for audit rules and thresholds."""
 
-        link_checks: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        link_checks: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Link-check rules and thresholds for the documentation audit.",
         )
-        style_checks: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        style_checks: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Style-check rules and thresholds for the documentation audit.",
         )
-        accessibility_checks: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        accessibility_checks: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
@@ -289,31 +289,31 @@ class FlextQualityConfigManager:
     class ValidationSettings(m.Quality.ValidationConfig):
         """Configuration for validation operations."""
 
-        content_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        content_validation: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Content validation options and their configured values.",
         )
-        image_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        image_validation: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Image validation options and their configured values.",
         )
-        accessibility_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        accessibility_validation: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Accessibility validation options and their values.",
         )
-        security_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        security_validation: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),
             description="Security validation options and their configured values.",
         )
-        performance_validation: Mapping[str, t.Primitives | t.StrSequence] = u.Field(
+        performance_validation: Mapping[str, t.Primitives | t.StrSequence] = m.Field(
             default_factory=lambda: MappingProxyType(
                 dict[str, t.Primitives | t.StrSequence](),
             ),

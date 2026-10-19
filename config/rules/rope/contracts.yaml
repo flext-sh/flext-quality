@@ -1,0 +1,20 @@
+rules:
+  - id: quality-json-mapping-adapter-owner
+    phase: contract-normalization
+    pattern: '${receiver}.json_mapping_adapter'
+    goal: 'u.json_mapping_adapter'
+    arguments:
+      receiver: name=flext_quality.typings.FlextQualityTypes
+    imports: &quality_utilities
+      u: from flext_quality import u
+    bindings:
+      u.json_mapping_adapter: flext_core._utilities.typeadapter_json.FlextUtilitiesTypingAdapterJson.json_mapping_adapter
+  - id: quality-json-mapping-sequence-adapter-owner
+    phase: contract-normalization
+    pattern: '${receiver}.json_mapping_sequence_adapter'
+    goal: 'u.json_mapping_sequence_adapter'
+    arguments:
+      receiver: name=flext_quality.typings.FlextQualityTypes
+    imports: *quality_utilities
+    bindings:
+      u.json_mapping_sequence_adapter: flext_core._utilities.typeadapter_json.FlextUtilitiesTypingAdapterJson.json_mapping_sequence_adapter
