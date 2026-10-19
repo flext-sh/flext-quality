@@ -671,22 +671,22 @@ class FlextQualityDocumentationDashboard:
     class Run(s[bool]):
         """CLI command for the FLEXT Quality Documentation Dashboard."""
 
-        host: str = u.Field(
+        host: str = m.Field(
             "localhost",
             description="Dashboard bind host",
             validate_default=True,
         )
-        port: int = u.Field(
+        port: int = m.Field(
             8080,
             description="Dashboard bind port",
             validate_default=True,
         )
-        debug: bool = u.Field(
+        debug: bool = m.Field(
             default=False,
             description="Enable dashboard debug mode",
             validate_default=True,
         )
-        reports_dir: str = u.Field(
+        reports_dir: str = m.Field(
             "docs/maintenance/reports/",
             description="Documentation reports directory",
             validate_default=True,

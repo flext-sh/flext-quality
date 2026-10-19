@@ -615,52 +615,52 @@ class FlextQualityDocumentationOptimizer:
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation optimization."""
 
-        fix_formatting: bool = u.Field(
+        fix_formatting: bool = m.Field(
             default=False,
             description="Fix formatting",
             validate_default=True,
         )
-        update_toc: bool = u.Field(
+        update_toc: bool = m.Field(
             default=False,
             description="Update tables of contents",
             validate_default=True,
         )
-        add_alt_text: bool = u.Field(
+        add_alt_text: bool = m.Field(
             default=False,
             description="Add missing alt text",
             validate_default=True,
         )
-        improve_accessibility: bool = u.Field(
+        improve_accessibility: bool = m.Field(
             default=False,
             description="Improve accessibility",
             validate_default=True,
         )
-        optimize_structure: bool = u.Field(
+        optimize_structure: bool = m.Field(
             default=False,
             description="Optimize content structure",
             validate_default=True,
         )
-        update_metadata: bool = u.Field(
+        update_metadata: bool = m.Field(
             default=False,
             description="Update metadata",
             validate_default=True,
         )
-        comprehensive: bool = u.Field(
+        comprehensive: bool = m.Field(
             default=False,
             description="Run all optimizations",
             validate_default=True,
         )
-        backup: bool = u.Field(
+        backup: bool = m.Field(
             default=True,
             description="Create file backups",
             validate_default=True,
         )
-        output: str = u.Field(
+        output: str = m.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
             description="Optimization report output directory",
             validate_default=True,
         )
-        files: t.StrSequence = u.Field(
+        files: t.StrSequence = m.Field(
             (),
             description="Documentation files to optimize",
             validate_default=True,

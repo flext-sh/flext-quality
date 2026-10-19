@@ -826,67 +826,67 @@ class FlextQualityDocumentationValidator:
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation validation."""
 
-        external_links: bool = u.Field(
+        external_links: bool = m.Field(
             default=False,
             description="Validate external links",
             validate_default=True,
         )
-        internal_links: bool = u.Field(
+        internal_links: bool = m.Field(
             default=False,
             description="Validate internal links",
             validate_default=True,
         )
-        images: bool = u.Field(
+        images: bool = m.Field(
             default=False,
             description="Validate image references",
             validate_default=True,
         )
-        anchors: bool = u.Field(
+        anchors: bool = m.Field(
             default=False,
             description="Validate anchor links",
             validate_default=True,
         )
-        link_text: bool = u.Field(
+        link_text: bool = m.Field(
             default=False,
             description="Check link text quality",
             validate_default=True,
         )
-        markdown_syntax: bool = u.Field(
+        markdown_syntax: bool = m.Field(
             default=False,
             description="Validate markdown syntax",
             validate_default=True,
         )
-        content_quality: bool = u.Field(
+        content_quality: bool = m.Field(
             default=False,
             description="Check content quality",
             validate_default=True,
         )
-        all: bool = u.Field(
+        all: bool = m.Field(
             default=False,
             description="Run all validation checks",
             validate_default=True,
         )
-        verbose: bool = u.Field(
+        verbose: bool = m.Field(
             default=False,
             description="Enable verbose output",
             validate_default=True,
         )
-        output: str = u.Field(
+        output: str = m.Field(
             c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
             description="Validation report output directory",
             validate_default=True,
         )
-        timeout: int = u.Field(
+        timeout: int = m.Field(
             10,
             description="External request timeout",
             validate_default=True,
         )
-        retries: int = u.Field(
+        retries: int = m.Field(
             3,
             description="External request retries",
             validate_default=True,
         )
-        workers: int = u.Field(
+        workers: int = m.Field(
             5,
             description="Concurrent link workers",
             validate_default=True,

@@ -795,7 +795,7 @@ class FlextQualityScheduledMaintenance:
 
         settings_path: Annotated[
             str,
-            u.Field(
+            m.Field(
                 default=str(
                     Path(__file__).resolve().parent
                     / "settings"
@@ -805,17 +805,17 @@ class FlextQualityScheduledMaintenance:
                 description="Scheduled maintenance settings file",
             ),
         ]
-        daemon: bool = u.Field(
+        daemon: bool = m.Field(
             default=False,
             description="Run scheduler daemon",
             validate_default=True,
         )
-        manual: str | None = u.Field(
+        manual: str | None = m.Field(
             None,
             description="Run one maintenance task",
             validate_default=True,
         )
-        list_schedules: bool = u.Field(
+        list_schedules: bool = m.Field(
             default=False,
             description="List configured schedules",
             validate_default=True,

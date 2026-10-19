@@ -1024,48 +1024,48 @@ class FlextQualityDocumentationReporter:
 
         output_format: Annotated[
             str,
-            u.Field(
+            m.Field(
                 alias="format",
                 description="Report output format",
                 validate_default=True,
             ),
         ] = "html"
-        output: str = u.Field(
+        output: str = m.Field(
             "docs/maintenance/reports/",
             description="Report output directory",
             validate_default=True,
         )
-        filename: str | None = u.Field(
+        filename: str | None = m.Field(
             None,
             description="Optional report filename",
             validate_default=True,
         )
-        monthly_trends: bool = u.Field(
+        monthly_trends: bool = m.Field(
             default=False,
             description="Generate monthly trend report",
             validate_default=True,
         )
-        weekly_trends: bool = u.Field(
+        weekly_trends: bool = m.Field(
             default=False,
             description="Generate weekly trend report",
             validate_default=True,
         )
-        include_trends: bool = u.Field(
+        include_trends: bool = m.Field(
             default=False,
             description="Include trend data",
             validate_default=True,
         )
-        notify: bool = u.Field(
+        notify: bool = m.Field(
             default=False,
             description="Send report notification",
             validate_default=True,
         )
-        webhook_url: str | None = u.Field(
+        webhook_url: str | None = m.Field(
             None,
             description="Notification webhook URL",
             validate_default=True,
         )
-        serve: bool = u.Field(
+        serve: bool = m.Field(
             default=False,
             description="Serve the report dashboard",
             validate_default=True,

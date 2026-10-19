@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
 from flext_cli import cli
 
-from flext_quality import m, p, quality, r, s, t, u
+from flext_quality import m, p, quality, r, s, t
 from flext_quality.integrations import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
@@ -38,7 +38,7 @@ class FlextQualityCli(s[bool]):
 
         target_path: Annotated[
             Path,
-            u.Field(default_factory=Path.cwd, description="Target path"),
+            m.Field(default_factory=Path.cwd, description="Target path"),
         ]
 
         @override
