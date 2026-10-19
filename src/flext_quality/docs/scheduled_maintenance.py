@@ -13,7 +13,7 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, ClassVar, override
@@ -168,12 +168,12 @@ class FlextQualityScheduledMaintenance:
         )
 
         schedules_raw = overrides.get("schedules")
-        if u.mapping(schedules_raw):
+        if isinstance(schedules_raw, Mapping):
             schedules = {
                 key: value.model_dump() for key, value in base.schedules.items()
             }
             for key, value in schedules_raw.items():
-                if u.mapping(value) and key in schedules:
+                if isinstance(value, Mapping) and key in schedules:
                     current = schedules[key]
                     updated = {
                         "enabled": self._as_bool(
@@ -192,10 +192,10 @@ class FlextQualityScheduledMaintenance:
             merged["schedules"] = schedules
 
         tasks_raw = overrides.get("tasks")
-        if u.mapping(tasks_raw):
+        if isinstance(tasks_raw, Mapping):
             tasks = {key: value.model_dump() for key, value in base.tasks.items()}
             for key, value in tasks_raw.items():
-                if u.mapping(value) and key in tasks:
+                if isinstance(value, Mapping) and key in tasks:
                     current = tasks[key]
                     tasks[key] = {
                         "description": self._as_str(
@@ -214,7 +214,7 @@ class FlextQualityScheduledMaintenance:
             merged["tasks"] = tasks
 
         error_handling_raw = overrides.get("error_handling")
-        if u.mapping(error_handling_raw):
+        if isinstance(error_handling_raw, Mapping):
             err_cfg = base.error_handling
             merged["error_handling"] = {
                 "max_retries": self._as_int(
@@ -236,7 +236,7 @@ class FlextQualityScheduledMaintenance:
             }
 
         logging_raw = overrides.get("logging")
-        if u.mapping(logging_raw):
+        if isinstance(logging_raw, Mapping):
             log_cfg = base.logging
             merged["logging"] = {
                 "enabled": self._as_bool(
