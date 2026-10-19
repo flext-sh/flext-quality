@@ -13,7 +13,7 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, ClassVar, override
@@ -55,51 +55,6 @@ class FlextQualityScheduledMaintenance:
         """Return the logs directory for documentation tooling."""
         return cls._docs_root() / "logs"
 
-    @staticmethod
-    def _as_str(value: t.JsonValue | None, default: str) -> str:
-        """Normalize unknown settings values to string.
-
-        Returns:
-            The resulting ``str``.
-
-        """
-        return value if isinstance(value, str) else default
-
-    @staticmethod
-    def _as_bool(value: t.JsonValue | None, /, *, default: bool) -> bool:
-        """Normalize unknown settings values to bool.
-
-        Returns:
-            The resulting ``bool``.
-
-        """
-        return value if isinstance(value, bool) else default
-
-    @staticmethod
-    def _as_int(value: t.JsonValue | None, default: int) -> int:
-        """Normalize unknown settings values to int.
-
-        Returns:
-            The resulting ``int``.
-
-        """
-        return value if isinstance(value, int) else default
-
-    @staticmethod
-    def _as_str_list(
-        value: t.JsonValue | None,
-        default: t.StrSequence,
-    ) -> t.StrSequence:
-        """Normalize unknown settings values to t.StrSequence.
-
-        Returns:
-            The resulting ``t.StrSequence``.
-
-        """
-        if isinstance(value, list):
-            return default
-        return default
-
     def __init__(self, config_path: str | None = None) -> None:
         """Initialize scheduled maintenance system.
 
@@ -107,8 +62,6 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        # Load (and keep) the merged maintenance config on the instance; the bare
-        # module-level `settings` refs below read from this attribute.
         self.settings: m.Quality.MaintenanceConfig = self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(self.settings.reports_dir)
@@ -120,144 +73,25 @@ class FlextQualityScheduledMaintenance:
         )
 
     def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
-        """Load maintenance schedule configuration, returning the merged config.
+        """Load external configuration once through the maintenance model.
 
         Args:
-            config_path: Optional path to a configuration file merged over the
-                defaults.
+            config_path: Optional path to a maintenance configuration file.
 
         Returns:
             The resulting ``m.Quality.MaintenanceConfig``.
 
         """
-        default_config = self.build_default_config()
         resolved_config_path = (
             Path(config_path)
             if config_path is not None
             else self._docs_config_file("schedule_config.yaml")
         )
         if resolved_config_path.is_file():
-            loaded_untyped = u.Cli.yaml_load_mapping(resolved_config_path)
-            if u.mapping(loaded_untyped) and loaded_untyped:
-                return self._merge_config(default_config, loaded_untyped)
-        return default_config
-
-    def _merge_config(
-        self,
-        base: m.Quality.MaintenanceConfig,
-        overrides: t.JsonMapping,
-    ) -> m.Quality.MaintenanceConfig:
-        """Merge external settings mapping into default typed self.settings.
-
-        Returns:
-            The resulting ``m.Quality.MaintenanceConfig``.
-
-        """
-        merged = base.model_dump()
-        merged["enabled"] = self._as_bool(
-            overrides.get("enabled"),
-            default=base.enabled,
-        )
-        merged["reports_dir"] = self._as_str(
-            overrides.get("reports_dir"),
-            base.reports_dir,
-        )
-        merged["backup_dir"] = self._as_str(
-            overrides.get("backup_dir"),
-            base.backup_dir,
-        )
-
-        schedules_raw = overrides.get("schedules")
-        if isinstance(schedules_raw, Mapping):
-            schedules = {
-                key: value.model_dump() for key, value in base.schedules.items()
-            }
-            for key, value in schedules_raw.items():
-                if isinstance(value, Mapping) and key in schedules:
-                    current = schedules[key]
-                    updated = {
-                        "enabled": self._as_bool(
-                            value.get("enabled"),
-                            default=current["enabled"],
-                        ),
-                        "time": self._as_str(value.get("time"), current["time"]),
-                        "tasks": self._as_str_list(
-                            value.get("tasks"),
-                            current["tasks"],
-                        ),
-                        "day": self._as_str(value.get("day"), current.get("day") or "")
-                        or None,
-                    }
-                    schedules[key] = updated
-            merged["schedules"] = schedules
-
-        tasks_raw = overrides.get("tasks")
-        if isinstance(tasks_raw, Mapping):
-            tasks = {key: value.model_dump() for key, value in base.tasks.items()}
-            for key, value in tasks_raw.items():
-                if isinstance(value, Mapping) and key in tasks:
-                    current = tasks[key]
-                    tasks[key] = {
-                        "description": self._as_str(
-                            value.get("description"),
-                            current["description"],
-                        ),
-                        "command": self._as_str(
-                            value.get("command"),
-                            current["command"],
-                        ),
-                        "timeout": self._as_int(
-                            value.get("timeout"),
-                            current["timeout"],
-                        ),
-                    }
-            merged["tasks"] = tasks
-
-        error_handling_raw = overrides.get("error_handling")
-        if isinstance(error_handling_raw, Mapping):
-            err_cfg = base.error_handling
-            merged["error_handling"] = {
-                "max_retries": self._as_int(
-                    error_handling_raw.get("max_retries"),
-                    err_cfg.max_retries,
-                ),
-                "retry_delay": self._as_int(
-                    error_handling_raw.get("retry_delay"),
-                    err_cfg.retry_delay,
-                ),
-                "fail_fast": self._as_bool(
-                    error_handling_raw.get("fail_fast"),
-                    default=err_cfg.fail_fast,
-                ),
-                "notify_on_failure": self._as_bool(
-                    error_handling_raw.get("notify_on_failure"),
-                    default=err_cfg.notify_on_failure,
-                ),
-            }
-
-        logging_raw = overrides.get("logging")
-        if isinstance(logging_raw, Mapping):
-            log_cfg = base.logging
-            merged["logging"] = {
-                "enabled": self._as_bool(
-                    logging_raw.get("enabled"),
-                    default=log_cfg.enabled,
-                ),
-                "log_file": self._as_str(logging_raw.get("log_file"), log_cfg.log_file),
-                "max_log_size": self._as_str(
-                    logging_raw.get("max_log_size"),
-                    log_cfg.max_log_size,
-                ),
-                "retention_days": self._as_int(
-                    logging_raw.get("retention_days"),
-                    log_cfg.retention_days,
-                ),
-            }
-
-        config: m.Quality.MaintenanceConfig = (
-            m.Quality.MaintenanceConfig.model_validate(merged)
-        )
-        return config
+            return m.Quality.MaintenanceConfig.model_validate(
+                u.Cli.yaml_safe_load(resolved_config_path).unwrap()
+            )
+        return self.build_default_config()
 
     def build_default_config(self) -> m.Quality.MaintenanceConfig:
         """Default maintenance configuration.

@@ -27,10 +27,10 @@ from flext_quality.rules import FlextQualityRulesLoader
 class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
     """Coordinate quality operations through the canonical facade instance."""
 
-    _hooks: FlextQualityHookManager = u.PrivateAttr(
+    _hooks: FlextQualityHookManager = m.PrivateAttr(
         default_factory=FlextQualityHookManager,
     )
-    _rules_loader: FlextQualityRulesLoader = u.PrivateAttr(
+    _rules_loader: FlextQualityRulesLoader = m.PrivateAttr(
         default_factory=FlextQualityRulesLoader,
     )
 

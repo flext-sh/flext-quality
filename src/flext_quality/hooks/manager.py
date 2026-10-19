@@ -89,7 +89,7 @@ class FlextQualityHookManager:
 
         """
         config_json: str = (
-            t
+            u
             .json_mapping_adapter()
             .dump_json(dict(self.fetch_config()), indent=c.Quality.JSON_INDENT)
             .decode("utf-8")

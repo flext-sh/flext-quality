@@ -13,7 +13,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_quality.docs import FlextQualityDocumentationDashboard
-from tests import t, tm, u
+from tests import tm, u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -149,7 +149,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(response.status_code, eq=200)
         payload_result = u.Cli.json_loads(response.get_data(as_text=True))
         tm.ok(payload_result)
-        payload = t.json_dict_adapter().validate_python(payload_result.value)
+        payload = u.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("status"), eq="No audit data available")
 
     @staticmethod
@@ -161,7 +161,7 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(response.status_code, eq=200)
         payload_result = u.Cli.json_loads(response.get_data(as_text=True))
         tm.ok(payload_result)
-        payload = t.json_dict_adapter().validate_python(payload_result.value)
+        payload = u.json_dict_adapter().validate_python(payload_result.value)
         tm.that(payload.get("period_days"), eq=5)
 
     @staticmethod

@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality import c, t, u
+from flext_quality import c, u
 from flext_quality.hooks import FlextQualityHookManager
 from flext_quality.integrations import (
     FlextQualityClaudeContextClient,
@@ -33,7 +33,7 @@ class FlextQualityMcpResources:
         manager = FlextQualityHookManager()
         settings = manager.fetch_config()
         config_json: str = (
-            t
+            u
             .json_mapping_adapter()
             .dump_json(settings, indent=c.Quality.JSON_INDENT)
             .decode("utf-8")
@@ -52,7 +52,7 @@ class FlextQualityMcpResources:
         engine = FlextQualityRulesEngine()
         rules = engine.list_rules()
         rules_json: str = (
-            t
+            u
             .json_mapping_sequence_adapter()
             .dump_json(
                 [rule.model_dump() for rule in rules],
@@ -87,7 +87,7 @@ class FlextQualityMcpResources:
         )
         status = {"claude_mem": mem_status, "claude_context": ctx_status}
         status_json: str = (
-            t
+            u
             .json_mapping_adapter()
             .dump_json(status, indent=c.Quality.JSON_INDENT)
             .decode("utf-8")
