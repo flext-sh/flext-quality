@@ -257,7 +257,7 @@ def test_should_do_something_when_condition():
     # Then (Assert) - Using current API
     data = result.unwrap_or(None)
     assert data is not None
-    assert data.expected_property == expected_value
+    tm.that(data.expected_property, eq=expected_value)
 ```
 
 ### Naming Conventions
