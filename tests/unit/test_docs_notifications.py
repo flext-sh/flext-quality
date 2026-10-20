@@ -46,11 +46,11 @@ class TestsFlextQualityDocumentationNotifier:
     def test_default_config_enables_only_console_channel(tmp_path: Path) -> None:
         """A missing config file yields defaults with only console enabled."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.config.enabled, eq=True)
-        tm.that(notifier.config.channels.console.enabled, eq=True)
-        tm.that(notifier.config.channels.email.enabled, eq=False)
-        tm.that(notifier.config.channels.slack.enabled, eq=False)
-        tm.that(notifier.config.channels.webhook.enabled, eq=False)
+        tm.ok(notifier.config.enabled)
+        tm.ok(notifier.config.channels.console.enabled)
+        tm.fail(notifier.config.channels.email.enabled)
+        tm.fail(notifier.config.channels.slack.enabled)
+        tm.fail(notifier.config.channels.webhook.enabled)
 
     @staticmethod
     def test_get_default_config_thresholds(tmp_path: Path) -> None:
@@ -72,9 +72,9 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.config.enabled, eq=False)
-        tm.that(notifier.config.channels.console.enabled, eq=False)
-        tm.that(notifier.config.channels.slack.enabled, eq=True)
+        tm.fail(notifier.config.enabled)
+        tm.fail(notifier.config.channels.console.enabled)
+        tm.ok(notifier.config.channels.slack.enabled)
 
     @staticmethod
     def test_yaml_overrides_alert_thresholds(tmp_path: Path) -> None:
@@ -87,9 +87,9 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.config.alerts.critical_issues.enabled, eq=False)
+        tm.fail(notifier.config.alerts.critical_issues.enabled)
         tm.that(notifier.config.alerts.critical_issues.threshold, eq=9)
-        tm.that(notifier.config.alerts.weekly_report.enabled, eq=False)
+        tm.fail(notifier.config.alerts.weekly_report.enabled)
 
     @staticmethod
     def test_yaml_overrides_slack_and_webhook_sections(tmp_path: Path) -> None:
@@ -123,7 +123,7 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.notify_critical_issues({}), eq=True)
+        tm.ok(notifier.notify_critical_issues({}))
 
     @staticmethod
     def test_notify_critical_issues_below_threshold_is_noop(
@@ -132,7 +132,7 @@ class TestsFlextQualityDocumentationNotifier:
         """A critical count under threshold reports success without sending."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         audit_data: t.JsonMapping = {"metrics": {"severity_breakdown": {"critical": 0}}}
-        tm.that(notifier.notify_critical_issues(audit_data), eq=True)
+        tm.ok(notifier.notify_critical_issues(audit_data))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
@@ -157,7 +157,7 @@ class TestsFlextQualityDocumentationNotifier:
                 },
             ],
         }
-        tm.that(notifier.notify_critical_issues(audit_data), eq=True)
+        tm.ok(notifier.notify_critical_issues(audit_data))
         tm.that(notifier.results.notifications_sent, eq=1)
 
     @staticmethod
@@ -171,13 +171,13 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.notify_quality_drop(50.0, 90.0), eq=True)
+        tm.ok(notifier.notify_quality_drop(50.0, 90.0))
 
     @staticmethod
     def test_notify_quality_drop_below_threshold_is_noop(tmp_path: Path) -> None:
         """A drop smaller than the configured threshold sends nothing."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.notify_quality_drop(85.0, 90.0), eq=True)
+        tm.ok(notifier.notify_quality_drop(85.0, 90.0))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
@@ -186,7 +186,7 @@ class TestsFlextQualityDocumentationNotifier:
     ) -> None:
         """Meeting the drop threshold sends a real console notification."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.notify_quality_drop(50.0, 90.0), eq=True)
+        tm.ok(notifier.notify_quality_drop(50.0, 90.0))
         tm.that(notifier.results.notifications_sent, eq=1)
 
     @staticmethod
@@ -200,13 +200,13 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.notify_broken_links([{"url": "x"}]), eq=True)
+        tm.ok(notifier.notify_broken_links([{"url": "x"}]))
 
     @staticmethod
     def test_notify_broken_links_below_threshold_is_noop(tmp_path: Path) -> None:
         """Fewer broken links than the threshold sends nothing."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.notify_broken_links([]), eq=True)
+        tm.ok(notifier.notify_broken_links([]))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
@@ -224,7 +224,7 @@ class TestsFlextQualityDocumentationNotifier:
             {"url": "http://a", "file": "a.md", "error": "404"},
             {"url": "http://b", "file": "b.md", "error": "timeout"},
         ]
-        tm.that(notifier.notify_broken_links(broken_links), eq=True)
+        tm.ok(notifier.notify_broken_links(broken_links))
         tm.that(notifier.results.notifications_sent, eq=1)
 
     @staticmethod
@@ -234,7 +234,7 @@ class TestsFlextQualityDocumentationNotifier:
         """More broken links than the display cap still sends one notification."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         many_links: t.JsonList = [{"url": f"http://x{i}"} for i in range(15)]
-        tm.that(notifier.notify_broken_links(many_links), eq=True)
+        tm.ok(notifier.notify_broken_links(many_links))
         tm.that(notifier.results.notifications_sent, eq=1)
 
     @staticmethod
@@ -248,7 +248,7 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.notify_weekly_report({}), eq=True)
+        tm.ok(notifier.notify_weekly_report({}))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
@@ -257,7 +257,7 @@ class TestsFlextQualityDocumentationNotifier:
     ) -> None:
         """An enabled weekly-report alert sends a real console notification."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.notify_weekly_report({}), eq=True)
+        tm.ok(notifier.notify_weekly_report({}))
         tm.that(notifier.results.notifications_sent, eq=1)
 
     @staticmethod
@@ -271,7 +271,7 @@ class TestsFlextQualityDocumentationNotifier:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        tm.that(notifier.notify_monthly_report({}), eq=True)
+        tm.ok(notifier.notify_monthly_report({}))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
@@ -280,7 +280,7 @@ class TestsFlextQualityDocumentationNotifier:
     ) -> None:
         """An enabled monthly-report alert sends a real console notification."""
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.notify_monthly_report({}), eq=True)
+        tm.ok(notifier.notify_monthly_report({}))
         tm.that(notifier.results.notifications_sent, eq=1)
 
 
@@ -316,7 +316,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
         success = notifier.send_notification("title", "message")
-        tm.that(success, eq=False)
+        tm.fail(success)
         tm.that(notifier.results.errors[0], has="Webhook notification failed")
 
     @staticmethod
@@ -327,8 +327,8 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             test=True,
         )
         result = command.execute()
-        tm.that(result.success, eq=True)
-        tm.that(result.value, eq=True)
+        tm.ok(result.success)
+        tm.ok(result.value)
 
     @staticmethod
     def test_run_execute_processes_audit_data_file(tmp_path: Path) -> None:
@@ -344,7 +344,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             audit_data=str(audit_path),
         )
         result = command.execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
 
     @staticmethod
     def test_run_execute_fails_for_missing_audit_data_file(
@@ -356,7 +356,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             audit_data=str(tmp_path / "missing.json"),
         )
         result = command.execute()
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_run_execute_processes_weekly_report_file(tmp_path: Path) -> None:
@@ -368,7 +368,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             weekly_report=str(report_path),
         )
         result = command.execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
 
     @staticmethod
     def test_run_execute_processes_monthly_report_file(tmp_path: Path) -> None:
@@ -380,7 +380,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             monthly_report=str(report_path),
         )
         result = command.execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
 
     @staticmethod
     def test_run_execute_fails_when_no_action_selected(tmp_path: Path) -> None:
@@ -389,5 +389,5 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             settings_path=str(tmp_path / "absent.yaml"),
         )
         result = command.execute()
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="No action selected")

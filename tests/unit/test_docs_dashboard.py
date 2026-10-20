@@ -188,5 +188,5 @@ class TestsFlextQualityDocumentationDashboard:
         command = FlextQualityDocumentationDashboard.Run()
         tm.that(command.host, eq="localhost")
         tm.that(command.port, eq=8080)
-        tm.that(command.debug, eq=False)
+        tm.fail(command.debug)
         tm.that(command.reports_dir, eq="docs/maintenance/reports/")

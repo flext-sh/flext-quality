@@ -23,8 +23,8 @@ class TestsFlextQualityScheduledMaintenanceTimeout:
             timeout=30,
         )
         ok = maintenance.run_single_task(task)
-        tm.that(ok, eq=False)
-        tm.that(len(maintenance.results.errors) > 0, eq=True)
+        tm.fail(ok)
+        tm.ok(len(maintenance.results.errors) > 0)
         joined = " ".join(maintenance.results.errors)
         tm.that(joined, has="Task failed in git missing ref")
         tm.that(joined.lower(), has="fatal:")
@@ -39,5 +39,5 @@ class TestsFlextQualityScheduledMaintenanceTimeout:
             timeout=30,
         )
         ok = maintenance.run_single_task(task)
-        tm.that(ok, eq=True)
+        tm.ok(ok)
         tm.that(list(maintenance.results.errors), eq=[])

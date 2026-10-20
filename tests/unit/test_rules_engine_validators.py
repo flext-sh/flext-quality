@@ -58,7 +58,7 @@ class TestsFlextQualityRulesEngine:
         """Loading rules from YAML makes them retrievable via ``list_rules``."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         result = engine.load_rules()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=2)
         tm.that(len(engine.list_rules()), eq=2)
 
@@ -79,14 +79,14 @@ class TestsFlextQualityRulesEngine:
         )
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         result = engine.load_rules(other_path)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=1)
 
     def test_validate_fails_for_missing_path(self, tmp_path: Path) -> None:
         """Validating a nonexistent path reports a descriptive failure."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         result = engine.validate(str(tmp_path / "nowhere.py"))
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="does not exist")
 
     def test_validate_finds_violations_in_a_single_file(self, tmp_path: Path) -> None:
@@ -95,7 +95,7 @@ class TestsFlextQualityRulesEngine:
         target = tmp_path / "module.py"
         target.write_text("# TODO: fix this\nvalue = 1\n", encoding="utf-8")
         result = engine.validate(str(target))
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=1)
         tm.that(result.value[0]["rule"], eq="no-todo")
         tm.that(result.value[0]["severity"], eq="warning")
@@ -106,7 +106,7 @@ class TestsFlextQualityRulesEngine:
         target = tmp_path / "notes.txt"
         target.write_text("TODO: whatever\n", encoding="utf-8")
         result = engine.validate(str(target))
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=[])
 
     def test_validate_walks_directory_for_python_files(self, tmp_path: Path) -> None:
@@ -115,7 +115,7 @@ class TestsFlextQualityRulesEngine:
         (tmp_path / "a.py").write_text("# FIXME later\n", encoding="utf-8")
         (tmp_path / "b.py").write_text("clean = True\n", encoding="utf-8")
         result = engine.validate(str(tmp_path))
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=1)
         tm.that(result.value[0]["rule"], eq="no-fixme")
 
@@ -149,7 +149,7 @@ class TestsFlextQualityRulesEngine:
         )
         engine = FlextQualityRulesEngine(rules_path)
         result = engine.validate_content("# TODO here")
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=[])
 
     def test_validate_content_lazy_loads_rules_on_first_use(
@@ -159,7 +159,7 @@ class TestsFlextQualityRulesEngine:
         """``validate_content`` triggers a lazy ``load_rules`` when unloaded."""
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         result = engine.validate_content("# TODO now", filename="in-memory.py")
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value[0]["file"], eq="in-memory.py")
 
     @staticmethod
@@ -167,7 +167,7 @@ class TestsFlextQualityRulesEngine:
         """A missing rules file surfaces as a failure from ``validate_content``."""
         engine = FlextQualityRulesEngine(tmp_path / "absent.yaml")
         result = engine.validate_content("anything")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     def test_validate_reports_read_error_for_invalid_utf8_file(
         self,
@@ -178,7 +178,7 @@ class TestsFlextQualityRulesEngine:
         bad_file = tmp_path / "invalid.py"
         bad_file.write_bytes(b"\xff\xfe# not valid utf-8\n")
         result = engine.validate(str(bad_file))
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value[0]["rule"], eq="file-read-error")
 
 
@@ -196,7 +196,7 @@ class TestsFlextQualityValidators:
         """Each configured named pattern produces a distinct violation."""
         validator = FlextQualityValidators.Pattern({"greeting": "hello"})
         result = validator.validate("hello world\ngoodbye", file_path="greet.py")
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=1)
         tm.that(result.value[0]["rule"], eq="pattern-greeting")
         tm.that(result.value[0]["file"], eq="greet.py")
@@ -219,8 +219,8 @@ class TestsFlextQualityValidators:
         """A forbidden suppression marker in content is flagged as a violation."""
         validator = FlextQualityValidators.ForbiddenPattern()
         result = validator.validate(_IGNORE_MARKER_CONTENT)
-        tm.that(result.success, eq=True)
-        tm.that(len(result.value) >= 1, eq=True)
+        tm.ok(result.success)
+        tm.ok(len(result.value) >= 1)
 
     @staticmethod
     def test_tier_validator_has_dedicated_name() -> None:
@@ -233,7 +233,7 @@ class TestsFlextQualityValidators:
         """Tier validation is a no-op when no file path is supplied."""
         validator = FlextQualityValidators.Tier()
         result = validator.validate("from flext_quality.api import FlextQuality")
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=[])
 
     @staticmethod
@@ -247,7 +247,7 @@ class TestsFlextQualityValidators:
             "from flext_quality.services import Something",
             file_path=target,
         )
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=[])
 
     @staticmethod
@@ -259,7 +259,7 @@ class TestsFlextQualityValidators:
         target = tmp_path / "constants.py"
         content = "from flext_quality.services import helper\n"
         result = validator.validate(content, file_path=str(target))
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=1)
         tm.that(result.value[0]["rule"], eq="tier-violation")
 
@@ -281,7 +281,7 @@ class TestsFlextQualityValidators:
         """A registered validator is retrievable by its own name."""
         registry = FlextQualityValidators.Registry()
         validator = registry.get("tier")
-        tm.that(validator is not None, eq=True)
+        tm.ok(validator is not None)
 
     @staticmethod
     def test_registry_register_adds_a_custom_validator() -> None:
@@ -289,7 +289,7 @@ class TestsFlextQualityValidators:
         registry = FlextQualityValidators.Registry()
         custom = FlextQualityValidators.Pattern({"marker": "XXX"})
         registry.register(custom)
-        tm.that(registry.get("pattern") is custom, eq=True)
+        tm.ok(registry.get("pattern") is custom)
         tm.that(len(registry.all()), eq=3)
 
     @staticmethod
@@ -304,7 +304,7 @@ class TestsFlextQualityValidators:
             }),
         )
         result = registry.validate_all(content)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(
             {"pattern-first", "pattern-second"}
             <= {str(violation["rule"]) for violation in result.value},
@@ -320,7 +320,7 @@ class TestsFlextQualityRulesLoader:
         """Loading a nonexistent rules file reports a descriptive failure."""
         loader = FlextQualityRulesLoader()
         result = loader.load(tmp_path / "missing.yaml")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="not found")
 
     @staticmethod
@@ -334,7 +334,7 @@ class TestsFlextQualityRulesLoader:
         rules_path.write_text("- just\n- a\n- list\n", encoding="utf-8")
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="must be a mapping")
 
     @staticmethod
@@ -344,7 +344,7 @@ class TestsFlextQualityRulesLoader:
         rules_path.write_text("rules: not-a-list\n", encoding="utf-8")
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="must be a list")
 
     @staticmethod
@@ -357,7 +357,7 @@ class TestsFlextQualityRulesLoader:
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="missing 'name'")
 
     @staticmethod
@@ -370,7 +370,7 @@ class TestsFlextQualityRulesLoader:
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="invalid type")
 
     @staticmethod
@@ -383,12 +383,12 @@ class TestsFlextQualityRulesLoader:
         )
         loader = FlextQualityRulesLoader()
         result = loader.load(rules_path)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         rule = result.value[0]
         tm.that(rule.description, eq="")
         tm.that(rule.action, eq="warn")
         tm.that(rule.pattern, eq=None)
-        tm.that(rule.enabled, eq=True)
+        tm.ok(rule.enabled)
 
     @staticmethod
     def test_load_multiple_aggregates_rules_across_files(tmp_path: Path) -> None:
@@ -402,7 +402,7 @@ class TestsFlextQualityRulesLoader:
         )
         loader = FlextQualityRulesLoader()
         result = loader.load_multiple([first, second])
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=2)
 
     @staticmethod
@@ -415,5 +415,5 @@ class TestsFlextQualityRulesLoader:
         missing = tmp_path / "missing.yaml"
         loader = FlextQualityRulesLoader()
         result = loader.load_multiple([good, missing])
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has=str(missing))

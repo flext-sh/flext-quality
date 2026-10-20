@@ -39,7 +39,7 @@ class TestsFlextQualityMcpServer:
         """Repeated lookups return the identical FastMCP server instance."""
         first = FlextQualityMcpServer.resolve_server()
         second = FlextQualityMcpServer.resolve_server()
-        tm.that(first is second, eq=True)
+        tm.ok(first is second)
 
     @staticmethod
     def test_get_server_exposes_configured_name() -> None:
@@ -111,7 +111,7 @@ class TestsFlextQualityMcpTools:
             input_data={"tool_name": "Edit"},
         )
         tm.that(output, is_=dict)
-        tm.that(output.get("continue"), eq=True)
+        tm.ok(output.get("continue"))
 
     @staticmethod
     def test_execute_hook_reports_error_for_unknown_event() -> None:
@@ -133,7 +133,7 @@ class TestsFlextQualityMcpTools:
         target = tmp_path / "module.py"
         target.write_text("value = 1\n", encoding="utf-8")
         output = FlextQualityMcpTools.validate_rules(path=str(target))
-        tm.that(bool(set(output) & {"violations", "error"}), eq=True)
+        tm.ok(bool(set(output) & {"violations", "error"}))
 
 
 class TestsFlextQualityMcpResources:

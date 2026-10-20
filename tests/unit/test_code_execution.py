@@ -29,7 +29,7 @@ class TestsFlextQualityCodeExecutionBridge:
         """The basedpyright command resolves the target path and emits JSON output."""
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_basedpyright_command(tmp_path)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value[0], eq="basedpyright")
         tm.that(result.value, has=str(tmp_path.resolve()))
 
@@ -40,7 +40,7 @@ class TestsFlextQualityCodeExecutionBridge:
         """Building a Python command for a nonexistent script fails."""
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_python_command(tmp_path / "missing.py")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_build_python_command_succeeds_for_real_script(
@@ -51,7 +51,7 @@ class TestsFlextQualityCodeExecutionBridge:
         script.write_text("print('hi')\n", encoding="utf-8")
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_python_command(script)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq=["python", str(script)])
 
     @staticmethod
@@ -68,7 +68,7 @@ class TestsFlextQualityCodeExecutionBridge:
         """The ruff command defaults to JSON output without a fix flag."""
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_ruff_command(tmp_path)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(
             result.value,
             eq=["ruff", "check", str(tmp_path), "--output-format=json"],
@@ -91,7 +91,7 @@ class TestsFlextQualityCodeExecutionBridge:
         """Building a TypeScript command for a nonexistent script fails."""
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.build_typescript_command(tmp_path / "missing.ts")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_build_typescript_command_succeeds_for_real_script(
@@ -111,7 +111,7 @@ class TestsFlextQualityCodeExecutionBridge:
         """An unrecognized runtime name is rejected before request construction."""
         bridge = FlextQualityCodeExecutionBridge()
         result = bridge.create_execution_request(tmp_path / "x.py", "cobol")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown runtime")
 
     @staticmethod
@@ -125,7 +125,7 @@ class TestsFlextQualityCodeExecutionBridge:
             "python",
             args=["--fast"],
         )
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.runtime, eq="python")
         tm.that(result.value.timeout_ms, eq=5000)
         tm.that(list(result.value.args), eq=["--fast"])
@@ -137,9 +137,9 @@ class TestsFlextQualityCodeExecutionBridge:
         """Health check reports the configured working directory and runtimes."""
         bridge = FlextQualityCodeExecutionBridge(working_dir=tmp_path)
         result = bridge.health_check()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.get("working_dir"), eq=str(tmp_path))
-        tm.that(result.value.get("available"), eq=True)
+        tm.ok(result.value.get("available"))
         tm.that(result.value.get("supported_runtimes"), has="ruff")
 
     @staticmethod

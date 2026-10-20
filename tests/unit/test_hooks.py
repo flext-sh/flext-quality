@@ -37,22 +37,22 @@ class TestsFlextQualityBaseHook:
     def test_should_run_defaults_true_without_a_matcher() -> None:
         """A hook without a matcher runs for every input."""
         hook = _AlwaysRunHook()
-        tm.that(hook.should_run({"tool_name": "Anything"}), eq=True)
-        tm.that(hook.should_run({}), eq=True)
+        tm.ok(hook.should_run({"tool_name": "Anything"}))
+        tm.ok(hook.should_run({}))
 
     @staticmethod
     def test_should_run_matches_configured_glob_patterns() -> None:
         """A hook with a matcher runs only for tool names matching any pattern."""
         hook = _MatcherHook()
-        tm.that(hook.should_run({"tool_name": "Edit"}), eq=True)
-        tm.that(hook.should_run({"tool_name": "WriteFile"}), eq=True)
-        tm.that(hook.should_run({"tool_name": "Bash"}), eq=False)
+        tm.ok(hook.should_run({"tool_name": "Edit"}))
+        tm.ok(hook.should_run({"tool_name": "WriteFile"}))
+        tm.fail(hook.should_run({"tool_name": "Bash"}))
 
     @staticmethod
     def test_should_run_treats_missing_tool_name_as_empty_string() -> None:
         """A matcher hook without a ``tool_name`` behaves as if it were empty."""
         hook = _MatcherHook()
-        tm.that(hook.should_run({}), eq=False)
+        tm.fail(hook.should_run({}))
 
 
 class TestsFlextQualityHookManager:
@@ -63,7 +63,7 @@ class TestsFlextQualityHookManager:
         """Executing an unregistered event name reports a descriptive failure."""
         manager = FlextQualityHookManager()
         result = manager.execute("NotARealEvent", {})
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown event")
 
     @staticmethod
@@ -71,8 +71,8 @@ class TestsFlextQualityHookManager:
         """A known event with nothing registered always continues."""
         manager = FlextQualityHookManager()
         result = manager.execute("PreToolUse", {})
-        tm.that(result.success, eq=True)
-        tm.that(result.value.get("continue"), eq=True)
+        tm.ok(result.success)
+        tm.ok(result.value.get("continue"))
 
     @staticmethod
     def test_register_and_execute_runs_matching_hook() -> None:
@@ -85,9 +85,9 @@ class TestsFlextQualityHookManager:
         """
         manager = FlextQualityHookManager()
         register_result = manager.register(_AlwaysRunHook())
-        tm.that(register_result.success, eq=True)
+        tm.ok(register_result.success)
         result = manager.execute("PreToolUse", {"tool_name": "Edit"})
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq={"continue": True})
 
     @staticmethod
@@ -96,7 +96,7 @@ class TestsFlextQualityHookManager:
         manager = FlextQualityHookManager()
         manager.register(_MatcherHook())
         result = manager.execute("PreToolUse", {"tool_name": "Bash"})
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, eq={"continue": True})
 
     @staticmethod
@@ -106,8 +106,8 @@ class TestsFlextQualityHookManager:
         manager.register(_AlwaysRunHook())
         manager.register(_BlockingHook())
         result = manager.execute("PreToolUse", {"tool_name": "Edit"})
-        tm.that(result.success, eq=True)
-        tm.that(result.value.get("continue"), eq=False)
+        tm.ok(result.success)
+        tm.fail(result.value.get("continue"))
         tm.that(result.value.get("reason"), eq="blocked")
 
     @staticmethod
@@ -116,7 +116,7 @@ class TestsFlextQualityHookManager:
         manager = FlextQualityHookManager()
         manager.register(_FailingHook())
         result = manager.execute("Stop", {})
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error, eq="boom")
 
     @staticmethod
