@@ -256,7 +256,7 @@ def test_should_do_something_when_condition():
 
     # Then (Assert) - Using current API
     data = result.unwrap_or(None)
-    assert data is not None
+    tm.not_none(data)
     tm.that(data.expected_property, eq=expected_value)
 ```
 
