@@ -800,32 +800,31 @@ Found {len(broken_links)} broken links that need attention:
         return message.strip()
 
     @staticmethod
-    def _format_weekly_report_message(_report_data: t.JsonMapping) -> str:
+    def _format_weekly_report_message(report_data: t.JsonMapping) -> str:
         """Format message for weekly report notification.
 
         Returns:
             The resulting ``str``.
 
         """
-        # Implementation would depend on weekly report data structure
-        # For now, report_data is not used but reserved for future implementation
         return (
             "Weekly documentation quality report is now available. Check the reports "
-            "dashboard for detailed metrics and trends."
+            "dashboard for detailed metrics and trends. "
+            f"Summary: {report_data!r}"
         )
 
     @staticmethod
-    def _format_monthly_report_message(_report_data: t.JsonMapping) -> str:
+    def _format_monthly_report_message(report_data: t.JsonMapping) -> str:
         """Format message for monthly report notification.
 
         Returns:
             The resulting ``str``.
 
         """
-        # Implementation would depend on monthly report data structure
         return (
             "Monthly comprehensive documentation quality report is now available. "
-            "Review trends and plan improvements for the next month."
+            "Review trends and plan improvements for the next month. "
+            f"Summary: {report_data!r}"
         )
 
     class Run(s[bool]):
