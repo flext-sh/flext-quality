@@ -481,7 +481,7 @@ Please review recent changes and address any identified issues.
 
         # Console notification (always enabled)
         if self.config.channels.console.enabled:
-            self._send_console_notification(title, message, priority)
+            self._send_console_notification()
 
         # Email notification
         if self.config.channels.email.enabled:
@@ -512,12 +512,7 @@ Please review recent changes and address any identified issues.
 
         return success
 
-    def _send_console_notification(
-        self,
-        title: str,
-        message: str,
-        priority: str,
-    ) -> None:
+    def _send_console_notification(self) -> None:
         """Send notification to console."""
         # For now, console notifications are disabled to avoid T201 violations
         # In the future, this could be implemented with proper logging
