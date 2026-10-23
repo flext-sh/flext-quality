@@ -143,7 +143,7 @@ class FlextQualityScheduledMaintenance:
             "tasks": {
                 "audit_quick": {
                     "description": "Quick daily audit for critical issues",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.audit "
                         f"--check-freshness --check-completeness --output "
                         f"{reports_dir}"
@@ -152,7 +152,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "audit_comprehensive": {
                     "description": "Full comprehensive audit",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.audit "
                         f"--comprehensive --output {reports_dir}"
                     ),
@@ -160,7 +160,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "validate_links": {
                     "description": "Validate all links and references",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.validate "
                         f"--external-links --internal-links --images "
                         f"--output {reports_dir}"
@@ -169,7 +169,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "check_critical": {
                     "description": "Check for critical issues and send alerts",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.notifications "
                         f"--audit-data {latest_audit_report}"
                     ),
@@ -177,7 +177,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "optimize_formatting": {
                     "description": "Auto-fix formatting issues",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.optimize "
                         f"--fix-formatting --backup --output {reports_dir}"
                     ),
@@ -185,7 +185,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "optimize_full": {
                     "description": "Full optimization suite",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.optimize "
                         f"--comprehensive --backup --output {reports_dir}"
                     ),
@@ -193,7 +193,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "update_toc": {
                     "description": "Update table of contents",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.optimize "
                         f"--update-toc --output {reports_dir}"
                     ),
@@ -201,7 +201,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "generate_report": {
                     "description": "Generate quality report",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.report "
                         f"--format html --output {reports_dir}"
                     ),
@@ -209,7 +209,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "generate_monthly_report": {
                     "description": "Generate comprehensive monthly report",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.scripts.report "
                         f"--monthly-trends --format html --output {reports_dir}"
                     ),
@@ -217,7 +217,7 @@ class FlextQualityScheduledMaintenance:
                 },
                 "notify_weekly": {
                     "description": "Send weekly notification",
-                    "command": (
+                    c.HandlerMode.COMMAND: (
                         f"python -m flext_quality.docs.notifications "
                         f"--weekly-report {latest_audit_report}"
                     ),
@@ -225,7 +225,9 @@ class FlextQualityScheduledMaintenance:
                 },
                 "cleanup_old_reports": {
                     "description": "Clean up old report files",
-                    "command": f'find {reports_dir} -name "*.json" -mtime +90 -delete',
+                    c.HandlerMode.COMMAND: (
+                        f'find {reports_dir} -name "*.json" -mtime +90 -delete'
+                    ),
                     "timeout": 30,
                 },
             },

@@ -16,7 +16,7 @@ from flext_quality.integrations import (
     FlextQualityClaudeMemClient,
     FlextQualityMcpClient,
 )
-from tests import tm
+from tests import c, tm
 
 
 class TestsFlextQualityIntegrations:
@@ -169,7 +169,7 @@ class TestsFlextQualityClaudeContextIntegrations:
         """Search calls fall back to the configured default result limit."""
         client = FlextQualityClaudeContextClient()
         result = client.build_search_call("query text")
-        tm.that(result.value.params.get("query"), eq="query text")
+        tm.that(result.value.params.get(c.HandlerMode.QUERY), eq="query text")
         tm.that(result.value.params.get("limit"), eq=20)
 
     @staticmethod

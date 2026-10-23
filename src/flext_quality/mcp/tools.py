@@ -58,7 +58,7 @@ class FlextQualityMcpTools:
             "server": result.value.server,
             "tool": result.value.tool,
             "params": params_payload,
-            "command": u.normalize_to_json_value(command_result.value),
+            c.HandlerMode.COMMAND: u.normalize_to_json_value(command_result.value),
         }
 
     @_mcp.tool()

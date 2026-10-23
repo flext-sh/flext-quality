@@ -19,7 +19,7 @@ from flext_quality.mcp import (
     FlextQualityMcpServer,
     FlextQualityMcpTools,
 )
-from tests import tm
+from tests import c, tm
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -64,7 +64,7 @@ class TestsFlextQualityMcpTools:
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
             return
-        tm.that(output, has=("server", "command", "params"))
+        tm.that(output, has=("server", c.HandlerMode.COMMAND, "params"))
         tm.that(output.get("server"), eq="claude-mem")
         params = output.get("params")
         tm.that(params, is_=dict)
@@ -106,7 +106,7 @@ class TestsFlextQualityMcpTools:
             tm.that(output, has="error")
             return
         tm.that(output.get("server"), eq="claude-context")
-        tm.that(output, has="command")
+        tm.that(output, has=c.HandlerMode.COMMAND)
 
     @staticmethod
     def test_search_code_honors_explicit_limit() -> None:

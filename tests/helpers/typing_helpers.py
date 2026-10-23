@@ -11,12 +11,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, TypeIs
+from typing import TypeIs
 
-from tests import tm
-
-if TYPE_CHECKING:
-    from tests import t
+from tests import t, tm
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]:

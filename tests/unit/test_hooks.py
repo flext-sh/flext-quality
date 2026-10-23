@@ -9,15 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, override
+from typing import ClassVar, override
 
 import pytest
 
 from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-from tests import c, r, t, tm
-
-if TYPE_CHECKING:
-    from tests import p
+from tests import c, p, r, t, tm
 
 
 class TestsFlextQualityBaseHook:

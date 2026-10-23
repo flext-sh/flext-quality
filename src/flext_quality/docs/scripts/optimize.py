@@ -686,7 +686,12 @@ class FlextQualityDocumentationOptimizer:
             ]:
                 doc_files.extend(project_root.glob(pattern))
             doc_files = list(set(doc_files))
-            ignored = [".git", "__pycache__", "node_modules", ".serena/memories"]
+            ignored = [
+                c.GIT_DIR_NAME,
+                "__pycache__",
+                "node_modules",
+                ".serena/memories",
+            ]
             return [f for f in doc_files if not any(pat in str(f) for pat in ignored)]
 
         @override
