@@ -121,18 +121,27 @@ class TestsFlextQualityHookManager:
 
     @staticmethod
     def test_fetch_config_reports_registered_hooks_by_event() -> None:
-        """The rendered config groups registered hooks by their event name."""
+        """The rendered config groups registered hooks by their event name.
+
+        Raises:
+            AssertionError: If hook entries are not a list of mappings.
+
+        """
         manager = FlextQualityHookManager()
         manager.register(_MatcherHook())
         config = manager.fetch_config()
         tm.that(config, has="PreToolUse")
         entries = config.get("PreToolUse")
         tm.that(entries, is_=list)
-        assert isinstance(entries, list)
+        if not isinstance(entries, list):
+            msg = "Expected a list of hook entries"
+            raise AssertionError(msg)
         tm.that(len(entries), eq=1)
         first_entry = entries[0]
         tm.that(first_entry, is_=dict)
-        assert isinstance(first_entry, dict)
+        if not isinstance(first_entry, dict):
+            msg = "Expected a hook entry mapping"
+            raise AssertionError(msg)
         tm.that(first_entry.get("matcher"), eq=["Edit", "Write*"])
 
     @staticmethod
@@ -146,13 +155,21 @@ class TestsFlextQualityHookManager:
 
     @staticmethod
     def test_register_appends_multiple_hooks_for_same_event() -> None:
-        """Multiple hooks registered for one event all execute in order."""
+        """Multiple hooks registered for one event all execute in order.
+
+        Raises:
+            AssertionError: If hook entries are not a list.
+
+        """
         manager = FlextQualityHookManager()
         manager.register(_AlwaysRunHook())
         manager.register(_AlwaysRunHook())
         config = manager.fetch_config()
         entries = config.get("PreToolUse")
-        assert isinstance(entries, list)
+        tm.that(entries, is_=list)
+        if not isinstance(entries, list):
+            msg = "Expected a list of hook entries"
+            raise AssertionError(msg)
         tm.that(len(entries), eq=2)
 
 

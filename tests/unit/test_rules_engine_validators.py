@@ -123,13 +123,21 @@ class TestsFlextQualityRulesEngine:
         self,
         tmp_path: Path,
     ) -> None:
-        """A context mapping is attached to every violation produced."""
+        """A context mapping is attached to every violation produced.
+
+        Raises:
+            AssertionError: If the violation context is not a mapping.
+
+        """
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
         target = tmp_path / "module.py"
         target.write_text("# TODO: ctx\n", encoding="utf-8")
         result = engine.validate(str(target), context={"stage": "ci"})
         violation_context = result.value[0].get("context")
-        assert isinstance(violation_context, dict)
+        tm.that(violation_context, is_=dict)
+        if not isinstance(violation_context, dict):
+            msg = "Expected a violation context mapping"
+            raise AssertionError(msg)
         tm.that(violation_context.get("stage"), eq="ci")
 
     @staticmethod

@@ -32,9 +32,15 @@ def assert_dict_structure(
     required_keys: t.StrSequence,
     msg: str = "",
 ) -> None:
-    """Assert that a dict contains all required keys."""
+    """Assert that a dict contains all required keys.
+
+    Raises:
+        AssertionError: If required keys are missing.
+
+    """
     missing = [k for k in required_keys if k not in data]
-    assert not missing, msg or f"Missing keys: {missing}"
+    if missing:
+        raise AssertionError(msg or f"Missing keys: {missing}")
 
 
 def assert_metrics_structure(metrics: t.ScalarMapping) -> None:

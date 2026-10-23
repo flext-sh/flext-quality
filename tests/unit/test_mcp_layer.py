@@ -53,7 +53,12 @@ class TestsFlextQualityMcpTools:
 
     @staticmethod
     def test_search_memory_builds_command_payload() -> None:
-        """search_memory returns a command payload for the memory client."""
+        """search_memory returns a command payload for the memory client.
+
+        Raises:
+            AssertionError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_memory(query="find this")
         tm.that(output, is_=dict)
         if not _MCP_CLI_AVAILABLE:
@@ -62,12 +67,20 @@ class TestsFlextQualityMcpTools:
         tm.that(output, has=("server", "command", "params"))
         tm.that(output.get("server"), eq="claude-mem")
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise AssertionError(msg)
         tm.that(params.get("search_type"), eq="observations")
 
     @staticmethod
     def test_search_memory_honors_explicit_search_type_and_limit() -> None:
-        """Explicit search_type and limit are threaded into the tool output."""
+        """Explicit search_type and limit are threaded into the tool output.
+
+        Raises:
+            AssertionError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_memory(
             query="find this",
             search_type="entities",
@@ -77,7 +90,10 @@ class TestsFlextQualityMcpTools:
             tm.that(output, has="error")
             return
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise AssertionError(msg)
         tm.that(params.get("search_type"), eq="entities")
         tm.that(params.get("limit"), eq=3)
 
@@ -94,13 +110,21 @@ class TestsFlextQualityMcpTools:
 
     @staticmethod
     def test_search_code_honors_explicit_limit() -> None:
-        """An explicit limit is threaded into the search_code tool output."""
+        """An explicit limit is threaded into the search_code tool output.
+
+        Raises:
+            AssertionError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_code(query="def foo", limit=7)
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
             return
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise AssertionError(msg)
         tm.that(params.get("limit"), eq=7)
 
     @staticmethod
