@@ -72,7 +72,7 @@ class TestsFlextQualityHookManager:
         manager = FlextQualityHookManager()
         result = manager.execute("PreToolUse", {})
         tm.ok(result.success)
-        tm.ok(result.value.get("continue"))
+        tm.that(result.value.get("continue"), eq=True)
 
     @staticmethod
     def test_register_and_execute_runs_matching_hook() -> None:
@@ -107,7 +107,7 @@ class TestsFlextQualityHookManager:
         manager.register(_BlockingHook())
         result = manager.execute("PreToolUse", {"tool_name": "Edit"})
         tm.ok(result.success)
-        tm.fail(result.value.get("continue"))
+        tm.that(result.value.get("continue"), eq=False)
         tm.that(result.value.get("reason"), eq="blocked")
 
     @staticmethod
@@ -179,10 +179,10 @@ class _AlwaysRunHook(FlextQualityBaseHook):
     event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
 
     @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+    def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         return r[t.JsonMapping].ok({
             "continue": True,
-            "seen": input_data.get("tool_name"),
+            "seen": _input_data.get("tool_name"),
         })
 
 
@@ -193,7 +193,7 @@ class _MatcherHook(FlextQualityBaseHook):
     matcher: ClassVar[t.StrSequence | None] = ("Edit", "Write*")
 
     @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+    def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         return r[t.JsonMapping].ok({"continue": True})
 
 
@@ -203,7 +203,7 @@ class _BlockingHook(FlextQualityBaseHook):
     event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
 
     @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+    def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         return r[t.JsonMapping].ok({"continue": False, "reason": "blocked"})
 
 
@@ -213,5 +213,5 @@ class _FailingHook(FlextQualityBaseHook):
     event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
 
     @override
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+    def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         return r[t.JsonMapping].fail("boom")

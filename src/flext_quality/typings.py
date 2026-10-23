@@ -14,12 +14,8 @@ from flext_quality._typings.quality import FlextQualityTypingsQuality
 class FlextQualityTypes(FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
-    class Quality:
+    class Quality(FlextQualityTypingsQuality):
         """Quality-specific types namespace (project slot)."""
-
-        RuleResult = FlextQualityTypingsQuality.RuleResult
-        GenericItem = FlextQualityTypingsQuality.GenericItem
-        DocumentationReportValue = FlextQualityTypingsQuality.DocumentationReportValue
 
 
 t = FlextQualityTypes

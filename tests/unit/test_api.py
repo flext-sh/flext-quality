@@ -235,7 +235,7 @@ class TestsFlextQualityApiHooks:
         """A known event with no registered hooks continues execution."""
         result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
         tm.ok(result.success)
-        tm.ok(result.value.get("continue"))
+        tm.that(result.value.get("continue"), eq=True)
 
     @staticmethod
     def test_execute_hook_fails_for_unknown_event() -> None:
@@ -260,13 +260,13 @@ class TestsFlextQualityApiHooks:
         """A well-formed known event on stdin is executed successfully."""
         result = self._run_with_stdin('{"event": "PreToolUse", "tool_name": "Edit"}')
         tm.ok(result.success)
-        tm.ok(result.value.get("continue"))
+        tm.that(result.value.get("continue"), eq=True)
 
     def test_process_stdin_hook_continues_when_event_absent(self) -> None:
         """Input without an event continues execution by default."""
         result = self._run_with_stdin('{"tool_name": "Edit"}')
         tm.ok(result.success)
-        tm.ok(result.value.get("continue"))
+        tm.that(result.value.get("continue"), eq=True)
 
     def test_process_stdin_hook_fails_on_invalid_json(self) -> None:
         """Malformed JSON on stdin produces a parse/invalid failure."""

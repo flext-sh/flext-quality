@@ -66,7 +66,7 @@ class TestsFlextQualityBasic:
     def test_config_singleton_is_a_frozen_quality_config() -> None:
         """The module-level ``config`` singleton is a frozen ``FlextQualityConfig``."""
         tm.that(config, is_=FlextQualityConfig)
-        tm.ok(config.model_config.get("frozen"))
+        tm.that(config.model_config.get("frozen"), eq=True)
 
     @staticmethod
     def test_config_quality_namespace_allows_open_extra_fields() -> None:

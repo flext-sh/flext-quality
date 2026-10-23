@@ -139,7 +139,7 @@ class TestsFlextQualityCodeExecutionBridge:
         result = bridge.health_check()
         tm.ok(result.success)
         tm.that(result.value.get("working_dir"), eq=str(tmp_path))
-        tm.ok(result.value.get("available"))
+        tm.that(result.value.get("available"), eq=True)
         tm.that(result.value.get("supported_runtimes"), has="ruff")
 
     @staticmethod

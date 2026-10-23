@@ -135,7 +135,7 @@ class TestsFlextQualityMcpTools:
             input_data={"tool_name": "Edit"},
         )
         tm.that(output, is_=dict)
-        tm.ok(output.get("continue"))
+        tm.that(output.get("continue"), eq=True)
 
     @staticmethod
     def test_execute_hook_reports_error_for_unknown_event() -> None:

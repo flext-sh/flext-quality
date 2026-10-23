@@ -539,7 +539,7 @@ class FlextQualityDocumentationOptimizer:
         frontmatter_content = "\n".join(frontmatter_lines)
         empty_frontmatter: t.JsonMapping = {}
         parsed_fm = u.Cli.yaml_parse(frontmatter_content).unwrap_or(empty_frontmatter)
-        metadata: t.MutableJsonMapping = {
+        metadata: t.JsonDict = {
             k: v
             for k, v in (parsed_fm or {}).items()
             if isinstance(v, c.PRIMITIVES_TYPES)
