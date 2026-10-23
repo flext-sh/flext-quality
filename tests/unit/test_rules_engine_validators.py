@@ -126,7 +126,7 @@ class TestsFlextQualityRulesEngine:
         """A context mapping is attached to every violation produced.
 
         Raises:
-            AssertionError: If the violation context is not a mapping.
+            TypeError: If the violation context is not a mapping.
 
         """
         engine = FlextQualityRulesEngine(self._write_rules(tmp_path))
@@ -137,7 +137,7 @@ class TestsFlextQualityRulesEngine:
         tm.that(violation_context, is_=dict)
         if not isinstance(violation_context, dict):
             msg = "Expected a violation context mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(violation_context.get("stage"), eq="ci")
 
     @staticmethod

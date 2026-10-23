@@ -56,7 +56,7 @@ class TestsFlextQualityMcpTools:
         """search_memory returns a command payload for the memory client.
 
         Raises:
-            AssertionError: If command parameters are not a mapping.
+            TypeError: If command parameters are not a mapping.
 
         """
         output = FlextQualityMcpTools.search_memory(query="find this")
@@ -70,7 +70,7 @@ class TestsFlextQualityMcpTools:
         tm.that(params, is_=dict)
         if not isinstance(params, dict):
             msg = "Expected a command parameter mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(params.get("search_type"), eq="observations")
 
     @staticmethod
@@ -78,7 +78,7 @@ class TestsFlextQualityMcpTools:
         """Explicit search_type and limit are threaded into the tool output.
 
         Raises:
-            AssertionError: If command parameters are not a mapping.
+            TypeError: If command parameters are not a mapping.
 
         """
         output = FlextQualityMcpTools.search_memory(
@@ -93,7 +93,7 @@ class TestsFlextQualityMcpTools:
         tm.that(params, is_=dict)
         if not isinstance(params, dict):
             msg = "Expected a command parameter mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(params.get("search_type"), eq="entities")
         tm.that(params.get("limit"), eq=3)
 
@@ -113,7 +113,7 @@ class TestsFlextQualityMcpTools:
         """An explicit limit is threaded into the search_code tool output.
 
         Raises:
-            AssertionError: If command parameters are not a mapping.
+            TypeError: If command parameters are not a mapping.
 
         """
         output = FlextQualityMcpTools.search_code(query="def foo", limit=7)
@@ -124,7 +124,7 @@ class TestsFlextQualityMcpTools:
         tm.that(params, is_=dict)
         if not isinstance(params, dict):
             msg = "Expected a command parameter mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(params.get("limit"), eq=7)
 
     @staticmethod

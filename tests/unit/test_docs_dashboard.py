@@ -76,7 +76,7 @@ class TestsFlextQualityDocumentationDashboard:
         """A recent, well-formed report file contributes one trend entry.
 
         Raises:
-            AssertionError: If trends are not a list of mappings.
+            TypeError: If trends are not a list of mappings.
 
         """
         report_file = tmp_path / "audit_report_20260101_120000.json"
@@ -96,12 +96,12 @@ class TestsFlextQualityDocumentationDashboard:
         tm.that(trend_entries, is_=list)
         if not isinstance(trend_entries, list):
             msg = "Expected a list of trends"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         first_entry = trend_entries[0]
         tm.that(first_entry, is_=dict)
         if not isinstance(first_entry, dict):
             msg = "Expected a trend mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(first_entry.get("quality_score"), eq=91)
 
     @staticmethod

@@ -124,7 +124,7 @@ class TestsFlextQualityHookManager:
         """The rendered config groups registered hooks by their event name.
 
         Raises:
-            AssertionError: If hook entries are not a list of mappings.
+            TypeError: If hook entries are not a list of mappings.
 
         """
         manager = FlextQualityHookManager()
@@ -135,13 +135,13 @@ class TestsFlextQualityHookManager:
         tm.that(entries, is_=list)
         if not isinstance(entries, list):
             msg = "Expected a list of hook entries"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(len(entries), eq=1)
         first_entry = entries[0]
         tm.that(first_entry, is_=dict)
         if not isinstance(first_entry, dict):
             msg = "Expected a hook entry mapping"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(first_entry.get("matcher"), eq=["Edit", "Write*"])
 
     @staticmethod
@@ -158,7 +158,7 @@ class TestsFlextQualityHookManager:
         """Multiple hooks registered for one event all execute in order.
 
         Raises:
-            AssertionError: If hook entries are not a list.
+            TypeError: If hook entries are not a list.
 
         """
         manager = FlextQualityHookManager()
@@ -169,7 +169,7 @@ class TestsFlextQualityHookManager:
         tm.that(entries, is_=list)
         if not isinstance(entries, list):
             msg = "Expected a list of hook entries"
-            raise AssertionError(msg)
+            raise TypeError(msg)
         tm.that(len(entries), eq=2)
 
 
