@@ -373,12 +373,12 @@ class FlextQualityModelsBase:
         blocked_domains: t.StrSequence = _WebModels.Field(
             description="Domains explicitly forbidden for external links.",
         )
-        github_links: FlextQualityModelsBase.GithubLinkConfig = _WebModels.Field(
+        github_links: GithubLinkConfig = _WebModels.Field(
             description=(
                 "Validation settings specific to links pointing at GitHub resources."
             ),
         )
-        documentation_links: FlextQualityModelsBase.DocumentationLinkConfig = (
+        documentation_links: DocumentationLinkConfig = (
             _WebModels.Field(
                 description=(
                     "Validation settings specific to internal documentation links."
@@ -476,20 +476,20 @@ class FlextQualityModelsBase:
     class AuditRulesConfig(_WebModels.FlexibleInternalModel):
         """Configuration for audit rules and thresholds."""
 
-        quality_thresholds: FlextQualityModelsBase.QualityThresholdsConfig = (
+        quality_thresholds: QualityThresholdsConfig = (
             _WebModels.Field(
                 description=(
                     "Threshold limits applied when auditing documentation quality."
                 ),
             )
         )
-        content_checks: FlextQualityModelsBase.ContentChecksConfig = _WebModels.Field(
+        content_checks: ContentChecksConfig = _WebModels.Field(
             description=(
                 "Toggles controlling which content checks are performed during "
                 "the audit."
             ),
         )
-        severity_levels: FlextQualityModelsBase.SeverityLevelsConfig = _WebModels.Field(
+        severity_levels: SeverityLevelsConfig = _WebModels.Field(
             description=(
                 "Mapping of issue type identifiers to severity level categorization."
             ),
@@ -498,32 +498,32 @@ class FlextQualityModelsBase:
     class StyleGuideConfig(_WebModels.FlexibleInternalModel):
         """Configuration for style guide rules."""
 
-        markdown: FlextQualityModelsBase.MarkdownStyleConfig = _WebModels.Field(
+        markdown: MarkdownStyleConfig = _WebModels.Field(
             description="Preferred Markdown style conventions."
         )
-        accessibility: FlextQualityModelsBase.AccessibilityConfig = _WebModels.Field(
+        accessibility: AccessibilityConfig = _WebModels.Field(
             description=("Accessibility requirements applied by the style guide."),
         )
-        formatting: FlextQualityModelsBase.FormattingConfig = _WebModels.Field(
+        formatting: FormattingConfig = _WebModels.Field(
             description="Formatting standards applied by the style guide.",
         )
-        headings: FlextQualityModelsBase.HeadingsConfig = _WebModels.Field(
+        headings: HeadingsConfig = _WebModels.Field(
             description="Heading hierarchy policy applied by the style guide.",
         )
-        code: FlextQualityModelsBase.CodeStyleConfig = _WebModels.Field(
+        code: CodeStyleConfig = _WebModels.Field(
             description="Code block style policy applied by the style guide.",
         )
 
     class ValidationConfig(_WebModels.FlexibleInternalModel):
         """Configuration for validation settings."""
 
-        validation: FlextQualityModelsBase.ValidationRunConfig = _WebModels.Field(
+        validation: ValidationRunConfig = _WebModels.Field(
             description="Execution limits applied to validation runs.",
         )
-        link_validation: FlextQualityModelsBase.LinkValidationConfig = _WebModels.Field(
+        link_validation: LinkValidationConfig = _WebModels.Field(
             description="Settings controlling how links are validated.",
         )
-        content_analysis: FlextQualityModelsBase.ContentAnalysisConfig = (
+        content_analysis: ContentAnalysisConfig = (
             _WebModels.Field(
                 description=("Settings controlling how document content is analyzed."),
             )
