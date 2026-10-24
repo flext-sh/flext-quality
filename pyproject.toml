@@ -605,25 +605,6 @@ msg = "Use cli.render_table from flext_cli."
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."
 
-[tool.ruff.lint.flake8-type-checking]
-runtime-evaluated-base-classes = [
-  "flext_cli.FlextCliConfig",
-  "flext_core.FlextService",
-  "flext_core.FlextSettings",
-  "flext_core.m.BaseModel",
-  "flext_quality.FlextQualityServiceBase",
-  "flext_quality.FlextQualitySettings",
-  "flext_quality.cli.Check",
-  "flext_quality.m.BaseModel",
-  "flext_quality.s",
-  "flext_tests.FlextTestsServiceBase",
-  "flext_tests.FlextTestsSettings",
-  "flext_web.FlextWebModels.FlexibleInternalModel",
-  "flext_web.FlextWebModels.ManagedModel",
-  "flext_web.m.BaseModel",
-  "pydantic.BaseModel",
-]
-
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false
@@ -655,6 +636,14 @@ section_whitelines = 1
 whitelines = 1
 
 [tool.uv]
+constraint-dependencies = [
+  "pillow>=13.0.0",
+  "certifi>=2026.10.19",
+  "setuptools>=84.1.0",
+  "virtualenv>=21.14.13",
+  "filelock>=4.2.1",
+  "uv>=0.13.4",
+]
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
 link-mode = "copy"
 override-dependencies = [
