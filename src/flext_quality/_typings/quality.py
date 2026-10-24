@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_cli import t
+
 
 class FlextQualityTypingsQuality:
     """Quality domain type aliases composed into ``t.Quality``."""

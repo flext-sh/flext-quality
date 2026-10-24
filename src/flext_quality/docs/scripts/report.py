@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
-from flext_cli import cli, u
+from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
 
