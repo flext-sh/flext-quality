@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Final, override
 
-from flext_cli import cli, u as cli_u
+from flext_cli import cli, u
 
 from flext_quality import c, m, p, r, s, t, u
 
@@ -574,7 +574,7 @@ class FlextQualityDocumentationReporter:
         template_data = {
             "title": data.title,
             "timestamp": timestamp,
-            "summary": data.summary,
+            c.MetricType.SUMMARY: data.summary,
             "audit_summary": self._summarize_audit_data(data.audit),
             "validation_summary": self._summarize_validation_data(data.validation),
             "optimization_summary": self._summarize_optimization_data(
@@ -583,7 +583,7 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        environment = cli_u.Cli.template_environment(
+        environment = u.Cli.template_environment(
             FlextQualityDocumentationReporter._TEMPLATES_DIR,
         )
         template = environment.get_template(

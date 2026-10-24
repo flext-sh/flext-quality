@@ -405,7 +405,7 @@ class FlextQualityLinkChecker:
             ValueError: If the report format is unsupported.
 
         """
-        if report_format == "summary":
+        if report_format == c.MetricType.SUMMARY:
             return self._generate_summary_report()
         if report_format == "json":
             return self.results.model_dump_json(indent=2)

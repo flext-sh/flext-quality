@@ -116,7 +116,9 @@ class TestsFlextQualityIntegrations:
         result = client.parse_result('{"key": 1, "other": true}', 0)
         tm.ok(result.success)
         tm.ok(result.value.success)
-        tm.that(result.value.data, eq={"key": "1", "other": "True"})
+        tm.that(
+            result.value.data, eq={"key": c.ParserBooleanToken.ONE, "other": "True"}
+        )
 
     @staticmethod
     def test_parse_result_parses_json_list_of_objects() -> None:

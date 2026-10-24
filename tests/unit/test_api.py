@@ -258,7 +258,9 @@ class TestsFlextQualityApiHooks:
 
     def test_process_stdin_hook_executes_known_event(self) -> None:
         """A well-formed known event on stdin is executed successfully."""
-        result = self._run_with_stdin('{"event": "PreToolUse", "tool_name": "Edit"}')
+        result = self._run_with_stdin(
+            '{c.HandlerType.EVENT: "PreToolUse", "tool_name": "Edit"}'
+        )
         tm.ok(result.success)
         tm.that(result.value.get("continue"), eq=True)
 
@@ -277,6 +279,6 @@ class TestsFlextQualityApiHooks:
 
     def test_process_stdin_hook_fails_for_unknown_event(self) -> None:
         """An unknown event supplied via stdin fails with a clear error."""
-        result = self._run_with_stdin('{"event": "UnknownEvent"}')
+        result = self._run_with_stdin('{c.HandlerType.EVENT: "UnknownEvent"}')
         tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown event")

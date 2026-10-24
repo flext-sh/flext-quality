@@ -332,14 +332,14 @@ class FlextQualityDocumentationNotifier:
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
-        severity_m: t.JsonMapping = (
+        (
             u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
         severity_breakdown: t.MutableIntMapping = {}
         for key_name in ("critical", "high", "medium", "low"):
-            kv = severity_m.get(key_name, 0)
+            kv = m.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
         critical_count: int = severity_breakdown.get("critical", 0)
         threshold = self.config.alerts.critical_issues.threshold
@@ -675,7 +675,7 @@ Timestamp: {u.now().isoformat()}
             )
         )
         for i_m in issues_seq:
-            sev = i_m.get("severity")
+            sev = m.get("severity")
             if sev == c.Quality.NotificationPriority.CRITICAL.value:
                 critical_issues.append(i_m)
                 if (
