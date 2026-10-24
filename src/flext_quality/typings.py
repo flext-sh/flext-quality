@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """Type definitions for flext-quality.
 
 Copyright (c) 2026 FLEXT Team. All rights reserved.
@@ -8,7 +9,7 @@ from __future__ import annotations
 
 from flext_web import FlextWebTypes
 
-from flext_quality._typings.quality import FlextQualityTypingsQuality
+from flext_quality._typings import FlextQualityTypingsQuality
 
 
 class FlextQualityTypes(FlextWebTypes):

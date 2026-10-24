@@ -1,3 +1,4 @@
+# AUTO-GENERATED FILE — Regenerate with: make gen
 """FLEXT Quality Constants.
 
 Centralized, immutable constants for the flext-quality project providing
@@ -17,8 +18,11 @@ from typing import TYPE_CHECKING
 
 from flext_web import FlextWebConstants
 
-from flext_quality._constants import FlextQualityConstantsValues
-from flext_quality._constants.enums import FlextQualityConstantsEnums
+from flext_quality._constants import (
+    FlextQualityConstantsBase,
+    FlextQualityConstantsEnums,
+    FlextQualityConstantsValues,
+)
 
 if TYPE_CHECKING:
     from flext_quality import t
@@ -38,9 +42,10 @@ class FlextQualityConstants(FlextWebConstants):
     """
 
     class Quality(
+        FlextQualityConstantsBase,
         FlextQualityConstantsEnums,
-        FlextQualityConstantsValues.Quality,
         FlextQualityConstantsValues,
+        FlextQualityConstantsValues.Quality,
     ):
         """Quality-specific constants namespace."""
 
