@@ -44,7 +44,7 @@ src/flext_quality/
 - MCP tools and hook execution are first-class orchestration paths.
 - CLI `Check` / `Validate` assemble Ruff, basedpyright, Bandit, pytest, and coverage
   commands.
-- Config/settings canonical pattern: ADR-012.
+- Config/settings canonical pattern: ADR-005 (SSOT) and ADR-024 (DI config contract).
 - Codemod governance (ast-grep + make mod): ADR-014.
 
 ## Commands
@@ -54,7 +54,7 @@ member — `PROJECT=` is not a root Make variable):
 
 ```bash
 make check
-make test
+make tests
 ```
 
 <!-- AIHUB-AGENTS-SCOPE-LOCAL-END -->
