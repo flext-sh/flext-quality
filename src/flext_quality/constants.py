@@ -14,8 +14,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from flext_web import FlextWebConstants
 
 from flext_quality._constants import (
@@ -23,9 +21,6 @@ from flext_quality._constants import (
     FlextQualityConstantsEnums,
     FlextQualityConstantsValues,
 )
-
-if TYPE_CHECKING:
-    from flext_quality import t
 
 
 class FlextQualityConstants(FlextWebConstants):
@@ -44,7 +39,6 @@ class FlextQualityConstants(FlextWebConstants):
     class Quality(
         FlextQualityConstantsBase,
         FlextQualityConstantsEnums,
-        FlextQualityConstantsValues,
         FlextQualityConstantsValues.Quality,
     ):
         """Quality-specific constants namespace."""
@@ -54,4 +48,4 @@ class FlextQualityConstants(FlextWebConstants):
 
 
 c = FlextQualityConstants
-__all__: t.StrSequence = ("FlextQualityConstants", "c")
+__all__: list[str] = ["FlextQualityConstants", "c"]

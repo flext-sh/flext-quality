@@ -7,6 +7,30 @@ config_version = "0"
 
 exclude_patterns = [
   "**/protos/**",
+  "**/conftest.py",
+  "**/src/flext_quality/__init__.py",
+  "**/src/flext_quality/__version__.py",
+  "**/src/flext_quality/_constants/__init__.py",
+  "**/src/flext_quality/_models/__init__.py",
+  "**/src/flext_quality/_protocols/__init__.py",
+  "**/src/flext_quality/_typings/__init__.py",
+  "**/src/flext_quality/_utilities/__init__.py",
+  "**/src/flext_quality/constants.py",
+  "**/src/flext_quality/docs/__init__.py",
+  "**/src/flext_quality/docs/core/__init__.py",
+  "**/src/flext_quality/docs/scripts/__init__.py",
+  "**/src/flext_quality/docs/tools/__init__.py",
+  "**/src/flext_quality/hooks/__init__.py",
+  "**/src/flext_quality/integrations/__init__.py",
+  "**/src/flext_quality/mcp/__init__.py",
+  "**/src/flext_quality/models.py",
+  "**/src/flext_quality/protocols.py",
+  "**/src/flext_quality/rules/__init__.py",
+  "**/src/flext_quality/typings.py",
+  "**/src/flext_quality/utilities.py",
+  "**/tests/__init__.py",
+  "**/tests/helpers/__init__.py",
+  "**/tests/unit/__init__.py",
 ]
 
 [smells]

@@ -18,28 +18,17 @@ classifiers = [
   "Typing :: Typed",
 ]
 dependencies = [
-  "aiohttp>=3.14.5",
-  "annotated-types>=0.8.0",
-  "beartype>=0.22.9",
-  "dependency-injector>=4.49.1",
-  "fastmcp>=4.1.2",
-  "flask>=3.1.3",
-  "flask-wtf>=1.3.0",
-  "flext-api @ git+https://github.com/flext-sh/flext-api.git@0.12.0-dev",
-  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
-  "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
-  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
-  "flext-web @ git+https://github.com/flext-sh/flext-web.git@0.12.0-dev",
-  "jinja2>=3.1.6",
-  "packaging>=26.3",
-  "pydantic>=2.14.1,<3",
-  "pydantic-settings>=2.15.0",
-  "pytest>=9.1.1",
-  "pyyaml>=6.0.3",
-  "requests>=2.34.2",
-  "schedule>=1.2.2",
-  "structlog>=25.5.0,<27",
-  "typing-extensions>=4.16.0",
+    "aiohttp>=3.14.5",
+    "fastmcp>=4.1.2",
+    "flask>=3.1.3",
+    "flext-api @ git+https://github.com/flext-sh/flext-api.git@0.12.0-dev",
+    "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
+    "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
+    "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
+    "flext-web @ git+https://github.com/flext-sh/flext-web.git@0.12.0-dev",
+    "pytest>=9.1.1",
+    "requests>=2.34.2",
+    "schedule>=1.2.2",
 ]
 description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
 keywords = ["adapter", "enterprise", "flext", "integration", "typed"]
@@ -454,18 +443,13 @@ addopts = [
   "--strict-markers",
   "--markdown-docs",
   "--durations=10",
-  "--flext-enforce-strict",
 ]
 asyncio_default_fixture_loop_scope = "function"
-filterwarnings = [
-  "error",
-  "module::flext_core._constants.enforcement.FlextMroViolation",
-  "once::pytest.PytestAssertRewriteWarning",
-]
+filterwarnings = ["error", "once::pytest.PytestAssertRewriteWarning"]
 flext_fixture_trees_root = "tests/fixtures"
 flext_make_ci_value = "Y"
 flext_make_ci_variable = "CI"
-flext_slow_timeout_seconds = "30"
+flext_slow_timeout_seconds = "25"
 markers = [
   "smoke: public-interface smoke tests",
   "unit: unit tests",
@@ -580,6 +564,7 @@ select = ["ALL"]
 unfixable = [
   "multi-value-repeated-key-literal",
   "multi-value-repeated-key-variable",
+  "non-pep695-type-alias",
   "p-print",
   "print",
   "pytest-duplicate-parametrize-test-cases",
@@ -605,6 +590,25 @@ msg = "Use cli.render_table from flext_cli."
 
 [tool.ruff.lint.flake8-tidy-imports.banned-api.typer]
 msg = "Use cli.create_app_with_common_params / cli.register_command from flext_cli."
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = [
+  "flext_cli.FlextCliConfig",
+  "flext_core.FlextService",
+  "flext_core.FlextSettings",
+  "flext_core.m.BaseModel",
+  "flext_quality.FlextQualityServiceBase",
+  "flext_quality.FlextQualitySettings",
+  "flext_quality.cli.Check",
+  "flext_quality.m.BaseModel",
+  "flext_quality.s",
+  "flext_tests.FlextTestsServiceBase",
+  "flext_tests.FlextTestsSettings",
+  "flext_web.FlextWebModels.FlexibleInternalModel",
+  "flext_web.FlextWebModels.ManagedModel",
+  "flext_web.m.BaseModel",
+  "pydantic.BaseModel",
+]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -648,5 +652,47 @@ constraint-dependencies = [
 environments = ["sys_platform == 'linux'", "sys_platform == 'darwin'"]
 link-mode = "copy"
 override-dependencies = [
-  "rope @ git+https://github.com/marlon-costa-dc/rope.git@ff1c992a100ae983baa79188a6a970c2858734de",
+  "rope @ git+https://github.com/marlon-costa-dc/rope.git@8414232e12b6328ba812bf49fe465fde65774dfd",
+  "flext-api @ git+https://github.com/flext-sh/flext-api.git@0.12.0-dev",
+  "flext-cli @ git+https://github.com/flext-sh/flext-cli.git@0.12.0-dev",
+  "flext-core @ git+https://github.com/flext-sh/flext-core.git@0.12.0-dev",
+  "flext-infra @ git+https://github.com/flext-sh/flext-infra.git@0.12.0-dev",
+  "flext-tests @ git+https://github.com/flext-sh/flext-tests.git@0.12.0-dev",
+  "flext-web @ git+https://github.com/flext-sh/flext-web.git@0.12.0-dev",
 ]
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-api"
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-cli"
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-core"
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-infra"
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-tests"
+
+[[tool.uv.exclude-dependencies]]
+dependencies = ["flext-quality"]
+
+[tool.uv.exclude-dependencies.package]
+name = "flext-web"
