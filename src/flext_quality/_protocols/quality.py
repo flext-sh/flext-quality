@@ -38,7 +38,7 @@ class FlextQualityProtocolsQuality:
         ]
 
     @runtime_checkable
-    class FlextQualityProtocolsValidatorBase(Protocol):
+    class ValidatorBase(Protocol):
         """Abstract base protocol for rule validators."""
 
         @property

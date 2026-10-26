@@ -29,25 +29,25 @@ class FlextQualityUtilitiesQuality:
     # a checker-visible type expression (bare aliases evaluate to
     # TypeAliasType objects, which the adapter form rejects). Concrete
     # generics only; runtime objects identical to the unwrapped aliases.
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.JsonValue]] = (
+    RELAXED_CONTAINER_MAPPING_ADAPTER: t.TypeAdapter[Mapping[str, t.JsonValue]] = (
         FlextWebUtilities.type_adapter(
             Mapping[str, t.JsonValue],
             config=m.ConfigDict(strict=False),
         )
     )
-    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
+    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: t.TypeAdapter[
         Sequence[Mapping[str, t.JsonValue]]
     ] = FlextWebUtilities.type_adapter(
         Sequence[Mapping[str, t.JsonValue]],
         config=m.ConfigDict(strict=False),
     )
-    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
+    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: t.TypeAdapter[
         MutableMapping[str, str | bool | None]
     ] = FlextWebUtilities.type_adapter(MutableMapping[str, str | bool | None])
-    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
+    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: t.TypeAdapter[
         MutableSequence[Mapping[str, str]]
     ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
-    REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[t.MappingKV[str, t.JsonMapping]] = (
+    REPORT_VALUE_MAPPING_ADAPTER: t.TypeAdapter[t.MappingKV[str, t.JsonMapping]] = (
         FlextWebUtilities.type_adapter(
             Mapping[str, Mapping[str, t.JsonValue]],
         )
