@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 from flext_quality import FlextQuality, FlextQualitySettings, quality
-from tests import m, p, t, tm
+from tests import c, m, p, t, tm, u
 
 
 class TestsFlextQualityApi:
@@ -259,9 +259,15 @@ class TestsFlextQualityApiHooks:
     def test_process_stdin_hook_executes_known_event(self) -> None:
         """A well-formed known event on stdin is executed successfully."""
         result = self._run_with_stdin(
-            '{c.HandlerType.EVENT: "PreToolUse", "tool_name": "Edit"}'
+            u
+            .json_mapping_adapter()
+            .dump_json({
+                c.HandlerType.EVENT: c.Quality.HookEvent.PRE_TOOL_USE.value,
+                "tool_name": "Edit",
+            })
+            .decode(c.DEFAULT_ENCODING),
         )
-        tm.ok(result.success)
+        _ = tm.ok(result)
         tm.that(result.value.get("continue"), eq=True)
 
     def test_process_stdin_hook_continues_when_event_absent(self) -> None:
@@ -279,6 +285,11 @@ class TestsFlextQualityApiHooks:
 
     def test_process_stdin_hook_fails_for_unknown_event(self) -> None:
         """An unknown event supplied via stdin fails with a clear error."""
-        result = self._run_with_stdin('{c.HandlerType.EVENT: "UnknownEvent"}')
+        result = self._run_with_stdin(
+            u
+            .json_mapping_adapter()
+            .dump_json({c.HandlerType.EVENT: "UnknownEvent"})
+            .decode(c.DEFAULT_ENCODING),
+        )
         tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown event")
