@@ -6,16 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import FlextWebModels as _WebModels, m, t
+from flext_web import FlextWebModels as _WebModels, t
+
+from flext_quality.config_models import FlextQualityConfigModels
 
 
-class FlextQualityModelsBase:
+class FlextQualityModelsBase(FlextQualityConfigModels):
     """Base models for flext-quality."""
-
-    class QualityConfigNamespace(m.BaseModel):
-        """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
-
-        model_config = m.ConfigDict(extra="allow", frozen=True)
 
     class QualityThresholdsConfig(_WebModels.ManagedModel):
         """Configuration for quality threshold limits."""
