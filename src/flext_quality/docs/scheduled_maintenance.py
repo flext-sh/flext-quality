@@ -866,8 +866,7 @@ class FlextQualityScheduledMaintenance:
             app_name="flext-quality-scheduled-maintenance",
             app_help="FLEXT Quality Scheduled Documentation Maintenance",
             route_help=(
-                "Run scheduled maintenance (use --daemon, --manual or "
-                "--list-schedules)"
+                "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
             ),
             model_cls=FlextQualityScheduledMaintenance.Run,
         )
