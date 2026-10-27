@@ -31,7 +31,7 @@ class TestsFlextQualityConfigManager:
         manager = FlextQualityConfigManager(tmp_path)
         first = manager.resolve_audit_rules()
         second = manager.resolve_audit_rules()
-        tm.that(first is second, eq=True)
+        tm.ok(first is second)
 
     @staticmethod
     def test_get_style_guide_falls_back_to_defaults(tmp_path: Path) -> None:
@@ -39,7 +39,7 @@ class TestsFlextQualityConfigManager:
         manager = FlextQualityConfigManager(tmp_path)
         guide = manager.resolve_style_guide()
         tm.that(guide.markdown.heading_style, eq="atx")
-        tm.that(guide.accessibility.require_alt_text, eq=True)
+        tm.ok(guide.accessibility.require_alt_text)
 
     @staticmethod
     def test_get_validation_config_falls_back_to_defaults(tmp_path: Path) -> None:
@@ -62,7 +62,7 @@ class TestsFlextQualityConfigManager:
         manager = FlextQualityConfigManager(tmp_path)
         rules = manager.resolve_audit_rules()
         tm.that(rules.quality_thresholds.max_age_days, eq=30)
-        tm.that(rules.content_checks.check_freshness, eq=False)
+        tm.fail(rules.content_checks.check_freshness)
 
     @staticmethod
     def test_reload_configs_clears_cached_state(tmp_path: Path) -> None:
@@ -71,7 +71,7 @@ class TestsFlextQualityConfigManager:
         first_rules = manager.resolve_audit_rules()
         manager.reload_configs()
         second_rules = manager.resolve_audit_rules()
-        tm.that(first_rules is second_rules, eq=False)
+        tm.fail(first_rules is second_rules)
 
     @staticmethod
     def test_validate_configs_reports_missing_required_files(
@@ -80,8 +80,8 @@ class TestsFlextQualityConfigManager:
         """Validation reports every required settings file that is absent."""
         manager = FlextQualityConfigManager(tmp_path)
         issues = manager.validate_configs()
-        tm.that(len(issues) >= _MIN_EXPECTED_MISSING_FILE_ISSUES, eq=True)
-        tm.that(any("audit_rules.yaml" in issue for issue in issues), eq=True)
+        tm.ok(len(issues) >= _MIN_EXPECTED_MISSING_FILE_ISSUES)
+        tm.ok(any("audit_rules.yaml" in issue for issue in issues))
 
     @staticmethod
     def test_validate_configs_passes_when_files_present_with_defaults(

@@ -13,7 +13,7 @@ from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
 from flext_cli import cli
 
-from flext_quality import m, p, quality, r, s, t
+from flext_quality import c, m, p, quality, r, s, t
 from flext_quality.integrations import FlextQualityCodeExecutionBridge
 
 if TYPE_CHECKING:
@@ -84,7 +84,7 @@ class FlextQualityCli(s[bool]):
                 if (self.target_path / "src").exists()
                 else self.target_path
             )
-            cmds.append(["bandit", "-r", str(src), "-c", "pyproject.toml"])
+            cmds.append(["bandit", "-r", str(src), "-c", c.PYPROJECT_FILENAME])
             cmds.append([
                 "pytest",
                 str(self.target_path / "tests"),

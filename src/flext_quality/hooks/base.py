@@ -19,7 +19,7 @@ class FlextQualityBaseHook:
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[t.StrSequence | None] = None
 
-    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+    def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         """Execute the hook logic.
 
         Args:

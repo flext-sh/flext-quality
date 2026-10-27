@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs import core as core, scripts as scripts, tools as tools
     from flext_quality.docs.core import FlextQualityConfigManager
     from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
     from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
@@ -43,9 +42,6 @@ __all__: tuple[str, ...] = (
     "FlextQualityLinkChecker",
     "FlextQualityScheduledMaintenance",
     "FlextQualityStyleValidator",
-    "core",
-    "scripts",
-    "tools",
 )
 
 install_lazy_exports(
@@ -62,9 +58,6 @@ install_lazy_exports(
         "FlextQualityLinkChecker": ".tools.link_checker",
         "FlextQualityScheduledMaintenance": ".scheduled_maintenance",
         "FlextQualityStyleValidator": ".tools.style_validator",
-        "core": ".core",
-        "scripts": ".scripts",
-        "tools": ".tools",
     }),
     public_exports=__all__,
 )

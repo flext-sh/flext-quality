@@ -75,7 +75,7 @@ class FlextQualityClaudeContextClient:
         return self._mcp.build_tool_call(
             c.Quality.CLAUDE_CONTEXT_SERVER_NAME,
             "search_code",
-            {"query": query, "limit": search_limit},
+            {c.HandlerMode.QUERY: query, "limit": search_limit},
         )
 
     def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:

@@ -539,7 +539,7 @@ class FlextQualityDocumentationOptimizer:
         frontmatter_content = "\n".join(frontmatter_lines)
         empty_frontmatter: t.JsonMapping = {}
         parsed_fm = u.Cli.yaml_parse(frontmatter_content).unwrap_or(empty_frontmatter)
-        metadata: t.MutableJsonMapping = {
+        metadata: t.JsonDict = {
             k: v
             for k, v in (parsed_fm or {}).items()
             if isinstance(v, c.PRIMITIVES_TYPES)
@@ -686,7 +686,12 @@ class FlextQualityDocumentationOptimizer:
             ]:
                 doc_files.extend(project_root.glob(pattern))
             doc_files = list(set(doc_files))
-            ignored = [".git", "__pycache__", "node_modules", ".serena/memories"]
+            ignored = [
+                c.GIT_DIR_NAME,
+                "__pycache__",
+                "node_modules",
+                ".serena/memories",
+            ]
             return [f for f in doc_files if not any(pat in str(f) for pat in ignored)]
 
         @override

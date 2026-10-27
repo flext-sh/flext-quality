@@ -58,7 +58,7 @@ class FlextQualityMcpTools:
             "server": result.value.server,
             "tool": result.value.tool,
             "params": params_payload,
-            "command": u.normalize_to_json_value(command_result.value),
+            c.HandlerMode.COMMAND: u.normalize_to_json_value(command_result.value),
         }
 
     @_mcp.tool()
@@ -148,7 +148,11 @@ class FlextQualityMcpTools:
         result = engine.validate(path=path, context=context)
         if result.failure:
             return {"error": result.error}
-        return {"violations": u.normalize_to_json_value(result.value)}
+        return {
+            "violations": [
+                u.normalize_to_json_value(violation) for violation in result.value
+            ],
+        }
 
 
 __all__: list[str] = ["FlextQualityMcpTools"]

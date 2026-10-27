@@ -32,7 +32,7 @@ class TestsFlextQualityCli:
     def test_status_execute_succeeds_with_mapping_payload() -> None:
         """Test status execute succeeds with mapping payload."""
         result = FlextQualityCli.Status().execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, is_=dict)
 
     @staticmethod
@@ -48,7 +48,7 @@ class TestsFlextQualityCli:
     def test_check_builds_exactly_lint_then_typecheck(tmp_path: Path) -> None:
         """Test check builds exactly lint then typecheck."""
         result = FlextQualityCli.Check(target_path=tmp_path).execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         commands = result.unwrap()
         tm.that(len(commands), eq=2)
         tm.that(commands[0], has="ruff")
@@ -71,7 +71,7 @@ class TestsFlextQualityCli:
         (tmp_path / "src").mkdir()
         (tmp_path / "tests").mkdir()
         result = FlextQualityCli.Validate(target_path=tmp_path).execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         commands = result.unwrap()
         tm.that(len(commands), eq=5)
         tm.that(commands[2], has="bandit")
@@ -110,8 +110,8 @@ class TestsFlextQualityCli:
     def test_facade_execute_reports_ready() -> None:
         """Test facade execute reports ready."""
         result = FlextQualityCli().execute()
-        tm.that(result.success, eq=True)
-        tm.that(result.unwrap(), eq=True)
+        tm.ok(result.success)
+        tm.ok(result.unwrap())
 
     # ---- main() exit codes ---------------------------------------------
 

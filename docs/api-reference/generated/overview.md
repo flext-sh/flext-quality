@@ -26,7 +26,7 @@
   `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols`,
   `FlextQualityServiceBase`, `FlextQualitySettings`, `FlextQualityTypes`,
   `FlextQualityUtilities` (+5 more)
-- Exported module shortcuts: `docs`, `hooks`, `integrations`, `mcp`, `rules`
+- Exported module shortcuts: _none_
 - Generated module pages: `8`
 
 ## Next Pages

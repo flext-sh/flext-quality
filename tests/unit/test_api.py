@@ -20,7 +20,7 @@ from pathlib import Path
 import pytest
 
 from flext_quality import FlextQuality, FlextQualitySettings, quality
-from tests import m, p, t, tm
+from tests import c, m, p, t, tm, u
 
 
 class TestsFlextQualityApi:
@@ -47,14 +47,14 @@ class TestsFlextQualityApi:
     def test_facade_constructs_without_arguments() -> None:
         """FlextQuality() instantiates and reports a successful status."""
         result = FlextQuality().fetch_status()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, has="name")
 
     @staticmethod
     def test_quality_alias_is_a_ready_facade() -> None:
         """The shared ``quality`` alias exposes the same status contract."""
         result = quality.fetch_status()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, has="name")
 
     @staticmethod
@@ -80,7 +80,7 @@ class TestsFlextQualityApi:
     def test_execute_delegates_to_status() -> None:
         """The default execute() operation yields the status snapshot."""
         result = FlextQuality().execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, has="name")
 
     # -- configuration validation ----------------------------------------
@@ -89,8 +89,8 @@ class TestsFlextQualityApi:
     def test_validate_configuration_succeeds_with_defaults() -> None:
         """Default thresholds validate successfully to True."""
         result = FlextQuality().validate_configuration()
-        tm.that(result.success, eq=True)
-        tm.that(result.value, eq=True)
+        tm.ok(result.success)
+        tm.ok(result.value)
 
     @staticmethod
     def test_validate_configuration_fails_when_function_exceeds_class_limit() -> None:
@@ -124,7 +124,7 @@ class TestsFlextQualityApi:
             rules_path = Path(handle.name)
         try:
             result = FlextQuality().load_rules(rules_path)
-            tm.that(result.success, eq=True)
+            tm.ok(result.success)
             tm.that(len(result.value), eq=1)
             tm.that(result.value[0].name, eq="test-rule")
         finally:
@@ -134,7 +134,7 @@ class TestsFlextQualityApi:
     def test_load_rules_fails_for_missing_file() -> None:
         """load_rules reports a not-found failure for a nonexistent path."""
         result = FlextQuality().load_rules(Path("/nonexistent/rules.yaml"))
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that((result.error or "").lower(), has="not found")
 
     @staticmethod
@@ -144,7 +144,7 @@ class TestsFlextQualityApi:
         with tempfile.TemporaryDirectory() as tmpdir:
             FlextQualitySettings.fetch_global().Quality.rules_dir = tmpdir
             result = service.load_rules_from_config()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=0)
 
     @staticmethod
@@ -163,7 +163,7 @@ class TestsFlextQualityApi:
             )
             FlextQualitySettings.fetch_global().Quality.rules_dir = str(rules_dir)
             result = service.load_rules_from_config()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(len(result.value), eq=2)
 
     @staticmethod
@@ -172,7 +172,7 @@ class TestsFlextQualityApi:
         service = FlextQuality()
         FlextQualitySettings.fetch_global().Quality.rules_dir = "/nonexistent/rules/dir"
         result = service.load_rules_from_config()
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
 
 class TestsFlextQualityApiHooks:
@@ -224,7 +224,7 @@ class TestsFlextQualityApiHooks:
     def test_fetch_hook_config_json_returns_empty_object() -> None:
         """With no hooks configured the config JSON is an empty object."""
         result = FlextQuality().fetch_hook_config_json()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, is_=str)
         tm.that(result.value, eq="{}")
 
@@ -234,14 +234,14 @@ class TestsFlextQualityApiHooks:
     def test_execute_hook_succeeds_for_known_event() -> None:
         """A known event with no registered hooks continues execution."""
         result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.get("continue"), eq=True)
 
     @staticmethod
     def test_execute_hook_fails_for_unknown_event() -> None:
         """An unknown event name yields a failure describing the problem."""
         result = FlextQuality().execute_hook("UnknownEvent", {})
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown event: UnknownEvent")
 
     # -- stdin hook processing (external boundary: sys.stdin) ------------
@@ -258,25 +258,38 @@ class TestsFlextQualityApiHooks:
 
     def test_process_stdin_hook_executes_known_event(self) -> None:
         """A well-formed known event on stdin is executed successfully."""
-        result = self._run_with_stdin('{"event": "PreToolUse", "tool_name": "Edit"}')
-        tm.that(result.success, eq=True)
+        result = self._run_with_stdin(
+            u
+            .json_mapping_adapter()
+            .dump_json({
+                c.HandlerType.EVENT: c.Quality.HookEvent.PRE_TOOL_USE.value,
+                "tool_name": "Edit",
+            })
+            .decode(c.DEFAULT_ENCODING),
+        )
+        _ = tm.ok(result)
         tm.that(result.value.get("continue"), eq=True)
 
     def test_process_stdin_hook_continues_when_event_absent(self) -> None:
         """Input without an event continues execution by default."""
         result = self._run_with_stdin('{"tool_name": "Edit"}')
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.get("continue"), eq=True)
 
     def test_process_stdin_hook_fails_on_invalid_json(self) -> None:
         """Malformed JSON on stdin produces a parse/invalid failure."""
         result = self._run_with_stdin("not valid json")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
         error = (result.error or "").lower()
-        tm.that("parse" in error or "invalid" in error, eq=True)
+        tm.ok("parse" in error or "invalid" in error)
 
     def test_process_stdin_hook_fails_for_unknown_event(self) -> None:
         """An unknown event supplied via stdin fails with a clear error."""
-        result = self._run_with_stdin('{"event": "UnknownEvent"}')
-        tm.that(result.failure, eq=True)
+        result = self._run_with_stdin(
+            u
+            .json_mapping_adapter()
+            .dump_json({c.HandlerType.EVENT: "UnknownEvent"})
+            .decode(c.DEFAULT_ENCODING),
+        )
+        tm.ok(result.failure)
         tm.that(result.error or "", has="Unknown event")

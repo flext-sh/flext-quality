@@ -16,7 +16,7 @@ from flext_quality.integrations import (
     FlextQualityClaudeMemClient,
     FlextQualityMcpClient,
 )
-from tests import tm
+from tests import c, tm
 
 
 class TestsFlextQualityIntegrations:
@@ -35,7 +35,7 @@ class TestsFlextQualityIntegrations:
         """Health check reflects mcp-cli's real (missing) PATH availability."""
         client = FlextQualityMcpClient()
         result = client.health_check()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         available = client.mcp_cli_available()
         tm.that(result.value.get("available"), eq=available)
         expected_status = "connected" if available else "disconnected"
@@ -53,7 +53,7 @@ class TestsFlextQualityIntegrations:
         """The server-scoped health result carries the requested server name."""
         client = FlextQualityMcpClient()
         result = client.build_server_health_result("some-server")
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.get("server"), eq="some-server")
         tm.that(result.value, has="mcp_cli")
 
@@ -62,7 +62,7 @@ class TestsFlextQualityIntegrations:
         """A tool call request carries the server, tool, and params verbatim."""
         client = FlextQualityMcpClient()
         result = client.build_tool_call("srv", "tool", {"a": 1})
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.server, eq="srv")
         tm.that(result.value.tool, eq="tool")
         tm.that(result.value.params, eq={"a": 1})
@@ -82,7 +82,7 @@ class TestsFlextQualityIntegrations:
             return
         call = client.build_tool_call("srv", "tool", {"q": "x"}).unwrap()
         result = client.build_call_command(call)
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_build_info_command_fails_when_cli_unavailable() -> None:
@@ -91,15 +91,15 @@ class TestsFlextQualityIntegrations:
         if client.mcp_cli_available():
             return
         result = client.build_info_command("srv", "tool")
-        tm.that(result.failure, eq=True)
+        tm.ok(result.failure)
 
     @staticmethod
     def test_parse_result_reports_failure_for_nonzero_exit() -> None:
         """A nonzero exit code yields a failed tool result with the output."""
         client = FlextQualityMcpClient()
         result = client.parse_result("boom", 1)
-        tm.that(result.success, eq=True)
-        tm.that(result.value.success, eq=False)
+        tm.ok(result.success)
+        tm.fail(result.value.success)
         tm.that(result.value.error or "", has="boom")
 
     @staticmethod
@@ -114,16 +114,18 @@ class TestsFlextQualityIntegrations:
         """Zero-exit JSON object output is coerced into a string-valued mapping."""
         client = FlextQualityMcpClient()
         result = client.parse_result('{"key": 1, "other": true}', 0)
-        tm.that(result.success, eq=True)
-        tm.that(result.value.success, eq=True)
-        tm.that(result.value.data, eq={"key": "1", "other": "True"})
+        tm.ok(result.success)
+        tm.ok(result.value.success)
+        tm.that(
+            result.value.data, eq={"key": c.ParserBooleanToken.ONE, "other": "True"}
+        )
 
     @staticmethod
     def test_parse_result_parses_json_list_of_objects() -> None:
         """Zero-exit JSON list output is normalized into an items payload."""
         client = FlextQualityMcpClient()
         result = client.parse_result('[{"a": 1}, {"a": 2}]', 0)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.data or {}, has="items")
 
     @staticmethod
@@ -131,7 +133,7 @@ class TestsFlextQualityIntegrations:
         """A JSON list of non-mapping items is coerced to string values."""
         client = FlextQualityMcpClient()
         result = client.parse_result("[1, 2, 3]", 0)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.data or {}, has="items")
 
     @staticmethod
@@ -139,7 +141,7 @@ class TestsFlextQualityIntegrations:
         """Non-JSON, non-list output is preserved verbatim under ``raw``."""
         client = FlextQualityMcpClient()
         result = client.parse_result("plain text output", 0)
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.data, eq={"raw": "plain text output"})
 
 
@@ -153,7 +155,7 @@ class TestsFlextQualityClaudeContextIntegrations:
         """Index calls default to an empty params mapping without a path."""
         client = FlextQualityClaudeContextClient()
         result = client.build_index_call()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value.tool, eq="index_codebase")
         tm.that(result.value.params, eq={})
 
@@ -169,7 +171,7 @@ class TestsFlextQualityClaudeContextIntegrations:
         """Search calls fall back to the configured default result limit."""
         client = FlextQualityClaudeContextClient()
         result = client.build_search_call("query text")
-        tm.that(result.value.params.get("query"), eq="query text")
+        tm.that(result.value.params.get(c.HandlerMode.QUERY), eq="query text")
         tm.that(result.value.params.get("limit"), eq=20)
 
     @staticmethod

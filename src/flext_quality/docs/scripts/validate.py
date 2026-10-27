@@ -816,7 +816,12 @@ class FlextQualityDocumentationValidator:
             if f not in seen:
                 seen.add(f)
                 unique.append(f)
-        ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
+        ignored_patterns = [
+            c.GIT_DIR_NAME,
+            "__pycache__",
+            "node_modules",
+            ".serena/memories",
+        ]
         return [
             f
             for f in unique

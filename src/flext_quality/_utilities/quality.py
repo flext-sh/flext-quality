@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 import sys
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from flext_cli import cli, u
 from flext_web import FlextWebUtilities
@@ -29,28 +29,28 @@ class FlextQualityUtilitiesQuality:
     # a checker-visible type expression (bare aliases evaluate to
     # TypeAliasType objects, which the adapter form rejects). Concrete
     # generics only; runtime objects identical to the unwrapped aliases.
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.JsonValue]] = (
-        FlextWebUtilities.type_adapter(
-            Mapping[str, t.JsonValue],
-            config=m.ConfigDict(strict=False),
-        )
+    RELAXED_CONTAINER_MAPPING_ADAPTER: ClassVar[
+        t.TypeAdapter[Mapping[str, t.JsonValue]]
+    ] = FlextWebUtilities.type_adapter(
+        Mapping[str, t.JsonValue],
+        config=m.ConfigDict(strict=False),
     )
-    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[Mapping[str, t.JsonValue]]
+    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: ClassVar[
+        t.TypeAdapter[Sequence[Mapping[str, t.JsonValue]]]
     ] = FlextWebUtilities.type_adapter(
         Sequence[Mapping[str, t.JsonValue]],
         config=m.ConfigDict(strict=False),
     )
-    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
-        MutableMapping[str, str | bool | None]
+    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: ClassVar[
+        t.TypeAdapter[MutableMapping[str, str | bool | None]]
     ] = FlextWebUtilities.type_adapter(MutableMapping[str, str | bool | None])
-    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-        MutableSequence[Mapping[str, str]]
+    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: ClassVar[
+        t.TypeAdapter[MutableSequence[Mapping[str, str]]]
     ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
-    REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[t.MappingKV[str, t.JsonMapping]] = (
-        FlextWebUtilities.type_adapter(
-            Mapping[str, Mapping[str, t.JsonValue]],
-        )
+    REPORT_VALUE_MAPPING_ADAPTER: ClassVar[
+        t.TypeAdapter[t.MappingKV[str, t.JsonMapping]]
+    ] = FlextWebUtilities.type_adapter(
+        Mapping[str, Mapping[str, t.JsonValue]],
     )
 
     @staticmethod

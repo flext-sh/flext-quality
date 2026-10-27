@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated
 
-from flext_core import FlextSettings, m, u
+from flext_core import FlextSettings, m
 
 
 class FlextQualitySettings(FlextSettings):
@@ -35,7 +35,7 @@ class FlextQualitySettings(FlextSettings):
         max_function_length: int = 50
         max_class_length: int = 200
 
-        @u.model_validator(mode="after")
+        @m.model_validator(mode="after")
         def _validate_thresholds(self) -> FlextQualitySettings._Quality:
             """Ensure function length ceiling does not exceed class length ceiling.
 

@@ -19,7 +19,7 @@ from flext_quality.mcp import (
     FlextQualityMcpServer,
     FlextQualityMcpTools,
 )
-from tests import tm
+from tests import c, tm
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -39,7 +39,7 @@ class TestsFlextQualityMcpServer:
         """Repeated lookups return the identical FastMCP server instance."""
         first = FlextQualityMcpServer.resolve_server()
         second = FlextQualityMcpServer.resolve_server()
-        tm.that(first is second, eq=True)
+        tm.ok(first is second)
 
     @staticmethod
     def test_get_server_exposes_configured_name() -> None:
@@ -53,21 +53,34 @@ class TestsFlextQualityMcpTools:
 
     @staticmethod
     def test_search_memory_builds_command_payload() -> None:
-        """search_memory returns a command payload for the memory client."""
+        """search_memory returns a command payload for the memory client.
+
+        Raises:
+            TypeError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_memory(query="find this")
         tm.that(output, is_=dict)
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
             return
-        tm.that(output, has=("server", "command", "params"))
+        tm.that(output, has=("server", c.HandlerMode.COMMAND, "params"))
         tm.that(output.get("server"), eq="claude-mem")
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise TypeError(msg)
         tm.that(params.get("search_type"), eq="observations")
 
     @staticmethod
     def test_search_memory_honors_explicit_search_type_and_limit() -> None:
-        """Explicit search_type and limit are threaded into the tool output."""
+        """Explicit search_type and limit are threaded into the tool output.
+
+        Raises:
+            TypeError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_memory(
             query="find this",
             search_type="entities",
@@ -77,7 +90,10 @@ class TestsFlextQualityMcpTools:
             tm.that(output, has="error")
             return
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise TypeError(msg)
         tm.that(params.get("search_type"), eq="entities")
         tm.that(params.get("limit"), eq=3)
 
@@ -90,17 +106,25 @@ class TestsFlextQualityMcpTools:
             tm.that(output, has="error")
             return
         tm.that(output.get("server"), eq="claude-context")
-        tm.that(output, has="command")
+        tm.that(output, has=c.HandlerMode.COMMAND)
 
     @staticmethod
     def test_search_code_honors_explicit_limit() -> None:
-        """An explicit limit is threaded into the search_code tool output."""
+        """An explicit limit is threaded into the search_code tool output.
+
+        Raises:
+            TypeError: If command parameters are not a mapping.
+
+        """
         output = FlextQualityMcpTools.search_code(query="def foo", limit=7)
         if not _MCP_CLI_AVAILABLE:
             tm.that(output, has="error")
             return
         params = output.get("params")
-        assert isinstance(params, dict)
+        tm.that(params, is_=dict)
+        if not isinstance(params, dict):
+            msg = "Expected a command parameter mapping"
+            raise TypeError(msg)
         tm.that(params.get("limit"), eq=7)
 
     @staticmethod
@@ -133,7 +157,7 @@ class TestsFlextQualityMcpTools:
         target = tmp_path / "module.py"
         target.write_text("value = 1\n", encoding="utf-8")
         output = FlextQualityMcpTools.validate_rules(path=str(target))
-        tm.that(bool(set(output) & {"violations", "error"}), eq=True)
+        tm.ok(bool(set(output) & {"violations", "error"}))
 
 
 class TestsFlextQualityMcpResources:

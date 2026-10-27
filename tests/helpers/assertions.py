@@ -9,12 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-from tests import tm
-
-if TYPE_CHECKING:
-    from tests import t
+from tests import t, tm
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping, _msg: str = "") -> None:
@@ -34,7 +29,8 @@ def assert_dict_structure(
 ) -> None:
     """Assert that a dict contains all required keys."""
     missing = [k for k in required_keys if k not in data]
-    assert not missing, msg or f"Missing keys: {missing}"
+    if missing:
+        tm.reject(msg or f"Missing keys: {missing}")
 
 
 def assert_metrics_structure(metrics: t.ScalarMapping) -> None:

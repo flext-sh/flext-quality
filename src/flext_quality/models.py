@@ -23,5 +23,4 @@ class FlextQualityModels(
 
 
 m = FlextQualityModels
-
 __all__: list[str] = ["FlextQualityModels", "m"]

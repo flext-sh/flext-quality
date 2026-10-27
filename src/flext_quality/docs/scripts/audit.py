@@ -156,7 +156,7 @@ class FlextQualityDocumentationAuditor:
 
         """
         ignored_patterns = [
-            ".git",
+            c.GIT_DIR_NAME,
             "__pycache__",
             "node_modules",
             ".pytest_cache",

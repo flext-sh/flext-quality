@@ -72,7 +72,10 @@ class FlextQualityClaudeMemClient:
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         # Why: mro-4p0t — bind JsonMapping for build_tool_call params.
-        params: t.MutableJsonMapping = {"query": query, "limit": search_limit}
+        params: t.MutableJsonMapping = {
+            c.HandlerMode.QUERY: query,
+            "limit": search_limit,
+        }
         return self._mcp.build_tool_call(
             c.Quality.CLAUDE_MEM_SERVER_NAME,
             "search",

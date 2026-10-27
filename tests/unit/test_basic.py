@@ -19,7 +19,7 @@ class TestsFlextQualityBasic:
     @staticmethod
     def test_facade_constructs_without_arguments() -> None:
         """FlextQuality() is constructible with no arguments and executes."""
-        tm.that(FlextQuality().execute().success, eq=True)
+        tm.ok(FlextQuality().execute().success)
 
     @staticmethod
     def test_global_alias_is_facade_instance() -> None:
@@ -30,7 +30,7 @@ class TestsFlextQualityBasic:
     def test_execute_reports_success() -> None:
         """execute() yields a successful result carrying the status snapshot."""
         result = FlextQuality().execute()
-        tm.that(result.success, eq=True)
+        tm.ok(result.success)
         tm.that(result.value, is_=dict)
 
     @staticmethod
@@ -60,7 +60,7 @@ class TestsFlextQualityBasic:
         """The reported hook-registration count is a valid non-negative total."""
         count = FlextQuality().execute().value["hooks_registered"]
         tm.that(count, is_=int)
-        tm.that(isinstance(count, int) and count >= 0, eq=True)
+        tm.ok(isinstance(count, int) and count >= 0)
 
     @staticmethod
     def test_config_singleton_is_a_frozen_quality_config() -> None:

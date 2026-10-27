@@ -150,7 +150,7 @@ class FlextQuality(FlextQualityServiceBase[t.JsonMapping]):
         if parse_result.failure:
             return r[t.JsonMapping].from_failure(parse_result)
         input_data = parse_result.value
-        event = str(input_data.get("event", ""))
+        event = str(input_data.get(c.HandlerType.EVENT, ""))
         if not event:
             return r[t.JsonMapping].ok({"continue": True})
         return self.execute_hook(event, input_data)

@@ -502,7 +502,7 @@ class FlextQualityStyleValidator:
             ValueError: If the report format is unsupported.
 
         """
-        if output_format == "summary":
+        if output_format == c.MetricType.SUMMARY:
             return self._generate_summary_report()
         if output_format == "json":
             return self.results.model_dump_json(indent=2)

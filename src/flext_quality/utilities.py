@@ -20,5 +20,4 @@ class FlextQualityUtilities(FlextWebUtilities):
 
 
 u = FlextQualityUtilities
-
 __all__: list[str] = ["FlextQualityUtilities", "u"]

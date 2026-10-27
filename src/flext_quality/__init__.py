@@ -12,18 +12,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import install_lazy_exports
 
-from flext_quality.__version__ import __version__
-
 if TYPE_CHECKING:
     from flext_web import d, e, h, r, x
 
-    from flext_quality import (
-        docs as docs,
-        hooks as hooks,
-        integrations as integrations,
-        mcp as mcp,
-        rules as rules,
-    )
     from flext_quality.__version__ import (
         FlextQualityVersion,
         __author__,
@@ -32,6 +23,7 @@ if TYPE_CHECKING:
         __license__,
         __title__,
         __url__,
+        __version__,
         __version_info__,
     )
     from flext_quality._config import FlextQualityConfig, config
@@ -69,18 +61,13 @@ __all__: tuple[str, ...] = (
     "c",
     "config",
     "d",
-    "docs",
     "e",
     "h",
-    "hooks",
-    "integrations",
     "m",
     "main",
-    "mcp",
     "p",
     "quality",
     "r",
-    "rules",
     "s",
     "settings",
     "t",
@@ -113,18 +100,13 @@ install_lazy_exports(
         "c": ".constants",
         "config": "._config",
         "d": "flext_web",
-        "docs": ".docs",
         "e": "flext_web",
         "h": "flext_web",
-        "hooks": ".hooks",
-        "integrations": ".integrations",
         "m": ".models",
         "main": ".cli",
-        "mcp": ".mcp",
         "p": ".protocols",
         "quality": ".api",
         "r": "flext_web",
-        "rules": ".rules",
         "s": ".base",
         "settings": "._settings",
         "t": ".typings",
@@ -133,3 +115,6 @@ install_lazy_exports(
     }),
     public_exports=__all__,
 )
+
+if not TYPE_CHECKING:
+    from flext_quality.__version__ import __version__

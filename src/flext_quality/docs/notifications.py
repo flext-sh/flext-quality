@@ -332,14 +332,14 @@ class FlextQualityDocumentationNotifier:
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
-        severity_m: t.JsonMapping = (
+        severity = (
             u.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
         severity_breakdown: t.MutableIntMapping = {}
         for key_name in ("critical", "high", "medium", "low"):
-            kv = severity_m.get(key_name, 0)
+            kv = severity.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
         critical_count: int = severity_breakdown.get("critical", 0)
         threshold = self.config.alerts.critical_issues.threshold
@@ -481,7 +481,7 @@ Please review recent changes and address any identified issues.
 
         # Console notification (always enabled)
         if self.config.channels.console.enabled:
-            self._send_console_notification(title, message, priority)
+            self._send_console_notification()
 
         # Email notification
         if self.config.channels.email.enabled:
@@ -512,12 +512,7 @@ Please review recent changes and address any identified issues.
 
         return success
 
-    def _send_console_notification(
-        self,
-        title: str,
-        message: str,
-        priority: str,
-    ) -> None:
+    def _send_console_notification(self) -> None:
         """Send notification to console."""
         # For now, console notifications are disabled to avoid T201 violations
         # In the future, this could be implemented with proper logging
@@ -805,32 +800,31 @@ Found {len(broken_links)} broken links that need attention:
         return message.strip()
 
     @staticmethod
-    def _format_weekly_report_message(_report_data: t.JsonMapping) -> str:
+    def _format_weekly_report_message(report_data: t.JsonMapping) -> str:
         """Format message for weekly report notification.
 
         Returns:
             The resulting ``str``.
 
         """
-        # Implementation would depend on weekly report data structure
-        # For now, report_data is not used but reserved for future implementation
         return (
             "Weekly documentation quality report is now available. Check the reports "
-            "dashboard for detailed metrics and trends."
+            "dashboard for detailed metrics and trends. "
+            f"Summary: {report_data!r}"
         )
 
     @staticmethod
-    def _format_monthly_report_message(_report_data: t.JsonMapping) -> str:
+    def _format_monthly_report_message(report_data: t.JsonMapping) -> str:
         """Format message for monthly report notification.
 
         Returns:
             The resulting ``str``.
 
         """
-        # Implementation would depend on monthly report data structure
         return (
             "Monthly comprehensive documentation quality report is now available. "
-            "Review trends and plan improvements for the next month."
+            "Review trends and plan improvements for the next month. "
+            f"Summary: {report_data!r}"
         )
 
     class Run(s[bool]):
