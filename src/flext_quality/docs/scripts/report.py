@@ -1115,16 +1115,6 @@ class FlextQualityDocumentationReporter:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationReporter.Run) -> p.Result[bool]:
-        """Execute the reporter ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the reporting system via the canonical cli facade.
 
@@ -1136,16 +1126,12 @@ class FlextQualityDocumentationReporter:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-docs-report",
             app_help="FLEXT Quality Documentation Reporting",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Generate a documentation quality report",
-                model_cls=FlextQualityDocumentationReporter.Run,
-                handler=FlextQualityDocumentationReporter._run_handler,
-            ),
+            route_help="Generate a documentation quality report",
+            model_cls=FlextQualityDocumentationReporter.Run,
         )
         return exit_code
 

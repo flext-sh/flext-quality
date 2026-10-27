@@ -705,16 +705,6 @@ class FlextQualityDocumentationDashboard:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
-        """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the dashboard via the canonical cli facade.
 
@@ -726,16 +716,12 @@ class FlextQualityDocumentationDashboard:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-dashboard",
             app_help="FLEXT Quality Documentation Dashboard",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Start the dashboard server",
-                model_cls=FlextQualityDocumentationDashboard.Run,
-                handler=FlextQualityDocumentationDashboard._run_handler,
-            ),
+            route_help="Start the dashboard server",
+            model_cls=FlextQualityDocumentationDashboard.Run,
         )
         return exit_code
 

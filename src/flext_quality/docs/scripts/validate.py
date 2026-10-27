@@ -25,6 +25,7 @@ from flext_api import FlextApiConstants
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
+from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, MutableSequence
@@ -599,21 +600,16 @@ class FlextQualityDocumentationValidator:
             """
             output_dir = Path(output_path)
             timestamp = u.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"validation_report_{timestamp}.json"
-            filepath = output_dir / filename
-            report_content = self.generate_report("json")
-            report_write = u.Cli.atomic_write_text_file(filepath, report_content)
-            if report_write.failure:
-                return r[Path].from_failure(report_write)
-            latest_file = output_dir / "latest_validation.json"
-            latest_write = u.Cli.json_write(
-                latest_file,
+            written = FlextQualityDocumentationReporter.write_report_and_latest(
+                output_dir,
+                f"validation_report_{timestamp}.json",
+                "latest_validation.json",
+                self.generate_report("json"),
                 self.results,
-                options=m.Cli.JsonWriteOptions(indent=2),
             )
-            if latest_write.failure:
-                return r[Path].from_failure(latest_write)
-            return r[Path].ok(filepath)
+            if written.failure:
+                return r[Path].from_failure(written)
+            return r[Path].ok(Path(written.value))
 
     class ContentValidator:
         """Content validation and quality checking system."""
@@ -966,16 +962,6 @@ class FlextQualityDocumentationValidator:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationValidator.Run) -> p.Result[bool]:
-        """Execute the validator ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation validation via the canonical cli facade.
 
@@ -987,16 +973,12 @@ class FlextQualityDocumentationValidator:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-docs-validate",
             app_help="FLEXT Quality Documentation Validation",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Run documentation validation checks",
-                model_cls=FlextQualityDocumentationValidator.Run,
-                handler=FlextQualityDocumentationValidator._run_handler,
-            ),
+            route_help="Run documentation validation checks",
+            model_cls=FlextQualityDocumentationValidator.Run,
         )
         return exit_code
 

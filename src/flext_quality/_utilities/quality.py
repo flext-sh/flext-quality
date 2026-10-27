@@ -19,7 +19,7 @@ from flext_quality import c, m, r, t
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_quality import p
+    from flext_quality import FlextQualityServiceBase, p
 
 
 class FlextQualityUtilitiesQuality:
@@ -122,6 +122,56 @@ class FlextQualityUtilitiesQuality:
             args=list(args) if args is not None else sys.argv[1:],
         )
         return 0 if outcome.success else 1
+
+    @staticmethod
+    def execute_run_command(
+        *,
+        args: t.StrSequence | None,
+        app_name: str,
+        app_help: str,
+        route_help: str,
+        model_cls: type[FlextQualityServiceBase[bool]],
+    ) -> int:
+        """Execute a single ``run`` result command for one self-executing model.
+
+        Args:
+            args: Command-line arguments for the application; defaults to
+                ``sys.argv[1:]`` when ``None``.
+            app_name: Display name of the Typer application.
+            app_help: Help text of the Typer application.
+            route_help: Help text of the registered ``run`` route.
+            model_cls: Command model class whose ``execute`` runs the route.
+
+        Returns:
+            The process exit code.
+
+        """
+        return FlextQualityUtilitiesQuality.execute_result_command(
+            args=args,
+            app_name=app_name,
+            app_help=app_help,
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text=route_help,
+                model_cls=model_cls,
+                handler=FlextQualityUtilitiesQuality.execute_run_route,
+            ),
+        )
+
+    @staticmethod
+    def execute_run_route(
+        params: FlextQualityServiceBase[bool],
+    ) -> p.Result[bool]:
+        """Execute one self-executing ``run`` command model.
+
+        Args:
+            params: Command model instance carrying the parsed arguments.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+
+        """
+        return params.execute()
 
     @staticmethod
     def format_hook_output(

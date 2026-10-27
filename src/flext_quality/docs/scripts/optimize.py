@@ -728,16 +728,6 @@ class FlextQualityDocumentationOptimizer:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationOptimizer.Run) -> p.Result[bool]:
-        """Execute the optimizer ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run optimization system via the canonical cli facade.
 
@@ -749,16 +739,12 @@ class FlextQualityDocumentationOptimizer:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-docs-optimize",
             app_help="FLEXT Quality Documentation Optimization",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Run documentation optimizations",
-                model_cls=FlextQualityDocumentationOptimizer.Run,
-                handler=FlextQualityDocumentationOptimizer._run_handler,
-            ),
+            route_help="Run documentation optimizations",
+            model_cls=FlextQualityDocumentationOptimizer.Run,
         )
         return exit_code
 

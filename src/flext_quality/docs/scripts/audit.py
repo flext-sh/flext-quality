@@ -1039,16 +1039,6 @@ class FlextQualityDocumentationAuditor:
             )
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationAuditor.Run) -> p.Result[bool]:
-        """Execute the auditor ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run documentation audit via the canonical cli facade.
 
@@ -1060,16 +1050,12 @@ class FlextQualityDocumentationAuditor:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-docs-audit",
             app_help="FLEXT Quality Documentation Audit",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Run documentation audit checks",
-                model_cls=FlextQualityDocumentationAuditor.Run,
-                handler=FlextQualityDocumentationAuditor._run_handler,
-            ),
+            route_help="Run documentation audit checks",
+            model_cls=FlextQualityDocumentationAuditor.Run,
         )
         return exit_code
 

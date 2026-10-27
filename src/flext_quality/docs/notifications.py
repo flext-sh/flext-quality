@@ -977,16 +977,6 @@ Found {len(broken_links)} broken links that need attention:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationNotifier.Run) -> p.Result[bool]:
-        """Execute the notifier ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run the notification system via the canonical cli facade.
 
@@ -998,16 +988,12 @@ Found {len(broken_links)} broken links that need attention:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-notifications",
             app_help="FLEXT Quality Documentation Notifications",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Send a documentation notification",
-                model_cls=FlextQualityDocumentationNotifier.Run,
-                handler=FlextQualityDocumentationNotifier._run_handler,
-            ),
+            route_help="Send a documentation notification",
+            model_cls=FlextQualityDocumentationNotifier.Run,
         )
         return exit_code
 

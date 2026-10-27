@@ -850,16 +850,6 @@ class FlextQualityScheduledMaintenance:
             )
 
     @staticmethod
-    def _run_handler(params: FlextQualityScheduledMaintenance.Run) -> p.Result[bool]:
-        """Execute the maintenance ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
     def main(args: t.StrSequence | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade.
 
@@ -871,19 +861,15 @@ class FlextQualityScheduledMaintenance:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-scheduled-maintenance",
             app_help="FLEXT Quality Scheduled Documentation Maintenance",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text=(
-                    "Run scheduled maintenance (use --daemon, --manual or "
-                    "--list-schedules)"
-                ),
-                model_cls=FlextQualityScheduledMaintenance.Run,
-                handler=FlextQualityScheduledMaintenance._run_handler,
+            route_help=(
+                "Run scheduled maintenance (use --daemon, --manual or "
+                "--list-schedules)"
             ),
+            model_cls=FlextQualityScheduledMaintenance.Run,
         )
         return exit_code
 
