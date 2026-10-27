@@ -19,8 +19,8 @@ from pathlib import Path
 
 import pytest
 
-from flext_quality import FlextQuality, FlextQualitySettings, quality
-from tests import c, m, p, t, tm, u
+from flext_quality import FlextQuality, FlextQualitySettings
+from tests import c, m, p, quality, t, tm, u
 
 
 class TestsFlextQualityApi:

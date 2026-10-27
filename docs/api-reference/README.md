@@ -29,6 +29,6 @@ This section is generated from public exports and real docstrings.
 
 - Primary facades: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
   `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols` (+5 more)
-- Generated module pages: `8`
+- Generated module pages: `9`
 
 Back to [project docs](../index.md).

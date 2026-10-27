@@ -27,7 +27,7 @@
   `FlextQualityServiceBase`, `FlextQualitySettings`, `FlextQualityTypes`,
   `FlextQualityUtilities` (+5 more)
 - Exported module shortcuts: _none_
-- Generated module pages: `8`
+- Generated module pages: `9`
 
 ## Next Pages
 

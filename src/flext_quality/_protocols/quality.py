@@ -9,7 +9,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, ClassVar, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from flext_quality import c, p, t
+    from flext_core._protocols import FlextProtocolsResult
+
+    from flext_quality import c, t
 
 
 class FlextQualityProtocolsQuality:
@@ -50,7 +52,7 @@ class FlextQualityProtocolsQuality:
             self,
             content: str,
             file_path: t.Cli.TextPath | None = None,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> FlextProtocolsResult.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content and return violations.
 
             Args:
@@ -67,7 +69,10 @@ class FlextQualityProtocolsQuality:
         event: ClassVar[type]
         matcher: ClassVar[t.StrSequence | None]
 
-        def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            input_data: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the hook logic.
 
             Args:
@@ -120,7 +125,10 @@ class FlextQualityProtocolsQuality:
         event: str
         matcher: t.StrSequence | None
 
-        def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            input_data: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the hook logic.
 
             Args:
@@ -148,7 +156,7 @@ class FlextQualityProtocolsQuality:
             self,
             settings: t.JsonMapping,
             context: t.JsonMapping,
-        ) -> p.Result[t.Quality.RuleResult]:
+        ) -> FlextProtocolsResult.Result[t.Quality.RuleResult]:
             """Validate according to the rule type.
 
             Args:
@@ -162,15 +170,15 @@ class FlextQualityProtocolsQuality:
     class FlextQualityProtocolsIntegrationClient(Protocol):
         """Protocol for external integrations."""
 
-        def connect(self) -> p.Result[bool]:
+        def connect(self) -> FlextProtocolsResult.Result[bool]:
             """Connect to external service."""
             ...
 
-        def disconnect(self) -> p.Result[bool]:
+        def disconnect(self) -> FlextProtocolsResult.Result[bool]:
             """Disconnect from external service."""
             ...
 
-        def health_check(self) -> p.Result[t.StrMapping]:
+        def health_check(self) -> FlextProtocolsResult.Result[t.StrMapping]:
             """Check integration health."""
             ...
 
@@ -181,7 +189,10 @@ class FlextQualityProtocolsQuality:
         name: str
         description: str
 
-        def execute(self, params: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            params: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the MCP tool.
 
             Args:
