@@ -8,15 +8,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Iterable,
-    Iterator,
-    Mapping,
-    MutableMapping,
-    MutableSequence,
-    Sequence,
-)
-
 import asyncio
 import pathlib
 import time
