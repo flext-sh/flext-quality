@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from flext_quality.api import FlextQuality, quality
     from flext_quality.base import FlextQualityServiceBase, s
     from flext_quality.cli import FlextQualityCli, main
-    from flext_quality.config_models import FlextQualityConfigModels
+    from flext_quality.config_models import FlextQualityModelsConfig
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.models import FlextQualityModels, m
     from flext_quality.protocols import FlextQualityProtocols, p
@@ -43,9 +43,9 @@ __all__: tuple[str, ...] = (
     "FlextQuality",
     "FlextQualityCli",
     "FlextQualityConfig",
-    "FlextQualityConfigModels",
     "FlextQualityConstants",
     "FlextQualityModels",
+    "FlextQualityModelsConfig",
     "FlextQualityProtocols",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
@@ -86,7 +86,7 @@ install_lazy_exports(
         "FlextQuality": ".api",
         "FlextQualityCli": ".cli",
         "FlextQualityConfig": "._config",
-        "FlextQualityConfigModels": ".config_models",
+        "FlextQualityModelsConfig": ".config_models",
         "FlextQualityConstants": ".constants",
         "FlextQualityModels": ".models",
         "FlextQualityProtocols": ".protocols",

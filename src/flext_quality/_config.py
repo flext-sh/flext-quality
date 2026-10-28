@@ -15,7 +15,7 @@ from typing import Annotated
 from flext_cli import FlextCliConfig
 from pydantic import Field
 
-from flext_quality.config_models import FlextQualityConfigModels
+from flext_quality.config_models import FlextQualityModelsConfig
 
 
 class FlextQualityConfig(FlextCliConfig):
@@ -28,11 +28,11 @@ class FlextQualityConfig(FlextCliConfig):
     """
 
     Quality: Annotated[
-        FlextQualityConfigModels.QualityConfigNamespace,
+        FlextQualityModelsConfig.QualityConfigNamespace,
         Field(
             description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = FlextQualityConfigModels.QualityConfigNamespace()
+    ] = FlextQualityModelsConfig.QualityConfigNamespace()
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()

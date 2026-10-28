@@ -8,10 +8,10 @@ from __future__ import annotations
 
 from flext_web import FlextWebModels as _WebModels, t
 
-from flext_quality.config_models import FlextQualityConfigModels
+from flext_quality.config_models import FlextQualityModelsConfig
 
 
-class FlextQualityModelsBase(FlextQualityConfigModels):
+class FlextQualityModelsBase(FlextQualityModelsConfig):
     """Base models for flext-quality."""
 
     class QualityThresholdsConfig(_WebModels.ManagedModel):
