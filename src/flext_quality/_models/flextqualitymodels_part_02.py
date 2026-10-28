@@ -11,6 +11,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 
 # Why: mro-fix-27vfb — `Path` backs a real Pydantic model field
