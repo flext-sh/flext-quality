@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping, MutableSequence
+from collections.abc import Mapping, MutableMapping, MutableSequence
 from typing import Annotated
 
 from flext_web import FlextWebModels as _WebModels
@@ -237,7 +237,7 @@ class FlextQualityModelsPart01(_WebModels):
                 _WebModels.Field(description="Recommended fix"),
             ] = ""
             context: Annotated[
-                t.MappingKV[str, t.Primitives | None] | None,
+                Mapping[str, t.Primitives | None] | None,
                 _WebModels.Field(
                     default=None,
                     description=(

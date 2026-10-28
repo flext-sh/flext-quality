@@ -15,16 +15,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import shutil
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, override
+from typing import Final, override
 
 from flext_cli import cli
 
 from flext_quality import c, m, p, r, s, t, u
 from flext_quality.docs.scripts import FlextQualityDocumentationReporter
-
-if TYPE_CHECKING:
-    from collections.abc import MutableSequence
 
 
 class FlextQualityDocumentationOptimizer:
@@ -48,7 +46,7 @@ class FlextQualityDocumentationOptimizer:
 
     def optimize_formatting(
         self,
-        doc_files: t.SequenceOf[Path],
+        doc_files: Sequence[Path],
     ) -> m.Quality.OptimizerResults:
         """Fix common formatting issues.
 
@@ -147,7 +145,7 @@ class FlextQualityDocumentationOptimizer:
 
     def update_table_of_contents(
         self,
-        doc_files: t.SequenceOf[Path],
+        doc_files: Sequence[Path],
     ) -> m.Quality.OptimizerResults:
         """Update or add table of contents for long documents.
 
@@ -186,7 +184,7 @@ class FlextQualityDocumentationOptimizer:
         return self.results
 
     @staticmethod
-    def _find_existing_toc(lines: t.StrSequence) -> tuple[int, int]:
+    def _find_existing_toc(lines: Sequence[str]) -> tuple[int, int]:
         """Find existing table of contents boundaries.
 
         Returns:
@@ -208,7 +206,7 @@ class FlextQualityDocumentationOptimizer:
                 break
         return (toc_start, toc_end)
 
-    def _extract_toc_headings(self, lines: t.StrSequence) -> MutableSequence[str]:
+    def _extract_toc_headings(self, lines: Sequence[str]) -> MutableSequence[str]:
         """Extract headings for table of contents.
 
         Returns:
@@ -228,17 +226,17 @@ class FlextQualityDocumentationOptimizer:
         return toc_lines
 
     @staticmethod
-    def _generate_toc_content(headings: t.StrSequence) -> t.StrSequence:
+    def _generate_toc_content(headings: Sequence[str]) -> Sequence[str]:
         """Generate the complete table of contents content.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         return ["## Table of Contents", "", *headings, "", "---", ""]
 
     @staticmethod
-    def _find_toc_insertion_point(lines: t.StrSequence) -> int:
+    def _find_toc_insertion_point(lines: Sequence[str]) -> int:
         """Find the best position to insert table of contents.
 
         Returns:
@@ -290,7 +288,7 @@ class FlextQualityDocumentationOptimizer:
 
     def enhance_accessibility(
         self,
-        doc_files: t.SequenceOf[Path],
+        doc_files: Sequence[Path],
     ) -> m.Quality.OptimizerResults:
         """Enhance accessibility of documentation.
 
@@ -373,7 +371,7 @@ class FlextQualityDocumentationOptimizer:
 
     def optimize_content_structure(
         self,
-        doc_files: t.SequenceOf[Path],
+        doc_files: Sequence[Path],
     ) -> m.Quality.OptimizerResults:
         """Optimize content structure and readability.
 
@@ -459,7 +457,7 @@ class FlextQualityDocumentationOptimizer:
 
     def update_metadata(
         self,
-        doc_files: t.SequenceOf[Path],
+        doc_files: Sequence[Path],
     ) -> m.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps.
 
@@ -531,7 +529,7 @@ class FlextQualityDocumentationOptimizer:
 
     @staticmethod
     def _replace_frontmatter_lines(
-        lines: t.StrSequence,
+        lines: Sequence[str],
         end_idx: int,
     ) -> list[str]:
         """Return document lines with refreshed YAML frontmatter metadata."""
@@ -660,17 +658,17 @@ class FlextQualityDocumentationOptimizer:
             description="Optimization report output directory",
             validate_default=True,
         )
-        files: t.StrSequence = m.Field(
+        files: Sequence[str] = m.Field(
             (),
             description="Documentation files to optimize",
             validate_default=True,
         )
 
-        def discover_files(self) -> t.SequenceOf[Path]:
+        def discover_files(self) -> Sequence[Path]:
             """Discover documentation files to optimize.
 
             Returns:
-                The resulting ``t.SequenceOf[Path]``.
+                The resulting ``Sequence[Path]``.
 
             """
             project_root = Path(__file__).parent.parent.parent.parent
@@ -728,7 +726,7 @@ class FlextQualityDocumentationOptimizer:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run optimization system via the canonical cli facade.
 
         Args:

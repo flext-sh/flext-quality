@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, ClassVar, Final
@@ -123,7 +124,7 @@ class FlextQualityConstantsValues:
             PATTERNS_OPTIONAL_PATTERN,
         )
         PATTERNS_UNION_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_UNION_PATTERN)
-        FORBIDDEN_PATTERN_RE_MAP: ClassVar[t.MappingKV[str, t.RegexPattern]] = (
+        FORBIDDEN_PATTERN_RE_MAP: ClassVar[Mapping[str, t.RegexPattern]] = (
             MappingProxyType({
                 "type-ignore": PATTERNS_TYPE_IGNORE_RE,
                 "cast-usage": PATTERNS_CAST_USAGE_RE,

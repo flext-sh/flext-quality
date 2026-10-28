@@ -880,6 +880,15 @@ custom_checks:
 # Create custom validator
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from docs import BaseValidator
 
 
@@ -893,6 +902,15 @@ class CustomValidator(BaseValidator):
 
 ```python
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 # Add new validation tools to the pipeline
 from docs import DocumentationAuditor

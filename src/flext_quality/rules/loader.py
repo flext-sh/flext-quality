@@ -50,7 +50,7 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: 'rules' must be a list",
             )
-        rules_data: t.SequenceOf[t.JsonMapping] = (
+        rules_data: Sequence[t.JsonMapping] = (
             u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
                 rules_data_val,
             )
@@ -68,7 +68,7 @@ class FlextQualityRulesLoader:
 
     def load_multiple(
         self,
-        paths: t.SequenceOf[Path],
+        paths: Sequence[Path],
     ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files.
 

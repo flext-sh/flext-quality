@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import ClassVar, override
 
 import pytest
@@ -187,7 +188,7 @@ class _MatcherHook(FlextQualityBaseHook):
     """Hook that only runs for matching tool names."""
 
     event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
-    matcher: ClassVar[t.StrSequence | None] = ("Edit", "Write*")
+    matcher: ClassVar[Sequence[str] | None] = ("Edit", "Write*")
 
     @override
     def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:

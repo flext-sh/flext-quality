@@ -13,7 +13,7 @@ from __future__ import annotations
 import ipaddress
 import smtplib
 import socket
-from collections.abc import Callable, Mapping, MutableSequence
+from collections.abc import Callable, Mapping, MutableSequence, Sequence
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
@@ -83,7 +83,7 @@ class FlextQualityDocumentationNotifier:
         username: str
         password: str | None
         from_address: str
-        to_addresses: t.StrSequence = m.Field(default_factory=tuple)
+        to_addresses: Sequence[str] = m.Field(default_factory=tuple)
 
     class _SlackConfig(m.BaseModel):
         webhook_url: str
@@ -92,7 +92,7 @@ class FlextQualityDocumentationNotifier:
 
     class _WebhookConfig(m.BaseModel):
         url: str
-        headers: t.StrMapping = m.Field(default_factory=dict[str, str])
+        headers: Mapping[str, str] = m.Field(default_factory=dict[str, str])
         timeout: int
 
     class _ChannelsConfig(m.BaseModel):
@@ -237,7 +237,7 @@ class FlextQualityDocumentationNotifier:
         if isinstance(timeout_val, int):
             cfg.webhook.timeout = timeout_val
         if isinstance(headers_val, dict):
-            str_headers: t.StrMapping = {k: str(v) for k, v in headers_val.items()}
+            str_headers: Mapping[str, str] = {k: str(v) for k, v in headers_val.items()}
             cfg.webhook.headers = str_headers
 
     @staticmethod
@@ -669,7 +669,7 @@ Timestamp: {u.now().isoformat()}
         critical_issues: MutableSequence[t.JsonMapping] = []
         if not isinstance(issues_val, list):
             return critical_issues
-        issues_seq: t.SequenceOf[t.JsonMapping] = (
+        issues_seq: Sequence[t.JsonMapping] = (
             u.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
                 issues_val,
             )
@@ -948,7 +948,7 @@ Found {len(broken_links)} broken links that need attention:
             issues_raw = audit_data.get("issues")
             if not isinstance(issues_raw, (list, tuple)):
                 return broken_links
-            issues_seq: t.SequenceOf[t.JsonValue] = issues_raw
+            issues_seq: Sequence[t.JsonValue] = issues_raw
             for i_raw in issues_seq:
                 if isinstance(i_raw, Mapping):
                     type_val = i_raw.get("type", "")
@@ -977,7 +977,7 @@ Found {len(broken_links)} broken links that need attention:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run the notification system via the canonical cli facade.
 
         Args:

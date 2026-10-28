@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import final
 
 from flext_quality import c, m, p, t
@@ -91,14 +92,14 @@ class FlextQualityClaudeContextClient:
             {},
         )
 
-    def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
+    def build_index_command(self, path: str | None = None) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for codebase indexing.
 
         Args:
             path: Optional codebase path indexed by the command.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
@@ -108,7 +109,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for code search.
 
         Args:
@@ -116,7 +117,7 @@ class FlextQualityClaudeContextClient:
             limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT

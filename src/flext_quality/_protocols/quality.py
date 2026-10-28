@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, ClassVar, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
@@ -21,13 +22,13 @@ class FlextQualityProtocolsQuality:
     class FlextQualityProtocolsArgumentOptionSpec(Protocol):
         """Structural contract for quality argparse option specs."""
 
-        flags: t.StrSequence
+        flags: Sequence[str]
         help: str
         action: c.Quality.ArgumentAction | None
         default: t.JsonValue | None
         value_type: c.Quality.ArgumentValueType | None
         nargs: int | str | None
-        choices: t.StrSequence | None
+        choices: Sequence[str] | None
         dest: str | None
 
     @runtime_checkable
@@ -35,7 +36,7 @@ class FlextQualityProtocolsQuality:
         """Structural contract for quality argparse parser specs."""
 
         description: str
-        options: t.SequenceOf[
+        options: Sequence[
             FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentOptionSpec
         ]
 
@@ -52,7 +53,7 @@ class FlextQualityProtocolsQuality:
             self,
             content: str,
             file_path: t.Cli.TextPath | None = None,
-        ) -> FlextProtocolsResult.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> FlextProtocolsResult.Result[Sequence[t.JsonMapping]]:
             """Validate content and return violations.
 
             Args:
@@ -67,7 +68,7 @@ class FlextQualityProtocolsQuality:
         """Abstract base protocol for hook implementations."""
 
         event: ClassVar[type]
-        matcher: ClassVar[t.StrSequence | None]
+        matcher: ClassVar[Sequence[str] | None]
 
         def execute(
             self,
@@ -123,7 +124,7 @@ class FlextQualityProtocolsQuality:
         """Protocol for hook implementations."""
 
         event: str
-        matcher: t.StrSequence | None
+        matcher: Sequence[str] | None
 
         def execute(
             self,
@@ -178,7 +179,7 @@ class FlextQualityProtocolsQuality:
             """Disconnect from external service."""
             ...
 
-        def health_check(self) -> FlextProtocolsResult.Result[t.StrMapping]:
+        def health_check(self) -> FlextProtocolsResult.Result[Mapping[str, str]]:
             """Check integration health."""
             ...
 

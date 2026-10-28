@@ -7,12 +7,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import p
+from flext_web import p as flext_web_p
 
 from flext_quality._protocols import FlextQualityProtocolsQuality
 
 
-class FlextQualityProtocols(p):
+class FlextQualityProtocols(flext_web_p):
     """Namespace for flext-quality protocols."""
 
     class Quality(FlextQualityProtocolsQuality):

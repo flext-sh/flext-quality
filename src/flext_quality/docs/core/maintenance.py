@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from types import MappingProxyType
 
@@ -167,16 +167,16 @@ class FlextQualityConfigManager:
                 merged[key] = dict(value) if isinstance(value, Mapping) else value
         return merged
 
-    type ConfigValue = t.Primitives | t.StrSequence
-    type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
+    type ConfigValue = t.Primitives | Sequence[str]
+    type ConfigSection = MutableMapping[str, t.Primitives | Sequence[str]]
     type ConfigData = MutableMapping[
         str,
-        MutableMapping[str, t.Primitives | t.StrSequence],
+        MutableMapping[str, t.Primitives | Sequence[str]],
     ]
-    type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
-    type RawConfigMap = t.MappingKV[
+    type RawSectionMap = Mapping[str, t.Primitives | Sequence[t.Primitives]]
+    type RawConfigMap = Mapping[
         str,
-        t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
+        Mapping[str, t.Primitives | Sequence[t.Primitives]],
     ]
 
     @staticmethod
@@ -302,11 +302,11 @@ class FlextQualityConfigManager:
         self._style_guide = None
         self._validation_config = None
 
-    def validate_configs(self) -> t.StrSequence:
+    def validate_configs(self) -> Sequence[str]:
         """Validate all configuration files and return any issues.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         # Check required settings files exist

@@ -19,13 +19,13 @@
 - Project class: `domain`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
 - Main facades: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
-  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols`,
-  `FlextQualityServiceBase`, `FlextQualitySettings` (+3 more)
+  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityModelsConfig`,
+  `FlextQualityProtocols`, `FlextQualityServiceBase` (+4 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
 - Public symbol exports: `FlextQuality`, `FlextQualityCli`, `FlextQualityConfig`,
-  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityProtocols`,
-  `FlextQualityServiceBase`, `FlextQualitySettings`, `FlextQualityTypes`,
-  `FlextQualityUtilities` (+5 more)
+  `FlextQualityConstants`, `FlextQualityModels`, `FlextQualityModelsConfig`,
+  `FlextQualityProtocols`, `FlextQualityServiceBase`, `FlextQualitySettings`,
+  `FlextQualityTypes` (+6 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `9`
 

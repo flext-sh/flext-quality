@@ -73,7 +73,7 @@ if result.success:
 
 **Methods**:
 
-- `check(files: t.SequenceOf[Path], threshold: float | None) -> p.Result[CheckResult]`
+- `check(files: Sequence[Path], threshold: float | None) -> p.Result[CheckResult]`
 
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold
@@ -303,6 +303,15 @@ make check
 
 ```python
 from __future__ import annotations
+
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 
 
 class Quality:

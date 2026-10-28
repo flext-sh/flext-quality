@@ -16,19 +16,17 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import concurrent.futures
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, override
+from typing import Final, override
 
 import requests
 from flext_api import FlextApiConstants
 from flext_cli import cli
 
-from flext_quality import c, m, p, r, s, t, u
+from flext_quality import c, m, p, r, s, u
 from flext_quality.docs.scripts import FlextQualityDocumentationReporter
-
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityDocumentationValidator:
@@ -62,12 +60,12 @@ class FlextQualityDocumentationValidator:
 
         def find_all_links(
             self,
-            doc_files: t.SequenceOf[Path],
-        ) -> t.SequenceOf[m.Quality.LinkRecord]:
+            doc_files: Sequence[Path],
+        ) -> Sequence[m.Quality.LinkRecord]:
             """Extract all links from documentation files.
 
             Returns:
-                The resulting ``t.SequenceOf[m.Quality.LinkRecord]``.
+                The resulting ``Sequence[m.Quality.LinkRecord]``.
 
             """
             all_links: MutableSequence[m.Quality.LinkRecord] = []
@@ -181,7 +179,7 @@ class FlextQualityDocumentationValidator:
 
         def validate_external_links(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
+            links: Sequence[m.Quality.LinkRecord],
             *,
             verbose: bool = False,
         ) -> m.Quality.LinkValidatorResults:
@@ -357,8 +355,8 @@ class FlextQualityDocumentationValidator:
 
         def validate_internal_links(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
+            links: Sequence[m.Quality.LinkRecord],
+            doc_files: Sequence[Path],
         ) -> m.Quality.LinkValidatorResults:
             """Validate internal links and references.
 
@@ -414,7 +412,7 @@ class FlextQualityDocumentationValidator:
 
         def validate_images(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
+            links: Sequence[m.Quality.LinkRecord],
             project_root: Path,
         ) -> m.Quality.LinkValidatorResults:
             """Validate image references.
@@ -453,8 +451,8 @@ class FlextQualityDocumentationValidator:
 
         def validate_anchors(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
+            links: Sequence[m.Quality.LinkRecord],
+            doc_files: Sequence[Path],
         ) -> m.Quality.LinkValidatorResults:
             """Validate anchor links within documents.
 
@@ -522,7 +520,7 @@ class FlextQualityDocumentationValidator:
 
         def check_link_text_quality(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
+            links: Sequence[m.Quality.LinkRecord],
         ) -> m.Quality.LinkValidatorResults:
             """Check quality of link text for accessibility and usability.
 
@@ -623,7 +621,7 @@ class FlextQualityDocumentationValidator:
 
         def validate_markdown_syntax(
             self,
-            doc_files: t.SequenceOf[Path],
+            doc_files: Sequence[Path],
         ) -> m.Quality.ContentValidatorResults:
             """Validate markdown syntax and formatting.
 
@@ -657,11 +655,11 @@ class FlextQualityDocumentationValidator:
         @staticmethod
         def _check_markdown_issues(
             content: str,
-        ) -> t.SequenceOf[m.Quality.ContentIssue]:
+        ) -> Sequence[m.Quality.ContentIssue]:
             """Check for markdown syntax issues.
 
             Returns:
-                The resulting ``t.SequenceOf[m.Quality.ContentIssue]``.
+                The resulting ``Sequence[m.Quality.ContentIssue]``.
 
             """
             issues: MutableSequence[m.Quality.ContentIssue] = []
@@ -699,7 +697,7 @@ class FlextQualityDocumentationValidator:
 
         def check_content_quality(
             self,
-            doc_files: t.SequenceOf[Path],
+            doc_files: Sequence[Path],
         ) -> m.Quality.ContentValidatorResults:
             """Check content quality metrics.
 
@@ -789,11 +787,11 @@ class FlextQualityDocumentationValidator:
             )
 
     @staticmethod
-    def discover_validation_files() -> t.SequenceOf[Path]:
+    def discover_validation_files() -> Sequence[Path]:
         """Discover documentation files for validation.
 
         Returns:
-            The resulting ``t.SequenceOf[Path]``.
+            The resulting ``Sequence[Path]``.
 
         """
         project_root = Path(__file__).parent.parent.parent.parent
@@ -897,8 +895,8 @@ class FlextQualityDocumentationValidator:
             self,
             link_validator: FlextQualityDocumentationValidator.LinkValidator,
             content_validator: FlextQualityDocumentationValidator.ContentValidator,
-            all_links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
+            all_links: Sequence[m.Quality.LinkRecord],
+            doc_files: Sequence[Path],
         ) -> bool:
             run_any = False
             if self.external_links or self.all:
@@ -962,7 +960,7 @@ class FlextQualityDocumentationValidator:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run documentation validation via the canonical cli facade.
 
         Args:

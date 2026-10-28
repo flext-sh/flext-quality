@@ -15,10 +15,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import datetime, timedelta
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Final, override
+from typing import Annotated, Final, override
 
 import requests
 from flext_cli import cli
@@ -26,9 +27,6 @@ from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 from flext_quality.docs.core import FlextQualityConfigManager
 from flext_quality.docs.scripts import FlextQualityDocumentationReporter
-
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityDocumentationAuditor:
@@ -124,11 +122,11 @@ class FlextQualityDocumentationAuditor:
             metrics=m.Quality.AuditMetrics(),
         )
 
-    def find_documentation_files(self) -> t.SequenceOf[Path]:
+    def find_documentation_files(self) -> Sequence[Path]:
         """Find all documentation files in the project.
 
         Returns:
-            The resulting ``t.SequenceOf[Path]``.
+            The resulting ``Sequence[Path]``.
 
         """
         doc_files: MutableSequence[Path] = []
@@ -190,7 +188,7 @@ class FlextQualityDocumentationAuditor:
         self.generate_recommendations()
         return self.results
 
-    def check_content_freshness(self, doc_files: t.SequenceOf[Path]) -> None:
+    def check_content_freshness(self, doc_files: Sequence[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
         max_age_days = self.audit_rules.quality_thresholds.max_age_days
         cutoff_date = u.now() - timedelta(days=max_age_days)
@@ -219,8 +217,8 @@ class FlextQualityDocumentationAuditor:
             | int
             | float
             | bool
-            | t.StrSequence
-            | t.SequenceOf[t.StrMapping]
+            | Sequence[str]
+            | Sequence[Mapping[str, str]]
             | None,
         ]
         | None
@@ -228,8 +226,8 @@ class FlextQualityDocumentationAuditor:
         """Build one freshness issue when the file is older than the threshold.
 
         Returns:
-            The resulting ``MutableMapping[str, str | int | float | bool | t.StrSequence
-                | t.SequenceOf[t.StrMapping] | None] | None``.
+            The resulting ``MutableMapping[str, str | int | float | bool | Sequence[str]
+                | Sequence[Mapping[str, str]] | None] | None``.
 
         """
         mtime = u.from_timestamp(file_path.stat().st_mtime)
@@ -291,7 +289,7 @@ class FlextQualityDocumentationAuditor:
             indicators.append("potentially inconsistent status")
         return indicators
 
-    def check_content_completeness(self, doc_files: t.SequenceOf[Path]) -> None:
+    def check_content_completeness(self, doc_files: Sequence[Path]) -> None:
         """Check documentation completeness and identify missing sections."""
         min_word_count = self.audit_rules.quality_thresholds.min_word_count
         required_sections = self.validation_config.content_analysis.required_sections
@@ -353,15 +351,15 @@ class FlextQualityDocumentationAuditor:
     @staticmethod
     def _check_required_sections(
         content: str,
-        required_sections: t.StrSequence,
-    ) -> t.StrSequence:
+        required_sections: Sequence[str],
+    ) -> Sequence[str]:
         """Check for required sections in documentation.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
-        missing: t.StrSequence = [
+        missing: Sequence[str] = [
             section
             for section in required_sections
             if not u.Quality.compile_pattern(
@@ -372,7 +370,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return missing
 
-    def check_content_consistency(self, doc_files: t.SequenceOf[Path]) -> None:
+    def check_content_consistency(self, doc_files: Sequence[Path]) -> None:
         """Check style consistency and formatting issues."""
         accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
@@ -460,14 +458,14 @@ class FlextQualityDocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> MutableSequence[t.StrMapping]:
+    def _check_accessibility(self, content: str) -> MutableSequence[Mapping[str, str]]:
         """Check accessibility compliance.
 
         Returns:
-            The resulting ``MutableSequence[t.StrMapping]``.
+            The resulting ``MutableSequence[Mapping[str, str]]``.
 
         """
-        issues: MutableSequence[t.StrMapping] = []
+        issues: MutableSequence[Mapping[str, str]] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = u.Quality.compile_pattern(
@@ -497,11 +495,11 @@ class FlextQualityDocumentationAuditor:
         return issues
 
     @staticmethod
-    def _check_heading_hierarchy(content: str) -> t.StrSequence:
+    def _check_heading_hierarchy(content: str) -> Sequence[str]:
         """Check heading hierarchy for logical structure.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         headings = u.Quality.compile_pattern(r"^(#+)\\s+(.+)$", multiline=True).findall(
@@ -517,11 +515,11 @@ class FlextQualityDocumentationAuditor:
             issues.append("Document should start with H1")
         return issues
 
-    def check_links_and_references(self, doc_files: t.SequenceOf[Path]) -> None:
+    def check_links_and_references(self, doc_files: Sequence[Path]) -> None:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
         all_links: MutableSequence[t.HeaderMapping] = []
-        image_refs: MutableSequence[t.StrMapping] = []
+        image_refs: MutableSequence[Mapping[str, str]] = []
         for file_path in doc_files:
             read = u.Cli.files_read_text(file_path)
             if read.failure:
@@ -570,7 +568,7 @@ class FlextQualityDocumentationAuditor:
         if link_validation.check_images:
             self._validate_images(image_refs)
 
-    def _validate_external_links(self, links: t.SequenceOf[t.HeaderMapping]) -> None:
+    def _validate_external_links(self, links: Sequence[t.HeaderMapping]) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
         timeout = link_validation.timeout
@@ -607,8 +605,8 @@ class FlextQualityDocumentationAuditor:
 
     def _validate_internal_links(
         self,
-        links: t.SequenceOf[t.HeaderMapping],
-        doc_files: t.SequenceOf[Path],
+        links: Sequence[t.HeaderMapping],
+        doc_files: Sequence[Path],
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -633,7 +631,7 @@ class FlextQualityDocumentationAuditor:
                         ),
                     })
 
-    def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
+    def _validate_images(self, images: Sequence[Mapping[str, str]]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):
@@ -834,9 +832,9 @@ class FlextQualityDocumentationAuditor:
 
     @staticmethod
     def _render_issue_row(
-        issue: t.MutableMappingKV[
+        issue: MutableMapping[
             str,
-            t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
+            t.Primitives | Sequence[str] | Sequence[Mapping[str, str]] | None,
         ],
     ) -> str:
         """Render one audit issue as an HTML block.
@@ -1039,7 +1037,7 @@ class FlextQualityDocumentationAuditor:
             )
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run documentation audit via the canonical cli facade.
 
         Args:

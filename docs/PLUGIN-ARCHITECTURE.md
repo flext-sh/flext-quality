@@ -75,6 +75,15 @@ Planned plugin interface for flext-quality:
 ```text
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from pathlib import Path
 
 from flext_core import p, t
@@ -100,7 +109,7 @@ class QualityPlugin(Protocol):
     def supports_fix(self) -> bool:
         """Whether plugin can auto-fix issues."""
 
-    def fix(self, path: Path, issues: t.SequenceOf[Issue]) -> p.Result[FixResult]:
+    def fix(self, path: Path, issues: Sequence[Issue]) -> p.Result[FixResult]:
         """Apply fixes for issues."""
 ```
 

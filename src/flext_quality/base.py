@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from abc import ABC
+from collections.abc import MutableSequence
 
 from flext_core import FlextService
 
@@ -23,4 +24,4 @@ class FlextQualityServiceBase[TResult = t.JsonDict](FlextService[TResult], ABC):
 
 s = FlextQualityServiceBase
 
-__all__: t.MutableSequenceOf[str] = ["FlextQualityServiceBase", "s"]
+__all__: MutableSequence[str] = ["FlextQualityServiceBase", "s"]

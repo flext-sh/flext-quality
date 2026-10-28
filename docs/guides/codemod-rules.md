@@ -10,6 +10,7 @@
 - [Catalogs and layers](#catalogs-and-layers)
 - [Make verbs](#make-verbs)
 - [ast-grep rules](#ast-grep-rules)
+  - [Pyrefly strict-typing cures (campaign flext-osru9, census 2026-10-28)](#pyrefly-strict-typing-cures-campaign-flext-osru9-census-2026-10-28)
   - [One rule per law](#one-rule-per-law)
 - [Text rules](#text-rules)
 - [Tests and snapshots](#tests-and-snapshots)
@@ -31,7 +32,9 @@ producer captures the complete workspace sources and asks that owner to authenti
 each imported helper and its dependency closure, including type-checking imports.
 
 Only proven exact module identities enter the generated constraint; a regex does
-not establish ownership or acyclicity. Own root and family imports remain forbidden.
+not establish ownership or acyclicity. For those layer-zero owners, own root and
+family imports remain forbidden. Family declarations composing upstream same-letter
+facades follow ADR-028 Decision 10; they are not layer-zero self-imports.
 Generation and native-scan agreement require runtime validation after source changes.
 
 | Layer | ast-grep rules | Text rules |
@@ -134,7 +137,7 @@ declared at the generation owner; authored files are never retired by that decla
 
 | Workspace declaration | Infra implementation |
 | --- | --- |
-| ADR-028 Decision 17 requires one snapshot/planner per repository. | [Codemod native utilities](https://github.com/flext-sh/flext-infra/blob/0.12.0-dev/src/flext_infra/_utilities/codemod_native_utilities.py) |
+| ADR-028 Decision 17 requires one snapshot/planner per repository. | [Codemod native utilities](https://github.com/flext-sh/flext-infra/blob/0.12.0-dev/src/flext_infra/_utilities/_codemod/codemod_native_utilities.py) |
 | ADR-028 Decision 18 owns one generalized source rule per law. | Repository plans preserve renderer IDs; the source catalog remains the single rule owner. |
 
 Every finding is the native match; no Python admission runs after the scan. A
@@ -175,6 +178,53 @@ terminating public matcher without rebinding a referenced name or changing the
 exception category. Runtime comparisons against the original snippets validate
 these properties; snapshot text alone does not prove them.
 
+### Pyrefly strict-typing cures (campaign flext-osru9, census 2026-10-28)
+
+Fleet pyrefly findings reduce to a small set of root causes; each has one
+canonical cure, applied at the origin and never by suppression or rule change
+(the lint-rule SSOT stays frozen):
+
+- **`implicit-any-lambda`** — Pyrefly cannot infer a lambda parameter from a
+  generic `Callable[[SubjectT], bool]` parameter (`tm.that(..., where=...)`,
+  `tm.ok(..., where=...)`, `Result.map(...)`). Cure: replace the lambda with a
+  local typed function (`def pred(value: <concrete subject type>) -> bool`)
+  and pass it by name. Lambdas cannot carry parameter annotations in Python,
+  so no call-site annotation exists; the typed def is the strict form.
+- **`missing-attribute` / `missing-module-attribute` on consumed APIs** — a
+  consumer names an attribute that a refactor removed or moved (for example
+  `u.chk`, `cli.ensure_dir`). Cure: rewire the consumer to the current owner
+  found by source search; never recreate the removed attribute.
+- **`missing-module-attribute` / `missing-import` on generated packages** — a
+  stale generated lazy `__init__.py` re-exports modules or letters that moved.
+  Cure: regenerate at the owner (`make gen`); hand-editing a managed
+  projection is prohibited.
+- **`invalid-annotation` on test fixtures** — a fixture declares
+  `self: SomeSettings` while its test class does not subclass that settings
+  type. Cure: drop the false self-type and inject legitimate settings
+  (conftest fixture or the canonical settings constructor).
+- **Bare generic containers** (`list[dict]`, `dict` literals as data
+  contracts) — cure with a Pydantic model per payload shape (see the root
+  `scripts/modularize_*` FleetMove/ModularizationMove repair) plus explicit
+  element-type annotations on every empty container.
+- **AST optionality** — `node.end_lineno`, `node.end_col_offset` and friends
+  are `int | None`; guard with an explicit `if ... is None: continue` before
+  arithmetic instead of asserting or casting.
+
+The railway-result and rewire-test-assert families above remain the model for
+turning each cure into one generalized, budgeted rule once the census reaches
+zero; detection-only candidates first, with `expected` receipts.
+
+The universal `railroad-result.yml` rule family implements Railway-Oriented
+Programming (ROP) normalization over `FlextResult` (`r`): terminal `if res.failure:
+return ...` passthrough guards collapse to `return res`, single-argument transform
+and chain tails collapse to `.map(...)` and `.flat_map(...)`, ternary/branch
+unwraps collapse to `.unwrap_or(...)` and `.map_or(...)`, and manual
+`model_validate` `try`/`except` blocks collapse to `r[M].from_validation(...)`.
+Because the native `ast-grep` cascade repeats up to `mod.phases.pass-cap`,
+consecutive failure guards at the end of a function collapse bottom-up across
+passes without custom AST walkers, and unused local `outcome = r[...]` aliases
+and their orphaned imports are pruned automatically.
+
 A rule file holds one or more YAML documents (`---`). Each is standard ast-grep
 (`id`, `language`, `severity`, `message`, `files`, `rule`, `constraints`, `utils`
 references through `matches:`, `transform`, `fix`). Shared guards live in
@@ -197,6 +247,14 @@ The engine reads these `metadata` keys, declared in
 | Workspace declaration | Accepted decision |
 | --- | --- |
 | This section, One rule per law; the generated Infra copy links back here. | FLEXT ADR-028 Decision 18 |
+
+Rope is the only accepted Python interpreter in FLEXT's own code ([ADR-028
+Decision 17, amendment
+2026-10-28](../../docs/architecture/adr/028-facade-boundary-orchestrators-declarative-enforcement.md#decision-17)):
+the engine never parses, analyzes or rewrites Python source with the `ast`
+module, `libcst`, or `re` applied to code — analysis and transforms go through
+rope's PyModules from the single indexed project. ast-grep (declarative rules),
+sed (text) and the generator (projections) keep their canonical domains.
 
 Operator order of 2026-10-25, verbatim (tracker memory
 `operator-order-2026-10-25-rules-generalized-min-count`; ADR-028 Decision 18):

@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import shutil
-from collections.abc import Mapping, MutableSequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from typing import final
 
 from flext_quality import c, e, m, p, r, t, u
@@ -37,23 +37,23 @@ class FlextQualityMcpClient:
     def build_call_command(
         self,
         call: m.Quality.McpToolCall,
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Build the mcp-cli command for a tool call.
 
         Args:
             call: Tool call converted into the command invocation.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
         params_json = u.json_mapping_adapter().dump_json(call.params).decode("utf-8")
-        return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
+        return r[Sequence[str]].ok(["mcp-cli", "call", tool_path, params_json])
 
-    def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
+    def build_info_command(self, server: str, tool: str) -> p.Result[Sequence[str]]:
         """Build the mcp-cli info command for a tool.
 
         Args:
@@ -61,13 +61,13 @@ class FlextQualityMcpClient:
             tool: Tool whose info is requested.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         if not self.mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{server}/{tool}"
-        return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
+        return r[Sequence[str]].ok(["mcp-cli", "info", tool_path])
 
     @staticmethod
     def build_tool_call(
@@ -161,7 +161,7 @@ class FlextQualityMcpClient:
             The resulting ``p.Result[m.Quality.McpToolResult]``.
 
         """
-        result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
+        result_data: Mapping[str, str] = {k: str(v) for k, v in parsed.items()}
         return r[m.Quality.McpToolResult].ok(
             m.Quality.McpToolResult.model_validate({
                 "success": True,
@@ -181,7 +181,7 @@ class FlextQualityMcpClient:
             parsed_list: t.JsonList = u.json_list_adapter().validate_json(output)
         except ValueError:
             return self._build_raw_result(output)
-        coerced_data: MutableSequence[t.StrMapping] = []
+        coerced_data: MutableSequence[Mapping[str, str]] = []
         for item in parsed_list:
             if isinstance(item, Mapping):
                 validated_item: t.JsonMapping = (

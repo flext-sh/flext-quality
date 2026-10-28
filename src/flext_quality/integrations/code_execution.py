@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import final
 
@@ -43,25 +44,25 @@ class FlextQualityCodeExecutionBridge:
         self._working_dir = working_dir or Path.cwd()
 
     @staticmethod
-    def build_basedpyright_command(target_path: Path) -> p.Result[t.StrSequence]:
+    def build_basedpyright_command(target_path: Path) -> p.Result[Sequence[str]]:
         """Build command for basedpyright type checker.
 
         Args:
             target_path: Path checked by basedpyright.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     @staticmethod
     def build_python_command(
         script_path: Path,
         *,
-        args: t.StrSequence | None = None,
-    ) -> p.Result[t.StrSequence]:
+        args: Sequence[str] | None = None,
+    ) -> p.Result[Sequence[str]]:
         """Build command for Python execution.
 
         Args:
@@ -69,19 +70,19 @@ class FlextQualityCodeExecutionBridge:
             args: Optional arguments appended to the command.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         if not script_path.exists():
             return e.fail_not_found(
                 "Script",
                 str(script_path),
-                result_type=r[t.StrSequence],
+                result_type=r[Sequence[str]],
             )
         cmd = ["python", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     @staticmethod
     def build_ruff_command(
@@ -89,7 +90,7 @@ class FlextQualityCodeExecutionBridge:
         *,
         fix: bool = False,
         output_format: str = "json",
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Build command for ruff linter.
 
         Args:
@@ -98,20 +99,20 @@ class FlextQualityCodeExecutionBridge:
             output_format: Output format requested from ruff.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
             cmd.append("--fix")
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     @staticmethod
     def build_typescript_command(
         script_path: Path,
         *,
-        args: t.StrSequence | None = None,
-    ) -> p.Result[t.StrSequence]:
+        args: Sequence[str] | None = None,
+    ) -> p.Result[Sequence[str]]:
         """Build command for TypeScript execution via npx tsx.
 
         Args:
@@ -119,26 +120,26 @@ class FlextQualityCodeExecutionBridge:
             args: Optional arguments appended to the command.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         if not script_path.exists():
             return e.fail_not_found(
                 "Script",
                 str(script_path),
-                result_type=r[t.StrSequence],
+                result_type=r[Sequence[str]],
             )
         cmd = ["npx", "tsx", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     def create_execution_request(
         self,
         script_path: Path,
         runtime: str,
         *,
-        args: t.StrSequence | None = None,
+        args: Sequence[str] | None = None,
     ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing.
 

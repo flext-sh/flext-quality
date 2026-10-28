@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import operator
-from collections.abc import Mapping, MutableSequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
@@ -182,7 +182,7 @@ class FlextQualityDocumentationDashboard:
         """
         cutoff_date = u.now() - timedelta(days=days)
 
-        trend_data: t.MutableSequenceOf[t.JsonDict] = []
+        trend_data: MutableSequence[t.JsonDict] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -250,14 +250,14 @@ class FlextQualityDocumentationDashboard:
             "high_issues": audit_metrics.severity_breakdown.get("high", 0),
         }
 
-    def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
+    def fetch_recent_reports(self, limit: int = 10) -> Sequence[t.JsonMapping]:
         """Return the list of recent audit reports.
 
         Args:
             limit: Maximum number of reports returned.
 
         Returns:
-            The resulting ``t.SequenceOf[t.JsonMapping]``.
+            The resulting ``Sequence[t.JsonMapping]``.
 
         """
         reports: MutableSequence[t.JsonMapping] = []
@@ -705,7 +705,7 @@ class FlextQualityDocumentationDashboard:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run the dashboard via the canonical cli facade.
 
         Args:

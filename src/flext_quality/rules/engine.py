@@ -6,14 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from flext_quality import c, m, p, r, t, u
 from flext_quality.rules import FlextQualityRulesLoader
-
-if TYPE_CHECKING:
-    from collections.abc import MutableSequence
 
 
 class FlextQualityRulesEngine:
@@ -66,7 +63,7 @@ class FlextQualityRulesEngine:
         self,
         path: str,
         context: t.JsonMapping | None = None,
-    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate code against loaded rules.
 
         Args:
@@ -74,30 +71,30 @@ class FlextQualityRulesEngine:
             context: Optional validation context attached to violations.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[t.SequenceOf[t.JsonMapping]].fail(load_result.error)
+                return r[Sequence[t.JsonMapping]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
-            return r[t.SequenceOf[t.JsonMapping]].fail(f"Path does not exist: {path}")
+            return r[Sequence[t.JsonMapping]].fail(f"Path does not exist: {path}")
         files = self._get_files(target_path)
         if files.failure:
-            return r[t.SequenceOf[t.JsonMapping]].fail(files.error)
+            return r[Sequence[t.JsonMapping]].fail(files.error)
         violations: MutableSequence[t.JsonMapping] = []
         for file_path in files.value:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+        return r[Sequence[t.JsonMapping]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate a content string against loaded rules.
 
         Args:
@@ -105,27 +102,27 @@ class FlextQualityRulesEngine:
             filename: Display name used in violation entries.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[t.SequenceOf[t.JsonMapping]].fail(load_result.error)
+                return r[Sequence[t.JsonMapping]].fail(load_result.error)
         violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+        return r[Sequence[t.JsonMapping]].ok(violations)
 
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> t.SequenceOf[t.JsonMapping]:
+    ) -> Sequence[t.JsonMapping]:
         """Check a single rule against content.
 
         Args:
@@ -134,7 +131,7 @@ class FlextQualityRulesEngine:
             filename: Display name used in violation entries.
 
         Returns:
-            The resulting ``t.SequenceOf[t.JsonMapping]``.
+            The resulting ``Sequence[t.JsonMapping]``.
 
         """
         violations: MutableSequence[t.JsonMapping] = []
@@ -165,16 +162,16 @@ class FlextQualityRulesEngine:
         return violations
 
     @staticmethod
-    def _get_files(path: Path) -> p.Result[t.SequenceOf[Path]]:
+    def _get_files(path: Path) -> p.Result[Sequence[Path]]:
         """Select the Python files under ``path`` through the CLI file owner.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[Path]]``.
+            The resulting ``p.Result[Sequence[Path]]``.
 
         """
         if path.is_file():
-            return r[t.SequenceOf[Path]].ok([path] if path.suffix == ".py" else [])
-        return r[t.SequenceOf[Path]].ok(
+            return r[Sequence[Path]].ok([path] if path.suffix == ".py" else [])
+        return r[Sequence[Path]].ok(
             list(u.Cli.files_matching(path, includes=["*.py"]).value),
         )
 
@@ -200,7 +197,7 @@ class FlextQualityRulesEngine:
         self,
         file_path: Path,
         context: t.JsonMapping,
-    ) -> t.SequenceOf[t.JsonMapping]:
+    ) -> Sequence[t.JsonMapping]:
         """Validate a single file against rules.
 
         Args:
@@ -208,7 +205,7 @@ class FlextQualityRulesEngine:
             context: Validation context attached to violations.
 
         Returns:
-            The resulting ``t.SequenceOf[t.JsonMapping]``.
+            The resulting ``Sequence[t.JsonMapping]``.
 
         """
         validation_context = u.json_dict_adapter().validate_python(context or {})

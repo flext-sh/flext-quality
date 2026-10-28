@@ -9,22 +9,24 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
+
 from tests import t, tm
 
 
-def assert_is_dict(value: t.Scalar | t.ScalarMapping, _msg: str = "") -> None:
+def assert_is_dict(value: t.Scalar | Mapping[str, t.Scalar], _msg: str = "") -> None:
     """Assert that value is a dict."""
     tm.that(value, is_=dict)
 
 
-def assert_is_list(value: t.Scalar | t.ScalarList, _msg: str = "") -> None:
+def assert_is_list(value: t.Scalar | Sequence[t.Scalar], _msg: str = "") -> None:
     """Assert that value is a list."""
     tm.that(value, is_=list)
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping,
-    required_keys: t.StrSequence,
+    data: Mapping[str, t.Scalar],
+    required_keys: Sequence[str],
     msg: str = "",
 ) -> None:
     """Assert that a dict contains all required keys."""
@@ -33,17 +35,17 @@ def assert_dict_structure(
         tm.reject(msg or f"Missing keys: {missing}")
 
 
-def assert_metrics_structure(metrics: t.ScalarMapping) -> None:
+def assert_metrics_structure(metrics: Mapping[str, t.Scalar]) -> None:
     """Assert that metrics dict has expected structure."""
     tm.that(metrics, is_=dict)
 
 
-def assert_issues_structure(issues: t.ScalarList) -> None:
+def assert_issues_structure(issues: Sequence[t.Scalar]) -> None:
     """Assert that issues data has expected structure."""
     tm.that(issues, is_=list)
 
 
-def assert_analysis_results_structure(results: t.ScalarMapping) -> None:
+def assert_analysis_results_structure(results: Mapping[str, t.Scalar]) -> None:
     """Assert that analysis results have expected structure."""
     tm.that(results, is_=dict)
 

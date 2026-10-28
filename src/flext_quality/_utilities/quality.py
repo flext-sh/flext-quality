@@ -48,7 +48,7 @@ class FlextQualityUtilitiesQuality:
         t.TypeAdapter[MutableSequence[Mapping[str, str]]]
     ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
     REPORT_VALUE_MAPPING_ADAPTER: ClassVar[
-        t.TypeAdapter[t.MappingKV[str, t.JsonMapping]]
+        t.TypeAdapter[Mapping[str, t.JsonMapping]]
     ] = FlextWebUtilities.type_adapter(
         Mapping[str, Mapping[str, t.JsonValue]],
     )
@@ -96,7 +96,7 @@ class FlextQualityUtilitiesQuality:
     @staticmethod
     def execute_result_command(
         *,
-        args: t.StrSequence | None,
+        args: Sequence[str] | None,
         app_name: str,
         app_help: str,
         route: p.Cli.ResultCommandRoute,
@@ -126,7 +126,7 @@ class FlextQualityUtilitiesQuality:
     @staticmethod
     def execute_run_command(
         *,
-        args: t.StrSequence | None,
+        args: Sequence[str] | None,
         app_name: str,
         app_help: str,
         route_help: str,
@@ -205,53 +205,53 @@ class FlextQualityUtilitiesQuality:
     @staticmethod
     def extract_rules_from_yaml(
         parsed: t.JsonMapping,
-    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate and extract the rules list from parsed YAML.
 
         Args:
             parsed: Parsed YAML mapping expected to carry a ``rules`` list.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         if not isinstance(parsed, dict):
-            return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
+            return r[Sequence[t.JsonMapping]].fail("Expected YAML dict")
         parsed_dict: t.JsonMapping = u.json_mapping_adapter().validate_python(
             parsed,
         )
         raw_rules_val = parsed_dict.get("rules", [])
         if not isinstance(raw_rules_val, list):
-            return r[t.SequenceOf[t.JsonMapping]].fail("Expected rules list")
-        rules: t.SequenceOf[t.JsonMapping] = [
+            return r[Sequence[t.JsonMapping]].fail("Expected rules list")
+        rules: Sequence[t.JsonMapping] = [
             u.json_mapping_adapter().validate_python(item)
             for item in raw_rules_val
             if isinstance(item, dict)
         ]
-        return r[t.SequenceOf[t.JsonMapping]].ok(rules)
+        return r[Sequence[t.JsonMapping]].ok(rules)
 
     @staticmethod
-    def load_yaml_rules(path: Path) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    def load_yaml_rules(path: Path) -> p.Result[Sequence[t.JsonMapping]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to the YAML file holding the rule definitions.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         try:
             yaml_result = u.Cli.yaml_safe_load(path)
             if yaml_result.failure:
-                return r[t.SequenceOf[t.JsonMapping]].fail(
+                return r[Sequence[t.JsonMapping]].fail(
                     f"Failed to load YAML: {yaml_result.error}",
                 )
             return FlextQualityUtilitiesQuality.extract_rules_from_yaml(
                 yaml_result.value,
             )
         except c.EXC_BROAD_IO_TYPE as e:
-            return r[t.SequenceOf[t.JsonMapping]].fail(
+            return r[Sequence[t.JsonMapping]].fail(
                 f"Failed to load rules: {e}",
                 exception=e,
             )
@@ -288,7 +288,7 @@ class FlextQualityUtilitiesQuality:
 
     @staticmethod
     def run_shell_command(
-        cmd: t.StrSequence,
+        cmd: Sequence[str],
         timeout_ms: int = c.Quality.HOOK_TIMEOUT_MS,
     ) -> p.Result[str]:
         """Run a shell command with timeout.

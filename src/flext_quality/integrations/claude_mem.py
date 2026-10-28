@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import final
 
 from flext_quality import c, m, p, t
@@ -35,7 +36,7 @@ class FlextQualityClaudeMemClient:
 
     def build_get_observations_call(
         self,
-        ids: t.SequenceOf[int],
+        ids: Sequence[int],
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call.
 
@@ -113,15 +114,15 @@ class FlextQualityClaudeMemClient:
 
     def build_observations_command(
         self,
-        ids: t.SequenceOf[int],
-    ) -> p.Result[t.StrSequence]:
+        ids: Sequence[int],
+    ) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for fetching observations.
 
         Args:
             ids: Observation identifiers fetched by the command.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         return self.build_get_observations_call(ids).flat_map(
@@ -133,7 +134,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for memory search.
 
         Args:
@@ -141,7 +142,7 @@ class FlextQualityClaudeMemClient:
             limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
@@ -155,7 +156,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for timeline query.
 
         Args:
@@ -166,7 +167,7 @@ class FlextQualityClaudeMemClient:
                 the configured depth.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH

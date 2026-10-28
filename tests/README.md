@@ -240,6 +240,15 @@ Shared test fixtures and configuration:
 ```python
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 
 def test_should_do_something_when_condition():
     """Test description following should/when pattern.

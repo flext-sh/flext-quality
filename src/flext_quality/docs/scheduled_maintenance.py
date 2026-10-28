@@ -13,7 +13,7 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Annotated, ClassVar, override
@@ -249,11 +249,11 @@ class FlextQualityScheduledMaintenance:
         )
         return config
 
-    def _get_task_names(self, schedule_key: str) -> t.StrSequence:
+    def _get_task_names(self, schedule_key: str) -> Sequence[str]:
         """Extract task name list from settings for a schedule key.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         schedules = self.settings.schedules
@@ -296,7 +296,7 @@ class FlextQualityScheduledMaintenance:
         """
         return self.run_tasks(self._get_task_names("monthly_deep_clean"))
 
-    def run_tasks(self, task_names: t.StrSequence) -> bool:
+    def run_tasks(self, task_names: Sequence[str]) -> bool:
         """Run a list of maintenance tasks.
 
         Args:
@@ -363,7 +363,7 @@ class FlextQualityScheduledMaintenance:
         command = task_config.command
         description = task_config.description
         timeout = task_config.timeout
-        cmd_parts: t.StrSequence = shlex.split(command) if command else []
+        cmd_parts: Sequence[str] = shlex.split(command) if command else []
         if not cmd_parts:
             self.results.errors.append(f"Empty command in task: {description}")
             return False
@@ -383,28 +383,28 @@ class FlextQualityScheduledMaintenance:
     def _get_command_handler(
         self,
         cmd_name: str,
-    ) -> Callable[[t.StrSequence, int, str], bool] | None:
+    ) -> Callable[[Sequence[str], int, str], bool] | None:
         """Get handler for command type.
 
         Returns:
-            The resulting ``Callable[[t.StrSequence, int, str], bool] | None``.
+            The resulting ``Callable[[Sequence[str], int, str], bool] | None``.
 
         """
-        handlers: t.MappingKV[str, Callable[[t.StrSequence, int, str], bool]] = {
+        handlers: Mapping[str, Callable[[Sequence[str], int, str], bool]] = {
             "python": self._handle_python_command,
             "pytest": self._handle_pytest_command,
             "make": self._handle_make_command,
             "git": self._handle_git_command,
             "echo": self._handle_echo_command,
         }
-        handler: Callable[[t.StrSequence, int, str], bool] | None = handlers.get(
+        handler: Callable[[Sequence[str], int, str], bool] | None = handlers.get(
             cmd_name,
         )
         return handler
 
     def _handle_python_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -425,7 +425,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_python_command_unchecked(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -462,7 +462,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_pytest_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -483,7 +483,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_pytest_command_unchecked(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -505,7 +505,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_make_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -526,7 +526,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_make_command_unchecked(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         description: str,
     ) -> bool:
         """Handle make commands after exception boundary setup.
@@ -539,7 +539,7 @@ class FlextQualityScheduledMaintenance:
         if not makefile.exists():
             self.results.warnings.append(f"Makefile not found for task: {description}")
             return False
-        empty_targets: t.StrSequence = []
+        empty_targets: Sequence[str] = []
         targets = cmd_parts[1:] if len(cmd_parts) > 1 else empty_targets
         if not targets:
             targets = ["default"]
@@ -554,7 +554,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_git_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -571,7 +571,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_git_command_unchecked(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -603,7 +603,7 @@ class FlextQualityScheduledMaintenance:
 
     def _handle_echo_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -850,7 +850,7 @@ class FlextQualityScheduledMaintenance:
             )
 
     @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run scheduled maintenance via the canonical cli facade.
 
         Args:
