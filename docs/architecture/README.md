@@ -174,27 +174,27 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 1. **Python Developer**
 
-   - Uses FLEXT Quality for local development quality checks
-   - Integrates quality analysis into development workflows
-   - Requires fast, accurate quality feedback
+    - Uses FLEXT Quality for local development quality checks
+    - Integrates quality analysis into development workflows
+    - Requires fast, accurate quality feedback
 
 1. **DevOps Engineer**
 
-   - Integrates quality gates into CI/CD pipelines
-   - Monitors quality trends across projects
-   - Requires automated, reliable quality enforcement
+    - Integrates quality gates into CI/CD pipelines
+    - Monitors quality trends across projects
+    - Requires automated, reliable quality enforcement
 
 1. **Software Architect**
 
-   - Reviews quality metrics for architectural decisions
-   - Analyzes quality trends and patterns
-   - Requires comprehensive quality reporting and insights
+    - Reviews quality metrics for architectural decisions
+    - Analyzes quality trends and patterns
+    - Requires comprehensive quality reporting and insights
 
 1. **FLEXT Ecosystem**
 
-   - Provides standardized quality analysis across FLEXT projects
-   - Ensures consistent quality standards and practices
-   - Enables ecosystem-wide quality governance
+    - Provides standardized quality analysis across FLEXT projects
+    - Ensures consistent quality standards and practices
+    - Enables ecosystem-wide quality governance
 
 ## 🏛️ Architecture Decisions
 
