@@ -28,8 +28,8 @@ class TestsFlextQualityApi:
 
     pytestmark = pytest.mark.usefixtures("_restore_settings")
 
-    @staticmethod
     @pytest.fixture
+    @staticmethod
     def _restore_settings() -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQualitySettings.fetch_global()
