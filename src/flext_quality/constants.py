@@ -40,6 +40,7 @@ class FlextQualityConstants(flext_web_c):
         FlextQualityConstantsBase,
         FlextQualityConstantsEnums,
         FlextQualityConstantsValues.Quality,
+        FlextQualityConstantsValues,
     ):
         """Quality-specific constants namespace."""
 
