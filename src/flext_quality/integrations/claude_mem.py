@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import final
 
-from flext_quality import c, m, p, t
+from flext_quality import c, p, t
 from flext_quality.integrations import FlextQualityMcpClient
 
 
@@ -37,14 +37,14 @@ class FlextQualityClaudeMemClient:
     def build_get_observations_call(
         self,
         ids: Sequence[int],
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a get_observations tool call.
 
         Args:
             ids: Observation identifiers fetched by the tool.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         normalized_ids: t.JsonValueList = list(ids)
@@ -60,7 +60,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a search tool call.
 
         Args:
@@ -68,7 +68,7 @@ class FlextQualityClaudeMemClient:
             limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
@@ -89,7 +89,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a timeline tool call.
 
         Args:
@@ -100,7 +100,7 @@ class FlextQualityClaudeMemClient:
                 the configured depth.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH

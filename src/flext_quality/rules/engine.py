@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-from flext_quality import c, m, p, r, t, u
+from flext_quality import c, p, r, t, u
 from flext_quality.rules import FlextQualityRulesLoader
 
 
@@ -25,14 +25,14 @@ class FlextQualityRulesEngine:
 
         """
         self._rules_path: Path | None = rules_path
-        self._rules: MutableSequence[m.Quality.RuleDefinition] = []
+        self._rules: MutableSequence[p.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def list_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
+    def list_rules(self) -> MutableSequence[p.Quality.RuleDefinition]:
         """Return the loaded rules.
 
         Returns:
-            The resulting ``MutableSequence[m.Quality.RuleDefinition]``.
+            The resulting ``MutableSequence[p.Quality.RuleDefinition]``.
 
         """
         return list(self._rules)
@@ -119,7 +119,7 @@ class FlextQualityRulesEngine:
 
     def _check_rule(
         self,
-        rule: m.Quality.RuleDefinition,
+        rule: p.Quality.RuleDefinition,
         content: str,
         filename: str,
     ) -> Sequence[t.JsonMapping]:

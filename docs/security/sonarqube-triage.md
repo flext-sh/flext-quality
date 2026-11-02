@@ -195,7 +195,7 @@ padrão.
 > Refactor this function to reduce its Cognitive Complexity from 57 to the 15 allowed.
 
 ```text
-       89          self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
+       89          self.results: p.Quality.NotifierResults = m.Quality.NotifierResults(
        90              timestamp=u.now().isoformat()
        91          )
        92
@@ -321,7 +321,7 @@ padrão.
       317
 >>>   318      def update_metadata(
       319          self, doc_files: Sequence[Path]
-      320      ) -> m.Quality.OptimizerResults:
+      320      ) -> p.Quality.OptimizerResults:
       321          """Update frontmatter metadata and timestamps."""
       322          for file_path in doc_files:
 ```
@@ -422,9 +422,9 @@ padrão.
       274
 >>>   275          def validate_internal_links(
       276              self,
-      277              links: Sequence[m.Quality.LinkRecord],
+      277              links: Sequence[p.Quality.LinkRecord],
       278              doc_files: Sequence[Path],
-      279          ) -> m.Quality.LinkValidatorResults:
+      279          ) -> p.Quality.LinkValidatorResults:
 ```
 
 **Decisão**: pendente

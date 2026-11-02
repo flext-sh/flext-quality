@@ -19,7 +19,7 @@ from urllib.robotparser import RobotFileParser
 import requests
 from aiohttp import ClientSession, ClientTimeout
 
-from flext_quality import c, m, t, u
+from flext_quality import c, m, p, t, u
 from flext_quality.docs.core import FlextQualityConfigManager
 
 
@@ -31,11 +31,11 @@ class FlextQualityLinkChecker:
         self.validation_config = FlextQualityConfigManager(
             config_dir,
         ).resolve_validation_config()
-        self.settings: m.Quality.LinkValidationConfig = (
+        self.settings: p.Quality.LinkValidationConfig = (
             self.validation_config.link_validation
         )
         self.session: ClientSession | None = None
-        self.results: m.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
+        self.results: p.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
             timestamp=u.now().isoformat(),
             performance=m.Quality.LinkPerformanceMetrics(),
         )
@@ -43,17 +43,17 @@ class FlextQualityLinkChecker:
     def find_all_links(
         self,
         file_paths: Sequence[pathlib.Path],
-    ) -> Sequence[m.Quality.LinkRecord]:
+    ) -> Sequence[p.Quality.LinkRecord]:
         """Extract all links from the given files.
 
         Args:
             file_paths: Files scanned for markdown and HTML links.
 
         Returns:
-            The resulting ``Sequence[m.Quality.LinkRecord]``.
+            The resulting ``Sequence[p.Quality.LinkRecord]``.
 
         """
-        all_links: MutableSequence[m.Quality.LinkRecord] = []
+        all_links: MutableSequence[p.Quality.LinkRecord] = []
 
         for file_path in file_paths:
             content = u.Cli.files_read_text(file_path).value
@@ -117,7 +117,7 @@ class FlextQualityLinkChecker:
         self,
         url: str,
         context: t.JsonMapping | None = None,
-    ) -> m.Quality.LinkCheckResult:
+    ) -> p.Quality.LinkCheckResult:
         """Check one link and propagate the first transport failure.
 
         Args:
@@ -164,7 +164,7 @@ class FlextQualityLinkChecker:
         self,
         url: str,
         context: t.JsonMapping | None = None,
-    ) -> m.Quality.LinkCheckResult:
+    ) -> p.Quality.LinkCheckResult:
         """Check a link once and propagate the first transport failure.
 
         Args:
@@ -201,13 +201,13 @@ class FlextQualityLinkChecker:
 
     def _record_batch_performance(
         self,
-        results: Sequence[m.Quality.LinkCheckResult],
+        results: Sequence[p.Quality.LinkCheckResult],
         start_time: float,
-    ) -> Sequence[m.Quality.LinkCheckResult]:
+    ) -> Sequence[p.Quality.LinkCheckResult]:
         """Record batch timing metrics and return the results unchanged.
 
         Returns:
-            The resulting ``Sequence[m.Quality.LinkCheckResult]``.
+            The resulting ``Sequence[p.Quality.LinkCheckResult]``.
 
         """
         self.results.performance.total_time = time.time() - start_time
@@ -222,15 +222,15 @@ class FlextQualityLinkChecker:
 
     async def check_links_batch_async(
         self,
-        links: Sequence[m.Quality.LinkRecord],
-    ) -> Sequence[m.Quality.LinkCheckResult]:
+        links: Sequence[p.Quality.LinkRecord],
+    ) -> Sequence[p.Quality.LinkCheckResult]:
         """Check multiple links asynchronously.
 
         Args:
             links: Link records checked concurrently.
 
         Returns:
-            The resulting ``Sequence[m.Quality.LinkCheckResult]``.
+            The resulting ``Sequence[p.Quality.LinkCheckResult]``.
 
         """
         start_time = time.time()
@@ -240,8 +240,8 @@ class FlextQualityLinkChecker:
         )
 
         async def check_with_semaphore(
-            link_info: m.Quality.LinkRecord,
-        ) -> m.Quality.LinkCheckResult:
+            link_info: p.Quality.LinkRecord,
+        ) -> p.Quality.LinkCheckResult:
             async with semaphore:
                 url = link_info.url
                 context = link_info.context
@@ -255,20 +255,20 @@ class FlextQualityLinkChecker:
 
     def check_links_batch_sync(
         self,
-        links: Sequence[m.Quality.LinkRecord],
-    ) -> Sequence[m.Quality.LinkCheckResult]:
+        links: Sequence[p.Quality.LinkRecord],
+    ) -> Sequence[p.Quality.LinkCheckResult]:
         """Check multiple links synchronously with thread pool.
 
         Args:
             links: Link records checked by the worker pool.
 
         Returns:
-            The resulting ``Sequence[m.Quality.LinkCheckResult]``.
+            The resulting ``Sequence[p.Quality.LinkCheckResult]``.
 
         """
         start_time = time.time()
 
-        def check_single(link_info: m.Quality.LinkRecord) -> m.Quality.LinkCheckResult:
+        def check_single(link_info: p.Quality.LinkRecord) -> p.Quality.LinkCheckResult:
             url = link_info.url
             ctx = link_info.context
             return self.check_link_sync(url, ctx)
@@ -282,10 +282,10 @@ class FlextQualityLinkChecker:
 
     async def validate_links(
         self,
-        links: Sequence[m.Quality.LinkRecord],
+        links: Sequence[p.Quality.LinkRecord],
         *,
         use_async: bool = True,
-    ) -> m.Quality.LinkValidatorResults:
+    ) -> p.Quality.LinkValidatorResults:
         """Validate all provided links.
 
         Args:
@@ -482,9 +482,9 @@ Broken Links:
 
     @staticmethod
     def validate_links_sync(
-        links: Sequence[m.Quality.LinkRecord],
+        links: Sequence[p.Quality.LinkRecord],
         config_dir: str | pathlib.Path | None = None,
-    ) -> m.Quality.LinkValidatorResults:
+    ) -> p.Quality.LinkValidatorResults:
         """Validate links synchronously.
 
         Args:
@@ -501,7 +501,7 @@ Broken Links:
     @staticmethod
     async def run_demo() -> None:
         """Run the example validation without leaking module-level test data."""
-        test_links: Sequence[m.Quality.LinkRecord] = [
+        test_links: Sequence[p.Quality.LinkRecord] = [
             m.Quality.LinkRecord(
                 url=c.Quality.LinkCheckerDemo.VSCODE_URL,
                 text="VSCode",

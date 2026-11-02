@@ -62,17 +62,17 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        self.settings: m.Quality.MaintenanceConfig = self.load_config(config_path)
+        self.settings: p.Quality.MaintenanceConfig = self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(self.settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
+        self.results: p.Quality.ScheduleResults = m.Quality.ScheduleResults(
             start_time=u.now().isoformat(),
         )
 
-    def load_config(self, config_path: str | None) -> m.Quality.MaintenanceConfig:
+    def load_config(self, config_path: str | None) -> p.Quality.MaintenanceConfig:
         """Load external configuration once through the maintenance model.
 
         Args:
@@ -93,7 +93,7 @@ class FlextQualityScheduledMaintenance:
             )
         return self.build_default_config()
 
-    def build_default_config(self) -> m.Quality.MaintenanceConfig:
+    def build_default_config(self) -> p.Quality.MaintenanceConfig:
         """Default maintenance configuration.
 
         Returns:
@@ -244,7 +244,7 @@ class FlextQualityScheduledMaintenance:
                 "retention_days": 30,
             },
         }
-        config: m.Quality.MaintenanceConfig = (
+        config: p.Quality.MaintenanceConfig = (
             m.Quality.MaintenanceConfig.model_validate(config_payload)
         )
         return config
@@ -335,7 +335,7 @@ class FlextQualityScheduledMaintenance:
         self.results.errors.append(message)
         return False
 
-    def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
+    def run_single_task(self, task_config: p.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries.
 
         Args:
@@ -352,7 +352,7 @@ class FlextQualityScheduledMaintenance:
 
     def _run_single_task_unchecked(
         self,
-        task_config: m.Quality.ScheduleTaskConfig,
+        task_config: p.Quality.ScheduleTaskConfig,
     ) -> bool:
         """Run a single task after exception boundary setup.
 

@@ -102,7 +102,7 @@ class QualityPlugin(Protocol):
         """Plugin description."""
 
     def analyze(
-        self, path: Path, settings: m.Quality.PluginConfigModel | None = None
+        self, path: Path, settings: p.Quality.PluginConfigModel | None = None
     ) -> p.Result[AnalysisResult]:
         """Run analysis on path."""
 

@@ -40,14 +40,14 @@ class FlextQualityDocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = u.fetch_logger(self.__class__.__name__)
-        self.results: m.Quality.OptimizerResults = m.Quality.OptimizerResults(
+        self.results: p.Quality.OptimizerResults = m.Quality.OptimizerResults(
             timestamp=u.now().isoformat(),
         )
 
     def optimize_formatting(
         self,
         doc_files: Sequence[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Fix common formatting issues.
 
         Args:
@@ -146,7 +146,7 @@ class FlextQualityDocumentationOptimizer:
     def update_table_of_contents(
         self,
         doc_files: Sequence[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Update or add table of contents for long documents.
 
         Args:
@@ -289,7 +289,7 @@ class FlextQualityDocumentationOptimizer:
     def enhance_accessibility(
         self,
         doc_files: Sequence[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Enhance accessibility of documentation.
 
         Args:
@@ -372,7 +372,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_content_structure(
         self,
         doc_files: Sequence[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Optimize content structure and readability.
 
         Args:
@@ -458,7 +458,7 @@ class FlextQualityDocumentationOptimizer:
     def update_metadata(
         self,
         doc_files: Sequence[Path],
-    ) -> m.Quality.OptimizerResults:
+    ) -> p.Quality.OptimizerResults:
         """Update frontmatter metadata and timestamps.
 
         Args:

@@ -124,7 +124,7 @@ class FlextQualityDocumentationNotifier:
         self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
             self._load_user_config(loaded)
         )
-        self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
+        self.results: p.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=u.now().isoformat(),
         )
 

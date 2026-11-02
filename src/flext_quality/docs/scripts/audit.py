@@ -108,16 +108,16 @@ class FlextQualityDocumentationAuditor:
         """
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.config_manager = FlextQualityConfigManager(config_dir)
-        self.audit_rules: m.Quality.AuditRulesConfig = (
+        self.audit_rules: p.Quality.AuditRulesConfig = (
             self.config_manager.resolve_audit_rules()
         )
-        self.style_guide: m.Quality.StyleGuideConfig = (
+        self.style_guide: p.Quality.StyleGuideConfig = (
             self.config_manager.resolve_style_guide()
         )
-        self.validation_config: m.Quality.ValidationConfig = (
+        self.validation_config: p.Quality.ValidationConfig = (
             self.config_manager.resolve_validation_config()
         )
-        self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
+        self.results: p.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(),
             metrics=m.Quality.AuditMetrics(),
         )
@@ -166,7 +166,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> m.Quality.AuditorResults:
+    def run_comprehensive_audit(self) -> p.Quality.AuditorResults:
         """Run complete documentation audit.
 
         Returns:
@@ -680,7 +680,7 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
+        recommendations: MutableSequence[p.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if (
             quality_score
@@ -1009,7 +1009,7 @@ class FlextQualityDocumentationAuditor:
         def _execute_checks(
             self,
             auditor: FlextQualityDocumentationAuditor,
-        ) -> m.Quality.AuditorResults:
+        ) -> p.Quality.AuditorResults:
             if self.comprehensive:
                 return auditor.run_comprehensive_audit()
             doc_files = auditor.find_documentation_files()
@@ -1025,7 +1025,7 @@ class FlextQualityDocumentationAuditor:
             auditor.generate_recommendations()
             return auditor.results
 
-        def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
+        def _should_fail(self, metrics: p.Quality.AuditMetrics) -> bool:
             if self.fail_on_errors:
                 severity_breakdown = metrics.severity_breakdown
                 if severity_breakdown["critical"] + severity_breakdown["high"] > 0:

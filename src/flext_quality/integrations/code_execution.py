@@ -140,7 +140,7 @@ class FlextQualityCodeExecutionBridge:
         runtime: str,
         *,
         args: Sequence[str] | None = None,
-    ) -> p.Result[m.Quality.ExecutionRequest]:
+    ) -> p.Result[p.Quality.ExecutionRequest]:
         """Create an execution request for later processing.
 
         Args:
@@ -150,12 +150,12 @@ class FlextQualityCodeExecutionBridge:
             args: Optional arguments appended to the request.
 
         Returns:
-            The resulting ``p.Result[m.Quality.ExecutionRequest]``.
+            The resulting ``p.Result[p.Quality.ExecutionRequest]``.
 
         """
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
-            return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
-        return r[m.Quality.ExecutionRequest].ok(
+            return r[p.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
+        return r[p.Quality.ExecutionRequest].ok(
             m.Quality.ExecutionRequest(
                 script_path=script_path,
                 runtime=runtime,
