@@ -87,7 +87,7 @@ from collections.abc import (
 from pathlib import Path
 
 from flext_core import p, t
-from flext_quality import m
+from flext_quality import m, p
 
 
 class QualityPlugin(Protocol):
