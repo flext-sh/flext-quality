@@ -14,9 +14,8 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_web import FlextWebProtocols
 
-from flext_quality import t
-
 if TYPE_CHECKING:
+    from flext_quality import t
     from flext_quality._constants import FlextQualityConstantsEnums
     from flext_quality._protocols import FlextQualityProtocolsFlextqualitymodelsPart01
 
@@ -25,23 +24,15 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class ScheduleTaskConfig(FlextWebProtocols.Model, Protocol):
+    class ScheduleTaskConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         description: str
         command: str
-
-        @property
-        def timeout(self) -> t.PositiveInt:
-            """Structural member projected from the owning model.
-
-            Maximum time, in seconds, the task command may run before being
-            terminated.
-            """
-            ...
+        timeout: t.PositiveInt
 
     @runtime_checkable
-    class ScheduleEntry(FlextWebProtocols.Model, Protocol):
+    class ScheduleEntry(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enabled: bool
@@ -50,40 +41,25 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         day: str | None
 
     @runtime_checkable
-    class ErrorHandlingConfig(FlextWebProtocols.Model, Protocol):
+    class ErrorHandlingConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def max_retries(self) -> t.NonNegativeInt:
-            """Maximum number of times a failed scheduled task is retried."""
-            ...
-
-        @property
-        def retry_delay(self) -> t.NonNegativeInt:
-            """Structural member projected from the owning model.
-
-            Delay, in seconds, between retry attempts for a failed scheduled task.
-            """
-            ...
-
+        max_retries: t.NonNegativeInt
+        retry_delay: t.NonNegativeInt
         fail_fast: bool
         notify_on_failure: bool
 
     @runtime_checkable
-    class LoggingConfig(FlextWebProtocols.Model, Protocol):
+    class LoggingConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enabled: bool
         log_file: str
         max_log_size: str
-
-        @property
-        def retention_days(self) -> t.PositiveInt:
-            """Number of days rotated log files are retained before deletion."""
-            ...
+        retention_days: t.PositiveInt
 
     @runtime_checkable
-    class MaintenanceConfig(FlextWebProtocols.Model, Protocol):
+    class MaintenanceConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enabled: bool
@@ -124,7 +100,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
             ...
 
     @runtime_checkable
-    class ScheduleResults(FlextWebProtocols.Model, Protocol):
+    class ScheduleResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         start_time: str
@@ -135,7 +111,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         duration_seconds: int
 
     @runtime_checkable
-    class ArgumentOptionSpec(FlextWebProtocols.Model, Protocol):
+    class ArgumentOptionSpec(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         flags: Sequence[str]
@@ -165,7 +141,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         dest: str | None
 
     @runtime_checkable
-    class ArgumentParserSpec(FlextWebProtocols.Model, Protocol):
+    class ArgumentParserSpec(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         description: str
@@ -178,7 +154,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
             ...
 
     @runtime_checkable
-    class AuditRecommendation(FlextWebProtocols.Model, Protocol):
+    class AuditRecommendation(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         priority: str
@@ -187,7 +163,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         actions: Sequence[str]
 
     @runtime_checkable
-    class AuditorResults(FlextWebProtocols.Model, Protocol):
+    class AuditorResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         timestamp: str
@@ -213,7 +189,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
             ...
 
     @runtime_checkable
-    class LinkRecord(FlextWebProtocols.Model, Protocol):
+    class LinkRecord(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         text: str
@@ -225,7 +201,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         context: t.JsonMapping | None
 
     @runtime_checkable
-    class LinkCheckResult(FlextWebProtocols.Model, Protocol):
+    class LinkCheckResult(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         valid: bool | None
@@ -247,7 +223,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         content_type: str | None
 
     @runtime_checkable
-    class LinkPerformanceMetrics(FlextWebProtocols.Model, Protocol):
+    class LinkPerformanceMetrics(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         total_time: float
@@ -255,7 +231,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         slowest_response: float
 
     @runtime_checkable
-    class ContentIssue(FlextWebProtocols.Model, Protocol):
+    class ContentIssue(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         type: str
@@ -268,7 +244,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         warning: str | None
 
     @runtime_checkable
-    class LinkValidatorResults(FlextWebProtocols.Model, Protocol):
+    class LinkValidatorResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         timestamp: str
@@ -299,7 +275,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
             ...
 
     @runtime_checkable
-    class ContentValidatorResults(FlextWebProtocols.Model, Protocol):
+    class ContentValidatorResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         timestamp: str
@@ -315,7 +291,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         quality_metrics: MutableMapping[str, t.Scalar]
 
     @runtime_checkable
-    class ContentMetrics(FlextWebProtocols.Model, Protocol):
+    class ContentMetrics(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         word_count: int
@@ -327,13 +303,13 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         has_headers: bool
 
     @runtime_checkable
-    class ChannelConfig(FlextWebProtocols.Model, Protocol):
+    class ChannelConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enabled: bool
 
     @runtime_checkable
-    class NotifierResults(FlextWebProtocols.Model, Protocol):
+    class NotifierResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         notifications_sent: int
@@ -341,7 +317,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         timestamp: str
 
     @runtime_checkable
-    class OptimizerResults(FlextWebProtocols.Model, Protocol):
+    class OptimizerResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         timestamp: str
@@ -351,7 +327,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         optimizations: MutableSequence[t.MutableStrMapping]
 
     @runtime_checkable
-    class ExecutionRequest(FlextWebProtocols.Model, Protocol):
+    class ExecutionRequest(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         script_path: Path
@@ -360,7 +336,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         timeout_ms: int
 
     @runtime_checkable
-    class ExecutionResult(FlextWebProtocols.Model, Protocol):
+    class ExecutionResult(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         success: bool
@@ -369,7 +345,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         stderr: str
 
     @runtime_checkable
-    class McpToolCall(FlextWebProtocols.Model, Protocol):
+    class McpToolCall(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         server: str
@@ -377,7 +353,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
         params: t.JsonMapping
 
     @runtime_checkable
-    class McpToolResult(FlextWebProtocols.Model, Protocol):
+    class McpToolResult(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         success: bool

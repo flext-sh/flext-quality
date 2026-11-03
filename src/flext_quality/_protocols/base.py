@@ -9,18 +9,19 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_web import FlextWebProtocols
 
-from flext_quality import t
+if TYPE_CHECKING:
+    from flext_quality import t
 
 
 class FlextQualityProtocolsBase:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class QualityThresholdsConfig(FlextWebProtocols.Model, Protocol):
+    class QualityThresholdsConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         max_age_days: int
@@ -30,7 +31,7 @@ class FlextQualityProtocolsBase:
         max_file_size_mb: int
 
     @runtime_checkable
-    class ContentChecksConfig(FlextWebProtocols.Model, Protocol):
+    class ContentChecksConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         check_freshness: bool
@@ -41,7 +42,7 @@ class FlextQualityProtocolsBase:
         check_accessibility: bool
 
     @runtime_checkable
-    class SeverityLevelsConfig(FlextWebProtocols.Model, Protocol):
+    class SeverityLevelsConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         critical: Sequence[str]
@@ -50,7 +51,7 @@ class FlextQualityProtocolsBase:
         low: Sequence[str]
 
     @runtime_checkable
-    class MarkdownStyleConfig(FlextWebProtocols.Model, Protocol):
+    class MarkdownStyleConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         heading_style: str
@@ -60,7 +61,7 @@ class FlextQualityProtocolsBase:
         link_style: str
 
     @runtime_checkable
-    class AccessibilityConfig(FlextWebProtocols.Model, Protocol):
+    class AccessibilityConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         require_alt_text: bool
@@ -72,7 +73,7 @@ class FlextQualityProtocolsBase:
         minimum_contrast_ratio: float
 
     @runtime_checkable
-    class FormattingConfig(FlextWebProtocols.Model, Protocol):
+    class FormattingConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         max_line_length: int
@@ -88,7 +89,7 @@ class FlextQualityProtocolsBase:
         blank_lines_around_code_blocks: bool
 
     @runtime_checkable
-    class HeadingsConfig(FlextWebProtocols.Model, Protocol):
+    class HeadingsConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enforce_hierarchy: bool
@@ -99,7 +100,7 @@ class FlextQualityProtocolsBase:
         toc_heading_level: int
 
     @runtime_checkable
-    class CodeStyleConfig(FlextWebProtocols.Model, Protocol):
+    class CodeStyleConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         require_language_specifier: bool
@@ -109,21 +110,21 @@ class FlextQualityProtocolsBase:
         fence_style: str
 
     @runtime_checkable
-    class GithubLinkConfig(FlextWebProtocols.Model, Protocol):
+    class GithubLinkConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         validate_existence: bool
         check_rate_limits: bool
 
     @runtime_checkable
-    class DocumentationLinkConfig(FlextWebProtocols.Model, Protocol):
+    class DocumentationLinkConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         validate_structure: bool
         check_anchors: bool
 
     @runtime_checkable
-    class LinkValidationConfig(FlextWebProtocols.Model, Protocol):
+    class LinkValidationConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         timeout: int
@@ -155,7 +156,7 @@ class FlextQualityProtocolsBase:
             ...
 
     @runtime_checkable
-    class ValidationRunConfig(FlextWebProtocols.Model, Protocol):
+    class ValidationRunConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         enabled: bool
@@ -168,7 +169,7 @@ class FlextQualityProtocolsBase:
         burst_limit: t.PositiveInt
 
     @runtime_checkable
-    class ContentAnalysisConfig(FlextWebProtocols.Model, Protocol):
+    class ContentAnalysisConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         check_structure: bool
@@ -181,7 +182,7 @@ class FlextQualityProtocolsBase:
         check_fixmes: bool
 
     @runtime_checkable
-    class AuditRulesConfig(FlextWebProtocols.Model, Protocol):
+    class AuditRulesConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property
@@ -208,7 +209,7 @@ class FlextQualityProtocolsBase:
             ...
 
     @runtime_checkable
-    class StyleGuideConfig(FlextWebProtocols.Model, Protocol):
+    class StyleGuideConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property
@@ -237,7 +238,7 @@ class FlextQualityProtocolsBase:
             ...
 
     @runtime_checkable
-    class ValidationConfig(FlextWebProtocols.Model, Protocol):
+    class ValidationConfig(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         @property

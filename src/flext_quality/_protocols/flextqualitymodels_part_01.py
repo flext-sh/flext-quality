@@ -13,9 +13,8 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from flext_web import FlextWebProtocols
 
-from flext_quality import t
-
 if TYPE_CHECKING:
+    from flext_quality import t
     from flext_quality._constants import FlextQualityConstantsEnums
 
 
@@ -23,7 +22,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
     """Own the structural contracts declared by its model source."""
 
     @runtime_checkable
-    class AuditMetrics(FlextWebProtocols.Model, Protocol):
+    class AuditMetrics(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         total_issues: int
@@ -33,7 +32,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         issues_per_file: float
 
     @runtime_checkable
-    class StyleIssue(FlextWebProtocols.Model, Protocol):
+    class StyleIssue(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         type: str
@@ -43,7 +42,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         severity: str
 
     @runtime_checkable
-    class StyleFileResults(FlextWebProtocols.Model, Protocol):
+    class StyleFileResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         file: str
@@ -68,7 +67,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         suggestions: MutableSequence[str]
 
     @runtime_checkable
-    class StyleSummaryMetrics(FlextWebProtocols.Model, Protocol):
+    class StyleSummaryMetrics(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         total_violations: int
@@ -78,7 +77,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         accessibility_issues: int
 
     @runtime_checkable
-    class StyleValidationResults(FlextWebProtocols.Model, Protocol):
+    class StyleValidationResults(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         files_checked: int
@@ -114,7 +113,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
             ...
 
     @runtime_checkable
-    class RuleDefinition(FlextWebProtocols.Model, Protocol):
+    class RuleDefinition(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         name: str
@@ -133,46 +132,19 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         enabled: bool
 
     @runtime_checkable
-    class Issue(FlextWebProtocols.Model, Protocol):
+    class Issue(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
-        @property
-        def type(self) -> str:
-            """FlextQualityModelsPart01.Quality.Issue type identifier."""
-            ...
-
-        @property
-        def severity(self) -> str:
-            """Severity level identifier."""
-            ...
-
-        @property
-        def file(self) -> str:
-            """File path where issue was found."""
-            ...
-
-        @property
-        def line(self) -> int | None:
-            """FlextQualityModelsPart01.Quality.Issue line number."""
-            ...
-
-        @property
-        def description(self) -> str:
-            """FlextQualityModelsPart01.Quality.Issue description."""
-            ...
-
-        @property
-        def recommendation(self) -> str:
-            """Recommended fix."""
-            ...
-
-        @property
-        def context(self) -> Mapping[str, t.Primitives | None] | None:
-            """Optional structured context data associated with the issue."""
-            ...
+        type: str
+        severity: str
+        file: str
+        line: int | None
+        description: str
+        recommendation: str
+        context: Mapping[str, t.Primitives | None] | None
 
     @runtime_checkable
-    class ValidationResult(FlextWebProtocols.Model, Protocol):
+    class ValidationResult(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         total_items: int
@@ -191,7 +163,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         metadata: MutableMapping[str, t.Primitives]
 
     @runtime_checkable
-    class FileMetadata(FlextWebProtocols.Model, Protocol):
+    class FileMetadata(FlextWebProtocols.BaseModel, Protocol):
         """Structural data contract projected from the owning model."""
 
         path: str
