@@ -8,10 +8,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
 from flext_quality import FlextQualityCli, main
-from tests import tm
+from tests import c, tm
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -133,7 +131,7 @@ class TestsFlextQualityCli:
         tm.that(main(["validate", "--target-path", str(tmp_path)]), eq=0)
 
     @staticmethod
-    @pytest.mark.parametrize("bad_args", [["unknown"], ["not-a-command"], ["xyz"]])
+    @c.Tests.MARK.parametrize("bad_args", [["unknown"], ["not-a-command"], ["xyz"]])
     def test_main_unknown_command_exits_nonzero(bad_args: list[str]) -> None:
         """Test main unknown command exits nonzero."""
         tm.that(main(bad_args), eq=1)

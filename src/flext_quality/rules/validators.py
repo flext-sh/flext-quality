@@ -10,11 +10,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import override
 
-from flext_quality.constants import c
-from flext_quality.protocols import p
-from flext_quality.result import r
-from flext_quality.typings import t
-from flext_quality.utilities import u
+from flext_quality import c, p, r, t, u
 
 
 class FlextQualityValidators:

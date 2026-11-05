@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from fastmcp import FastMCP
 
-from flext_quality.constants import c
+from flext_quality import c
 
 
 class FlextQualityMcpServer:

@@ -11,7 +11,7 @@ from collections.abc import MutableSequence
 
 from flext_core import FlextService
 
-from flext_quality.typings import t
+from flext_quality import t
 
 
 class FlextQualityServiceBase[TResult = t.JsonDict](FlextService[TResult], ABC):

@@ -17,8 +17,6 @@ import tempfile
 from collections.abc import Iterator
 from pathlib import Path
 
-import pytest
-
 from flext_quality import FlextQuality, FlextQualitySettings
 from tests import c, m, p, quality, t, tm, u
 
@@ -26,9 +24,9 @@ from tests import c, m, p, quality, t, tm, u
 class TestsFlextQualityApi:
     """Behavioral contract for the FlextQuality facade."""
 
-    pytestmark = pytest.mark.usefixtures("_restore_settings")
+    pytestmark = c.Tests.MARK.usefixtures("_restore_settings")
 
-    @pytest.fixture
+    @u.Tests.fixture
     def _restore_settings() -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQualitySettings.fetch_global()
@@ -180,7 +178,7 @@ class TestsFlextQualityApiHooks:
     # -- hook output formatting ------------------------------------------
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("continue_exec", "expected"),
         [(True, '"continue":true'), (False, '"continue":false')],
     )
