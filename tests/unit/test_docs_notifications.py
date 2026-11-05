@@ -15,10 +15,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import pytest
-
 from flext_quality.docs import FlextQualityDocumentationNotifier
-from tests import tm, u
+from tests import c, tm, u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -30,7 +28,7 @@ class TestsFlextQualityDocumentationNotifier:
     """Contract tests for the documentation notification system."""
 
     @staticmethod
-    @pytest.mark.parametrize("password", [None, ""])
+    @c.Tests.MARK.parametrize("password", [None, ""])
     def test_email_requires_password_before_delivery(
         tmp_path: Path,
         password: str | None,

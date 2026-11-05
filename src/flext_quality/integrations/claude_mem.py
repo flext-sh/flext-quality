@@ -12,10 +12,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import final
 
-from flext_quality.constants import c
+from flext_quality import c, p, t
 from flext_quality.integrations import FlextQualityMcpClient
-from flext_quality.protocols import p
-from flext_quality.typings import t
 
 
 @final

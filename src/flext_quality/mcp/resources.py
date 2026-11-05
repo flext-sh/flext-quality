@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.constants import c
+from flext_quality import c, u
 from flext_quality.hooks import FlextQualityHookManager
 from flext_quality.integrations import (
     FlextQualityClaudeContextClient,
@@ -14,7 +14,6 @@ from flext_quality.integrations import (
 )
 from flext_quality.mcp import FlextQualityMcpServer
 from flext_quality.rules import FlextQualityRulesEngine
-from flext_quality.utilities import u
 
 
 class FlextQualityMcpResources:
