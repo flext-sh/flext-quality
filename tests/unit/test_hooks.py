@@ -12,10 +12,8 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import ClassVar, override
 
-import pytest
-
 from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-from tests import c, p, r, t, tm
+from tests import c, p, r, t, tm, u
 
 
 class TestsFlextQualityBaseHook:
@@ -28,7 +26,7 @@ class TestsFlextQualityBaseHook:
         class _BareHook(FlextQualityBaseHook):
             event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
 
-        with pytest.raises(NotImplementedError):
+        with u.Tests.raises(NotImplementedError):
             _BareHook().execute({})
 
     @staticmethod

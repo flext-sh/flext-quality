@@ -23,7 +23,13 @@ from urllib.parse import urlparse
 import requests
 from flext_cli import cli
 
-from flext_quality import c, m, p, r, s, t, u
+from flext_quality.constants import c
+from flext_quality.models import m
+from flext_quality.protocols import p
+from flext_quality.result import r
+from flext_quality.service import s
+from flext_quality.typings import t
+from flext_quality.utilities import u
 
 
 class FlextQualityDocumentationNotifier:

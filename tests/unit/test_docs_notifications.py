@@ -18,7 +18,7 @@ from typing import TYPE_CHECKING
 import pytest
 
 from flext_quality.docs import FlextQualityDocumentationNotifier
-from tests import tm
+from tests import tm, u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -39,7 +39,7 @@ class TestsFlextQualityDocumentationNotifier:
         notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
         notifier.config.channels.email.enabled = True
         notifier.config.email.password = password
-        with pytest.raises(ValueError, match="non-empty SMTP password"):
+        with u.Tests.raises(ValueError, match="non-empty SMTP password"):
             notifier.send_notification("title", "message")
 
     @staticmethod
@@ -299,7 +299,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             encoding="utf-8",
         )
         notifier = FlextQualityDocumentationNotifier(str(config_path))
-        with pytest.raises(ValueError, match="webhook target is not allowlisted"):
+        with u.Tests.raises(ValueError, match="webhook target is not allowlisted"):
             notifier.send_notification("title", "message")
         tm.that(notifier.results.notifications_sent, eq=0)
 

@@ -16,8 +16,9 @@ from typing import Annotated
 
 from flext_web import FlextWebModels as _WebModels
 
-from flext_quality import c, t
 from flext_quality._models import FlextQualityModelsBase
+from flext_quality.constants import c
+from flext_quality.typings import t
 
 
 class FlextQualityModelsPart01(_WebModels):

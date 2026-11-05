@@ -11,10 +11,14 @@ import sys
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING, ClassVar
 
-from flext_cli import cli, u
+from flext_cli import cli
 from flext_web import FlextWebUtilities
 
-from flext_quality import c, m, r, t
+from flext_quality.constants import c
+from flext_quality.models import m
+from flext_quality.result import r
+from flext_quality.typings import t
+from flext_quality.utilities import u
 
 if TYPE_CHECKING:
     from pathlib import Path

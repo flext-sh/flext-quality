@@ -13,7 +13,12 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import final
 
-from flext_quality import c, e, m, p, r, t
+from flext_quality.constants import c
+from flext_quality.exceptions import e
+from flext_quality.models import m
+from flext_quality.protocols import p
+from flext_quality.result import r
+from flext_quality.typings import t
 
 
 @final

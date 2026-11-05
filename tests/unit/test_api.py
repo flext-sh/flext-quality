@@ -99,7 +99,7 @@ class TestsFlextQualityApi:
         an invalid threshold pair must raise ValidationError on the public
         settings model instead of passing through ``validate_configuration``.
         """
-        with pytest.raises(m.ValidationError, match="max_function_length"):
+        with u.Tests.raises(m.ValidationError, match="max_function_length"):
             FlextQualitySettings.model_validate({
                 "Quality": {"max_function_length": 500, "max_class_length": 100},
             })
