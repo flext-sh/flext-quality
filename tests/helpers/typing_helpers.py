@@ -11,12 +11,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from typing import TypeIs
 
 from tests import t, tm
 
 
-def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]:
+def assert_is_dict(
+    value: t.Scalar | Mapping[str, t.Scalar],
+) -> TypeIs[Mapping[str, t.Scalar]]:
     """Type-safe t.JsonMapping assertion following Single Responsibility Principle.
 
     Args:
@@ -30,7 +33,7 @@ def assert_is_dict(value: t.Scalar | t.ScalarMapping) -> TypeIs[t.ScalarMapping]
     return True
 
 
-def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
+def assert_is_list(value: t.Scalar | Sequence[t.Scalar]) -> TypeIs[Sequence[t.Scalar]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -45,9 +48,9 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping,
-    required_keys: t.StrSequence,
-) -> t.ScalarMapping:
+    data: Mapping[str, t.Scalar],
+    required_keys: Sequence[str],
+) -> Mapping[str, t.Scalar]:
     """Assert that t.JsonValue is dict with required keys - DRY pattern.
 
     Args:
@@ -63,7 +66,9 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMapping:
+def assert_analysis_results_structure(
+    results: Mapping[str, t.Scalar],
+) -> Mapping[str, t.Scalar]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -77,7 +82,7 @@ def assert_analysis_results_structure(results: t.ScalarMapping) -> t.ScalarMappi
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
+def assert_metrics_structure(metrics: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -91,7 +96,7 @@ def assert_metrics_structure(metrics: t.ScalarMapping) -> t.ScalarMapping:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
+def assert_issues_structure(issues: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
     """Assert issues have expected structure - specialized helper.
 
     Args:

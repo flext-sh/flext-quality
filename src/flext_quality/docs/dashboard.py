@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import operator
-from collections.abc import Mapping, MutableSequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
@@ -182,7 +182,7 @@ class FlextQualityDocumentationDashboard:
         """
         cutoff_date = u.now() - timedelta(days=days)
 
-        trend_data: t.MutableSequenceOf[t.JsonDict] = []
+        trend_data: MutableSequence[t.JsonDict] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -250,14 +250,14 @@ class FlextQualityDocumentationDashboard:
             "high_issues": audit_metrics.severity_breakdown.get("high", 0),
         }
 
-    def fetch_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
+    def fetch_recent_reports(self, limit: int = 10) -> Sequence[t.JsonMapping]:
         """Return the list of recent audit reports.
 
         Args:
             limit: Maximum number of reports returned.
 
         Returns:
-            The resulting ``t.SequenceOf[t.JsonMapping]``.
+            The resulting ``Sequence[t.JsonMapping]``.
 
         """
         reports: MutableSequence[t.JsonMapping] = []
@@ -705,17 +705,7 @@ class FlextQualityDocumentationDashboard:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationDashboard.Run) -> p.Result[bool]:
-        """Execute the dashboard ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run the dashboard via the canonical cli facade.
 
         Args:
@@ -726,16 +716,12 @@ class FlextQualityDocumentationDashboard:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-dashboard",
             app_help="FLEXT Quality Documentation Dashboard",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Start the dashboard server",
-                model_cls=FlextQualityDocumentationDashboard.Run,
-                handler=FlextQualityDocumentationDashboard._run_handler,
-            ),
+            route_help="Start the dashboard server",
+            model_cls=FlextQualityDocumentationDashboard.Run,
         )
         return exit_code
 

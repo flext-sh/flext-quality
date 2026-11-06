@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, ClassVar, override
 
@@ -33,7 +33,7 @@ class FlextQualityCli(s[bool]):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s[t.SequenceOf[t.StrSequence]]):
+    class Check(s[Sequence[Sequence[str]]]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
@@ -42,39 +42,39 @@ class FlextQualityCli(s[bool]):
         ]
 
         @override
-        def execute(self) -> p.Result[t.SequenceOf[t.StrSequence]]:
+        def execute(self) -> p.Result[Sequence[Sequence[str]]]:
             """Build the canonical quality check command sequence.
 
             Returns:
-                The resulting ``p.Result[t.SequenceOf[t.StrSequence]]``.
+                The resulting ``p.Result[Sequence[Sequence[str]]]``.
 
             """
             built = self._analysis_commands()
             if built.failure:
-                return r[t.SequenceOf[t.StrSequence]].fail(built.error)
-            return r[t.SequenceOf[t.StrSequence]].ok(built.value)
+                return r[Sequence[Sequence[str]]].fail(built.error)
+            return r[Sequence[Sequence[str]]].ok(built.value)
 
-        def _analysis_commands(self) -> p.Result[MutableSequence[t.StrSequence]]:
+        def _analysis_commands(self) -> p.Result[MutableSequence[Sequence[str]]]:
             """Build the static-analysis command sequence for the target path.
 
             Returns:
-                The resulting ``p.Result[MutableSequence[t.StrSequence]]``.
+                The resulting ``p.Result[MutableSequence[Sequence[str]]]``.
 
             """
             bridge = FlextQualityCodeExecutionBridge()
-            cmds: MutableSequence[t.StrSequence] = []
+            cmds: MutableSequence[Sequence[str]] = []
             for build in (bridge.build_ruff_command, bridge.build_basedpyright_command):
                 sub = build(self.target_path)
                 if sub.failure:
-                    return r[MutableSequence[t.StrSequence]].fail(sub.error)
+                    return r[MutableSequence[Sequence[str]]].fail(sub.error)
                 cmds.append(sub.value)
-            return r[MutableSequence[t.StrSequence]].ok(cmds)
+            return r[MutableSequence[Sequence[str]]].ok(cmds)
 
     class Validate(Check):
         """Run full validation (lint + type + security + tests) on --target."""
 
         @override
-        def _analysis_commands(self) -> p.Result[MutableSequence[t.StrSequence]]:
+        def _analysis_commands(self) -> p.Result[MutableSequence[Sequence[str]]]:
             built = super()._analysis_commands()
             if built.failure:
                 return built
@@ -92,7 +92,7 @@ class FlextQualityCli(s[bool]):
                 "--cov-report=term-missing",
             ])
             cmds.append(["python", "-m", "coverage", "report"])
-            return r[MutableSequence[t.StrSequence]].ok(cmds)
+            return r[MutableSequence[Sequence[str]]].ok(cmds)
 
     COMMANDS: ClassVar[
         tuple[
@@ -114,8 +114,8 @@ class FlextQualityCli(s[bool]):
     @staticmethod
     def invoke(
         params: FlextQualityServiceBase[t.JsonMapping]
-        | FlextQualityServiceBase[t.SequenceOf[t.StrSequence]],
-    ) -> p.Result[t.JsonMapping] | p.Result[t.SequenceOf[t.StrSequence]]:
+        | FlextQualityServiceBase[Sequence[Sequence[str]]],
+    ) -> p.Result[t.JsonMapping] | p.Result[Sequence[Sequence[str]]]:
         """Execute a registered service instance for its declarative CLI route.
 
         Args:
@@ -123,13 +123,13 @@ class FlextQualityCli(s[bool]):
 
         Returns:
             The resulting ``p.Result[t.JsonMapping] |
-                p.Result[t.SequenceOf[t.StrSequence]]``.
+                p.Result[Sequence[Sequence[str]]]``.
 
         """
         return params.execute()
 
 
-def main(args: t.StrSequence | None = None) -> int:
+def main(args: Sequence[str] | None = None) -> int:
     """Run the flext-quality CLI entry point.
 
     Args:

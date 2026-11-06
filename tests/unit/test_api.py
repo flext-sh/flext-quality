@@ -17,19 +17,16 @@ import tempfile
 from collections.abc import Iterator
 from pathlib import Path
 
-import pytest
-
-from flext_quality import FlextQuality, FlextQualitySettings, quality
-from tests import c, m, p, t, tm, u
+from flext_quality import FlextQuality, FlextQualitySettings
+from tests import c, m, p, quality, t, tm, u
 
 
 class TestsFlextQualityApi:
     """Behavioral contract for the FlextQuality facade."""
 
-    pytestmark = pytest.mark.usefixtures("_restore_settings")
+    pytestmark = c.Tests.MARK.usefixtures("_restore_settings")
 
-    @staticmethod
-    @pytest.fixture
+    @u.Tests.fixture
     def _restore_settings() -> Iterator[None]:
         """Snapshot and restore shared settings mutated by behavioral tests."""
         settings = FlextQualitySettings.fetch_global()
@@ -100,7 +97,7 @@ class TestsFlextQualityApi:
         an invalid threshold pair must raise ValidationError on the public
         settings model instead of passing through ``validate_configuration``.
         """
-        with pytest.raises(m.ValidationError, match="max_function_length"):
+        with u.Tests.raises(m.ValidationError, match="max_function_length"):
             FlextQualitySettings.model_validate({
                 "Quality": {"max_function_length": 500, "max_class_length": 100},
             })
@@ -181,7 +178,7 @@ class TestsFlextQualityApiHooks:
     # -- hook output formatting ------------------------------------------
 
     @staticmethod
-    @pytest.mark.parametrize(
+    @c.Tests.MARK.parametrize(
         ("continue_exec", "expected"),
         [(True, '"continue":true'), (False, '"continue":false')],
     )

@@ -11,10 +11,10 @@ from __future__ import annotations
 
 import operator
 import sys
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-from flext_quality import c, m, t, u
+from flext_quality import c, m, p, t, u
 from flext_quality.docs.core import FlextQualityConfigManager
 
 
@@ -23,10 +23,10 @@ class FlextQualityStyleValidator:
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize style validation from declared, validated configuration."""
-        self.settings: m.Quality.StyleGuideConfig = FlextQualityConfigManager(
+        self.settings: p.Quality.StyleGuideConfig = FlextQualityConfigManager(
             config_dir,
         ).resolve_style_guide()
-        self.results: m.Quality.StyleValidationResults = (
+        self.results: p.Quality.StyleValidationResults = (
             m.Quality.StyleValidationResults(
                 files_checked=0,
                 style_violations=[],
@@ -43,7 +43,7 @@ class FlextQualityStyleValidator:
             )
         )
 
-    def validate_file(self, file_path: Path) -> m.Quality.StyleFileResults:
+    def validate_file(self, file_path: Path) -> p.Quality.StyleFileResults:
         """Validate a single documentation file.
 
         Args:
@@ -56,8 +56,8 @@ class FlextQualityStyleValidator:
         content = u.Cli.files_read_text(file_path).value
         filename = str(file_path)
 
-        violations_list: MutableSequence[m.Quality.StyleIssue] = []
-        issues_list: MutableSequence[m.Quality.StyleIssue] = []
+        violations_list: MutableSequence[p.Quality.StyleIssue] = []
+        issues_list: MutableSequence[p.Quality.StyleIssue] = []
         suggestions_list: MutableSequence[str] = []
         file_results = m.Quality.StyleFileResults(
             file=filename,
@@ -88,14 +88,14 @@ class FlextQualityStyleValidator:
     def _check_markdown_formatting(
         self,
         content: str,
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    ) -> Sequence[p.Quality.StyleIssue]:
         """Check basic markdown formatting consistency.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -134,16 +134,16 @@ class FlextQualityStyleValidator:
     def _check_heading_consistency(
         self,
         content: str,
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    ) -> Sequence[p.Quality.StyleIssue]:
         """Check heading hierarchy and consistency.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
-        headings: t.SequenceOf[tuple[int, str, int]] = [
+        headings: Sequence[tuple[int, str, int]] = [
             (
                 len(match.group(1)),
                 match.group(2).strip(),
@@ -192,16 +192,16 @@ class FlextQualityStyleValidator:
     def _check_list_consistency(
         self,
         content: str,
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    ) -> Sequence[p.Quality.StyleIssue]:
         """Check list formatting consistency.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
-        list_items: t.SequenceOf[tuple[str, str, int]] = [
+        list_items: Sequence[tuple[str, str, int]] = [
             (match.group(1), match.group(2), content[: match.start()].count("\n") + 1)
             for match in u.Quality.compile_pattern(
                 r"^(\s*)([-\*\+])\s+",
@@ -235,14 +235,14 @@ class FlextQualityStyleValidator:
     def _check_code_formatting(
         self,
         content: str,
-    ) -> t.SequenceOf[m.Quality.StyleIssue]:
+    ) -> Sequence[p.Quality.StyleIssue]:
         """Check code block and inline code formatting.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
         code_block_style = self.settings.markdown.code_block_style
         if (
@@ -288,14 +288,14 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_accessibility(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_accessibility(self, content: str) -> Sequence[p.Quality.StyleIssue]:
         """Check accessibility compliance.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        issues: MutableSequence[m.Quality.StyleIssue] = []
+        issues: MutableSequence[p.Quality.StyleIssue] = []
 
         if self.settings.accessibility.require_alt_text:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
@@ -333,14 +333,14 @@ class FlextQualityStyleValidator:
 
         return issues
 
-    def _check_line_length(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_line_length(self, content: str) -> Sequence[p.Quality.StyleIssue]:
         """Check line length compliance.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
         max_length = self.settings.formatting.max_line_length
         lines = content.split("\n")
@@ -371,14 +371,14 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_whitespace(self, content: str) -> t.SequenceOf[m.Quality.StyleIssue]:
+    def _check_whitespace(self, content: str) -> Sequence[p.Quality.StyleIssue]:
         """Check whitespace formatting.
 
         Returns:
-            The resulting ``t.SequenceOf[m.Quality.StyleIssue]``.
+            The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[m.Quality.StyleIssue] = []
+        violations: MutableSequence[p.Quality.StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -412,12 +412,12 @@ class FlextQualityStyleValidator:
 
     def _generate_suggestions(
         self,
-        violations: t.SequenceOf[m.Quality.StyleIssue],
-    ) -> t.StrSequence:
+        violations: Sequence[p.Quality.StyleIssue],
+    ) -> Sequence[str]:
         """Generate improvement suggestions based on violations.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         suggestions: MutableSequence[str] = []
@@ -454,8 +454,8 @@ class FlextQualityStyleValidator:
 
     def validate_files_batch(
         self,
-        file_paths: t.SequenceOf[Path],
-    ) -> m.Quality.StyleValidationResults:
+        file_paths: Sequence[Path],
+    ) -> p.Quality.StyleValidationResults:
         """Validate multiple files and aggregate results.
 
         Args:
@@ -476,7 +476,7 @@ class FlextQualityStyleValidator:
         self.results.summary.accessibility_issues = len(accessibility_issues)
         self.results.summary.suggestions_count = len(suggestions)
 
-        all_violations: MutableSequence[m.Quality.StyleIssue] = []
+        all_violations: MutableSequence[p.Quality.StyleIssue] = []
         all_violations.extend(style_violations)
         all_violations.extend(accessibility_issues)
 
@@ -561,7 +561,7 @@ Top Issues:
     def validate_file_style(
         file_path: str,
         config_dir: str | None = None,
-    ) -> m.Quality.StyleFileResults:
+    ) -> p.Quality.StyleFileResults:
         """Validate a single file.
 
         Args:
@@ -577,9 +577,9 @@ Top Issues:
 
     @staticmethod
     def validate_files_style(
-        file_paths: t.StrSequence,
+        file_paths: Sequence[str],
         config_dir: str | None = None,
-    ) -> m.Quality.StyleValidationResults:
+    ) -> p.Quality.StyleValidationResults:
         """Validate multiple files.
 
         Args:

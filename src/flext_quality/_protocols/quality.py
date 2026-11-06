@@ -6,10 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, ClassVar, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
-    from flext_quality import c, p, t
+    from flext_core._protocols import FlextProtocolsResult
+
+    from flext_quality import c, t
 
 
 class FlextQualityProtocolsQuality:
@@ -19,13 +22,13 @@ class FlextQualityProtocolsQuality:
     class FlextQualityProtocolsArgumentOptionSpec(Protocol):
         """Structural contract for quality argparse option specs."""
 
-        flags: t.StrSequence
+        flags: Sequence[str]
         help: str
         action: c.Quality.ArgumentAction | None
         default: t.JsonValue | None
         value_type: c.Quality.ArgumentValueType | None
         nargs: int | str | None
-        choices: t.StrSequence | None
+        choices: Sequence[str] | None
         dest: str | None
 
     @runtime_checkable
@@ -33,7 +36,7 @@ class FlextQualityProtocolsQuality:
         """Structural contract for quality argparse parser specs."""
 
         description: str
-        options: t.SequenceOf[
+        options: Sequence[
             FlextQualityProtocolsQuality.FlextQualityProtocolsArgumentOptionSpec
         ]
 
@@ -50,7 +53,7 @@ class FlextQualityProtocolsQuality:
             self,
             content: str,
             file_path: t.Cli.TextPath | None = None,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> FlextProtocolsResult.Result[Sequence[t.JsonMapping]]:
             """Validate content and return violations.
 
             Args:
@@ -65,9 +68,12 @@ class FlextQualityProtocolsQuality:
         """Abstract base protocol for hook implementations."""
 
         event: ClassVar[type]
-        matcher: ClassVar[t.StrSequence | None]
+        matcher: ClassVar[Sequence[str] | None]
 
-        def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            input_data: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the hook logic.
 
             Args:
@@ -118,9 +124,12 @@ class FlextQualityProtocolsQuality:
         """Protocol for hook implementations."""
 
         event: str
-        matcher: t.StrSequence | None
+        matcher: Sequence[str] | None
 
-        def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            input_data: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the hook logic.
 
             Args:
@@ -148,7 +157,7 @@ class FlextQualityProtocolsQuality:
             self,
             settings: t.JsonMapping,
             context: t.JsonMapping,
-        ) -> p.Result[t.Quality.RuleResult]:
+        ) -> FlextProtocolsResult.Result[t.Quality.RuleResult]:
             """Validate according to the rule type.
 
             Args:
@@ -162,15 +171,15 @@ class FlextQualityProtocolsQuality:
     class FlextQualityProtocolsIntegrationClient(Protocol):
         """Protocol for external integrations."""
 
-        def connect(self) -> p.Result[bool]:
+        def connect(self) -> FlextProtocolsResult.Result[bool]:
             """Connect to external service."""
             ...
 
-        def disconnect(self) -> p.Result[bool]:
+        def disconnect(self) -> FlextProtocolsResult.Result[bool]:
             """Disconnect from external service."""
             ...
 
-        def health_check(self) -> p.Result[t.StrMapping]:
+        def health_check(self) -> FlextProtocolsResult.Result[Mapping[str, str]]:
             """Check integration health."""
             ...
 
@@ -181,7 +190,10 @@ class FlextQualityProtocolsQuality:
         name: str
         description: str
 
-        def execute(self, params: t.JsonMapping) -> p.Result[t.JsonMapping]:
+        def execute(
+            self,
+            params: t.JsonMapping,
+        ) -> FlextProtocolsResult.Result[t.JsonMapping]:
             """Execute the MCP tool.
 
             Args:

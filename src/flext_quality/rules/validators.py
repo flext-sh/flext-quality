@@ -6,13 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
-from typing import TYPE_CHECKING, override
+from typing import override
 
 from flext_quality import c, p, r, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping, MutableSequence
 
 
 class FlextQualityValidators:
@@ -23,7 +21,7 @@ class FlextQualityValidators:
     class Pattern(p.Quality.ValidatorBase):
         """Validates content against regex patterns."""
 
-        def __init__(self, patterns: t.StrMapping) -> None:
+        def __init__(self, patterns: Mapping[str, str]) -> None:
             """Initialize with the patterns to enforce.
 
             Args:
@@ -47,7 +45,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: t.Cli.TextPath | None = None,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> p.Result[Sequence[t.JsonMapping]]:
             """Validate content against patterns.
 
             Args:
@@ -55,7 +53,7 @@ class FlextQualityValidators:
                 file_path: Optional source path recorded in violations.
 
             Returns:
-                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+                The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
             """
             path_value = Path(file_path) if isinstance(file_path, str) else file_path
@@ -72,7 +70,7 @@ class FlextQualityValidators:
                             "message": f"Pattern violation: {pattern_name}",
                             "severity": c.Quality.Severity.ERROR,
                         })
-            return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+            return r[Sequence[t.JsonMapping]].ok(violations)
 
     class ForbiddenPattern(Pattern):
         """Validates against FLEXT forbidden patterns."""
@@ -109,7 +107,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: t.Cli.TextPath | None = None,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> p.Result[Sequence[t.JsonMapping]]:
             """Validate tier violations.
 
             Args:
@@ -117,17 +115,17 @@ class FlextQualityValidators:
                 file_path: Optional source path determining the file's tier.
 
             Returns:
-                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+                The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
             """
             path_value = Path(file_path) if isinstance(file_path, str) else file_path
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(path_value) if path_value else "<string>"
             if path_value is None:
-                return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+                return r[Sequence[t.JsonMapping]].ok(violations)
             file_tier = self._get_file_tier(path_value)
             if file_tier is None:
-                return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+                return r[Sequence[t.JsonMapping]].ok(violations)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
                 if c.Quality.PATTERNS_TIER_VIOLATION_RE.search(line):
@@ -138,7 +136,7 @@ class FlextQualityValidators:
                         "message": "Tier 0/1 modules cannot import from services/api",
                         "severity": c.Quality.Severity.ERROR,
                     })
-            return r[t.SequenceOf[t.JsonMapping]].ok(violations)
+            return r[Sequence[t.JsonMapping]].ok(violations)
 
         @staticmethod
         def _get_file_tier(path: Path) -> int | None:
@@ -170,11 +168,11 @@ class FlextQualityValidators:
             self._validators: MutableMapping[str, p.Quality.ValidatorBase] = {}
             self._register_defaults()
 
-        def all(self) -> t.SequenceOf[p.Quality.ValidatorBase]:
+        def all(self) -> Sequence[p.Quality.ValidatorBase]:
             """Return all registered validators.
 
             Returns:
-                The resulting ``t.SequenceOf[p.Quality.ValidatorBase]``.
+                The resulting ``Sequence[p.Quality.ValidatorBase]``.
 
             """
             return list(self._validators.values())
@@ -204,7 +202,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+        ) -> p.Result[Sequence[t.JsonMapping]]:
             """Run all validators.
 
             Args:
@@ -212,7 +210,7 @@ class FlextQualityValidators:
                 file_path: Optional source path passed to every validator.
 
             Returns:
-                The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+                The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
             """
             all_violations: MutableSequence[t.JsonMapping] = []
@@ -220,7 +218,7 @@ class FlextQualityValidators:
                 result = validator.validate(content, file_path)
                 if result.success:
                     all_violations.extend(result.value)
-            return r[t.SequenceOf[t.JsonMapping]].ok(all_violations)
+            return r[Sequence[t.JsonMapping]].ok(all_violations)
 
         def _register_defaults(self) -> None:
             """Register default validators."""

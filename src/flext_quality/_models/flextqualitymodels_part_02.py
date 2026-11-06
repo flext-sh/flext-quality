@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping, MutableSequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 
 # Why: mro-fix-27vfb — `Path` backs a real Pydantic model field
 # (ExecutionRequest.script_path) and must resolve at runtime; a
@@ -65,7 +65,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             time: str = _WebModels.Field(
                 description="Time of day at which the scheduled tasks should run.",
             )
-            tasks: t.StrSequence = _WebModels.Field(
+            tasks: Sequence[str] = _WebModels.Field(
                 default_factory=tuple,
                 description="Names of the tasks executed by this schedule entry.",
             )
@@ -228,7 +228,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
         class ArgumentOptionSpec(_WebModels.ManagedModel):
             """Typed argparse option spec for quality tooling."""
 
-            flags: t.StrSequence = _WebModels.Field(
+            flags: Sequence[str] = _WebModels.Field(
                 description=(
                     "Command-line flag strings for this option (e.g. '-v', "
                     "'--verbose')."
@@ -267,7 +267,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                     "argparse nargs semantics."
                 ),
             )
-            choices: t.StrSequence | None = _WebModels.Field(
+            choices: Sequence[str] | None = _WebModels.Field(
                 default=None,
                 description=(
                     "Restricted set of values the option accepts; None means any "
@@ -290,12 +290,12 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                     "Human-readable description of the command-line parser's purpose."
                 ),
             )
-            options: t.SequenceOf[
-                FlextQualityModelsPart02.Quality.ArgumentOptionSpec
-            ] = _WebModels.Field(
-                description=(
-                    "Option specifications registered on the command-line parser."
-                ),
+            options: Sequence[FlextQualityModelsPart02.Quality.ArgumentOptionSpec] = (
+                _WebModels.Field(
+                    description=(
+                        "Option specifications registered on the command-line parser."
+                    ),
+                )
             )
 
         class AuditRecommendation(_WebModels.ManagedModel):
@@ -317,7 +317,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                     "Human-readable text describing the recommended improvement."
                 ),
             )
-            actions: t.StrSequence = _WebModels.Field(
+            actions: Sequence[str] = _WebModels.Field(
                 default_factory=tuple,
                 description=(
                     "Concrete action items suggested to address the recommendation."
@@ -337,15 +337,15 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             issues: MutableSequence[
                 MutableMapping[
                     str,
-                    t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
+                    t.Primitives | Sequence[str] | Sequence[Mapping[str, str]] | None,
                 ]
             ] = _WebModels.Field(
                 default_factory=list[
                     MutableMapping[
                         str,
                         t.Primitives
-                        | t.StrSequence
-                        | t.SequenceOf[t.StrMapping]
+                        | Sequence[str]
+                        | Sequence[Mapping[str, str]]
                         | None,
                     ]
                 ],
@@ -614,7 +614,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                 default_factory=list["FlextQualityModelsPart02.Quality.ContentIssue"],
                 description="Content issues found across all checked files.",
             )
-            quality_metrics: t.MutableScalarMapping = _WebModels.Field(
+            quality_metrics: MutableMapping[str, t.Scalar] = _WebModels.Field(
                 default_factory=dict[str, t.Scalar],
                 description=(
                     "Aggregate scalar quality metrics computed from the checked "
@@ -721,7 +721,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
                     "ruff, basedpyright)."
                 ),
             )
-            args: t.StrSequence = _WebModels.Field(
+            args: Sequence[str] = _WebModels.Field(
                 default_factory=tuple,
                 description="Command-line arguments passed to the script.",
             )
@@ -770,7 +770,7 @@ class FlextQualityModelsPart02(FlextQualityModelsPart01):
             success: bool = _WebModels.Field(
                 description="Whether the MCP tool invocation completed successfully.",
             )
-            data: t.StrMapping | None = _WebModels.Field(
+            data: Mapping[str, str] | None = _WebModels.Field(
                 default=None,
                 description="Data payload returned by the MCP tool invocation.",
             )

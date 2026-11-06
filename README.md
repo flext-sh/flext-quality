@@ -57,7 +57,7 @@ required validation.
   classes listed under Module Map above.
 - Public extensions exposed by this project: `FlextQuality`, `FlextQualityCli`,
   `FlextQualityConfig`, `FlextQualityConstants`, `FlextQualityModels`,
-  `FlextQualityProtocols` (+5 more).
+  `FlextQualityModelsConfig` (+6 more).
 - Library abstraction boundaries: see the project `AGENTS.md` and the referenced parent
   architecture rules.
 

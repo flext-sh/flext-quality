@@ -341,7 +341,7 @@ Tool execution → Hook validates → Violations found? →
 
 - **CQ010**: Uncentralized dict types
 
-  - Problem: Repeated `t.StrMapping` patterns
+  - Problem: Repeated `Mapping[str, str]` patterns
   - Fix: Use centralized types like `t.StringDict` from typings.py
 
 #### Testing (CQ011)

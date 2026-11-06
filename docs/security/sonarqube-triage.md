@@ -195,7 +195,7 @@ padrão.
 > Refactor this function to reduce its Cognitive Complexity from 57 to the 15 allowed.
 
 ```text
-       89          self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
+       89          self.results: p.Quality.NotifierResults = m.Quality.NotifierResults(
        90              timestamp=u.now().isoformat()
        91          )
        92
@@ -259,7 +259,7 @@ padrão.
       264              indicators.append("potentially inconsistent status")
       265          return indicators
       266
->>>   267      def check_content_completeness(self, doc_files: t.SequenceOf[Path]) -> None:
+>>>   267      def check_content_completeness(self, doc_files: Sequence[Path]) -> None:
       268          """Check documentation completeness and identify missing sections."""
       269          min_word_count = self.audit_rules.quality_thresholds.min_word_count
       270          required_sections = self.validation_config.content_analysis.required_sections
@@ -320,8 +320,8 @@ padrão.
       316          return "\n".join(enhanced_lines)
       317
 >>>   318      def update_metadata(
-      319          self, doc_files: t.SequenceOf[Path]
-      320      ) -> m.Quality.OptimizerResults:
+      319          self, doc_files: Sequence[Path]
+      320      ) -> p.Quality.OptimizerResults:
       321          """Update frontmatter metadata and timestamps."""
       322          for file_path in doc_files:
 ```
@@ -382,7 +382,7 @@ padrão.
       556
 >>>   557      def _analyze_trend_data(
       558          self,
-      559          reports: t.SequenceOf[
+      559          reports: Sequence[
       560              Mapping[str, t.Quality.DocumentationReportValue | datetime]
       561          ],
 ```
@@ -422,9 +422,9 @@ padrão.
       274
 >>>   275          def validate_internal_links(
       276              self,
-      277              links: t.SequenceOf[m.Quality.LinkRecord],
-      278              doc_files: t.SequenceOf[Path],
-      279          ) -> m.Quality.LinkValidatorResults:
+      277              links: Sequence[p.Quality.LinkRecord],
+      278              doc_files: Sequence[Path],
+      279          ) -> p.Quality.LinkValidatorResults:
 ```
 
 **Decisão**: pendente
@@ -793,7 +793,7 @@ padrão.
 
 ```text
       567
-      568      def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
+      568      def _validate_images(self, images: Sequence[Mapping[str, str]]) -> None:
       569          """Validate image references."""
       570          for image in images:
 >>>   571              if image["src"].startswith(("http://", "https://")):
@@ -1001,8 +1001,8 @@ padrão.
        31              return []
        32
        33          @staticmethod
-       34          def _empty_dict_str_str() -> t.StrMapping:
->>>    35              return t.StrDict()
+       34          def _empty_dict_str_str() -> Mapping[str, str]:
+>>>    35              return dict[str, str]()
        36
        37          @staticmethod
        38          def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:

@@ -115,6 +115,8 @@ container.
 Use the `r` alias instead of importing from `returns` directly:
 
 ```python
+from __future__ import annotations
+
 from math import isclose
 
 from flext_tests import p, r, tm
@@ -222,7 +224,6 @@ mutation, including assertion failure:
 
 ```python
 from flext_core import FlextSettings
-
 from flext_tests import tm
 
 

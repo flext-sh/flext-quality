@@ -6,16 +6,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import FlextWebModels as _WebModels, m, t
+from collections.abc import Sequence
+
+from flext_web import FlextWebModels as _WebModels, t
+
+from flext_quality.config_models import FlextQualityModelsConfig
 
 
-class FlextQualityModelsBase:
+class FlextQualityModelsBase(FlextQualityModelsConfig):
     """Base models for flext-quality."""
-
-    class QualityConfigNamespace(m.BaseModel):
-        """Open, frozen namespace exposing every ``config/*.yaml`` domain."""
-
-        model_config = m.ConfigDict(extra="allow", frozen=True)
 
     class QualityThresholdsConfig(_WebModels.ManagedModel):
         """Configuration for quality threshold limits."""
@@ -86,16 +85,16 @@ class FlextQualityModelsBase:
     class SeverityLevelsConfig(_WebModels.ManagedModel):
         """Configuration for severity level categorization."""
 
-        critical: t.StrSequence = _WebModels.Field(
+        critical: Sequence[str] = _WebModels.Field(
             description="Issue type identifiers classified as critical severity.",
         )
-        high: t.StrSequence = _WebModels.Field(
+        high: Sequence[str] = _WebModels.Field(
             description="Issue type identifiers classified as high severity.",
         )
-        medium: t.StrSequence = _WebModels.Field(
+        medium: Sequence[str] = _WebModels.Field(
             description="Issue type identifiers classified as medium severity.",
         )
-        low: t.StrSequence = _WebModels.Field(
+        low: Sequence[str] = _WebModels.Field(
             description="Issue type identifiers classified as low severity.",
         )
 
@@ -260,7 +259,7 @@ class FlextQualityModelsBase:
                 "Whether fenced code blocks must declare a language specifier."
             ),
         )
-        preferred_languages: t.StrSequence = _WebModels.Field(
+        preferred_languages: Sequence[str] = _WebModels.Field(
             description="Language specifiers accepted for fenced code blocks.",
         )
         inline_code_style: str = _WebModels.Field(
@@ -349,7 +348,7 @@ class FlextQualityModelsBase:
                 "link as broken."
             ),
         )
-        acceptable_status_codes: t.SequenceOf[int] = _WebModels.Field(
+        acceptable_status_codes: Sequence[int] = _WebModels.Field(
             description=(
                 "HTTP status codes treated as a successful link check response."
             ),
@@ -359,18 +358,18 @@ class FlextQualityModelsBase:
                 "Whether to verify the response Content-Type header of a checked link."
             ),
         )
-        expected_content_types: t.StrSequence = _WebModels.Field(
+        expected_content_types: Sequence[str] = _WebModels.Field(
             description=(
                 "Content-Type values accepted when validate_content_type is enabled."
             ),
         )
-        allowed_domains: t.StrSequence = _WebModels.Field(
+        allowed_domains: Sequence[str] = _WebModels.Field(
             description=(
                 "Domains explicitly permitted for external links; empty means no "
                 "allowlist restriction."
             ),
         )
-        blocked_domains: t.StrSequence = _WebModels.Field(
+        blocked_domains: Sequence[str] = _WebModels.Field(
             description="Domains explicitly forbidden for external links.",
         )
         github_links: FlextQualityModelsBase.GithubLinkConfig = _WebModels.Field(
@@ -443,7 +442,7 @@ class FlextQualityModelsBase:
                 "Minimum number of nested section levels a document must contain."
             ),
         )
-        required_sections: t.StrSequence = _WebModels.Field(
+        required_sections: Sequence[str] = _WebModels.Field(
             description=(
                 "Section headings that must be present in every analyzed document."
             ),

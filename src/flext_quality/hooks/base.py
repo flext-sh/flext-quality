@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import fnmatch
+from collections.abc import Sequence
 from typing import TYPE_CHECKING, ClassVar
 
 if TYPE_CHECKING:
@@ -17,7 +18,7 @@ class FlextQualityBaseHook:
     """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]
-    matcher: ClassVar[t.StrSequence | None] = None
+    matcher: ClassVar[Sequence[str] | None] = None
 
     def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         """Execute the hook logic.

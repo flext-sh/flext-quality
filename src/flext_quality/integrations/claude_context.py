@@ -9,9 +9,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import final
 
-from flext_quality import c, m, p, t
+from flext_quality import c, p, t
 from flext_quality.integrations import FlextQualityMcpClient
 
 
@@ -36,14 +37,14 @@ class FlextQualityClaudeContextClient:
     def build_index_call(
         self,
         path: str | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build an index_codebase tool call.
 
         Args:
             path: Optional codebase path indexed by the tool.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         params: t.MutableJsonMapping = {}
@@ -60,7 +61,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[m.Quality.McpToolCall]:
+    ) -> p.Result[p.Quality.McpToolCall]:
         """Build a search_code tool call.
 
         Args:
@@ -68,7 +69,7 @@ class FlextQualityClaudeContextClient:
             limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
@@ -78,11 +79,11 @@ class FlextQualityClaudeContextClient:
             {c.HandlerMode.QUERY: query, "limit": search_limit},
         )
 
-    def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:
+    def build_status_call(self) -> p.Result[p.Quality.McpToolCall]:
         """Build a get_indexing_status tool call.
 
         Returns:
-            The resulting ``p.Result[m.Quality.McpToolCall]``.
+            The resulting ``p.Result[p.Quality.McpToolCall]``.
 
         """
         return self._mcp.build_tool_call(
@@ -91,14 +92,14 @@ class FlextQualityClaudeContextClient:
             {},
         )
 
-    def build_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
+    def build_index_command(self, path: str | None = None) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for codebase indexing.
 
         Args:
             path: Optional codebase path indexed by the command.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
@@ -108,7 +109,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> p.Result[t.StrSequence]:
+    ) -> p.Result[Sequence[str]]:
         """Get the mcp-cli command for code search.
 
         Args:
@@ -116,7 +117,7 @@ class FlextQualityClaudeContextClient:
             limit: Maximum number of results; defaults to the configured limit.
 
         Returns:
-            The resulting ``p.Result[t.StrSequence]``.
+            The resulting ``p.Result[Sequence[str]]``.
 
         """
         search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT

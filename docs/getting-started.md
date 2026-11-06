@@ -156,6 +156,15 @@ ls -la src/flext_quality/
 ```python
 from __future__ import annotations
 
+from collections.abc import (
+    Iterable,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
+
 from flext_quality import FlextQualityCodeAnalyzer, FlextQualityService
 
 

@@ -9,12 +9,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import ClassVar, override
 
-import pytest
-
 from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-from tests import c, p, r, t, tm
+from tests import c, p, r, t, tm, u
 
 
 class TestsFlextQualityBaseHook:
@@ -27,7 +26,7 @@ class TestsFlextQualityBaseHook:
         class _BareHook(FlextQualityBaseHook):
             event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.STOP
 
-        with pytest.raises(NotImplementedError):
+        with u.Tests.raises(NotImplementedError):
             _BareHook().execute({})
 
     @staticmethod
@@ -187,7 +186,7 @@ class _MatcherHook(FlextQualityBaseHook):
     """Hook that only runs for matching tool names."""
 
     event: ClassVar[c.Quality.HookEvent] = c.Quality.HookEvent.PRE_TOOL_USE
-    matcher: ClassVar[t.StrSequence | None] = ("Edit", "Write*")
+    matcher: ClassVar[Sequence[str] | None] = ("Edit", "Write*")
 
     @override
     def execute(self, _input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:

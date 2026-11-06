@@ -11,15 +11,15 @@ import sys
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from typing import TYPE_CHECKING, ClassVar
 
-from flext_cli import cli, u
-from flext_web import FlextWebUtilities
+from flext_cli import cli
+from flext_web import FlextWebUtilities, r, u
 
-from flext_quality import c, m, r, t
+from flext_quality import c, m, t
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_quality import p
+    from flext_quality import FlextQualityServiceBase, p
 
 
 class FlextQualityUtilitiesQuality:
@@ -48,7 +48,7 @@ class FlextQualityUtilitiesQuality:
         t.TypeAdapter[MutableSequence[Mapping[str, str]]]
     ] = FlextWebUtilities.type_adapter(MutableSequence[Mapping[str, str]])
     REPORT_VALUE_MAPPING_ADAPTER: ClassVar[
-        t.TypeAdapter[t.MappingKV[str, t.JsonMapping]]
+        t.TypeAdapter[Mapping[str, t.JsonMapping]]
     ] = FlextWebUtilities.type_adapter(
         Mapping[str, Mapping[str, t.JsonValue]],
     )
@@ -96,7 +96,7 @@ class FlextQualityUtilitiesQuality:
     @staticmethod
     def execute_result_command(
         *,
-        args: t.StrSequence | None,
+        args: Sequence[str] | None,
         app_name: str,
         app_help: str,
         route: p.Cli.ResultCommandRoute,
@@ -122,6 +122,56 @@ class FlextQualityUtilitiesQuality:
             args=list(args) if args is not None else sys.argv[1:],
         )
         return 0 if outcome.success else 1
+
+    @staticmethod
+    def execute_run_command(
+        *,
+        args: Sequence[str] | None,
+        app_name: str,
+        app_help: str,
+        route_help: str,
+        model_cls: type[FlextQualityServiceBase[bool]],
+    ) -> int:
+        """Execute a single ``run`` result command for one self-executing model.
+
+        Args:
+            args: Command-line arguments for the application; defaults to
+                ``sys.argv[1:]`` when ``None``.
+            app_name: Display name of the Typer application.
+            app_help: Help text of the Typer application.
+            route_help: Help text of the registered ``run`` route.
+            model_cls: Command model class whose ``execute`` runs the route.
+
+        Returns:
+            The process exit code.
+
+        """
+        return FlextQualityUtilitiesQuality.execute_result_command(
+            args=args,
+            app_name=app_name,
+            app_help=app_help,
+            route=m.Cli.ResultCommandRoute(
+                name="run",
+                help_text=route_help,
+                model_cls=model_cls,
+                handler=FlextQualityUtilitiesQuality.execute_run_route,
+            ),
+        )
+
+    @staticmethod
+    def execute_run_route(
+        params: FlextQualityServiceBase[bool],
+    ) -> p.Result[bool]:
+        """Execute one self-executing ``run`` command model.
+
+        Args:
+            params: Command model instance carrying the parsed arguments.
+
+        Returns:
+            The resulting ``p.Result[bool]``.
+
+        """
+        return params.execute()
 
     @staticmethod
     def format_hook_output(
@@ -155,53 +205,53 @@ class FlextQualityUtilitiesQuality:
     @staticmethod
     def extract_rules_from_yaml(
         parsed: t.JsonMapping,
-    ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate and extract the rules list from parsed YAML.
 
         Args:
             parsed: Parsed YAML mapping expected to carry a ``rules`` list.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         if not isinstance(parsed, dict):
-            return r[t.SequenceOf[t.JsonMapping]].fail("Expected YAML dict")
+            return r[Sequence[t.JsonMapping]].fail("Expected YAML dict")
         parsed_dict: t.JsonMapping = u.json_mapping_adapter().validate_python(
             parsed,
         )
         raw_rules_val = parsed_dict.get("rules", [])
         if not isinstance(raw_rules_val, list):
-            return r[t.SequenceOf[t.JsonMapping]].fail("Expected rules list")
-        rules: t.SequenceOf[t.JsonMapping] = [
+            return r[Sequence[t.JsonMapping]].fail("Expected rules list")
+        rules: Sequence[t.JsonMapping] = [
             u.json_mapping_adapter().validate_python(item)
             for item in raw_rules_val
             if isinstance(item, dict)
         ]
-        return r[t.SequenceOf[t.JsonMapping]].ok(rules)
+        return r[Sequence[t.JsonMapping]].ok(rules)
 
     @staticmethod
-    def load_yaml_rules(path: Path) -> p.Result[t.SequenceOf[t.JsonMapping]]:
+    def load_yaml_rules(path: Path) -> p.Result[Sequence[t.JsonMapping]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to the YAML file holding the rule definitions.
 
         Returns:
-            The resulting ``p.Result[t.SequenceOf[t.JsonMapping]]``.
+            The resulting ``p.Result[Sequence[t.JsonMapping]]``.
 
         """
         try:
             yaml_result = u.Cli.yaml_safe_load(path)
             if yaml_result.failure:
-                return r[t.SequenceOf[t.JsonMapping]].fail(
+                return r[Sequence[t.JsonMapping]].fail(
                     f"Failed to load YAML: {yaml_result.error}",
                 )
             return FlextQualityUtilitiesQuality.extract_rules_from_yaml(
                 yaml_result.value,
             )
         except c.EXC_BROAD_IO_TYPE as e:
-            return r[t.SequenceOf[t.JsonMapping]].fail(
+            return r[Sequence[t.JsonMapping]].fail(
                 f"Failed to load rules: {e}",
                 exception=e,
             )
@@ -238,7 +288,7 @@ class FlextQualityUtilitiesQuality:
 
     @staticmethod
     def run_shell_command(
-        cmd: t.StrSequence,
+        cmd: Sequence[str],
         timeout_ms: int = c.Quality.HOOK_TIMEOUT_MS,
     ) -> p.Result[str]:
         """Run a shell command with timeout.

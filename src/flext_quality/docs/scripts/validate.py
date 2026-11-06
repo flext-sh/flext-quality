@@ -16,18 +16,17 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import concurrent.futures
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from http import HTTPStatus
 from pathlib import Path
-from typing import TYPE_CHECKING, Final, override
+from typing import Final, override
 
 import requests
 from flext_api import FlextApiConstants
 from flext_cli import cli
 
-from flext_quality import c, m, p, r, s, t, u
-
-if TYPE_CHECKING:
-    from collections.abc import MutableMapping, MutableSequence
+from flext_quality import c, m, p, r, s, u
+from flext_quality.docs.scripts import FlextQualityDocumentationReporter
 
 
 class FlextQualityDocumentationValidator:
@@ -52,7 +51,7 @@ class FlextQualityDocumentationValidator:
             self.retries = retries
             self.max_workers = max_workers
             self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-            self.results: m.Quality.LinkValidatorResults = (
+            self.results: p.Quality.LinkValidatorResults = (
                 m.Quality.LinkValidatorResults(
                     timestamp=u.now().isoformat(),
                     performance=m.Quality.LinkPerformanceMetrics(),
@@ -61,15 +60,15 @@ class FlextQualityDocumentationValidator:
 
         def find_all_links(
             self,
-            doc_files: t.SequenceOf[Path],
-        ) -> t.SequenceOf[m.Quality.LinkRecord]:
+            doc_files: Sequence[Path],
+        ) -> Sequence[p.Quality.LinkRecord]:
             """Extract all links from documentation files.
 
             Returns:
-                The resulting ``t.SequenceOf[m.Quality.LinkRecord]``.
+                The resulting ``Sequence[p.Quality.LinkRecord]``.
 
             """
-            all_links: MutableSequence[m.Quality.LinkRecord] = []
+            all_links: MutableSequence[p.Quality.LinkRecord] = []
             for file_path in doc_files:
                 file_rel_path = str(file_path)
                 read = u.Cli.files_read_text(file_path)
@@ -180,10 +179,10 @@ class FlextQualityDocumentationValidator:
 
         def validate_external_links(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
+            links: Sequence[p.Quality.LinkRecord],
             *,
             verbose: bool = False,
-        ) -> m.Quality.LinkValidatorResults:
+        ) -> p.Quality.LinkValidatorResults:
             """Validate external links with concurrent checking.
 
             Returns:
@@ -252,16 +251,16 @@ class FlextQualityDocumentationValidator:
 
         def _handle_request_attempt(
             self,
-            link: m.Quality.LinkRecord,
+            link: p.Quality.LinkRecord,
             attempt: int,
-        ) -> m.Quality.LinkCheckResult | None:
+        ) -> p.Quality.LinkCheckResult | None:
             """Handle a single request attempt.
 
             Returns:
                 The resulting ``m.Quality.LinkCheckResult | None``.
 
             """
-            result: m.Quality.LinkCheckResult | None = None
+            result: p.Quality.LinkCheckResult | None = None
             base_result = m.Quality.LinkCheckResult(
                 url=link.url,
                 file=link.file,
@@ -290,9 +289,9 @@ class FlextQualityDocumentationValidator:
 
         def _handle_request_attempt_unchecked(
             self,
-            link: m.Quality.LinkRecord,
-            base_result: m.Quality.LinkCheckResult,
-        ) -> m.Quality.LinkCheckResult:
+            link: p.Quality.LinkRecord,
+            base_result: p.Quality.LinkCheckResult,
+        ) -> p.Quality.LinkCheckResult:
             """Handle one request attempt while letting transport exceptions propagate.
 
             Returns:
@@ -301,7 +300,7 @@ class FlextQualityDocumentationValidator:
             """
             response = self._make_http_request(link.url)
             if response.status_code < HTTPStatus.BAD_REQUEST:
-                success_result: m.Quality.LinkCheckResult = base_result.model_copy(
+                success_result: p.Quality.LinkCheckResult = base_result.model_copy(
                     update={"valid": True, "status_code": response.status_code},
                 )
                 return success_result
@@ -311,13 +310,13 @@ class FlextQualityDocumentationValidator:
                     FlextApiConstants.Api.Method.GET,
                 )
             if response.status_code < HTTPStatus.BAD_REQUEST:
-                retry_success_result: m.Quality.LinkCheckResult = (
+                retry_success_result: p.Quality.LinkCheckResult = (
                     base_result.model_copy(
                         update={"valid": True, "status_code": response.status_code},
                     )
                 )
                 return retry_success_result
-            failure_result: m.Quality.LinkCheckResult = base_result.model_copy(
+            failure_result: p.Quality.LinkCheckResult = base_result.model_copy(
                 update={
                     "valid": False,
                     "status_code": response.status_code,
@@ -328,10 +327,10 @@ class FlextQualityDocumentationValidator:
 
         def _check_single_external_link(
             self,
-            link: m.Quality.LinkRecord,
+            link: p.Quality.LinkRecord,
             *,
             verbose: bool = False,
-        ) -> m.Quality.LinkCheckResult:
+        ) -> p.Quality.LinkCheckResult:
             """Check a single external link.
 
             Returns:
@@ -343,7 +342,7 @@ class FlextQualityDocumentationValidator:
                 attempt_result = self._handle_request_attempt(link, attempt)
                 if attempt_result is not None:
                     return attempt_result
-            max_retry_result: m.Quality.LinkCheckResult = (
+            max_retry_result: p.Quality.LinkCheckResult = (
                 m.Quality.LinkCheckResult.model_validate({
                     "valid": False,
                     "url": link.url,
@@ -356,9 +355,9 @@ class FlextQualityDocumentationValidator:
 
         def validate_internal_links(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.LinkValidatorResults:
+            links: Sequence[p.Quality.LinkRecord],
+            doc_files: Sequence[Path],
+        ) -> p.Quality.LinkValidatorResults:
             """Validate internal links and references.
 
             Returns:
@@ -413,9 +412,9 @@ class FlextQualityDocumentationValidator:
 
         def validate_images(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
+            links: Sequence[p.Quality.LinkRecord],
             project_root: Path,
-        ) -> m.Quality.LinkValidatorResults:
+        ) -> p.Quality.LinkValidatorResults:
             """Validate image references.
 
             Returns:
@@ -452,9 +451,9 @@ class FlextQualityDocumentationValidator:
 
         def validate_anchors(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.LinkValidatorResults:
+            links: Sequence[p.Quality.LinkRecord],
+            doc_files: Sequence[Path],
+        ) -> p.Quality.LinkValidatorResults:
             """Validate anchor links within documents.
 
             Returns:
@@ -521,8 +520,8 @@ class FlextQualityDocumentationValidator:
 
         def check_link_text_quality(
             self,
-            links: t.SequenceOf[m.Quality.LinkRecord],
-        ) -> m.Quality.LinkValidatorResults:
+            links: Sequence[p.Quality.LinkRecord],
+        ) -> p.Quality.LinkValidatorResults:
             """Check quality of link text for accessibility and usability.
 
             Returns:
@@ -599,21 +598,16 @@ class FlextQualityDocumentationValidator:
             """
             output_dir = Path(output_path)
             timestamp = u.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"validation_report_{timestamp}.json"
-            filepath = output_dir / filename
-            report_content = self.generate_report("json")
-            report_write = u.Cli.atomic_write_text_file(filepath, report_content)
-            if report_write.failure:
-                return r[Path].from_failure(report_write)
-            latest_file = output_dir / "latest_validation.json"
-            latest_write = u.Cli.json_write(
-                latest_file,
+            written = FlextQualityDocumentationReporter.write_report_and_latest(
+                output_dir,
+                f"validation_report_{timestamp}.json",
+                "latest_validation.json",
+                self.generate_report("json"),
                 self.results,
-                options=m.Cli.JsonWriteOptions(indent=2),
             )
-            if latest_write.failure:
-                return r[Path].from_failure(latest_write)
-            return r[Path].ok(filepath)
+            if written.failure:
+                return r[Path].from_failure(written)
+            return r[Path].ok(Path(written.value))
 
     class ContentValidator:
         """Content validation and quality checking system."""
@@ -621,14 +615,14 @@ class FlextQualityDocumentationValidator:
         def __init__(self) -> None:
             """Initialize the content validator."""
             super().__init__()
-            self.results: m.Quality.ContentValidatorResults = (
+            self.results: p.Quality.ContentValidatorResults = (
                 m.Quality.ContentValidatorResults(timestamp=u.now().isoformat())
             )
 
         def validate_markdown_syntax(
             self,
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.ContentValidatorResults:
+            doc_files: Sequence[Path],
+        ) -> p.Quality.ContentValidatorResults:
             """Validate markdown syntax and formatting.
 
             Returns:
@@ -661,14 +655,14 @@ class FlextQualityDocumentationValidator:
         @staticmethod
         def _check_markdown_issues(
             content: str,
-        ) -> t.SequenceOf[m.Quality.ContentIssue]:
+        ) -> Sequence[p.Quality.ContentIssue]:
             """Check for markdown syntax issues.
 
             Returns:
-                The resulting ``t.SequenceOf[m.Quality.ContentIssue]``.
+                The resulting ``Sequence[p.Quality.ContentIssue]``.
 
             """
-            issues: MutableSequence[m.Quality.ContentIssue] = []
+            issues: MutableSequence[p.Quality.ContentIssue] = []
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
                 if "[" in line and "]" in line and ("(" in line) and (")" not in line):
@@ -703,8 +697,8 @@ class FlextQualityDocumentationValidator:
 
         def check_content_quality(
             self,
-            doc_files: t.SequenceOf[Path],
-        ) -> m.Quality.ContentValidatorResults:
+            doc_files: Sequence[Path],
+        ) -> p.Quality.ContentValidatorResults:
             """Check content quality metrics.
 
             Returns:
@@ -754,7 +748,7 @@ class FlextQualityDocumentationValidator:
             return self.results
 
         @staticmethod
-        def _calculate_content_metrics(content: str) -> m.Quality.ContentMetrics:
+        def _calculate_content_metrics(content: str) -> p.Quality.ContentMetrics:
             """Calculate basic content quality metrics.
 
             Returns:
@@ -793,11 +787,11 @@ class FlextQualityDocumentationValidator:
             )
 
     @staticmethod
-    def discover_validation_files() -> t.SequenceOf[Path]:
+    def discover_validation_files() -> Sequence[Path]:
         """Discover documentation files for validation.
 
         Returns:
-            The resulting ``t.SequenceOf[Path]``.
+            The resulting ``Sequence[Path]``.
 
         """
         project_root = Path(__file__).parent.parent.parent.parent
@@ -901,8 +895,8 @@ class FlextQualityDocumentationValidator:
             self,
             link_validator: FlextQualityDocumentationValidator.LinkValidator,
             content_validator: FlextQualityDocumentationValidator.ContentValidator,
-            all_links: t.SequenceOf[m.Quality.LinkRecord],
-            doc_files: t.SequenceOf[Path],
+            all_links: Sequence[p.Quality.LinkRecord],
+            doc_files: Sequence[Path],
         ) -> bool:
             run_any = False
             if self.external_links or self.all:
@@ -966,17 +960,7 @@ class FlextQualityDocumentationValidator:
             return r[bool].ok(value=True)
 
     @staticmethod
-    def _run_handler(params: FlextQualityDocumentationValidator.Run) -> p.Result[bool]:
-        """Execute the validator ``Run`` route (typed, not a lambda, for pyrefly).
-
-        Returns:
-            The resulting ``p.Result[bool]``.
-
-        """
-        return params.execute()
-
-    @staticmethod
-    def main(args: t.StrSequence | None = None) -> int:
+    def main(args: Sequence[str] | None = None) -> int:
         """Run documentation validation via the canonical cli facade.
 
         Args:
@@ -987,16 +971,12 @@ class FlextQualityDocumentationValidator:
             The process exit code.
 
         """
-        exit_code: int = u.Quality.execute_result_command(
+        exit_code: int = u.Quality.execute_run_command(
             args=args,
             app_name="flext-quality-docs-validate",
             app_help="FLEXT Quality Documentation Validation",
-            route=m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Run documentation validation checks",
-                model_cls=FlextQualityDocumentationValidator.Run,
-                handler=FlextQualityDocumentationValidator._run_handler,
-            ),
+            route_help="Run documentation validation checks",
+            model_cls=FlextQualityDocumentationValidator.Run,
         )
         return exit_code
 

@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from types import MappingProxyType
 from typing import TYPE_CHECKING
 
 from flext_core.lazy import install_lazy_exports
@@ -31,6 +30,7 @@ if TYPE_CHECKING:
     from flext_quality.api import FlextQuality, quality
     from flext_quality.base import FlextQualityServiceBase, s
     from flext_quality.cli import FlextQualityCli, main
+    from flext_quality.config_models import FlextQualityModelsConfig
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.models import FlextQualityModels, m
     from flext_quality.protocols import FlextQualityProtocols, p
@@ -44,6 +44,7 @@ __all__: tuple[str, ...] = (
     "FlextQualityConfig",
     "FlextQualityConstants",
     "FlextQualityModels",
+    "FlextQualityModelsConfig",
     "FlextQualityProtocols",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
@@ -78,12 +79,13 @@ __all__: tuple[str, ...] = (
 install_lazy_exports(
     __name__,
     globals(),
-    MappingProxyType({
+    {
         "FlextQuality": ".api",
         "FlextQualityCli": ".cli",
         "FlextQualityConfig": "._config",
         "FlextQualityConstants": ".constants",
         "FlextQualityModels": ".models",
+        "FlextQualityModelsConfig": ".config_models",
         "FlextQualityProtocols": ".protocols",
         "FlextQualityServiceBase": ".base",
         "FlextQualitySettings": "._settings",
@@ -112,7 +114,7 @@ install_lazy_exports(
         "t": ".typings",
         "u": ".utilities",
         "x": "flext_web",
-    }),
+    },
     public_exports=__all__,
 )
 

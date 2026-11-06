@@ -10,11 +10,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from types import MappingProxyType
 
-from flext_quality import c, m, t, u
+from flext_quality import c, m, p, t, u
 
 
 class FlextQualityConfigManager:
@@ -167,16 +167,16 @@ class FlextQualityConfigManager:
                 merged[key] = dict(value) if isinstance(value, Mapping) else value
         return merged
 
-    type ConfigValue = t.Primitives | t.StrSequence
-    type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
+    type ConfigValue = t.Primitives | Sequence[str]
+    type ConfigSection = MutableMapping[str, t.Primitives | Sequence[str]]
     type ConfigData = MutableMapping[
         str,
-        MutableMapping[str, t.Primitives | t.StrSequence],
+        MutableMapping[str, t.Primitives | Sequence[str]],
     ]
-    type RawSectionMap = t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]]
-    type RawConfigMap = t.MappingKV[
+    type RawSectionMap = Mapping[str, t.Primitives | Sequence[t.Primitives]]
+    type RawConfigMap = Mapping[
         str,
-        t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
+        Mapping[str, t.Primitives | Sequence[t.Primitives]],
     ]
 
     @staticmethod
@@ -232,11 +232,11 @@ class FlextQualityConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._audit_rules: m.Quality.AuditRulesConfig | None = None
-        self._style_guide: m.Quality.StyleGuideConfig | None = None
-        self._validation_config: m.Quality.ValidationConfig | None = None
+        self._audit_rules: p.Quality.AuditRulesConfig | None = None
+        self._style_guide: p.Quality.StyleGuideConfig | None = None
+        self._validation_config: p.Quality.ValidationConfig | None = None
 
-    def resolve_audit_rules(self) -> m.Quality.AuditRulesConfig:
+    def resolve_audit_rules(self) -> p.Quality.AuditRulesConfig:
         """Get audit rules configuration.
 
         Returns:
@@ -251,7 +251,7 @@ class FlextQualityConfigManager:
             self._audit_rules = m.Quality.AuditRulesConfig.model_validate(data)
         return self._audit_rules
 
-    def resolve_style_guide(self) -> m.Quality.StyleGuideConfig:
+    def resolve_style_guide(self) -> p.Quality.StyleGuideConfig:
         """Get style guide configuration.
 
         Returns:
@@ -266,7 +266,7 @@ class FlextQualityConfigManager:
             self._style_guide = m.Quality.StyleGuideConfig.model_validate(data)
         return self._style_guide
 
-    def resolve_validation_config(self) -> m.Quality.ValidationConfig:
+    def resolve_validation_config(self) -> p.Quality.ValidationConfig:
         """Get validation configuration.
 
         Returns:
@@ -302,11 +302,11 @@ class FlextQualityConfigManager:
         self._style_guide = None
         self._validation_config = None
 
-    def validate_configs(self) -> t.StrSequence:
+    def validate_configs(self) -> Sequence[str]:
         """Validate all configuration files and return any issues.
 
         Returns:
-            The resulting ``t.StrSequence``.
+            The resulting ``Sequence[str]``.
 
         """
         # Check required settings files exist
