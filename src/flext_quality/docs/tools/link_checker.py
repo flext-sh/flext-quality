@@ -35,7 +35,7 @@ class FlextQualityLinkChecker:
             self.validation_config.link_validation
         )
         self.session: ClientSession | None = None
-        self.results: p.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
+        self.results: m.Quality.LinkValidatorResults = m.Quality.LinkValidatorResults(
             timestamp=u.now().isoformat(),
             performance=m.Quality.LinkPerformanceMetrics(),
         )
@@ -314,7 +314,9 @@ class FlextQualityLinkChecker:
                 self.results.valid_links += 1
             else:
                 self.results.broken_links += 1
-                self.results.errors.append(result)
+                self.results.errors.append(
+                    m.Quality.LinkCheckResult.model_validate(result)
+                )
 
         return self.results
 

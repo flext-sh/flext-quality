@@ -51,7 +51,7 @@ class FlextQualityDocumentationValidator:
             self.retries = retries
             self.max_workers = max_workers
             self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-            self.results: p.Quality.LinkValidatorResults = (
+            self.results: m.Quality.LinkValidatorResults = (
                 m.Quality.LinkValidatorResults(
                     timestamp=u.now().isoformat(),
                     performance=m.Quality.LinkPerformanceMetrics(),
@@ -210,7 +210,9 @@ class FlextQualityDocumentationValidator:
                         self.results.valid_links += 1
                     else:
                         self.results.broken_links += 1
-                        self.results.errors.append(result)
+                        self.results.errors.append(
+                            m.Quality.LinkCheckResult.model_validate(result)
+                        )
             return self.results
 
         def _make_http_request(
@@ -615,7 +617,7 @@ class FlextQualityDocumentationValidator:
         def __init__(self) -> None:
             """Initialize the content validator."""
             super().__init__()
-            self.results: p.Quality.ContentValidatorResults = (
+            self.results: m.Quality.ContentValidatorResults = (
                 m.Quality.ContentValidatorResults(timestamp=u.now().isoformat())
             )
 
@@ -645,10 +647,12 @@ class FlextQualityDocumentationValidator:
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 issues = self._check_markdown_issues(content)
                 if issues:
-                    self.results.content_issues.extend([
-                        issue.model_copy(update={"file": file_rel_path})
+                    self.results.content_issues.extend(
+                        m.Quality.ContentIssue.model_validate(
+                            issue.model_copy(update={"file": file_rel_path})
+                        )
                         for issue in issues
-                    ])
+                    )
                 self.results.files_checked += 1
             return self.results
 

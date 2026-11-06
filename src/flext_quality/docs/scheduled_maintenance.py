@@ -68,7 +68,7 @@ class FlextQualityScheduledMaintenance:
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results: p.Quality.ScheduleResults = m.Quality.ScheduleResults(
+        self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
             start_time=u.now().isoformat(),
         )
 
