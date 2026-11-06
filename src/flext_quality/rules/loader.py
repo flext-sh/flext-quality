@@ -116,7 +116,9 @@ class FlextQualityRulesLoader:
         try:
             rule_type = c.Quality.RuleType(str(rule_type_str))
         except ValueError:
-            valid_types = [p.value for m in c.Quality.RuleType.__members__.values()]
+            valid_types = [
+                member.value for member in c.Quality.RuleType.__members__.values()
+            ]
             return r[p.Quality.RuleDefinition].fail(
                 f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}",
             )

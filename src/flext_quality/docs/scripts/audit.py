@@ -117,7 +117,7 @@ class FlextQualityDocumentationAuditor:
         self.validation_config: p.Quality.ValidationConfig = (
             self.config_manager.resolve_validation_config()
         )
-        self.results: p.Quality.AuditorResults = m.Quality.AuditorResults(
+        self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=u.now().isoformat(),
             metrics=m.Quality.AuditMetrics(),
         )
@@ -680,7 +680,7 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: MutableSequence[p.Quality.AuditRecommendation] = []
+        recommendations: list[m.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if (
             quality_score

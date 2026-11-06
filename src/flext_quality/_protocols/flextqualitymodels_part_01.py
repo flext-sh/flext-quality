@@ -14,8 +14,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 from flext_web import FlextWebProtocols
 
 if TYPE_CHECKING:
-    from flext_quality import t
-    from flext_quality._constants import FlextQualityConstantsEnums
+    from flext_quality import c, t
 
 
 class FlextQualityProtocolsFlextqualitymodelsPart01:
@@ -117,15 +116,7 @@ class FlextQualityProtocolsFlextqualitymodelsPart01:
         """Structural data contract projected from the owning model."""
 
         name: str
-
-        @property
-        def type(self) -> FlextQualityConstantsEnums.RuleType:
-            """Structural member projected from the owning model.
-
-            Category of quality rule (e.g. content, style, link, accessibility).
-            """
-            ...
-
+        type: c.Quality.RuleType
         description: str
         pattern: str | None
         action: str

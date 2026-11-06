@@ -26,7 +26,7 @@ class FlextQualityStyleValidator:
         self.settings: p.Quality.StyleGuideConfig = FlextQualityConfigManager(
             config_dir,
         ).resolve_style_guide()
-        self.results: p.Quality.StyleValidationResults = (
+        self.results: m.Quality.StyleValidationResults = (
             m.Quality.StyleValidationResults(
                 files_checked=0,
                 style_violations=[],
@@ -56,8 +56,8 @@ class FlextQualityStyleValidator:
         content = u.Cli.files_read_text(file_path).value
         filename = str(file_path)
 
-        violations_list: MutableSequence[p.Quality.StyleIssue] = []
-        issues_list: MutableSequence[p.Quality.StyleIssue] = []
+        violations_list: list[m.Quality.StyleIssue] = []
+        issues_list: list[m.Quality.StyleIssue] = []
         suggestions_list: MutableSequence[str] = []
         file_results = m.Quality.StyleFileResults(
             file=filename,
@@ -88,14 +88,14 @@ class FlextQualityStyleValidator:
     def _check_markdown_formatting(
         self,
         content: str,
-    ) -> Sequence[p.Quality.StyleIssue]:
+    ) -> list[m.Quality.StyleIssue]:
         """Check basic markdown formatting consistency.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -134,14 +134,14 @@ class FlextQualityStyleValidator:
     def _check_heading_consistency(
         self,
         content: str,
-    ) -> Sequence[p.Quality.StyleIssue]:
+    ) -> list[m.Quality.StyleIssue]:
         """Check heading hierarchy and consistency.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         headings: Sequence[tuple[int, str, int]] = [
             (
@@ -192,14 +192,14 @@ class FlextQualityStyleValidator:
     def _check_list_consistency(
         self,
         content: str,
-    ) -> Sequence[p.Quality.StyleIssue]:
+    ) -> list[m.Quality.StyleIssue]:
         """Check list formatting consistency.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         list_items: Sequence[tuple[str, str, int]] = [
             (match.group(1), match.group(2), content[: match.start()].count("\n") + 1)
@@ -235,14 +235,14 @@ class FlextQualityStyleValidator:
     def _check_code_formatting(
         self,
         content: str,
-    ) -> Sequence[p.Quality.StyleIssue]:
+    ) -> list[m.Quality.StyleIssue]:
         """Check code block and inline code formatting.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         code_block_style = self.settings.markdown.code_block_style
         if (
@@ -288,14 +288,14 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_accessibility(self, content: str) -> Sequence[p.Quality.StyleIssue]:
+    def _check_accessibility(self, content: str) -> list[m.Quality.StyleIssue]:
         """Check accessibility compliance.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        issues: MutableSequence[p.Quality.StyleIssue] = []
+        issues: list[m.Quality.StyleIssue] = []
 
         if self.settings.accessibility.require_alt_text:
             images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
@@ -333,14 +333,14 @@ class FlextQualityStyleValidator:
 
         return issues
 
-    def _check_line_length(self, content: str) -> Sequence[p.Quality.StyleIssue]:
+    def _check_line_length(self, content: str) -> list[m.Quality.StyleIssue]:
         """Check line length compliance.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         max_length = self.settings.formatting.max_line_length
         lines = content.split("\n")
@@ -371,14 +371,14 @@ class FlextQualityStyleValidator:
 
         return violations
 
-    def _check_whitespace(self, content: str) -> Sequence[p.Quality.StyleIssue]:
+    def _check_whitespace(self, content: str) -> list[m.Quality.StyleIssue]:
         """Check whitespace formatting.
 
         Returns:
             The resulting ``Sequence[p.Quality.StyleIssue]``.
 
         """
-        violations: MutableSequence[p.Quality.StyleIssue] = []
+        violations: list[m.Quality.StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -476,7 +476,7 @@ class FlextQualityStyleValidator:
         self.results.summary.accessibility_issues = len(accessibility_issues)
         self.results.summary.suggestions_count = len(suggestions)
 
-        all_violations: MutableSequence[p.Quality.StyleIssue] = []
+        all_violations: list[m.Quality.StyleIssue] = []
         all_violations.extend(style_violations)
         all_violations.extend(accessibility_issues)
 

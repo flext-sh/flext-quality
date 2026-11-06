@@ -15,8 +15,7 @@ from typing import TYPE_CHECKING, Protocol, runtime_checkable
 from flext_web import FlextWebProtocols
 
 if TYPE_CHECKING:
-    from flext_quality import t
-    from flext_quality._constants import FlextQualityConstantsEnums
+    from flext_quality import c, t
     from flext_quality._protocols import FlextQualityProtocolsFlextqualitymodelsPart01
 
 
@@ -116,26 +115,9 @@ class FlextQualityProtocolsFlextqualitymodelsPart02:
 
         flags: Sequence[str]
         help: str
-
-        @property
-        def action(self) -> FlextQualityConstantsEnums.ArgumentAction | None:
-            """Structural member projected from the owning model.
-
-            Argparse action to perform when the option is provided (e.g.
-            store_true).
-            """
-            ...
-
+        action: c.Quality.ArgumentAction | None
         default: t.JsonValue | None
-
-        @property
-        def value_type(self) -> FlextQualityConstantsEnums.ArgumentValueType | None:
-            """Structural member projected from the owning model.
-
-            Type the option's value is converted to (e.g. string, integer, boolean).
-            """
-            ...
-
+        value_type: c.Quality.ArgumentValueType | None
         nargs: int | str | None
         choices: Sequence[str] | None
         dest: str | None
