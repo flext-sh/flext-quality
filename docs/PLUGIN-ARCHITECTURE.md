@@ -127,7 +127,7 @@ The legacy integration proposal below preserves its intended layers; it is not p
 that the external MCP server or historical hooks are installed. Current execution uses
 the workspace-root Make contract above.
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                     Claude Code Hooks                        │
 ├─────────────────────────────────────────────────────────────┤

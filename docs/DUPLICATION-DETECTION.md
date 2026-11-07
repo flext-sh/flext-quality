@@ -92,7 +92,7 @@ Prevents Edit/Write operations that increase code duplication.
 
 **Behavior**:
 
-```
+```text
 
 First Attempt (Edit Increases Duplication): ├─ Calculate duplicate pair count for
 project ├─ Compare against baseline ├─ If count increased: │ ├─ Block operation (exit
@@ -115,7 +115,7 @@ as intentional ├─ Update baseline to new count └─ Allow operation (exit 
 
 **Message on Block**:
 
-```
+```text
 
 ❌ VIOLATION: Duplicate code count increased
    Project:      flext-ldif
@@ -166,7 +166,7 @@ Generates and manages duplicate code baselines for all FLEXT projects.
 
 **Baseline Format**:
 
-```
+```text
 
 # FLEXT Duplicate Code Baseline - date
 # Format: project_name:duplicate_pair_count
@@ -193,7 +193,7 @@ retry acceptance.
 
 **Example**:
 
-```
+```text
 flext-api:0
 flext-auth:0
 flext-cli:0

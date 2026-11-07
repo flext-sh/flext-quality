@@ -48,7 +48,7 @@ ls flext-quality/src/flext_quality/rules/data/*.yaml
 
 **16 YAML files with rule categories**:
 
-```
+```text
 architecture.yaml          (12 rules)  - Architecture layering
 bash_commands.yaml         (21 rules)  - Shell command safety
 behavioral.yaml            (3 rules)   - Behavioral patterns
