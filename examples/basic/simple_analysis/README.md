@@ -78,7 +78,7 @@ python example.py ../../../src
 
 ### Expected Output
 
-```
+```text
 🚀 FLEXT Quality - Basic Analysis Example
 ============================================================
 🔍 Starting quality analysis for: /path/to/project
@@ -329,24 +329,24 @@ pdf_report = report.generate_pdf_report()
 
 For additional support:
 
-- Review the **API Documentation** (_Documentation coming soon_)
-- Check **Integration Examples** (_Documentation coming soon_)
-- Consult **Troubleshooting Guide** (_Documentation coming soon_)
+- Review the **API Documentation** (*Documentation coming soon*)
+- Check **Integration Examples** (*Documentation coming soon*)
+- Consult **Troubleshooting Guide** (*Documentation coming soon*)
 
 ## Next Steps
 
 After mastering this basic example:
 
-1. **Explore Advanced Examples** - (_Documentation coming soon_)
-1. **Learn Integration Patterns** - (_Documentation coming soon_)
-1. **Implement CI/CD** - (_Documentation coming soon_)
-1. **Create Custom Reports** - (_Documentation coming soon_)
+1. **Explore Advanced Examples** - (*Documentation coming soon*)
+1. **Learn Integration Patterns** - (*Documentation coming soon*)
+1. **Implement CI/CD** - (*Documentation coming soon*)
+1. **Create Custom Reports** - (*Documentation coming soon*)
 
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system
   documentation
-- **CodeAnalyzer API** - Detailed API reference (_Documentation coming soon_)
+- **CodeAnalyzer API** - Detailed API reference (*Documentation coming soon*)
 - **Quality Metrics Guide** - Understanding quality scoring
-  (_Documentation coming soon_)
-- **Integration Patterns** - FLEXT ecosystem integration (_Documentation coming soon_)
+  (*Documentation coming soon*)
+- **Integration Patterns** - FLEXT ecosystem integration (*Documentation coming soon*)

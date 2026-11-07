@@ -154,7 +154,7 @@ on the codebase **Content**: Classes, interfaces, implementation details
 
 ### Internal Dependencies
 
-```
+```text
 Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Layer
 ```
 

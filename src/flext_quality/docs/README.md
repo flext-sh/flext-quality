@@ -242,7 +242,7 @@ that ensure:
 
 ### Core Components
 
-```
+```text
 docs/maintenance/
 ├── README.md                 # This file - system overview and setup guide
 ├── demo.py                   # Interactive demonstration of all features
@@ -718,7 +718,7 @@ jobs:
 
 ### Quality Metrics Dashboard
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │ FLEXT Quality Documentation Health Dashboard                │
 ├─────────────────────────────────────────────────────────────┤

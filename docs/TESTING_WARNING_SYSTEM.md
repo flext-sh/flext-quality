@@ -80,7 +80,7 @@ The hook system is **fully operational in warning-only mode** with:
 
 **✅ 16 YAML Files Loaded**
 
-```
+```text
 architecture.yaml        → 12 rules
 bash_commands.yaml       → 21 rules
 behavioral.yaml          → 3 rules

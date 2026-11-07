@@ -29,7 +29,7 @@ warning categories.
 
 **The hook system is configured to warn but NOT block**:
 
-```
+```text
 Tool execution → Hook validates → Violations found? →
   YES: Show warnings + suggestions → Allow execution anyway ✅
   NO:  Silent pass → Allow execution ✅
@@ -568,7 +568,7 @@ mv old_directory old_directory.bak # Instead of rm -rf
 
 If the violation is truly intentional and necessary:
 
-```
+```text
 1. Understand the warning
 2. Acknowledge in your response to Claude
 3. Execution will proceed

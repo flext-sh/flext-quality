@@ -378,16 +378,16 @@ ls -la /path/to/project
 ### Getting Help
 
 - **Documentation**: [docs/README.md](../docs/README.md)
-- **API Reference** - (_Documentation coming soon_)
-- **Integration Guide** - (_Documentation coming soon_)
-- **Troubleshooting** - (_Documentation coming soon_)
+- **API Reference** - (*Documentation coming soon*)
+- **Integration Guide** - (*Documentation coming soon*)
+- **Troubleshooting** - (*Documentation coming soon*)
 
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../docs/README.md)** - Complete system documentation
 - **API Reference** - REST API and Python SDK documentation
-  (_Documentation coming soon_)
+  (*Documentation coming soon*)
 - **Integration Guide** - FLEXT ecosystem integration patterns
-  (_Documentation coming soon_)
+  (*Documentation coming soon*)
 - **Development Guide** - Development setup and contribution guidelines
-  (_Documentation coming soon_)
+  (*Documentation coming soon*)

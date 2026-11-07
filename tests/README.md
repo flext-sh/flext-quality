@@ -44,7 +44,7 @@ analysis functionality, domain business rules, and ecosystem integration.
 
 ### Test Structure
 
-```
+```text
 tests/
 ├── __init__.py              # Test suite initialization and configuration
 ├── conftest.py              # Shared test fixtures and configuration
@@ -421,9 +421,9 @@ make setup
 
 ## Related Documentation
 
-- **Source Code Documentation** - Implementation details (_Documentation coming soon_)
-- **Development Guide** - Development setup and workflows (_Documentation coming soon_)
+- **Source Code Documentation** - Implementation details (*Documentation coming soon*)
+- **Development Guide** - Development setup and workflows (*Documentation coming soon*)
 - **[Architecture Documentation](../docs/architecture/README.md)** - System design and
   patterns
 - **Quality Standards** - Quality requirements and validation
-  (_Documentation coming soon_)
+  (*Documentation coming soon*)
