@@ -680,7 +680,7 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: list[m.Quality.AuditRecommendation] = []
+        recommendations: list[p.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if (
             quality_score
