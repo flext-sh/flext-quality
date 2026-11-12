@@ -412,7 +412,7 @@ class FlextQualityStyleValidator:
 
     def _generate_suggestions(
         self,
-        violations: Sequence[p.Quality.StyleIssue],
+        violations: Sequence[m.Quality.StyleIssue],
     ) -> Sequence[str]:
         """Generate improvement suggestions based on violations.
 
