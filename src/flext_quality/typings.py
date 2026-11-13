@@ -7,12 +7,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import t as flext_web_t
+from flext_web import FlextWebTypes
 
 from flext_quality._typings import FlextQualityTypingsQuality
 
 
-class FlextQualityTypes(flext_web_t):
+class FlextQualityTypes(FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
     class Quality(FlextQualityTypingsQuality):

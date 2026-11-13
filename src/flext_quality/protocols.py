@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import p as flext_web_p
+from flext_web import FlextWebProtocols
 
 from flext_quality._protocols import (
     FlextQualityProtocolsBase,
@@ -18,7 +18,7 @@ from flext_quality._protocols import (
 
 
 class FlextQualityProtocols(
-    flext_web_p,
+    FlextWebProtocols,
     FlextQualityProtocolsBase,
     FlextQualityProtocolsFlextqualitymodelsPart01,
     FlextQualityProtocolsFlextqualitymodelsPart02,

@@ -14,7 +14,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_web import c as flext_web_c
+from flext_web import FlextWebConstants
 
 from flext_quality._constants import (
     FlextQualityConstantsBase,
@@ -23,7 +23,7 @@ from flext_quality._constants import (
 )
 
 
-class FlextQualityConstants(flext_web_c):
+class FlextQualityConstants(FlextWebConstants):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,
