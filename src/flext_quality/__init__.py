@@ -116,6 +116,9 @@ install_lazy_exports(
         "x": "flext_web",
     },
     public_exports=__all__,
+    deferred_members={
+        "FlextQualityModelsConfig": ("QualityConfigNamespace",),
+    },
 )
 
 if not TYPE_CHECKING:
