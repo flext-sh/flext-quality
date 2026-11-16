@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import install_lazy_exports
+from flext_core.lazy import defer_lazy_bases, install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality._models.base import FlextQualityModelsBase
@@ -36,4 +36,35 @@ install_lazy_exports(
         "FlextQualityModelsPart02": ".flextqualitymodels_part_02",
     },
     public_exports=__all__,
+    deferred_members={
+        "FlextQualityModelsBase": (
+            "QualityThresholdsConfig",
+            "ContentChecksConfig",
+            "SeverityLevelsConfig",
+            "MarkdownStyleConfig",
+            "AccessibilityConfig",
+            "FormattingConfig",
+            "HeadingsConfig",
+            "CodeStyleConfig",
+            "GithubLinkConfig",
+            "DocumentationLinkConfig",
+            "LinkValidationConfig",
+            "ValidationRunConfig",
+            "ContentAnalysisConfig",
+            "AuditRulesConfig",
+            "StyleGuideConfig",
+            "ValidationConfig",
+        ),
+        "FlextQualityModelsPart01": ("Quality",),
+        "FlextQualityModelsPart02": ("Quality",),
+    },
+)
+
+defer_lazy_bases(
+    __name__,
+    {
+        "FlextQualityModelsBase": (("flext_quality", "FlextQualityModelsConfig"),),
+        "FlextQualityModelsPart01": (("flext_web", "FlextWebModels"),),
+        "FlextQualityModelsPart02": ((".", "FlextQualityModelsPart01"),),
+    },
 )
