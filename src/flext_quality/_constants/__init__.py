@@ -32,20 +32,8 @@ install_lazy_exports(
         "FlextQualityConstantsValues": ".values",
     },
     public_exports=__all__,
-    deferred_members={
-        "FlextQualityConstantsEnums": (
-            "HookEvent",
-            "RuleType",
-            "Severity",
-            "RuleResult",
-            "IntegrationStatus",
-            "NotificationPriority",
-            "ArgumentAction",
-            "ArgumentValueType",
-        ),
-        "FlextQualityConstantsValues": (
-            "Quality",
-            "LinkCheckerDemo",
-        ),
-    },
+    deferred_members=(
+        "FlextQualityConstantsEnums",
+        "FlextQualityConstantsValues",
+    ),
 )
