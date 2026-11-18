@@ -32,4 +32,8 @@ install_lazy_exports(
         "FlextQualityConstantsValues": ".values",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextQualityConstantsEnums",
+        "FlextQualityConstantsValues",
+    ),
 )

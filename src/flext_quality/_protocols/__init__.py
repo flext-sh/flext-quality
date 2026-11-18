@@ -39,4 +39,10 @@ install_lazy_exports(
         "FlextQualityProtocolsQuality": ".quality",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextQualityProtocolsBase",
+        "FlextQualityProtocolsFlextqualitymodelsPart01",
+        "FlextQualityProtocolsFlextqualitymodelsPart02",
+        "FlextQualityProtocolsQuality",
+    ),
 )

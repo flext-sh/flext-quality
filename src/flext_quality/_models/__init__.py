@@ -36,4 +36,9 @@ install_lazy_exports(
         "FlextQualityModelsPart02": ".flextqualitymodels_part_02",
     },
     public_exports=__all__,
+    deferred_members=(
+        "FlextQualityModelsBase",
+        "FlextQualityModelsPart01",
+        "FlextQualityModelsPart02",
+    ),
 )
