@@ -8,17 +8,14 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsModels
 
-from flext_quality import FlextQualityModels
+from tests import FlextQualityModels
 
 
 class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
     """Test models for flext-quality."""
 
-    class Quality(FlextQualityModels.Quality):
-        """Quality domain test models."""
-
-        class Tests:
-            """Test-specific models."""
+    class Tests(FlextTestsModels.Tests):
+        """Test-specific models."""
 
 
 m = TestsFlextQualityModels

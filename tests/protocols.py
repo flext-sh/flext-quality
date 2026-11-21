@@ -8,17 +8,14 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsProtocols
 
-from flext_quality import FlextQualityProtocols
+from tests import FlextQualityProtocols
 
 
 class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
     """Test protocols for flext-quality."""
 
-    class Quality(FlextQualityProtocols.Quality):
-        """Quality domain test protocols."""
-
-        class Tests:
-            """Test-specific protocols."""
+    class Tests(FlextTestsProtocols.Tests):
+        """Test-specific protocols."""
 
 
 p = TestsFlextQualityProtocols
