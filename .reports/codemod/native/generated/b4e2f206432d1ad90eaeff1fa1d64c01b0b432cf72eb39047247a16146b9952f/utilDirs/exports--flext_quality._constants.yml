@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality._constants","language":"Python","rule":{"regex":"^(?:FlextQualityConstantsBase|FlextQualityConstantsEnums|FlextQualityConstantsValues)$"}}

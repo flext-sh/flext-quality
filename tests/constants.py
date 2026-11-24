@@ -8,17 +8,14 @@ from __future__ import annotations
 
 from flext_tests import FlextTestsConstants
 
-from flext_quality import FlextQualityConstants
+from tests import FlextQualityConstants
 
 
 class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
     """Test constants for flext-quality."""
 
-    class Quality(FlextQualityConstants.Quality):
-        """Quality domain test constants."""
-
-        class Tests(FlextTestsConstants.Tests):
-            """Test-specific constants."""
+    class Tests(FlextTestsConstants.Tests):
+        """Test-specific constants."""
 
 
 c = TestsFlextQualityConstants

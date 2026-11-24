@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality.rules","language":"Python","rule":{"regex":"^(?:FlextQualityRulesEngine|FlextQualityRulesLoader|FlextQualityValidators)$"}}

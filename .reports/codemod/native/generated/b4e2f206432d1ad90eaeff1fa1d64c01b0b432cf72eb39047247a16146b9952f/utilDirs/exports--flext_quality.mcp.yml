@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality.mcp","language":"Python","rule":{"regex":"^(?:FlextQualityMcpResources|FlextQualityMcpServer|FlextQualityMcpTools)$"}}

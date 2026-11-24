@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality.integrations","language":"Python","rule":{"regex":"^(?:FlextQualityClaudeContextClient|FlextQualityClaudeMemClient|FlextQualityCodeExecutionBridge|FlextQualityMcpClient)$"}}

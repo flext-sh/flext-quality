@@ -32,16 +32,41 @@ if TYPE_CHECKING:
         quality,
         settings,
     )
+    from flext_quality.docs import (
+        FlextQualityDocumentationDashboard,
+        FlextQualityDocumentationNotifier,
+        FlextQualityScheduledMaintenance,
+    )
+    from flext_quality.docs.core import FlextQualityConfigManager
+    from flext_quality.docs.scripts import (
+        FlextQualityDocumentationAuditor,
+        FlextQualityDocumentationOptimizer,
+        FlextQualityDocumentationReporter,
+        FlextQualityDocumentationValidator,
+    )
+    from flext_quality.docs.tools import (
+        FlextQualityLinkChecker,
+        FlextQualityStyleValidator,
+    )
+    from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
+    from flext_quality.integrations import (
+        FlextQualityClaudeContextClient,
+        FlextQualityClaudeMemClient,
+        FlextQualityCodeExecutionBridge,
+        FlextQualityMcpClient,
+    )
+    from flext_quality.mcp import (
+        FlextQualityMcpResources,
+        FlextQualityMcpServer,
+        FlextQualityMcpTools,
+    )
+    from flext_quality.rules import (
+        FlextQualityRulesEngine,
+        FlextQualityRulesLoader,
+        FlextQualityValidators,
+    )
     from tests.base import TestsFlextQualityServiceBase, s
     from tests.constants import TestsFlextQualityConstants, c
-    from tests.helpers import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-    )
     from tests.models import TestsFlextQualityModels, m
     from tests.protocols import TestsFlextQualityProtocols, p
     from tests.settings import TestsFlextQualitySettings
@@ -51,16 +76,38 @@ if TYPE_CHECKING:
 
 __all__: tuple[str, ...] = (
     "FlextQuality",
+    "FlextQualityBaseHook",
+    "FlextQualityClaudeContextClient",
+    "FlextQualityClaudeMemClient",
     "FlextQualityCli",
+    "FlextQualityCodeExecutionBridge",
     "FlextQualityConfig",
+    "FlextQualityConfigManager",
     "FlextQualityConstants",
+    "FlextQualityDocumentationAuditor",
+    "FlextQualityDocumentationDashboard",
+    "FlextQualityDocumentationNotifier",
+    "FlextQualityDocumentationOptimizer",
+    "FlextQualityDocumentationReporter",
+    "FlextQualityDocumentationValidator",
+    "FlextQualityHookManager",
+    "FlextQualityLinkChecker",
+    "FlextQualityMcpClient",
+    "FlextQualityMcpResources",
+    "FlextQualityMcpServer",
+    "FlextQualityMcpTools",
     "FlextQualityModels",
     "FlextQualityModelsConfig",
     "FlextQualityProtocols",
+    "FlextQualityRulesEngine",
+    "FlextQualityRulesLoader",
+    "FlextQualityScheduledMaintenance",
     "FlextQualityServiceBase",
     "FlextQualitySettings",
+    "FlextQualityStyleValidator",
     "FlextQualityTypes",
     "FlextQualityUtilities",
+    "FlextQualityValidators",
     "FlextQualityVersion",
     "TestsFlextQualityConstants",
     "TestsFlextQualityModels",
@@ -70,12 +117,6 @@ __all__: tuple[str, ...] = (
     "TestsFlextQualityTypes",
     "TestsFlextQualityUtilities",
     "api",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
     "c",
     "config",
     "d",
@@ -102,16 +143,38 @@ install_lazy_exports(
     globals(),
     {
         "FlextQuality": "flext_quality",
+        "FlextQualityBaseHook": "flext_quality.hooks",
+        "FlextQualityClaudeContextClient": "flext_quality.integrations",
+        "FlextQualityClaudeMemClient": "flext_quality.integrations",
         "FlextQualityCli": "flext_quality",
+        "FlextQualityCodeExecutionBridge": "flext_quality.integrations",
         "FlextQualityConfig": "flext_quality",
+        "FlextQualityConfigManager": "flext_quality.docs.core",
         "FlextQualityConstants": "flext_quality",
+        "FlextQualityDocumentationAuditor": "flext_quality.docs.scripts",
+        "FlextQualityDocumentationDashboard": "flext_quality.docs",
+        "FlextQualityDocumentationNotifier": "flext_quality.docs",
+        "FlextQualityDocumentationOptimizer": "flext_quality.docs.scripts",
+        "FlextQualityDocumentationReporter": "flext_quality.docs.scripts",
+        "FlextQualityDocumentationValidator": "flext_quality.docs.scripts",
+        "FlextQualityHookManager": "flext_quality.hooks",
+        "FlextQualityLinkChecker": "flext_quality.docs.tools",
+        "FlextQualityMcpClient": "flext_quality.integrations",
+        "FlextQualityMcpResources": "flext_quality.mcp",
+        "FlextQualityMcpServer": "flext_quality.mcp",
+        "FlextQualityMcpTools": "flext_quality.mcp",
         "FlextQualityModels": "flext_quality",
         "FlextQualityModelsConfig": "flext_quality",
         "FlextQualityProtocols": "flext_quality",
+        "FlextQualityRulesEngine": "flext_quality.rules",
+        "FlextQualityRulesLoader": "flext_quality.rules",
+        "FlextQualityScheduledMaintenance": "flext_quality.docs",
         "FlextQualityServiceBase": "flext_quality",
         "FlextQualitySettings": "flext_quality",
+        "FlextQualityStyleValidator": "flext_quality.docs.tools",
         "FlextQualityTypes": "flext_quality",
         "FlextQualityUtilities": "flext_quality",
+        "FlextQualityValidators": "flext_quality.rules",
         "FlextQualityVersion": "flext_quality",
         "TestsFlextQualityConstants": ".constants",
         "TestsFlextQualityModels": ".models",
@@ -121,12 +184,6 @@ install_lazy_exports(
         "TestsFlextQualityTypes": ".typings",
         "TestsFlextQualityUtilities": ".utilities",
         "api": "flext_tests",
-        "assert_analysis_results_structure": ".helpers",
-        "assert_dict_structure": ".helpers",
-        "assert_is_dict": ".helpers",
-        "assert_is_list": ".helpers",
-        "assert_issues_structure": ".helpers",
-        "assert_metrics_structure": ".helpers",
         "c": ".constants",
         "config": "flext_quality",
         "d": "flext_tests",

@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality._models","language":"Python","rule":{"regex":"^(?:FlextQualityModelsBase|FlextQualityModelsPart01|FlextQualityModelsPart02)$"}}

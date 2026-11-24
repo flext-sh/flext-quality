@@ -1,0 +1,1 @@
+{"id":"exports--flext_quality.docs.scripts","language":"Python","rule":{"regex":"^(?:FlextQualityDocumentationAuditor|FlextQualityDocumentationOptimizer|FlextQualityDocumentationReporter|FlextQualityDocumentationValidator)$"}}
