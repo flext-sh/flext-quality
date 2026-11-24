@@ -19,10 +19,6 @@ from flext_quality._protocols import (
 
 class FlextQualityProtocols(
     FlextWebProtocols,
-    FlextQualityProtocolsBase,
-    FlextQualityProtocolsFlextqualitymodelsPart01,
-    FlextQualityProtocolsFlextqualitymodelsPart02,
-    FlextQualityProtocolsQuality,
 ):
     """Namespace for flext-quality protocols."""
 
