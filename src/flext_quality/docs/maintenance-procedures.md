@@ -494,8 +494,10 @@ team + product owners **Preparation**: Review monthly comprehensive report
 | `audit_rules.yaml`         | Quality audit parameters        | Monthly          |
 | `style_guide.yaml`         | Style and formatting rules      | Quarterly        |
 | `validation_config.yaml`   | Link and content validation     | Monthly          |
-| `notification_config.yaml` | Alert and notification settings | As needed        |
 | `schedule_config.yaml`     | Automated maintenance schedules | Monthly          |
+
+Notification policy is packaged as `Quality.notifications` in
+`flext_quality/config/quality.yaml`; `--settings <file>` overrides its keys.
 
 ### Utility Scripts
 

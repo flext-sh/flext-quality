@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_quality.docs import FlextQualityDocumentationNotifier
-from tests import c, tm, u
+from tests import c, config, tm, u
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -34,29 +34,29 @@ class TestsFlextQualityDocumentationNotifier:
         password: str | None,
     ) -> None:
         """Selecting email with absent credentials fails before opening SMTP."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        notifier.config.channels.email.enabled = True
-        notifier.config.email.password = password
+        declared = "null" if password is None else repr(password)
+        config_path = tmp_path / "notify.yaml"
+        config_path.write_text(
+            f"channels:\n  email:\n    enabled: true\nemail:\n  password: {declared}\n",
+            encoding="utf-8",
+        )
+        notifier = FlextQualityDocumentationNotifier(str(config_path))
         with u.Tests.raises(ValueError, match="non-empty SMTP password"):
             notifier.send_notification("title", "message")
 
     @staticmethod
-    def test_default_config_enables_only_console_channel(tmp_path: Path) -> None:
-        """A missing config file yields defaults with only console enabled."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.ok(notifier.config.enabled)
-        tm.ok(notifier.config.channels.console.enabled)
-        tm.fail(notifier.config.channels.email.enabled)
-        tm.fail(notifier.config.channels.slack.enabled)
-        tm.fail(notifier.config.channels.webhook.enabled)
+    def test_packaged_policy_is_the_default() -> None:
+        """Without an override the notifier uses ``config.Quality.notifications``."""
+        tm.that(
+            FlextQualityDocumentationNotifier().config,
+            eq=config.Quality.notifications,
+        )
 
     @staticmethod
-    def test_get_default_config_thresholds(tmp_path: Path) -> None:
-        """The default configuration ships the documented alert thresholds."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
-        tm.that(notifier.config.alerts.critical_issues.threshold, eq=1)
-        tm.that(notifier.config.alerts.quality_drop.threshold, eq=10)
-        tm.that(notifier.config.alerts.broken_links.threshold, eq=5)
+    def test_missing_override_file_fails_loud(tmp_path: Path) -> None:
+        """A declared override file that does not exist fails at construction."""
+        with u.Tests.raises(RuntimeError, match="YAML file not found"):
+            FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
 
     @staticmethod
     def test_yaml_overrides_channel_toggles(tmp_path: Path) -> None:
@@ -125,20 +125,20 @@ class TestsFlextQualityDocumentationNotifier:
 
     @staticmethod
     def test_notify_critical_issues_below_threshold_is_noop(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """A critical count under threshold reports success without sending."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         audit_data: t.JsonMapping = {"metrics": {"severity_breakdown": {"critical": 0}}}
         tm.ok(notifier.notify_critical_issues(audit_data))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
     def test_notify_critical_issues_at_threshold_sends_console_notification(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """Meeting the critical threshold sends through the default console channel."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         audit_data: t.JsonMapping = {
             "metrics": {
                 "severity_breakdown": {"critical": 2, "high": 1},
@@ -172,18 +172,20 @@ class TestsFlextQualityDocumentationNotifier:
         tm.ok(notifier.notify_quality_drop(50.0, 90.0))
 
     @staticmethod
-    def test_notify_quality_drop_below_threshold_is_noop(tmp_path: Path) -> None:
+    def test_notify_quality_drop_below_threshold_is_noop(
+        alerting_policy_file: Path,
+    ) -> None:
         """A drop smaller than the configured threshold sends nothing."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         tm.ok(notifier.notify_quality_drop(85.0, 90.0))
         tm.that(notifier.results.notifications_sent, eq=0)
 
     @staticmethod
     def test_notify_quality_drop_at_threshold_sends_notification(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """Meeting the drop threshold sends a real console notification."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         tm.ok(notifier.notify_quality_drop(50.0, 90.0))
         tm.that(notifier.results.notifications_sent, eq=1)
 
@@ -201,9 +203,11 @@ class TestsFlextQualityDocumentationNotifier:
         tm.ok(notifier.notify_broken_links([{"url": "x"}]))
 
     @staticmethod
-    def test_notify_broken_links_below_threshold_is_noop(tmp_path: Path) -> None:
+    def test_notify_broken_links_below_threshold_is_noop(
+        alerting_policy_file: Path,
+    ) -> None:
         """Fewer broken links than the threshold sends nothing."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         tm.ok(notifier.notify_broken_links([]))
         tm.that(notifier.results.notifications_sent, eq=0)
 
@@ -227,10 +231,10 @@ class TestsFlextQualityDocumentationNotifier:
 
     @staticmethod
     def test_notify_broken_links_handles_more_links_than_the_display_cap(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """More broken links than the display cap still sends one notification."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         many_links: t.JsonList = [{"url": f"http://x{i}"} for i in range(15)]
         tm.ok(notifier.notify_broken_links(many_links))
         tm.that(notifier.results.notifications_sent, eq=1)
@@ -251,10 +255,10 @@ class TestsFlextQualityDocumentationNotifier:
 
     @staticmethod
     def test_notify_weekly_report_enabled_sends_notification(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """An enabled weekly-report alert sends a real console notification."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         tm.ok(notifier.notify_weekly_report({}))
         tm.that(notifier.results.notifications_sent, eq=1)
 
@@ -274,10 +278,10 @@ class TestsFlextQualityDocumentationNotifier:
 
     @staticmethod
     def test_notify_monthly_report_enabled_sends_notification(
-        tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """An enabled monthly-report alert sends a real console notification."""
-        notifier = FlextQualityDocumentationNotifier(str(tmp_path / "absent.yaml"))
+        notifier = FlextQualityDocumentationNotifier(str(alerting_policy_file))
         tm.ok(notifier.notify_monthly_report({}))
         tm.that(notifier.results.notifications_sent, eq=1)
 
@@ -318,10 +322,10 @@ class TestsFlextQualityDocumentationNotifierDelivery:
         tm.that(notifier.results.errors[0], has="Webhook notification failed")
 
     @staticmethod
-    def test_run_execute_sends_a_test_notification(tmp_path: Path) -> None:
+    def test_run_execute_sends_a_test_notification(alerting_policy_file: Path) -> None:
         """``Run.execute()`` with ``test=True`` sends a real test notification."""
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
             test=True,
         )
         result = command.execute()
@@ -329,7 +333,9 @@ class TestsFlextQualityDocumentationNotifierDelivery:
         tm.ok(result.value)
 
     @staticmethod
-    def test_run_execute_processes_audit_data_file(tmp_path: Path) -> None:
+    def test_run_execute_processes_audit_data_file(tmp_path: Path,
+        alerting_policy_file: Path,
+    ) -> None:
         """``Run.execute()`` reads a real audit-data JSON file and notifies."""
         audit_path = tmp_path / "audit.json"
         audit_path.write_text(
@@ -338,7 +344,7 @@ class TestsFlextQualityDocumentationNotifierDelivery:
             encoding="utf-8",
         )
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
             audit_data=str(audit_path),
         )
         result = command.execute()
@@ -347,44 +353,51 @@ class TestsFlextQualityDocumentationNotifierDelivery:
     @staticmethod
     def test_run_execute_fails_for_missing_audit_data_file(
         tmp_path: Path,
+        alerting_policy_file: Path,
     ) -> None:
         """``Run.execute()`` reports a failure for an unreadable audit-data path."""
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
             audit_data=str(tmp_path / "missing.json"),
         )
         result = command.execute()
         tm.ok(result.failure)
 
     @staticmethod
-    def test_run_execute_processes_weekly_report_file(tmp_path: Path) -> None:
+    def test_run_execute_processes_weekly_report_file(tmp_path: Path,
+        alerting_policy_file: Path,
+    ) -> None:
         """``Run.execute()`` reads a real weekly-report JSON file and notifies."""
         report_path = tmp_path / "weekly.json"
         report_path.write_text("{}", encoding="utf-8")
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
             weekly_report=str(report_path),
         )
         result = command.execute()
         tm.ok(result.success)
 
     @staticmethod
-    def test_run_execute_processes_monthly_report_file(tmp_path: Path) -> None:
+    def test_run_execute_processes_monthly_report_file(tmp_path: Path,
+        alerting_policy_file: Path,
+    ) -> None:
         """``Run.execute()`` reads a real monthly-report JSON file and notifies."""
         report_path = tmp_path / "monthly.json"
         report_path.write_text("{}", encoding="utf-8")
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
             monthly_report=str(report_path),
         )
         result = command.execute()
         tm.ok(result.success)
 
     @staticmethod
-    def test_run_execute_fails_when_no_action_selected(tmp_path: Path) -> None:
+    def test_run_execute_fails_when_no_action_selected(
+        alerting_policy_file: Path,
+    ) -> None:
         """``Run.execute()`` fails when no action flag is provided."""
         command = FlextQualityDocumentationNotifier.Run(
-            settings_path=str(tmp_path / "absent.yaml"),
+            settings_path=str(alerting_policy_file),
         )
         result = command.execute()
         tm.ok(result.failure)
