@@ -1,3 +1,43 @@
 Quality:
   name: flext-quality
   version: "0.20.0-dev"
+  notifications:
+    enabled: true
+    channels:
+      console:
+        enabled: true
+      email:
+        enabled: false
+      slack:
+        enabled: false
+      webhook:
+        enabled: false
+    alerts:
+      critical_issues:
+        enabled: true
+        threshold: 1
+      quality_drop:
+        enabled: true
+        threshold: 10
+      broken_links:
+        enabled: true
+        threshold: 5
+      weekly_report:
+        enabled: true
+      monthly_report:
+        enabled: true
+    email:
+      smtp_server: "smtp.gmail.com"
+      smtp_port: 587
+      username: ""
+      password: null
+      from_address: ""
+      to_addresses: []
+    slack:
+      webhook_url: ""
+      channel: "#docs-quality"
+      username: "FLEXT Quality Bot"
+    webhook:
+      url: ""
+      headers: {}
+      timeout: 10

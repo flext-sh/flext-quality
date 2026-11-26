@@ -23,7 +23,7 @@ from urllib.parse import urlparse
 import requests
 from flext_cli import cli
 
-from flext_quality import c, m, p, r, s, t, u
+from flext_quality import c, config, m, p, r, s, t, u
 
 
 class FlextQualityDocumentationNotifier:
@@ -60,256 +60,24 @@ class FlextQualityDocumentationNotifier:
                 msg = f"webhook host resolves to a non-public address: {host}"
                 raise ValueError(msg)
 
-    class _ChannelConfig(m.BaseModel):
-        enabled: bool
-
-    class _AlertThresholdConfig(m.BaseModel):
-        enabled: bool
-        threshold: int
-
-    class _AlertToggleConfig(m.BaseModel):
-        enabled: bool
-
-    class _AlertsConfig(m.BaseModel):
-        critical_issues: FlextQualityDocumentationNotifier._AlertThresholdConfig
-        quality_drop: FlextQualityDocumentationNotifier._AlertThresholdConfig
-        broken_links: FlextQualityDocumentationNotifier._AlertThresholdConfig
-        weekly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
-        monthly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
-
-    class _EmailConfig(m.BaseModel):
-        smtp_server: str
-        smtp_port: int
-        username: str
-        password: str | None
-        from_address: str
-        to_addresses: Sequence[str] = m.Field(default_factory=tuple)
-
-    class _SlackConfig(m.BaseModel):
-        webhook_url: str
-        channel: str
-        username: str
-
-    class _WebhookConfig(m.BaseModel):
-        url: str
-        headers: Mapping[str, str] = m.Field(default_factory=dict[str, str])
-        timeout: int
-
-    class _ChannelsConfig(m.BaseModel):
-        console: FlextQualityDocumentationNotifier._ChannelConfig
-        email: FlextQualityDocumentationNotifier._ChannelConfig
-        slack: FlextQualityDocumentationNotifier._ChannelConfig
-        webhook: FlextQualityDocumentationNotifier._ChannelConfig
-
-    class _NotifierConfig(m.BaseModel):
-        enabled: bool
-        channels: FlextQualityDocumentationNotifier._ChannelsConfig
-        alerts: FlextQualityDocumentationNotifier._AlertsConfig
-        email: FlextQualityDocumentationNotifier._EmailConfig
-        slack: FlextQualityDocumentationNotifier._SlackConfig
-        webhook: FlextQualityDocumentationNotifier._WebhookConfig
-
-    def __init__(
-        self,
-        config_path: str = "docs/maintenance/settings/notification_config.yaml",
-    ) -> None:
-        """Initialize the documentation notifier with configuration.
+    def __init__(self, config_path: str | None = None) -> None:
+        """Bind the notifier to the packaged notification policy.
 
         Args:
-            config_path: Path to the notification configuration file.
+            config_path: Optional YAML file whose keys override
+                ``config.Quality.notifications``; when given it must exist.
 
         """
-        # Wire config_path: load YAML overrides into the typed notifier config.
-        loaded = u.Cli.yaml_load_mapping(Path(config_path))
-        self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
-            self._load_user_config(loaded)
-        )
+        policy = config.Quality.notifications
+        if config_path is not None:
+            overrides = u.Cli.yaml_load_mapping(Path(config_path))
+            merged = u.merge_mappings(
+                policy.model_dump(mode="json"), overrides
+            ).unwrap()
+            policy = policy.model_validate(merged)
+        self.config = policy
         self.results: p.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=u.now().isoformat(),
-        )
-
-    def _load_user_config(
-        self,
-        loaded: t.JsonMapping,
-    ) -> FlextQualityDocumentationNotifier._NotifierConfig:
-        cfg = self.build_default_config()
-        self._apply_channel_toggles(cfg, loaded)
-        self._apply_alerts_config(cfg, loaded)
-        self._apply_email_config(cfg, loaded)
-        self._apply_slack_config(cfg, loaded)
-        self._apply_webhook_config(cfg, loaded)
-        return self._apply_enabled_flag(cfg, loaded)
-
-    @staticmethod
-    def _apply_channel_toggles(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> None:
-        """Apply per-channel enabled toggles from the user mapping."""
-        channels = loaded.get("channels")
-        if not isinstance(channels, dict):
-            return
-        for key in ("console", "email", "slack", "webhook"):
-            value = channels.get(key)
-            if isinstance(value, dict):
-                enabled = value.get("enabled")
-                if isinstance(enabled, bool):
-                    channel_cfg = getattr(cfg.channels, key)
-                    channel_cfg.enabled = enabled
-
-    @staticmethod
-    def _apply_alerts_config(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> None:
-        """Apply alert thresholds and toggles from the user mapping."""
-        alerts = loaded.get("alerts")
-        if not isinstance(alerts, dict):
-            return
-        for key in ("critical_issues", "quality_drop", "broken_links"):
-            value = alerts.get(key)
-            if isinstance(value, dict):
-                enabled = value.get("enabled")
-                threshold = value.get("threshold")
-                alert_cfg = getattr(cfg.alerts, key)
-                if isinstance(enabled, bool):
-                    alert_cfg.enabled = enabled
-                if isinstance(threshold, int):
-                    alert_cfg.threshold = threshold
-        for key in ("weekly_report", "monthly_report"):
-            value = alerts.get(key)
-            if isinstance(value, dict):
-                enabled = value.get("enabled")
-                if isinstance(enabled, bool):
-                    toggle_cfg = getattr(cfg.alerts, key)
-                    toggle_cfg.enabled = enabled
-
-    @staticmethod
-    def _apply_email_config(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> None:
-        """Apply email relay settings from the user mapping."""
-        email = loaded.get("email")
-        if not isinstance(email, dict):
-            return
-        for key in ("smtp_server", "username", "password", "from_address"):
-            value = email.get(key)
-            if isinstance(value, str):
-                setattr(cfg.email, key, value)
-        smtp_port = email.get("smtp_port")
-        if isinstance(smtp_port, int):
-            cfg.email.smtp_port = smtp_port
-        to_addresses = email.get("to_addresses")
-        if isinstance(to_addresses, list):
-            cfg.email.to_addresses = [
-                address for address in to_addresses if isinstance(address, str)
-            ]
-
-    @staticmethod
-    def _apply_slack_config(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> None:
-        """Apply Slack delivery settings from the user mapping."""
-        slack = loaded.get("slack")
-        if not isinstance(slack, dict):
-            return
-        for key in ("webhook_url", "channel", "username"):
-            value = slack.get(key)
-            if isinstance(value, str):
-                setattr(cfg.slack, key, value)
-
-    @staticmethod
-    def _apply_webhook_config(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> None:
-        """Apply generic webhook settings from the user mapping."""
-        webhook = loaded.get("webhook")
-        if not isinstance(webhook, dict):
-            return
-        url_val = webhook.get("url")
-        timeout_val = webhook.get("timeout")
-        headers_val = webhook.get("headers")
-        if isinstance(url_val, str):
-            cfg.webhook.url = url_val
-        if isinstance(timeout_val, int):
-            cfg.webhook.timeout = timeout_val
-        if isinstance(headers_val, dict):
-            str_headers: Mapping[str, str] = {k: str(v) for k, v in headers_val.items()}
-            cfg.webhook.headers = str_headers
-
-    @staticmethod
-    def _apply_enabled_flag(
-        cfg: FlextQualityDocumentationNotifier._NotifierConfig,
-        loaded: t.JsonMapping,
-    ) -> FlextQualityDocumentationNotifier._NotifierConfig:
-        """Apply the global notifier enabled flag from the user mapping.
-
-        Returns:
-            The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
-
-        """
-        enabled_val = loaded.get("enabled")
-        if isinstance(enabled_val, bool):
-            return cfg.model_validate({**cfg.model_dump(), "enabled": enabled_val})
-        return cfg
-
-    @staticmethod
-    def build_default_config() -> FlextQualityDocumentationNotifier._NotifierConfig:
-        """Default notification configuration.
-
-        Returns:
-            The resulting ``FlextQualityDocumentationNotifier._NotifierConfig``.
-
-        """
-        return FlextQualityDocumentationNotifier._NotifierConfig(
-            enabled=True,
-            channels=FlextQualityDocumentationNotifier._ChannelsConfig(
-                console=FlextQualityDocumentationNotifier._ChannelConfig(enabled=True),
-                email=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
-                slack=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
-                webhook=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
-            ),
-            alerts=FlextQualityDocumentationNotifier._AlertsConfig(
-                critical_issues=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True,
-                    threshold=1,
-                ),
-                quality_drop=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True,
-                    threshold=10,
-                ),
-                broken_links=FlextQualityDocumentationNotifier._AlertThresholdConfig(
-                    enabled=True,
-                    threshold=5,
-                ),
-                weekly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
-                    enabled=True,
-                ),
-                monthly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
-                    enabled=True,
-                ),
-            ),
-            email=FlextQualityDocumentationNotifier._EmailConfig(
-                smtp_server="smtp.gmail.com",
-                smtp_port=587,
-                username="",
-                password=None,
-                from_address="",
-                to_addresses=[],
-            ),
-            slack=FlextQualityDocumentationNotifier._SlackConfig(
-                webhook_url="",
-                channel="#docs-quality",
-                username="FLEXT Quality Bot",
-            ),
-            webhook=FlextQualityDocumentationNotifier._WebhookConfig(
-                url="",
-                headers={},
-                timeout=10,
-            ),
         )
 
     def notify_critical_issues(self, audit_data: t.JsonMapping) -> bool:
@@ -831,13 +599,13 @@ Found {len(broken_links)} broken links that need attention:
         """CLI command for FLEXT Quality documentation notifications."""
 
         settings_path: Annotated[
-            str,
+            str | None,
             m.Field(
                 alias="settings",
-                description="Notification settings file",
+                description="YAML file overriding the packaged notification policy",
                 validate_default=True,
             ),
-        ] = "docs/maintenance/settings/notification_config.yaml"
+        ] = None
         test: bool = m.Field(
             default=False,
             description="Send a test notification",

@@ -146,7 +146,7 @@ resource_limits:
   max_memory_mb: 512
   max_disk_usage_percent: 80
 
-# Notification settings (integrates with notification_config.yaml)
+# Notification settings (policy: Quality.notifications in config/quality.yaml)
 notifications:
   enabled: true
   on_success: false # Only notify on failures or critical issues

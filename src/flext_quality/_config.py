@@ -1,8 +1,8 @@
 """FlextQualityConfig — frozen config singleton for flext-quality (ADR-005 §7).
 
-Model-less: business rules live in ``config/*.yaml`` under the ``Quality:`` key and
-are exposed through the open ``config.Quality`` namespace (``extra="allow"``), with
-no per-domain model. Access is ``config.Quality.<domain>[<key>...]``.
+Business rules live in ``config/*.yaml`` under the ``Quality:`` key. Typed domains
+such as ``config.Quality.notifications`` are validated by their layer-zero models in
+``config_models``; the namespace stays open for the remaining keys.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -30,9 +30,9 @@ class FlextQualityConfig(FlextCliConfig):
     Quality: Annotated[
         FlextQualityModelsConfig.QualityConfigNamespace,
         Field(
-            description="Open namespace exposing ``config/*.yaml`` under ``Quality``.",
+            description="Namespace exposing ``config/*.yaml`` under ``Quality``.",
         ),
-    ] = FlextQualityModelsConfig.QualityConfigNamespace()
+    ]
 
 
 config: FlextQualityConfig = FlextQualityConfig.fetch_global()
