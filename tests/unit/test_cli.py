@@ -132,6 +132,6 @@ class TestsFlextQualityCli:
 
     @staticmethod
     @c.Tests.MARK.parametrize("bad_args", [["unknown"], ["not-a-command"], ["xyz"]])
-    def test_main_unknown_command_exits_nonzero(bad_args: list[str]) -> None:
-        """Test main unknown command exits nonzero."""
-        tm.that(main(bad_args), eq=1)
+    def test_main_unknown_command_exits_with_usage_code(bad_args: list[str]) -> None:
+        """An unknown command exits with the CLI usage-error code."""
+        tm.that(main(bad_args), eq=c.Cli.EXIT_CODE_USAGE)
